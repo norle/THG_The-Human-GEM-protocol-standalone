@@ -9,6 +9,7 @@ Start with:
 - [Usage](usage.md)
 - [Development](development.md)
 - [Data and model files](data-and-model-files.md)
+- [Publish the Git LFS migration in a standalone repository](git-lfs-standalone-repository.md)
 
 Workflow guides:
 
