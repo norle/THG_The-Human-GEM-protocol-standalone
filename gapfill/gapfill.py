@@ -40,7 +40,7 @@ import sys
 import importlib
 
 
-def main():
+def main(argv=None) -> int:
     parser = argparse.ArgumentParser(description="Gapfill pipeline orchestrator")
     sub = parser.add_subparsers(dest="cmd")
 
@@ -263,7 +263,7 @@ def main():
         help="Cache directory (default: OUTPUT_DIR/cache)",
     )
 
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
 
     if args.cmd == "phase1":
         # ensure local package directory is on path so imports work when running script directly
@@ -290,7 +290,7 @@ def main():
             mc, out_dir=out
         )
         print("Phase1 outputs:", cand, dead, comp)
-        return
+        return 0
 
     if args.cmd == "phase2":
         cand = args.candidates or os.path.join(
@@ -322,7 +322,7 @@ def main():
                 phase2_model_out=args.model_out,
             )
             print("Phase2 prioritized wrote", out_csv, "model", model_out, "n=", n)
-        return
+        return 0
 
     if args.cmd == "phase3":
         script_dir = os.path.dirname(__file__)
@@ -448,7 +448,7 @@ def main():
                 print(
                     f"Phase3 blocked ({args.strategy}) wrote {out_csv}, model {model_out}, n={n}"
                 )
-        return
+        return 0
 
     if args.cmd == "run-all":
         # Ensure local modules importable
@@ -618,9 +618,10 @@ def main():
                 print(f"Phase-3 blocked: added {n3} connectors -> model {phase3_model}")
 
         print("Run-all pipeline complete.")
-        return
+        return 0
 
     parser.print_help()
+    return 0
 
 
 if __name__ == "__main__":

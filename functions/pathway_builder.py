@@ -365,19 +365,11 @@ def create_compartment_metabolites(model, id_database, compartment_abbrev, confi
     
     # Create pathway-specific metabolites
     if pathway_key:
-        # Handle nested keys (e.g., ('metabolites', 'Syndecan1_HS_specific'))
-        if isinstance(pathway_key, tuple):
-            parent_key, child_key = pathway_key
-            if parent_key in config and child_key in config[parent_key]:
-                pathway_metabolites = config[parent_key][child_key]
-            else:
-                pathway_metabolites = None
-        elif pathway_key in config.get('metabolites', {}):
-            pathway_metabolites = config['metabolites'][pathway_key]
-        elif pathway_key in config:
-            pathway_metabolites = config[pathway_key]
-        else:
-            pathway_metabolites = None
+        from thg_protocol.pathway import select_pathway_metabolites
+
+        pathway_metabolites = select_pathway_metabolites(
+            config, pathway_key, compartment_abbrev, abbrev_map
+        )
         
         if pathway_metabolites and isinstance(pathway_metabolites, dict):
             print(f"  ✓ Loaded {len(pathway_metabolites)} pathway-specific metabolite definitions from config")
@@ -476,86 +468,9 @@ def parse_universal_reaction(equation, model, id_database):
     Returns:
         dict: {'metabolites': {met_id: stoich}} or None if parsing fails
     """
-    # Split by arrow to get reactants and products
-    if '-->' in equation:
-        arrow = '-->'
-        reversible = False
-    elif '<=>' in equation:
-        arrow = '<=>'
-        reversible = True
-    else:
-        print(f"  ⚠ Warning: No valid arrow found in equation: {equation}")
-        return None
-    
-    parts = equation.split(arrow)
-    if len(parts) != 2:
-        print(f"  ⚠ Warning: Invalid equation format: {equation}")
-        return None
-    
-    reactants_str, products_str = parts
-    
-    # Parse metabolites
-    metabolites = {}
-    
-    def parse_side(side_str, sign):
-        """Parse one side of the equation."""
-        # Split by ' + ' (with spaces) to separate terms
-        # This preserves metabolites like H+ which contain + in their name
-        terms = [t.strip() for t in side_str.split(' + ')]
-        
-        for term in terms:
-            if not term:
-                continue
-                
-            # Pattern for each term: [optional_number] metabolite_name[compartment]
-            # Matches: "2 ATP[c]" or "ATP[c]" or "0.5 H+[m]" or "9 H2O[gl]"
-            # Two alternatives: with stoichiometry or without
-            pattern = r'^(\d+(?:\.\d+)?)\s+(.+?)\[(\w+)\]$|^(.+?)\[(\w+)\]$'
-            match = re.match(pattern, term)
-            
-            if not match:
-                continue
-            
-            groups = match.groups()
-            if groups[0]:  # Has stoichiometry
-                stoich_str = groups[0]
-                met_name = groups[1]
-                compartment = groups[2]
-            else:  # No stoichiometry
-                stoich_str = None
-                met_name = groups[3]
-                compartment = groups[4]
-            
-            # Parse stoichiometry (default to 1.0 if not provided)
-            stoich = float(stoich_str) if stoich_str else 1.0
-            
-            # Clean metabolite name
-            met_name = met_name.strip()
-            compartment = compartment.strip()
-            
-            if not met_name or not compartment:
-                continue
-            
-            # Find metabolite in model (with auto-creation if found in other compartments)
-            met = find_metabolite_robust(model, met_name, id_database, compartment, auto_create=True)
-            if not met:
-                print(f"  ⚠ Warning: Metabolite '{met_name}' not found in [{compartment}]")
-                continue
-            
-            met_id = met['id']
-            metabolites[met_id] = metabolites.get(met_id, 0.0) + (sign * stoich)
-    
-    # Parse reactants (negative stoichiometry)
-    parse_side(reactants_str, -1.0)
-    
-    # Parse products (positive stoichiometry)
-    parse_side(products_str, 1.0)
-    
-    if not metabolites:
-        print(f"  ⚠ Warning: No metabolites parsed from equation: {equation}")
-        return None
-    
-    return {'metabolites': metabolites, 'reversible': reversible}
+    from thg_protocol.pathway import parse_universal_reaction as parse_reaction
+
+    return parse_reaction(equation, model, id_database)
 
 
 def create_compartment_reactions(model, id_database, compartment_abbrev, config, abbrev_map=None):
@@ -603,11 +518,12 @@ def create_compartment_reactions(model, id_database, compartment_abbrev, config,
         
         # Get equation and substitute compartment abbreviations if needed
         equation = rxn_config['equation']
-        if abbrev_map:
-            # Replace config compartment abbreviations with model abbreviations
-            for config_abbrev, model_abbrev in abbrev_map.items():
-                if config_abbrev != model_abbrev:
-                    equation = equation.replace(f'[{config_abbrev}]', f'[{model_abbrev}]')
+        from thg_protocol.pathway import (
+            build_reaction_from_config,
+            substitute_compartment_abbreviations,
+        )
+
+        equation = substitute_compartment_abbreviations(equation, abbrev_map)
         
         # Parse universal reaction format
         reaction_data = parse_universal_reaction(equation, model, id_database)
@@ -616,33 +532,10 @@ def create_compartment_reactions(model, id_database, compartment_abbrev, config,
             print(f"  ⚠ Warning: Could not parse reaction: {rxn_id}")
             continue
         
-        # Create reaction object
-        new_rxn = {
-            'id': rxn_id,
-            'name': rxn_config.get('name', ''),
-            'metabolites': reaction_data['metabolites'],
-            'lower_bound': rxn_config.get('lower_bound', 0.0),
-            'upper_bound': rxn_config.get('upper_bound', 1000.0),
-            'gene_reaction_rule': rxn_config.get('gpr', ''),
-            'subsystem': rxn_config.get('subsystem', ''),
-        }
-        
-        # Add optional fields
-        if 'notes' in rxn_config or 'description' in rxn_config:
-            new_rxn['notes'] = {
-                'description': rxn_config.get('description', rxn_config.get('notes', ''))
-            }
-        
-        # Add annotations
-        annotation = {}
-        if 'ec' in rxn_config and rxn_config['ec']:
-            annotation['ec-code'] = rxn_config['ec']
-        if 'sbo' in rxn_config:
-            annotation['sbo'] = rxn_config['sbo']
-        
-        if annotation:
-            new_rxn['annotation'] = annotation
-        
+        # Create the serializable reaction object through the package API.
+        reaction_config = dict(rxn_config)
+        reaction_config["id"] = rxn_id
+        new_rxn = build_reaction_from_config(reaction_config, reaction_data)
         new_reactions.append(new_rxn)
     
     # Add all new reactions to model
@@ -737,3 +630,28 @@ def create_cytoskeleton_reactions(model, id_database, compartment_abbrev='ck', c
 def check_cytoskeleton_exists(model):
     """Backward compatibility wrapper for check_pathway_exists."""
     return check_pathway_exists(model, 'ck', 'cytoskeleton')
+
+
+# The pure pathway helpers now live in the installed package.  Keep the
+# workflow-heavy creation functions above local until their explicit workflow
+# API is migrated, but make direct legacy imports use the same implementation
+# as ``thg_protocol.pathway``.
+from thg_protocol import pathway as _pathway_api
+
+add_compartment = _pathway_api.add_compartment
+build_reaction_from_config = _pathway_api.build_reaction_from_config
+check_pathway_exists = _pathway_api.check_pathway_exists
+create_compartment_metabolites = _pathway_api.create_compartment_metabolites
+create_compartment_reactions = _pathway_api.create_compartment_reactions
+find_metabolite_by_annotation = _pathway_api.find_metabolite_by_annotation
+find_metabolite_by_formula_in_model = _pathway_api.find_metabolite_by_formula_in_model
+find_metabolite_robust = _pathway_api.find_metabolite_robust
+get_metabolite_id_base = _pathway_api.get_metabolite_id_base
+get_next_metabolite_id = _pathway_api.get_next_metabolite_id
+get_next_reaction_id = _pathway_api.get_next_reaction_id
+parse_reaction_equation = _pathway_api.parse_reaction_equation
+parse_universal_reaction = _pathway_api.parse_universal_reaction
+select_pathway_metabolites = _pathway_api.select_pathway_metabolites
+substitute_compartment_abbreviations = (
+    _pathway_api.substitute_compartment_abbreviations
+)

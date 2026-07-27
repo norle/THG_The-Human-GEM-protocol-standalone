@@ -4,6 +4,58 @@ This document captures the current maintainability issues in the repository and
 lays out an implementation plan for turning it into a maintainable Python
 package with tests, documentation, and large-file handling through Git LFS.
 
+This document is the authoritative source for current decisions, open work,
+phase gates, and next pull requests. Dated implementation notes and validation
+snapshots belong in `REFACTORING_PROGRESS.md`.
+
+## Plan Maintenance
+
+- Update the "last reviewed" date whenever the status table or open decisions
+  change.
+- Keep only pending work and durable architectural decisions in this file.
+- Record completed implementation details and historical test counts in
+  `REFACTORING_PROGRESS.md`.
+- Remove completed entries from "Next Pull Requests" instead of retaining them
+  as historical suggestions.
+- Do not mark a phase complete until every acceptance criterion for that phase
+  has passed and the result has been recorded in the progress log.
+
+## Commit and Pull Request Checkpoints
+
+Use commits as validated recovery points, not as a record of every small edit.
+Each commit should represent one coherent change that leaves the repository in
+a reviewable state.
+
+- Commit the approved baseline inventories and decisions before moving more
+  code.
+- Commit packaging and test infrastructure after the clean-wheel gate passes.
+- Commit each characterized module move together with its tests and any legacy
+  compatibility wrapper. Do not leave either import path broken between
+  commits.
+- Commit each workflow API separately from unrelated workflows. Add its CLI in
+  the same commit only when import-safety and `--help` tests pass; otherwise add
+  the CLI in a later focused commit.
+- Commit the reviewed artifact inventory before any Git LFS tracking or index
+  removal. Keep LFS pointer changes and generated-artifact removals in a
+  dedicated commit.
+- Commit documentation and CI changes alongside the behavior or gate they
+  describe when practical, rather than deferring all documentation to the end.
+- Record the checkpoint commit hash in `REFACTORING_PROGRESS.md` after
+  validation.
+
+Before each checkpoint commit:
+
+1. Review `git diff` and exclude unrelated working-tree changes.
+2. Run the validation commands for the affected phase.
+3. Update the current status and next pull requests in this plan.
+4. Add a dated progress-log entry with the validation result.
+5. Use a message that names the completed boundary, for example
+   `refactor: move reaction annotation API`.
+
+History rewrites such as `git lfs migrate import` are coordinated repository
+operations, not normal checkpoint commits. They require explicit maintainer
+approval, recorded affected refs, and fresh-clone verification.
+
 ## Goals
 
 - Make the repository installable as a Python package.
@@ -19,12 +71,14 @@ package with tests, documentation, and large-file handling through Git LFS.
 
 ## Current Issues
 
-### Repository Layout
+### Repository Layout (baseline reviewed 2026-07-13)
 
 - Source code, scripts, generated models, logs, reports, notebooks, caches, and
   backups are mixed together.
-- There is no package metadata: no `pyproject.toml`, `setup.py`, `setup.cfg`, or
-  central pytest configuration.
+- Package metadata and central pytest configuration now exist in
+  `pyproject.toml`; the remaining Phase 1 gate is validating them against an
+  installed wheel. Older implementation observations are retained in
+  `REFACTORING_PROGRESS.md`.
 - Several directories are not valid or ideal Python package names:
   - `generate_data-base` contains a hyphen.
   - `merge_metabolic_netowrks_and_network_consistency` is misspelled.
@@ -63,8 +117,9 @@ package with tests, documentation, and large-file handling through Git LFS.
 
 ### Tests
 
-- `pytest` was not installed in the active environment during review, so current
-  test collection could not be verified.
+- Earlier review could not verify test collection because `pytest` was not
+  installed in the active environment. Current validation must use the dev
+  extra and record the environment and command used.
 - Existing tests often import copied helper files from test directories instead
   of testing production modules.
 - Some tests depend on live external services.
@@ -91,6 +146,7 @@ than accidentally resolving local files.
 ├── pyproject.toml
 ├── README.md
 ├── REFACTORING_PLAN.md
+├── REFACTORING_PROGRESS.md
 ├── docs/
 │   ├── index.md
 │   ├── installation.md
@@ -112,6 +168,9 @@ than accidentally resolving local files.
 │       ├── gapfill/
 │       ├── cell_specific/
 │       ├── pathway/
+│       │   ├── __init__.py
+│       │   ├── core.py
+│       │   └── cli.py
 │       ├── analysis/
 │       ├── figures/
 │       └── cli/
@@ -140,6 +199,13 @@ Suggested mapping from existing folders:
 | `generate_figures/` | `thg_protocol.figures` |
 | `network_analysis/` | `thg_protocol.analysis.network` |
 | `utils/` | `thg_protocol.io` or `thg_protocol.utils` |
+
+`thg_protocol.pathway` is intentionally a package, not a single
+`pathway.py` module. Before adding the `thg-pathway` command, move the current
+`src/thg_protocol/pathway.py` implementation to `pathway/core.py` and re-export
+its stable public helpers from `pathway/__init__.py`. This preserves the
+`thg_protocol.pathway` import path while leaving room for `pathway.cli` and
+future workflow-specific modules.
 
 ## Packaging Plan
 
@@ -177,6 +243,7 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = [
+  "build",
   "pytest",
   "pytest-cov",
   "ruff",
@@ -204,6 +271,21 @@ docs = [
 # thg-pathway = "thg_protocol.pathway.cli:main"
 ```
 
+### Packaging Validation
+
+Do not add `src` to pytest's `pythonpath`: doing so bypasses installation and
+can hide packaging defects. Unit tests should run against an installed package.
+During the transition, checkout-local tests may still resolve the legacy
+top-level `functions` namespace, but clean-environment tests must not depend on
+that accidental import path. Migrate those tests to `thg_protocol` APIs, or
+explicitly package a documented compatibility namespace before removing the
+legacy imports.
+In addition to editable-install checks during development, CI should build both
+the source distribution and wheel, install the wheel into a clean environment,
+change to a directory outside the repository, and run package-import and CLI
+smoke tests there. This catches missing modules, package data, and entry points
+that an editable install can mask.
+
 ### Python API Principles
 
 - The Python API is the primary interface for reusable logic.
@@ -211,10 +293,22 @@ docs = [
   objects, configuration objects, and output directories.
 - Core functions should return structured results or write only to explicitly
   provided paths.
+- Every promoted public function must document its input model type, output
+  schema, mutation behavior, and error behavior. Do not expose an untyped mix
+  of COBRA models and ad-hoc dictionaries without an explicit compatibility
+  contract.
 - Importing a module should not load large models, write files, open network
   sessions, or start long-running work.
 - External services should be isolated behind client modules and injected into
-  workflow functions where practical.
+  workflow functions where practical. Each service boundary must define a small
+  client protocol, a production implementation, and a fake/static implementation
+  for tests. The client owns timeouts, retries, rate limits, caching,
+  authentication, and response normalization; workflow code must not mutate
+  global proxy state or call service SDKs directly.
+- Any Phase 2 or Phase 3 migration that touches BioCyc, KEGG, PubChem, or Ensembl
+  must establish that client boundary as part of the same migration; it must not
+  stabilize a new public API around direct network calls while waiting for a
+  later cleanup phase.
 - Existing import paths may remain temporarily as thin compatibility wrappers
   during migration, but new code should import from `thg_protocol`.
 
@@ -233,6 +327,9 @@ docs = [
 - `--help` should work without importing optional heavy dependencies or loading
   models.
 - Every installed CLI command should have a smoke test for `--help`.
+- Help smoke tests must run with optional heavy dependencies absent, proving
+  argument parsing does not eagerly import solvers, model files, or network
+  clients.
 - Good initial CLI candidates are `thg-gapfill`, `thg-compare`, and
   `thg-pathway`. Defer `thg-build` and `thg-generate-db` until their inputs,
   outputs, credentials, and dependency requirements are cleanly parameterized.
@@ -341,6 +438,12 @@ git lfs ls-files
 git status
 ```
 
+The approved artifact inventory must record each path's ownership, provenance,
+size, SHA-256 checksum, and whether it is expected in a normal clone. A
+fresh-clone check must verify both the LFS pointer checkout and fetched content
+against those checksums. Record rewritten branches and tags before publishing
+rewritten refs.
+
 ## Testing Strategy
 
 ### Test Categories
@@ -373,8 +476,12 @@ markers = [
 Default CI should run:
 
 ```bash
-pytest -m "not slow and not online and not gurobi and not memote"
+pytest -m "not slow and not online and not solver and not gurobi and not memote"
 ```
+
+Run solver-dependent tests in a separate job that installs `.[solver]`.
+Gurobi tests should remain a distinct opt-in job because they also require a
+licensed solver installation.
 
 ### Priority Test Coverage
 
@@ -400,6 +507,9 @@ tests for the behavior it moves.
 - Use large full models only in marked integration or slow tests.
 - Do not require online services in default tests.
 - Mock external API clients and provide recorded/static response fixtures.
+- Maintain a supported Python/dependency compatibility matrix and use a
+  constraints or lock file for CI and release validation; unbounded dependency
+  ranges alone are not sufficient for reproducible model and solver workflows.
 
 ## Documentation Plan
 
@@ -425,7 +535,43 @@ Recommended docs:
   - memote/task analysis
   - comparison and figures
 
-## Implementation Plan
+## Implementation Plan and Status
+
+### Current Status
+
+Last reviewed: 2026-07-27
+
+The current default offline/non-solver test selection passes with 49 tests, and
+`ruff check src tests` passes. The package has now passed the local clean-wheel
+and outside-checkout smoke gate. Gapfill and comparison APIs/CLIs now join the
+pathway workflow; the remaining work is continued helper and legacy-script
+migration plus the approved branch-local LFS rewrite and fresh-clone check.
+
+| Phase | Status | Remaining gate |
+| --- | --- | --- |
+| Phase 0 | Complete | Dependency/artifact policy and source-only legacy namespace decisions are recorded; checkpoint commit remains before the branch-local LFS rewrite. |
+| Phase 1 | Complete | Baseline CI and local clean-wheel/outside-checkout validation are recorded in the progress log. |
+| Phase 2 | In progress | Continue characterized helper moves; introduce injectable clients with network-dependent moves. |
+| Phase 3 | In progress | Initial gapfill, pathway, and comparison APIs/CLIs are import-safe; characterize legacy report contracts and migrate remaining script entry points. |
+| Phase 6 | In progress | Apply the approved targeted LFS policy on `refactoring-cleanup`, remove approved generated artifacts from the index, and verify a fresh clone. |
+| Phases 4–7 | Not started | Begin after the relevant earlier-phase gates pass. |
+
+### Open Decisions
+
+The following decisions block phase acceptance or determine public
+compatibility:
+
+- Approve the supported Python and dependency matrix, including optional
+  workflow extras.
+- The legacy `functions` namespace is source-checkout-only; wheels expose
+  `thg_protocol` under `src/`.
+- The approved artifact inventory retains canonical models/reference inputs in
+  Git LFS, final published reports/figures in ordinary Git, and removes
+  generated/duplicate outputs from tracking while keeping them locally.
+- The initial installed CLI scope is `thg-gapfill`, `thg-pathway`, and
+  `thg-compare`.
+- Decide whether package-owned configuration templates or schemas must be
+  included as package data.
 
 ### Phase 0: Stabilize the Current State
 
@@ -453,17 +599,28 @@ Deliverables:
 - Large-file inventory and proposed LFS/ignore policy.
 - Agreement on Python version, solver support, and initial CLI scope.
 
+Checkpoint commit:
+
+- Commit the reviewed inventories, decisions, and updated plan before additional
+  package migrations depend on them.
+
 ### Phase 1: Add Packaging and Developer Tooling
 
 - Add `pyproject.toml`.
 - Add `src/thg_protocol/__init__.py`.
 - Add central pytest config.
+- Remove any pytest `pythonpath = ["src"]` setting so tests exercise the
+  installed package rather than importing directly from the source tree.
+- Migrate package tests away from checkout-only `functions.*` imports, unless
+  an explicitly packaged legacy compatibility namespace is approved.
 - Add `ruff` and `black` configuration.
 - Add a `tests/` directory with one trivial import test.
 - Add the first characterization tests for the safest pure functions before
   moving their code.
 - Add `docs/` skeleton.
 - Add updated `.gitignore`.
+- Add baseline CI that runs Ruff, the default test selection, and clean-wheel
+  import checks.
 - Do not add `[project.scripts]` entries yet unless the matching CLI module is
   already import-safe and has a help smoke test.
 
@@ -471,9 +628,18 @@ Validation:
 
 ```bash
 python -m pip install -e ".[dev]"
-pytest -m "not slow and not online and not gurobi and not memote"
+pytest -m "not slow and not online and not solver and not gurobi and not memote"
 python -c "import thg_protocol; print(thg_protocol.__version__)"
+python -m build
 ```
+
+Also install the built wheel into a clean environment and run the import test
+from outside the repository before Phase 1 is considered complete.
+
+Checkpoint commit:
+
+- Commit packaging, baseline CI, and clean-wheel tests together once the chosen
+  legacy-namespace policy is proven outside the checkout.
 
 ### Phase 2: Move Pure Utilities First
 
@@ -483,6 +649,13 @@ python -c "import thg_protocol; print(thg_protocol.__version__)"
 - Move GPR parsing/sanitization into `thg_protocol.gpr`.
 - Move metabolite annotation helpers into `thg_protocol.annotation.metabolites`.
 - Move reaction annotation helpers into `thg_protocol.annotation.reactions`.
+- For service-backed helpers, land the client protocol, production adapter,
+  fake/static test adapter, timeout/retry policy, and response normalization in
+  the same change as the public API migration.
+- When a moved helper calls BioCyc, KEGG, PubChem, or Ensembl, introduce an
+  injectable client interface and mock/static-response tests in the same PR.
+  Lazy imports alone are useful for import safety but are not the final service
+  boundary.
 - Replace wildcard imports with explicit imports.
 - Keep old import paths as thin compatibility wrappers during transition when
   existing scripts still depend on them. Add tests for both old and new imports
@@ -491,9 +664,14 @@ python -c "import thg_protocol; print(thg_protocol.__version__)"
 Validation:
 
 ```bash
-pytest tests/unit
+pytest tests/unit tests/characterization
 ruff check src tests
 ```
+
+Checkpoint commits:
+
+- Make one coherent commit per characterized helper cluster. Include the moved
+  implementation, tests, explicit imports, and compatibility wrapper together.
 
 ### Phase 3: Define Workflow APIs and Refactor Script Entry Points
 
@@ -518,6 +696,11 @@ Initial targets:
 3. `compare_models/compare_models.py` -> `thg_protocol.analysis.compare` API
    plus `thg-compare`.
 
+Before target 2 receives a CLI, convert the transitional
+`src/thg_protocol/pathway.py` module into the `thg_protocol/pathway/` package
+described in the target layout. Keep existing imports working by re-exporting
+the public helpers from `pathway/__init__.py`.
+
 Deferred targets until inputs, outputs, credentials, and dependencies are
 cleanly parameterized:
 
@@ -536,6 +719,11 @@ thg-gapfill --help
 thg-pathway --help
 ```
 
+Checkpoint commits:
+
+- Commit each workflow API independently. Add its entry point in the same or a
+  following focused commit only after its help and temporary-output tests pass.
+
 ### Phase 4: Expand Integration and CLI Tests
 
 - Convert existing `test_algorithms/` tests to import production modules.
@@ -550,25 +738,38 @@ thg-pathway --help
 Validation:
 
 ```bash
-pytest -m "not slow and not online and not gurobi and not memote"
-pytest -m slow
+pytest -m "not slow and not online and not solver and not gurobi and not memote"
+pytest -m "slow and not online and not solver and not gurobi and not memote"
 ```
 
-### Phase 5: External Service Isolation
+Checkpoint commits:
 
-- Create client modules for BioCyc, KEGG, PubChem, and Ensembl.
+- Group tests by the production workflow they validate; avoid a single
+  repository-wide test-migration commit.
+
+### Phase 5: Complete External Service Hardening
+
+- Complete any client modules for BioCyc, KEGG, PubChem, and Ensembl that were
+  introduced incrementally during Phases 2 and 3.
 - Inject clients into workflow functions instead of calling services directly.
 - Add retry, timeout, and cache behavior in one place.
 - Add mock/static-response tests for all client-dependent logic.
 - Ensure credentials are read only from environment variables or config files
   outside git.
+- Audit the public APIs migrated so far and remove any remaining direct service
+  calls before declaring the phase complete.
 
 Validation:
 
 ```bash
-pytest -m "not online"
-pytest -m online
+pytest -m "not online and not solver and not gurobi and not memote"
+pytest -m "online and not slow and not solver and not gurobi and not memote"
 ```
+
+Checkpoint commits:
+
+- Commit one service boundary at a time, including its protocol, production
+  adapter, static fake, normalized errors, and offline tests.
 
 ### Phase 6: Large File Cleanup and Git LFS
 
@@ -584,55 +785,72 @@ Validation:
 
 ```bash
 git lfs ls-files
+git lfs fsck
 git status
 git ls-files | wc -l
 ```
 
-### Phase 7: Documentation and CI
+After any LFS migration or history rewrite, verify a fresh clone in a temporary
+directory: fetch LFS objects, check out the canonical artifacts, and compare
+their recorded hashes or checksums with the approved inventory. Record exactly
+which branches and tags were rewritten, and require collaborators to coordinate
+before rewritten refs are pushed.
+
+Checkpoint commits:
+
+- First commit the approved inventory and targeted tracking policy.
+- Then commit LFS pointer changes and generated-artifact removals in dedicated,
+  reviewable commits before considering any separately approved history rewrite.
+
+### Phase 7: Complete Documentation and Expand CI
 
 - Update `README.md` with a short overview and links to docs.
 - Add install instructions for base, dev, solver, memote, and cell-specific
   extras.
 - Add examples for the main Python workflow APIs.
 - Add CLI examples only for installed, tested commands.
-- Add GitHub Actions or equivalent CI:
-  - install package
-  - run lint
-  - run default tests
+- Expand the baseline CI added in Phase 1:
   - run CLI help smoke tests for installed commands
-  - optionally run slow/online tests on manual schedule
+  - run supported Python/dependency matrix jobs
+  - run solver jobs with the matching extras
+  - optionally run slow/online tests on a manual schedule
 
 Validation:
 
 ```bash
 python -m pip install -e ".[dev]"
 ruff check src tests
-pytest -m "not slow and not online and not gurobi and not memote"
+pytest -m "not slow and not online and not solver and not gurobi and not memote"
+python -m build
 ```
 
-## Suggested First Pull Requests
+CI must additionally install the built wheel into a clean environment and run
+imports and installed CLI `--help` smoke tests from outside the checkout.
 
-1. Add `REFACTORING_PLAN.md`, dependency inventory, large-file inventory, and an
-   improved `.gitignore`.
-2. Add `pyproject.toml`, `src/thg_protocol`, pytest configuration, and one
-   import test without console scripts.
-3. Add first characterization tests for pure utilities.
-4. Move GPR parsing utilities with compatibility wrappers and tests.
-5. Move metabolite/reaction annotation utilities with compatibility wrappers
-   and tests.
-6. Convert gapfill into a package API plus `thg-gapfill` once help and smoke
-   tests pass.
-7. Convert pathway implementation or compare models into a package API plus a
-   CLI wrapper.
-8. Move selected canonical large files to Git LFS after artifact ownership is
-   approved.
-9. Convert existing tests to use production modules.
+Checkpoint commits:
+
+- Update workflow documentation with the corresponding stable API or CLI.
+- Use a final focused commit for the completed compatibility matrix, expanded
+  CI jobs, and release-validation documentation.
+
+## Next Pull Requests
+
+Keep this list limited to pending, reviewable changes. Remove an entry when it
+is completed and record the result in `REFACTORING_PROGRESS.md`.
+
+1. Validate the rewritten `refactoring-cleanup` branch in a fresh clone and
+   compare LFS checksums with the approved inventory before publishing refs.
+2. Continue characterized helper/workflow migration and complete the remaining
+   external-service hardening work.
 
 ## Definition of Done
 
 The refactor can be considered successful when:
 
 - `pip install -e ".[dev]"` works from a clean checkout.
+- A built wheel installs into a clean environment, and package imports plus
+  installed CLI smoke tests pass from outside the repository without pytest
+  `pythonpath` injection.
 - Reusable logic is available through documented Python APIs.
 - Core modules can be imported without loading models, writing files, or calling
   external services.

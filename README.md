@@ -6,7 +6,11 @@ Please cite https://github.com/biosustain/THG if you use THG in your research.
 
 ## User Guide 
 
-Use of the repository and installation instructions and can be found below and in the respective folders.
+Package installation, Python APIs, and tested CLI workflows are documented in
+the [THG Protocol guide](docs/index.md). The refactoring decisions and current
+implementation checkpoints are tracked in
+[`REFACTORING_PLAN.md`](REFACTORING_PLAN.md) and
+[`REFACTORING_PROGRESS.md`](REFACTORING_PROGRESS.md).
 
 ## Model Overview
 

@@ -11,6 +11,9 @@ The script will prompt for all necessary information and add the reaction to con
 import json
 import sys
 
+from thg_protocol.reaction_config import build_reaction_entry, upsert_reaction_entry
+
+
 def add_reaction_interactive():
     """Interactive helper to add a new reaction."""
     
@@ -54,7 +57,9 @@ def add_reaction_interactive():
         subsystem = input("\nSubsystem (optional): ").strip()
         ec = input("EC number (optional): ").strip()
         gpr = input("Gene-protein-reaction rule (optional): ").strip()
-        sbo = input("SBO term (default: SBO:0000176 for biochemical reaction): ").strip()
+        sbo = input(
+            "SBO term (default: SBO:0000176 for biochemical reaction): "
+        ).strip()
         if not sbo:
             sbo = "SBO:0000176"
         
@@ -77,18 +82,18 @@ def add_reaction_interactive():
         ub = float(ub_input) if ub_input else 1000.0
         
         # Build reaction dict
-        new_reaction = {
-            "id": rxn_id,
-            "name": name,
-            "description": description,
-            "equation": equation,
-            "subsystem": subsystem,
-            "ec": ec,
-            "gpr": gpr,
-            "lower_bound": lb,
-            "upper_bound": ub,
-            "sbo": sbo
-        }
+        new_reaction = build_reaction_entry(
+            reaction_id=rxn_id,
+            name=name,
+            description=description,
+            equation=equation,
+            subsystem=subsystem,
+            ec=ec,
+            gpr=gpr,
+            lower_bound=lb,
+            upper_bound=ub,
+            sbo=sbo,
+        )
         
         # Show summary
         print("\n" + "=" * 70)
@@ -99,30 +104,24 @@ def add_reaction_interactive():
                 print(f"  {key}: {value}")
         
         # Confirm
-        confirm = input("\nAdd this reaction to config.json? (yes/no): ").strip().lower()
+        confirm = input("\nAdd this reaction to config.json? (yes/no): ")
+        confirm = confirm.strip().lower()
         if confirm not in ['yes', 'y']:
             print("✗ Cancelled")
             return False
         
         # Load config
-        with open('config.json', 'r') as f:
+        with open('config.json') as f:
             config = json.load(f)
         
-        # Check if reactions exist
-        if 'reactions' not in config:
-            config['reactions'] = []
-        
         # Check for duplicate ID
-        if any(r['id'] == rxn_id for r in config['reactions']):
+        if any(r['id'] == rxn_id for r in config.get('reactions', [])):
             print(f"\n✗ ERROR: Reaction with ID '{rxn_id}' already exists")
             overwrite = input("Overwrite existing reaction? (yes/no): ").strip().lower()
             if overwrite not in ['yes', 'y']:
                 return False
-            # Remove old reaction
-            config['reactions'] = [r for r in config['reactions'] if r['id'] != rxn_id]
-        
-        # Add reaction
-        config['reactions'].append(new_reaction)
+
+        config = upsert_reaction_entry(config, new_reaction, overwrite=True)
         
         # Save
         with open('config.json', 'w') as f:

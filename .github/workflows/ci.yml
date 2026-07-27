@@ -1,0 +1,49 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.11", "3.12"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install development dependencies
+        run: python -m pip install --upgrade pip && python -m pip install -e ".[dev]"
+
+      - name: Lint package and tests
+        run: ruff check src tests
+
+      - name: Run default offline tests
+        run: >-
+          pytest -m "not slow and not online and not solver and not gurobi and not
+          memote"
+
+      - name: Build source distribution and wheel
+        run: python -m build
+
+      - name: Verify wheel outside the checkout
+        shell: bash
+        run: |
+          smoke_dir="$(mktemp -d)"
+          trap 'rm -rf "$smoke_dir"' EXIT
+          python -m venv "$smoke_dir/venv"
+          "$smoke_dir/venv/bin/python" -m pip install --no-deps dist/*.whl
+          (
+            cd "$smoke_dir"
+            "$smoke_dir/venv/bin/python" -c \
+              "import thg_protocol; import thg_protocol.pathway; import thg_protocol.gapfill; import thg_protocol.analysis.compare; print(thg_protocol.__version__)"
+            "$smoke_dir/venv/bin/thg-gapfill" --help
+            "$smoke_dir/venv/bin/thg-compare" --help
+            "$smoke_dir/venv/bin/thg-pathway" --help
+          )

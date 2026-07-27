@@ -26,6 +26,7 @@ dependencies = [
 [project.optional-dependencies]
 dev = [
   "black",
+  "build",
   "pytest",
   "pytest-cov",
   "ruff",
@@ -46,12 +47,16 @@ cell-specific = [
   "troppo",
 ]
 
+[project.scripts]
+thg-gapfill = "thg_protocol.gapfill.cli:main"
+thg-compare = "thg_protocol.analysis.compare_cli:main"
+thg-pathway = "thg_protocol.pathway.cli:main"
+
 [tool.setuptools.packages.find]
 where = ["src"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-pythonpath = ["src"]
 addopts = "-ra --strict-markers"
 markers = [
   "slow: long-running model or workflow test",

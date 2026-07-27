@@ -29,3 +29,26 @@ files/caches/
 files/*cache*
 files/*checkpoint*
 *.tmp
+
+.tokensave/
+
+# Large generated artifacts retained locally but not tracked.
+/backups/
+/run_full.log
+/compare_models/reports/THG-beta-1_vs_Human1.xlsx
+/compare_models/reports/THG-beta-2_vs_Human1.xlsx
+/generate_figures/reports/
+/files/model_variables.pkl
+/memote_and_task_analysis/models/Human-GEM_2022-06-21.xml
+/memote_and_task_analysis/models/THG-2023-02-25.xml
+/memote_and_task_analysis/models/THG-beta1.xml
+/memote_and_task_analysis/models/THG-beta2.xml
+/models/base/
+/implement_pathway/figures/THG-beta-batch_251106_canonical_compartments/
+/implement_pathway/figures/THG-beta-batch_251106_combined_compartments/
+/implement_pathway/figures/THG-beta-batch_251106_connected_minptr_canonical_compartments/
+/implement_pathway/figures/THG-beta-batch_251106_connected_minptr_combined_compartments/
+/test_algorithms/mass_balance/models/F-H1-compartments_DB-2022-10-05.xml
+/test_algorithms/metabolite_identification/models/00_Lipid_Carma_KEGG_Model.xml
+/test_algorithms/reac_identification/models/00_Lipid_Carma_KEGG_Model.xml
+/test_algorithms/reac_identification/models/Human-GEM.xml

@@ -9,3 +9,9 @@ Start with:
 - [Usage](usage.md)
 - [Development](development.md)
 - [Data and model files](data-and-model-files.md)
+
+Workflow guides:
+
+- [Gapfill](workflows/gapfill.md)
+- [Pathway implementation](workflows/pathway.md)
+- [Model comparison](workflows/comparison.md)

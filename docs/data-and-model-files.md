@@ -1,8 +1,14 @@
 # Data and Model Files
 
-Large canonical model and data artifacts should be reviewed before adding Git
-LFS rules. Generated outputs, logs, caches, editor files, and local environment
-files should stay ignored.
+Canonical model and reference inputs are tracked with targeted Git LFS rules.
+Final published reports and figures remain ordinary Git files; generated
+outputs, logs, caches, duplicate models, and large test fixtures stay on disk
+but are no longer tracked.
 
 Do not add broad LFS rules for entire file types until repository file
 ownership has been decided.
+
+See the [draft tracked-artifact inventory](artifact-inventory.md) for the
+current size and checksum review, and the
+[dependency compatibility matrix](dependency-compatibility.md) for the
+package/runtime inventory.
