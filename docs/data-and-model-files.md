@@ -8,7 +8,7 @@ but are no longer tracked.
 Do not add broad LFS rules for entire file types until repository file
 ownership has been decided.
 
-See the [draft tracked-artifact inventory](artifact-inventory.md) for the
+See the [approved tracked-artifact inventory](artifact-inventory.md) for the
 current size and checksum review, and the
 [dependency compatibility matrix](dependency-compatibility.md) for the
 package/runtime inventory.

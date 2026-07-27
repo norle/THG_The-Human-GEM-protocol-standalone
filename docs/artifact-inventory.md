@@ -2,9 +2,10 @@
 
 This inventory was generated from the current Git checkout on 2026-07-27 and
 the disposition was approved by the maintainer on 2026-07-27.
-It includes every tracked file at least 1 MiB. Checksums are SHA-256 of the
-working-tree content. All entries are currently normal Git blobs; no Git LFS
-tracking or history rewrite has been performed.
+It includes every tracked file at least 1 MiB before cleanup. Checksums are
+SHA-256 of the original working-tree content and remain the verification
+record even after LFS conversion or index removal. The approved LFS paths are
+now pointers on `refactoring-cleanup`; generated paths are no longer tracked.
 
 The provenance field is intentionally conservative: the repository records the
 current blob but not a source URL or generation recipe. Paths classified as
