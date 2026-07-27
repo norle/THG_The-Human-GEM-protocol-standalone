@@ -31,7 +31,9 @@ When adding an entry:
   - A temporary fresh clone of `refactoring-cleanup`, populated from the local
     LFS object cache, checked out all seven files and matched every recorded
     SHA-256 checksum.
-- Rewritten target tip: `b23c438`; pre-rewrite recovery tip: `e54c81f`.
+- Rewritten target tip at migration validation: `b23c438`; validation record
+  commit: `122b7f8`; final inventory wording commit: `4011255`; pre-rewrite
+  recovery tip: `e54c81f`.
 - Follow-up: coordinate the force-push of the rewritten branch and upload its
   LFS objects before collaborators use the new remote history.
 
