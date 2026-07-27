@@ -14,6 +14,29 @@ When adding an entry:
 
 ## 2026-07-27
 
+### Branch-local Git LFS migration and artifact cleanup
+
+- Created checkpoint commits `2750cad` (package and approved artifact policy)
+  and `e54c81f` (generated-artifact index cleanup) before rewriting history.
+- Rewrote only the local `refactoring-cleanup` branch. The seven approved
+  canonical model/reference paths are now LFS pointers; the pre-rewrite tip is
+  retained locally as `refactoring-cleanup-pre-lfs` for recovery. No remote refs
+  were changed.
+- Generated backups, logs, caches, duplicate models, intermediate reports and
+  figures, and large test fixtures were removed from Git tracking but remain in
+  the working tree. Final published reports/figures remain ordinary Git files.
+- Validation:
+  - `git lfs ls-files --long` lists exactly the seven approved paths.
+  - `git lfs fsck refactoring-cleanup` passed.
+  - A temporary fresh clone of `refactoring-cleanup`, populated from the local
+    LFS object cache, checked out all seven files and matched every recorded
+    SHA-256 checksum.
+- Rewritten target tip: `b23c438`; pre-rewrite recovery tip: `e54c81f`.
+- Follow-up: coordinate the force-push of the rewritten branch and upload its
+  LFS objects before collaborators use the new remote history.
+
+## 2026-07-27
+
 ### Maintainer artifact and namespace decisions
 
 - Maintainer approved retaining all large files locally while separating Git

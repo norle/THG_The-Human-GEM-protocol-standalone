@@ -553,8 +553,8 @@ migration plus the approved branch-local LFS rewrite and fresh-clone check.
 | Phase 1 | Complete | Baseline CI and local clean-wheel/outside-checkout validation are recorded in the progress log. |
 | Phase 2 | In progress | Continue characterized helper moves; introduce injectable clients with network-dependent moves. |
 | Phase 3 | In progress | Initial gapfill, pathway, and comparison APIs/CLIs are import-safe; characterize legacy report contracts and migrate remaining script entry points. |
-| Phase 6 | In progress | Apply the approved targeted LFS policy on `refactoring-cleanup`, remove approved generated artifacts from the index, and verify a fresh clone. |
-| Phases 4–7 | Not started | Begin after the relevant earlier-phase gates pass. |
+| Phase 6 | Complete | The approved targeted LFS policy and generated-artifact index cleanup passed on `refactoring-cleanup`; fresh-clone checksums are recorded in the progress log. |
+| Phases 4–5, 7 | Not started | Begin after the relevant earlier-phase gates pass. |
 
 ### Open Decisions
 
@@ -838,8 +838,8 @@ Checkpoint commits:
 Keep this list limited to pending, reviewable changes. Remove an entry when it
 is completed and record the result in `REFACTORING_PROGRESS.md`.
 
-1. Validate the rewritten `refactoring-cleanup` branch in a fresh clone and
-   compare LFS checksums with the approved inventory before publishing refs.
+1. Publish the rewritten `refactoring-cleanup` branch only after coordinating
+   the required force-push and LFS object upload with collaborators.
 2. Continue characterized helper/workflow migration and complete the remaining
    external-service hardening work.
 
