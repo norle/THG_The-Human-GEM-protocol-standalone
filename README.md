@@ -1,5 +1,19 @@
 # The Human GEM (THG): A protocol for the automatic construction of highly curated genome-scale models of human metabolism.
 
+> [!NOTE]
+> This is a standalone repository derived from
+> [MarindeMasLab/THG_The-Human-GEM-protocol](https://github.com/MarindeMasLab/THG_The-Human-GEM-protocol).
+> It was created with rewritten Git history to migrate repository artifacts to
+> Git LFS, because new LFS objects cannot be added to the existing public fork
+> network. It is intentionally **not** part of that repository's GitHub fork
+> network.
+>
+> The source repository is itself a fork of
+> [biosustain/THG](https://github.com/biosustain/THG). Please refer to those
+> repositories for the original project lineage and upstream history. For the
+> publishing rationale and procedure, see
+> [the standalone-repository runbook](docs/git-lfs-standalone-repository.md).
+
 The protocol enables the automatic curation and/or expansion of existing human GEMs or generates a highly curated metabolic network based on the current information retrieved from multiple databases in real time. 
 
 Please cite https://github.com/biosustain/THG if you use THG in your research. 
