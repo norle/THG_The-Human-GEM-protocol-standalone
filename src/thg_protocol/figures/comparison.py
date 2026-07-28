@@ -9,9 +9,10 @@ not require a plotting backend or load models.
 
 from __future__ import annotations
 
+from collections.abc import Iterable, Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Iterable, Mapping, Sequence
+from typing import Any
 
 __all__ = [
     "AnnotationGroupSummary",
@@ -53,7 +54,7 @@ def annotation_group_percentages(values: Iterable[Any]) -> AnnotationGroupSummar
         return AnnotationGroupSummary(0.0, 0.0, 0.0)
 
     def percentage(allowed: set[float]) -> float:
-        return 100.0 * sum(value in allowed for value in values) / denominator
+        return sum(value in allowed for value in values) / denominator * 100
 
     return AnnotationGroupSummary(
         added=percentage({1.0, 2.0, 3.0}),
