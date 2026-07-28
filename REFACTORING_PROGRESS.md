@@ -42,6 +42,7 @@ When adding an entry:
   - The retry CLI `--help` smoke test passed from the installed package target.
 - Follow-up: characterize and migrate the remaining batch KEGG, single-model
   location, and legacy database service fallbacks listed in the plan.
+- Checkpoint commit: `42ad990` (`refactor: isolate retry annotation workflow`).
 
 ## 2026-07-28
 
