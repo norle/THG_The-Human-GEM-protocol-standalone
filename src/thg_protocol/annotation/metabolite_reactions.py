@@ -4,15 +4,14 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any
 
-from thg_protocol.annotation.model import annotate_cobra_model
 from thg_protocol.annotation.metabolites import (
     PubChemClientProtocol,
     gather_metabolites,
     generate_met_annotation,
     process_annotation,
 )
+from thg_protocol.annotation.model import annotate_cobra_model
 from thg_protocol.annotation.reactions import (
     execute_jaccard,
     gather_kegg_metabolites,

@@ -1,4 +1,5 @@
 from functions.gpr.gpr_def import getGPR
+
 from thg_protocol.services.biocyc import StaticBioCycClient
 from thg_protocol.services.kegg import KeggClient, StaticKeggClient
 

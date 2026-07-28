@@ -46,7 +46,9 @@ class EnsemblClientProtocol(Protocol):
 class StaticEnsemblClient:
     """Offline client backed by normalized annotations or plain mappings."""
 
-    annotations: dict[str, EnsemblAnnotation | dict[str, Any]] = field(default_factory=dict)
+    annotations: dict[str, EnsemblAnnotation | dict[str, Any]] = field(
+        default_factory=dict
+    )
 
     def annotate(self, identifiers: Iterable[str]) -> dict[str, EnsemblAnnotation]:
         result: dict[str, EnsemblAnnotation] = {}
@@ -127,7 +129,9 @@ class EnsemblClient:
         entrez: set[str] = set()
         uniprot: set[str] = set()
         for item in payload:
-            database = str(item.get("dbname") or item.get("db_display_name") or "").lower()
+            database = str(
+                item.get("dbname") or item.get("db_display_name") or ""
+            ).lower()
             primary_id = item.get("primary_id")
             if not primary_id:
                 continue
