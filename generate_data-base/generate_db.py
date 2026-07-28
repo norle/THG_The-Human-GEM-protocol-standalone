@@ -25,7 +25,6 @@ import logging
 import os
 import pickle
 import re
-import urllib
 from functools import reduce
 from typing import Dict, List
 

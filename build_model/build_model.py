@@ -3,15 +3,11 @@
 from cobra.io import read_sbml_model, write_sbml_model
 import cobra
 import os
-import urllib.request, urllib.error, urllib.parse
 import re
-import urllib.request, urllib.parse, urllib.error
-import requests
 import copy
 import time
 import traceback
 import itertools
-import pubchempy as pcp
 import string
 import pickle
 from collections import defaultdict
