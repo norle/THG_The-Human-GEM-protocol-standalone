@@ -22,9 +22,20 @@ snapshots belong in `REFACTORING_PROGRESS.md`.
 
 ## Commit and Pull Request Checkpoints
 
-Use commits as validated recovery points, not as a record of every small edit.
-Each commit should represent one coherent change that leaves the repository in
-a reviewable state.
+Use frequent commits as validated recovery points, not as a record of every
+small edit. Agents are expected to commit autonomously once a coherent,
+reviewable boundary has been implemented and its available validation has
+passed; they should not wait for a separate user request to commit.
+
+Prefer one commit per independently testable module, workflow, service
+boundary, or documentation gate. As a practical upper bound, split work before
+it combines unrelated subsystems or becomes difficult to review. Commit before
+moving on to the next boundary, and make at least one checkpoint during any
+work session that completes a validated boundary.
+
+Never include unrelated working-tree changes in an agent-created commit. If a
+validation tool is unavailable, run the strongest available checks, record the
+limitation in the progress log, and keep the commit narrowly scoped.
 
 - Commit the approved baseline inventories and decisions before moving more
   code.
@@ -542,12 +553,12 @@ Recommended docs:
 Last reviewed: 2026-07-28
 
 The last fully validated default offline/non-solver checkpoint passed 49 tests
-and `ruff check src tests`. The current tree now includes the characterized
+and `ruff check src tests`. The current tree includes the characterized
 metabolite/reaction workflow and its PubChem service boundary in addition to the
-earlier service-boundary tests. Their files pass `compileall`, but the complete
-current test and lint gates remain pending because `pytest`, `ruff`, and the GPR runtime
-dependency `cobra` are unavailable in the active environment. The package has
-passed the local clean-wheel and outside-checkout smoke gate. Gapfill and
+earlier service-boundary tests. The shared Python 3.12.9 environment passed the
+default offline suite with 64 tests and one matplotlib-dependent skip, and
+`ruff check src tests` passed. The package has passed the local clean-wheel and
+outside-checkout smoke gate. Gapfill and
 comparison APIs/CLIs now join the pathway workflow, and Ensembl annotation is
 behind an injectable package client. BioCyc and KEGG GPR lookups now use
 injectable package clients. The characterized batch model-builder workflow now
@@ -557,17 +568,20 @@ migrated as those workflows are characterized. The single-model builder now
 passes package clients through its GPR, Ensembl prefetch, and
 location-annotation paths. The characterized database-builder workflow now
 passes package clients through its KEGG page/entry, GPR, and Ensembl annotation
-paths. The report-driven annotation figures are now characterized behind an
-import-safe package API with a separate plotting extra; model-dependent and
-hard-coded legacy figures remain.
+paths. The report-driven annotation figures and model-derived comparison
+figures are now behind import-safe package APIs with a separate plotting extra.
+The legacy figure script is an explicit-path wrapper; supplied MEMOTE and
+algorithm score data are required for those optional charts rather than being
+hard-coded. A service-boundary audit records the remaining compatibility
+fallbacks in deferred workflows.
 
 | Phase | Status | Remaining gate |
 | --- | --- | --- |
 | Phase 0 | Complete | Dependency/artifact policy and source-only legacy namespace decisions were recorded before the completed branch-local LFS migration. |
 | Phase 1 | Complete | Baseline CI and local clean-wheel/outside-checkout validation are recorded in the progress log; source-only legacy compatibility tests are an explicit exception to the package-test import rule. |
 | Phase 2 | In progress | Continue characterized helper moves and migrate remaining direct service use as each legacy workflow is characterized; the batch, single-model builder, database-builder, and metabolite/reaction boundaries are now covered. |
-| Phase 3 | In progress | Initial gapfill, pathway, and comparison APIs/CLIs are import-safe; the report-driven figure contract is characterized, while model-dependent figures and remaining script entry points are pending. |
-| Phase 5 | In progress | PubChem, Ensembl, BioCyc, and KEGG package clients exist; run the pending full offline gate and migrate remaining direct service calls in deferred workflows before declaring the phase complete. The characterized database-builder and metabolite/reaction paths now use injectable clients. |
+| Phase 3 | In progress | Initial gapfill, pathway, and comparison APIs/CLIs are import-safe; report-driven and model-derived figure contracts are characterized, while remaining workflow entry points are pending. |
+| Phase 5 | In progress | PubChem, Ensembl, BioCyc, and KEGG package clients exist; the offline gate passes, but remaining direct service calls in deferred workflows must be migrated before declaring the phase complete. The characterized database-builder and metabolite/reaction paths now use injectable clients. |
 | Phase 6 | Complete | The approved targeted LFS policy and generated-artifact index cleanup passed on `refactoring-cleanup`; fresh-clone checksums are recorded in the progress log. |
 | Phases 4 and 7 | Not started | Begin after the relevant earlier-phase gates pass. |
 
@@ -855,11 +869,10 @@ Checkpoint commits:
 Keep this list limited to pending, reviewable changes. Remove an entry when it
 is completed and record the result in `REFACTORING_PROGRESS.md`.
 
-1. Run the pending offline pytest/Ruff gates, then complete the remaining
-   model-dependent figure migration and audit direct service use in deferred
-   workflows. The batch, single-model builder, database-builder, and
-   metabolite/reaction boundaries plus the report-driven figure contract are
-   now covered.
+1. Characterize and migrate the remaining legacy service fallbacks identified
+   in `docs/service-boundary-audit.md`. The batch, single-model builder,
+   database-builder, metabolite/reaction, and figure boundaries are now
+   covered.
 
 ## Definition of Done
 

@@ -16,6 +16,53 @@ When adding an entry:
 
 ## 2026-07-28
 
+### Autonomous checkpoint commit cadence
+
+- Clarified the implementation plan so agents create frequent, narrowly scoped
+  commits automatically after independently validated boundaries, without
+  waiting for a separate user request.
+- Required agents to isolate unrelated working-tree changes and record any
+  unavailable validation tools when committing a reviewable change.
+- Validation: reviewed the plan diff and ran `git diff --check`.
+
+## 2026-07-28
+
+### Explicit model-derived figure workflow and service audit
+
+- Added `thg_protocol.figures.models` with dependency-light model summaries,
+  unannotated-metabolite statistics, new-reaction annotation group statistics,
+  and lazy matplotlib rendering for model-component, annotation-group,
+  MEMOTE, and supplied algorithm-result charts.
+- Replaced import-time execution in `generate_figures/create_figure.py` with an
+  explicit-path compatibility CLI. It loads models only after parsing,
+  delegates report and model work to package APIs, and accepts optional score
+  JSON files instead of embedding historical values in production code.
+- Removed unused direct network-library imports from the single-model and
+  database-builder orchestrators and recorded remaining compatibility-helper
+  fallbacks in `docs/service-boundary-audit.md`.
+- Added offline fake-model coverage for the new pure statistics and a guarded
+  rendering smoke test when matplotlib is installed.
+- Validation:
+  - targeted Ruff checks for the figure package and figure tests passed;
+  - the shared Python 3.12.9 environment at
+    `/home/reinism/THG_igor_repo/THG_The-Human-GEM-protocol/.venv` provides
+    pytest 9.1.1 and Ruff 0.15.20;
+  - full offline validation passed: `64 passed, 1 skipped, 2 warnings` for
+    `python -m pytest -m "not slow and not online and not solver and not gurobi and not memote" -q`;
+  - `ruff check src tests` passed;
+  - `python -m compileall -q src/thg_protocol build_model functions generate_data-base metabolite_reac_identification generate_figures tests/unit` passed with the known legacy invalid-escape warnings;
+  - `generate_figures/create_figure.py --help` passed without COBRA or
+    matplotlib;
+  - `pip wheel --no-deps --no-build-isolation .` passed, and the wheel was
+    installed into `/tmp/thg-installed-check-20260728` and imported from
+    `/tmp` outside the checkout;
+  - the rendering smoke test was skipped because matplotlib is not installed
+    in this validation environment.
+- Follow-up: migrate the retry annotation script and legacy database/location
+  service fallbacks with static-client tests.
+
+## 2026-07-28
+
 ### Current checkpoint packaging validation
 
 - Reviewed the combined service-boundary, metabolite/reaction, and figure API
