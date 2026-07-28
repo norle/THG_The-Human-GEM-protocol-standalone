@@ -22,7 +22,8 @@ python3 metabolite_reac_identification.py
 
 ### Intelligent Multi-Pass Version (Recommended)
 
-For better results with automatic retry of failures:
+For better results with automatic retry of failures (the defaults use ten retry
+rounds and a 10% unresolved threshold):
 
 ```bash
 /path/to/venv/bin/python metabolite_reac_identification_with_retry.py
@@ -71,12 +72,19 @@ Given a model with 1,000 metabolites:
 
 ### Configuration
 
-Easily adjustable parameters at the top of `metabolite_reac_identification_with_retry.py`:
+Configure the retry workflow with command-line options:
 
-```python
-MAX_RETRY_ROUNDS = 10    # Maximum number of retry attempts
-STOP_THRESHOLD = 0.10    # Stop if remaining failures < 10% of achievable
+```bash
+python metabolite_reac_identification_with_retry.py --help
+python metabolite_reac_identification_with_retry.py \
+  --max-retry-rounds 10 \
+  --retry-stop-threshold 0.1
 ```
+
+The compatibility script delegates to `thg_protocol.annotation` and accepts
+explicit model, database, output, and retry paths. The PubChem client is
+injected by the package workflow, so static clients can be used by tests
+without network access.
 
 ### Benefits
 

@@ -16,6 +16,35 @@ When adding an entry:
 
 ## 2026-07-28
 
+### Retry metabolite/reaction workflow service boundary
+
+- Characterized `metabolite_reac_identification/metabolite_reac_identification_with_retry.py`.
+  It now provides an import-safe argument parser and delegates execution to
+  `thg_protocol.annotation.metabolite_reactions` instead of loading models or
+  running annotation at import time.
+- Added `retry_metabolite_annotations` and `MetaboliteRetryResult`. Retry
+  rounds use the injected PubChem client, append successful records to the
+  explicit annotation report, and rewrite the final unresolved-record report.
+  The workflow API exposes optional retry-round and stopping-threshold
+  controls while retaining single-pass defaults for existing callers.
+- Added static PubChem coverage for successful retry records, unresolved
+  failure reporting, configuration validation, and CLI `--help` import safety.
+  Updated the legacy workflow README and service-boundary audit.
+- Validation:
+  - Installed this checkout into `/tmp/thg-refactor-validation.BnvTQF` with
+    `pip install --no-deps --no-build-isolation --target ... .`.
+  - The installed-package focused retry suite passed with 6 tests.
+  - The full offline gate passed: `68 passed, 1 skipped, 2 warnings` for
+    `pytest -m "not slow and not online and not solver and not gurobi and not memote" -q`.
+  - `ruff check src tests` passed.
+  - `python -m compileall -q src/thg_protocol metabolite_reac_identification tests/unit`
+    and `git diff --check` passed.
+  - The retry CLI `--help` smoke test passed from the installed package target.
+- Follow-up: characterize and migrate the remaining batch KEGG, single-model
+  location, and legacy database service fallbacks listed in the plan.
+
+## 2026-07-28
+
 ### Autonomous checkpoint commit cadence
 
 - Clarified the implementation plan so agents create frequent, narrowly scoped

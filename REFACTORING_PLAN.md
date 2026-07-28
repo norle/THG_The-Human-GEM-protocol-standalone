@@ -555,8 +555,10 @@ Last reviewed: 2026-07-28
 The last fully validated default offline/non-solver checkpoint passed 49 tests
 and `ruff check src tests`. The current tree includes the characterized
 metabolite/reaction workflow and its PubChem service boundary in addition to the
-earlier service-boundary tests. The shared Python 3.12.9 environment passed the
-default offline suite with 64 tests and one matplotlib-dependent skip, and
+earlier service-boundary tests. The retry annotation compatibility script now
+delegates to that package API and injected client. The shared Python 3.12.9
+environment passed the
+default offline suite with 68 tests and one matplotlib-dependent skip, and
 `ruff check src tests` passed. The package has passed the local clean-wheel and
 outside-checkout smoke gate. Gapfill and
 comparison APIs/CLIs now join the pathway workflow, and Ensembl annotation is
@@ -869,10 +871,11 @@ Checkpoint commits:
 Keep this list limited to pending, reviewable changes. Remove an entry when it
 is completed and record the result in `REFACTORING_PROGRESS.md`.
 
-1. Characterize and migrate the remaining legacy service fallbacks identified
-   in `docs/service-boundary-audit.md`. The batch, single-model builder,
-   database-builder, metabolite/reaction, and figure boundaries are now
-   covered.
+1. Characterize and migrate the remaining legacy database/location service
+   fallbacks identified in `docs/service-boundary-audit.md`: the batch KEGG
+   compatibility helper, the single-model location helper, and legacy database
+   classes/equation helpers. Add static-client tests before removing any
+   fallback.
 
 ## Definition of Done
 
