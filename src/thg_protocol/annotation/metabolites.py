@@ -327,6 +327,7 @@ def generate_met_annotation(
     delay_between_requests: float = 1.0,
     checkpoint_interval: int = 10,
     resume: bool = True,
+    client: PubChemClientProtocol | None = None,
 ) -> Tuple[List, List]:
     """Identify and write metabolite annotations to file (Tab-separated).
 
@@ -342,6 +343,9 @@ def generate_met_annotation(
         save progress after every N metabolites
     resume: bool, default=True
         if True, resume from checkpoint file if it exists
+    client: PubChemClientProtocol, optional
+        PubChem service adapter. Supplying a client makes the workflow
+        deterministic and keeps network access behind the service boundary.
 
     Returns
     -------
@@ -350,6 +354,7 @@ def generate_met_annotation(
     anotated: list[tuple[str, str, str, str]]
         list of anotated metabolites
     """
+    out = os.fspath(out)
     unnanotated, annotated = [], []
     api_failures = []  # Track API/temporary failures separately
     total = len(met_list)
@@ -374,7 +379,7 @@ def generate_met_annotation(
                 api_error = False
                 failure_reason = "unknown"
                 
-                result = identify_metabolite(name, formula, iden)
+                result = identify_metabolite(name, formula, iden, client=client)
                 met = [name, formula, annotation, iden]
                 
                 if result is None:
@@ -410,9 +415,11 @@ def generate_met_annotation(
     print(f"ANNOTATION COMPLETE")
     print(f"{'='*70}")
     print(f"Total metabolites:          {total}")
-    print(f"Successfully annotated:     {len(annotated)} ({(len(annotated)/total)*100:.1f}%)")
-    print(f"Failed (likely not in DB):  {len(unnanotated)-len(api_failures)} ({((len(unnanotated)-len(api_failures))/total)*100:.1f}%)")
-    print(f"Failed (API/temp errors):   {len(api_failures)} ({(len(api_failures)/total)*100:.1f}%)")
+    def percentage(count: int) -> float:
+        return (count / total) * 100 if total else 0.0
+    print(f"Successfully annotated:     {len(annotated)} ({percentage(len(annotated)):.1f}%)")
+    print(f"Failed (likely not in DB):  {len(unnanotated)-len(api_failures)} ({percentage(len(unnanotated)-len(api_failures)):.1f}%)")
+    print(f"Failed (API/temp errors):   {len(api_failures)} ({percentage(len(api_failures)):.1f}%)")
     print(f"\nResults saved to:      {out}")
     print(f"Failures saved to:     {failure_file}")
     print(f"{'='*70}\n")

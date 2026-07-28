@@ -26,6 +26,7 @@ LOGGER = logging.getLogger(__name__)
 
 # import the functions
 from functions.gpr.gpr_def import getGPR, setup_biocyc_session
+from thg_protocol.services.ensembl import EnsemblClientProtocol
 
 from functions.equations_bm_gdb import *
 
@@ -77,6 +78,7 @@ def getLocationnew(
     location_dict_file,
     session: Optional[requests.Session] = None,
     ensembl_cache: Optional[dict] = None,
+    ensembl_client: Optional[EnsemblClientProtocol] = None,
 ):
     """Finds subcellular location.
     Using a SGPR (or GPR), it identifies the corresponding cellular locations and adapts the location-specific SGPRs accordingly.
@@ -524,32 +526,8 @@ def getLocationnew(
                 else:
                     if LocGPR2[i]:
                         iiii = LocGPR2[i]
-                        iiii2 = ""
-                        iiii2 = re.search(
-                            "gene=([A-Z0-9]+)",
-                            str(
-                                urllib.request.urlopen(
-                                    "https://www.genome.jp/dbget-bin/www_bget?hsa+"
-                                    + LocGPR2[i]
-                                ).read()
-                            ),
-                        )  # .group(1)
-                        if not iiii2:
-                            iiii2 = re.search(
-                                "(ENSG[0-9]+)",
-                                str(
-                                    urllib.request.urlopen(
-                                        "https://www.ensembl.org/Homo_sapiens/Gene/Summary?g="
-                                        + LocGPR2[i]
-                                    ).read()
-                                ),
-                            )
-                        if iiii2:
-                            iiii = iiii2.group(1)
-                        # If an external ensembl cache was provided, prefer it to avoid
-                        # expensive web requests. The cache is expected to map gene
-                        # identifiers (symbols or other ids) to Ensembl IDs or to a
-                        # dictionary containing an 'ensembl' key.
+                        # Prefer the supplied cache/client so workflow calls do not
+                        # fall through to unowned Ensembl HTTP requests.
                         if ensembl_cache is not None:
                             try:
                                 if LocGPR2[i] in ensembl_cache:
@@ -564,8 +542,44 @@ def getLocationnew(
                                     elif isinstance(val, str):
                                         iiii = val
                             except Exception:
-                                # fall back to existing lookup behaviour on any error
                                 pass
+                        if iiii == LocGPR2[i] and ensembl_client is not None:
+                            try:
+                                annotation = ensembl_client.annotate([LocGPR2[i]]).get(
+                                    LocGPR2[i]
+                                )
+                                if annotation is not None:
+                                    iiii = annotation.ensembl
+                                    if ensembl_cache is not None:
+                                        ensembl_cache[LocGPR2[i]] = annotation.as_dict()
+                            except Exception:
+                                LOGGER.debug(
+                                    "Ensembl lookup failed for %s",
+                                    LocGPR2[i],
+                                    exc_info=True,
+                                )
+                        if iiii == LocGPR2[i] and ensembl_client is None:
+                            iiii2 = re.search(
+                                "gene=([A-Z0-9]+)",
+                                str(
+                                    urllib.request.urlopen(
+                                        "https://www.genome.jp/dbget-bin/www_bget?hsa+"
+                                        + LocGPR2[i]
+                                    ).read()
+                                ),
+                            )  # .group(1)
+                            if not iiii2:
+                                iiii2 = re.search(
+                                    "(ENSG[0-9]+)",
+                                    str(
+                                        urllib.request.urlopen(
+                                            "https://www.ensembl.org/Homo_sapiens/Gene/Summary?g="
+                                            + LocGPR2[i]
+                                        ).read()
+                                    ),
+                                )
+                            if iiii2:
+                                iiii = iiii2.group(1)
                 RuleLoc4[iiii] = list()
                 RuleLoc4[iiii].append(LocGPR2[i])
                 create_dict(LocGPR2[i], iiii)

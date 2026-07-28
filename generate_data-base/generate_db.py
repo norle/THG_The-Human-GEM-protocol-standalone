@@ -55,7 +55,9 @@ from functions.function_bm_gdb import *
 from functions.equations_bm_gdb import *
 from functions.function_bm_gdb import batch_fetch_kegg_entries
 from types import MethodType
-from functions.ensembl_client import fetch_ensembl_annotations
+from thg_protocol.services.biocyc import BioCycClient, BioCycClientProtocol
+from thg_protocol.services.ensembl import EnsemblClient, EnsemblClientProtocol
+from thg_protocol.services.kegg import KeggClient, KeggClientProtocol
 
 # Debugging flag: limit number of reactions to process (None = no limit)
 # Set this to an integer to process at most that many reactions and then
@@ -159,6 +161,8 @@ def cobra_reconstruction(
     location_dict: Dict[str, str],
     metabolite_equivalent: Dict[str, str],
     metabolite_list_general: Dict[List, CompoundType],
+    *,
+    ensembl_client: EnsemblClientProtocol | None = None,
 ) -> cobra.Model:
     """Reconstruction of gathered information given by using cobrapy.
     Parameters
@@ -177,6 +181,7 @@ def cobra_reconstruction(
         name, so this mapping is necessary to achieve a proper
         SBML-compatible identifier (no spaces).
     """
+    ensembl_client = ensembl_client or EnsemblClient()
     model = cobra.Model(model_id or model_name, model_name or model_id)
     location_dict = {k.lower(): v for k, v in location_dict.items()}
     LOGGER.debug(
@@ -438,7 +443,10 @@ def cobra_reconstruction(
 
     # Try to fetch using gene symbols - the API can look up by symbol
     try:
-        ensembl_annotations = fetch_ensembl_annotations(gene_symbols, max_workers=10)
+        ensembl_annotations = {
+            identifier: annotation.as_dict()
+            for identifier, annotation in ensembl_client.annotate(gene_symbols).items()
+        }
         LOGGER.info(
             "Fetched Ensembl annotations for %d genes (out of %d requested)",
             len(ensembl_annotations),
@@ -549,6 +557,9 @@ if __name__ == "__main__":
     )
 
     session = setup_biocyc_session()
+    biocyc_client: BioCycClientProtocol = BioCycClient(session=session)
+    kegg_client: KeggClientProtocol = KeggClient()
+    ensembl_client: EnsemblClientProtocol = EnsemblClient()
 
     #### Initial Parameters
     # Determine the current file's directory and the project root.
@@ -702,7 +713,14 @@ if __name__ == "__main__":
         PathName = Path[i].split("\t")[1]
         PathURL = "https://rest.kegg.jp/get/" + PathID + "/kgml"
         PathReferer = "https://www.kegg.jp/kegg-bin/show_pathway?" + PathID
-        PathList[PathID] = pathway(PathURL, time, PathID, PathReferer, PathName)
+        PathList[PathID] = pathway(
+            PathURL,
+            time,
+            PathID,
+            PathReferer,
+            PathName,
+            kegg_client=kegg_client,
+        )
         if PathList[PathID].Compounds():
             print(
                 PathName
@@ -732,7 +750,12 @@ if __name__ == "__main__":
                         RxnURL = PathList[PathID].Reactions()[j][1]
                         RxnTermDyn = PathList[PathID].Reactions()[j][0][1]
                         RxnList[RxnID] = reaction(
-                            RxnURL, time, RxnID, PathName, RxnTermDyn
+                            RxnURL,
+                            time,
+                            RxnID,
+                            PathName,
+                            RxnTermDyn,
+                            kegg_client=kegg_client,
                         )
 
                         # Debug: Show initial reaction data from KEGG
@@ -807,6 +830,7 @@ if __name__ == "__main__":
                                     database="compound",
                                     batch_size=10,  # KEGG API limit per request
                                     max_workers=5,  # Number of concurrent batch requests
+                                    client=kegg_client,
                                 )
                                 batch_data.update(compound_batch_data)
 
@@ -817,6 +841,7 @@ if __name__ == "__main__":
                                     database="glycan",
                                     batch_size=10,  # KEGG API limit per request
                                     max_workers=5,  # Number of concurrent batch requests
+                                    client=kegg_client,
                                 )
                                 batch_data.update(glycan_batch_data)
 
@@ -836,6 +861,7 @@ if __name__ == "__main__":
                                             time,
                                             EF,
                                             specialCompounds,
+                                            kegg_client=kegg_client,
                                         )
                                     else:
                                         # Fallback to individual fetch if concurrent fetch failed
@@ -844,7 +870,12 @@ if __name__ == "__main__":
                                         )
                                         CompURL = "https://rest.kegg.jp/get/" + CompID
                                         MetList[CompID] = compound(
-                                            CompURL, CompID, time, EF, specialCompounds
+                                            CompURL,
+                                            CompID,
+                                            time,
+                                            EF,
+                                            specialCompounds,
+                                            kegg_client=kegg_client,
                                         )
 
                                     # Debug: Show compound details
@@ -954,6 +985,7 @@ if __name__ == "__main__":
                                                 time,
                                                 EF,
                                                 specialCompounds,
+                                                kegg_client=kegg_client,
                                             )
                                         else:
                                             MetList[extra_compound[x[0]]] = (
@@ -1071,7 +1103,14 @@ if __name__ == "__main__":
                         for x in RxnList[RxnID].EC():
                             if x not in GPRIdent:
                                 GPRIdent.append(x)  # Optimized: use append
-                                GPRList[x] = gpr(x, session)
+                                GPRList[x] = gpr(
+                                    x,
+                                    time,
+                                    session=session,
+                                    biocyc_client=biocyc_client,
+                                    kegg_client=kegg_client,
+                                    ensembl_client=ensembl_client,
+                                )
                             try:
                                 gpr_result = GPRList[x].GprSubcell()
                                 # Check if we got a valid tuple result (not empty string)
@@ -1275,7 +1314,11 @@ if __name__ == "__main__":
             while z < len(gene_matches):
                 if not gene_matches[z] in GeneIdent:
                     GeneIdent.append(gene_matches[z])  # Optimized: use append
-                    GeneList[gene_matches[z]] = gene(gene_matches[z], EnsblDB)
+                    GeneList[gene_matches[z]] = gene(
+                        gene_matches[z],
+                        EnsblDB,
+                        ensembl_client=ensembl_client,
+                    )
                 z = z + 1
         g = g + 1
 
@@ -1379,6 +1422,7 @@ if __name__ == "__main__":
         LocVar,
         MetEquiv,
         MetList,
+        ensembl_client=ensembl_client,
     )
     cobra.io.write_sbml_model(model, Output)
 

@@ -25,6 +25,7 @@ from functions.gpr.auth_gpr import getGPR, setup_biocyc_session
 
 # 👇 import the addtional function
 from functions.gpr.get_location_def import getLocationnew as getLocation
+from thg_protocol.services.kegg import KeggClientProtocol
 
 
 # Optimized batch fetching functions for KEGG API
@@ -155,7 +156,12 @@ def parse_kegg_flat_file_to_html(flat_file_text, entry_id):
 
 
 def batch_fetch_kegg_entries(
-    entry_ids, database="compound", batch_size=10, max_workers=5
+    entry_ids,
+    database="compound",
+    batch_size=10,
+    max_workers=5,
+    *,
+    client: KeggClientProtocol | None = None,
 ):
     """
     Fetch multiple KEGG entries using REST API batch requests with concurrent execution.
@@ -179,6 +185,13 @@ def batch_fetch_kegg_entries(
     --------
     dict : Mapping of entry_id -> parsed page content (pseudo-HTML format)
     """
+    if client is not None:
+        return client.get_entries(
+            entry_ids,
+            database=database,
+            batch_size=batch_size,
+        )
+
     from concurrent.futures import ThreadPoolExecutor, as_completed
 
     results = {}
@@ -1566,7 +1579,7 @@ def ParseNestedParen(string, level):
 """"Path: Extract the links from a HTML page"""
 
 
-def getLinkPath(page, follow_maps=True):
+def getLinkPath(page, follow_maps=True, *, kegg_client=None):
     try:
         # Collect (reaction_id, type) tuples from KGML-like entry attributes.
         urls_set = set()
@@ -1619,8 +1632,11 @@ def getLinkPath(page, follow_maps=True):
                 if pid:
                     try:
                         url = f"https://rest.kegg.jp/get/{pid}"
-                        resp = urllib.request.urlopen(url, timeout=10).read()
-                        text = resp.decode("utf-8") if isinstance(resp, bytes) else resp
+                        if kegg_client is not None:
+                            text = kegg_client.get_page(url)
+                        else:
+                            resp = urllib.request.urlopen(url, timeout=10).read()
+                            text = resp.decode("utf-8") if isinstance(resp, bytes) else resp
                         # find all RIDs in the REACTION section
                         rids = sorted(set(re.findall(r'R[0-9]{5,6}', text)))
                         for rid in rids:
@@ -1647,8 +1663,11 @@ def getLinkPath(page, follow_maps=True):
                                 q = "+".join(chunk)
                                 try:
                                     url = f"https://rest.kegg.jp/link/rn/{q}"
-                                    resp = urllib.request.urlopen(url, timeout=10).read()
-                                    txt = resp.decode('utf-8') if isinstance(resp, bytes) else resp
+                                    if kegg_client is not None:
+                                        txt = kegg_client.get_page(url)
+                                    else:
+                                        resp = urllib.request.urlopen(url, timeout=10).read()
+                                        txt = resp.decode('utf-8') if isinstance(resp, bytes) else resp
                                     for line in txt.split('\n'):
                                         if not line.strip():
                                             continue
@@ -1685,11 +1704,16 @@ def getLinkPath(page, follow_maps=True):
                     for pid in linked[:max_linked]:
                         try:
                             url = f"https://rest.kegg.jp/get/{pid}/kgml"
-                            resp = urllib.request.urlopen(url, timeout=10).read()
-                            text = resp.decode('utf-8') if isinstance(resp, bytes) else resp
+                            if kegg_client is not None:
+                                text = kegg_client.get_page(url)
+                            else:
+                                resp = urllib.request.urlopen(url, timeout=10).read()
+                                text = resp.decode('utf-8') if isinstance(resp, bytes) else resp
                             # call getLinkPath on the linked map but do not follow maps again
                             try:
-                                _urls2, _urls3 = getLinkPath(text, follow_maps=False)
+                                _urls2, _urls3 = getLinkPath(
+                                    text, follow_maps=False, kegg_client=kegg_client
+                                )
                                 # _urls3 is list of ((rid, type), viewer_url)
                                 for ((rid, rtype), _) in _urls3:
                                     urls_set.add((rid, rtype if rtype else ''))
@@ -2857,7 +2881,16 @@ def parse_kegg_flat_file(flat_file_text):
     return fields
 
 
-def getCompParamFromRestAPI(flat_file_text, ident, time, EF, specialCompounds, RxnID):
+def getCompParamFromRestAPI(
+    flat_file_text,
+    ident,
+    time,
+    EF,
+    specialCompounds,
+    RxnID,
+    *,
+    kegg_client: KeggClientProtocol | None = None,
+):
     """
     Extract compound parameters from KEGG REST API flat file format.
     This is a new implementation that works directly with REST API data.
@@ -2945,12 +2978,15 @@ def getCompParamFromRestAPI(flat_file_text, ident, time, EF, specialCompounds, R
                 # Fetch the primary compound data
                 try:
                     primary_url = f"https://rest.kegg.jp/get/{urls01}"
-                    primary_response = urllib.request.urlopen(primary_url).read()
-                    primary_text = (
-                        primary_response.decode("utf-8")
-                        if isinstance(primary_response, bytes)
-                        else primary_response
-                    )
+                    if kegg_client is not None:
+                        primary_text = kegg_client.get_page(primary_url)
+                    else:
+                        primary_response = urllib.request.urlopen(primary_url).read()
+                        primary_text = (
+                            primary_response.decode("utf-8")
+                            if isinstance(primary_response, bytes)
+                            else primary_response
+                        )
                     primary_fields = parse_kegg_flat_file(primary_text)
 
                     if "NAME" in primary_fields:

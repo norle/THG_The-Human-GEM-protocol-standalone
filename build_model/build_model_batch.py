@@ -23,7 +23,6 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from collections import defaultdict
 import pickle
 
-import requests
 import cobra
 import pandas as pd
 import copy
@@ -42,7 +41,9 @@ if project_root not in os.sys.path:
 
 from functions.gpr.gpr_def import getGPR, setup_biocyc_session
 from functions.gpr.get_location_def import getLocationnew as getLocation
-from functions.ensembl_client import fetch_ensembl_annotations
+from thg_protocol.services.biocyc import BioCycClient, BioCycClientProtocol
+from thg_protocol.services.ensembl import EnsemblClient, EnsemblClientProtocol
+from thg_protocol.services.kegg import KeggClient, KeggClientProtocol
 from functions.function_bm_gdb import (
     meltGeneList,
     create_compartments_dict_bm,
@@ -149,97 +150,38 @@ def save_cache(path, obj):
 
 
 def batch_fetch_kegg_entries(
-    kegg_ids, batch_size=50, max_workers=3, requests_per_second=3
+    kegg_ids,
+    batch_size=50,
+    max_workers=3,
+    requests_per_second=3,
+    *,
+    client: KeggClientProtocol | None = None,
 ):
-    """Fetch KEGG entries for a list of KEGG reaction ids using rest.kegg.jp/get
+    """Fetch KEGG entries through the package-owned client boundary.
 
-    Uses parallel requests with rate limiting to speed up fetching while respecting
-    API limits.
+    Batching, pacing, retries, and response caching now belong to ``client``.
+    ``max_workers`` remains accepted for compatibility with old callers.
 
     Args:
         kegg_ids: List of KEGG reaction IDs to fetch
         batch_size: Number of IDs to fetch in a single request (KEGG API supports multiple)
-        max_workers: Maximum number of parallel requests
+        max_workers: Retained compatibility argument; ignored by the client
         requests_per_second: Maximum requests per second (rate limit)
 
     Returns:
         dict {id: text} mapping KEGG IDs to their entry text
     """
-    base = "https://rest.kegg.jp/get/"
-    results = {}
-    ids = list(kegg_ids)
-
-    # Create batches
-    batches = []
-    for i in range(0, len(ids), batch_size):
-        batch = ids[i : i + batch_size]
-        batches.append(batch)
-
-    # Rate limiting: minimum time between requests
-    min_delay = 1.0 / requests_per_second
-    last_request_time = [0.0]  # Use list to allow modification in nested function
-    request_lock = __import__("threading").Lock()
-
-    def fetch_batch(batch):
-        """Fetch a single batch with rate limiting."""
-        query = "+".join(batch)
-        url = base + query
-
-        # Rate limiting
-        with request_lock:
-            elapsed = time.time() - last_request_time[0]
-            if elapsed < min_delay:
-                time.sleep(min_delay - elapsed)
-            last_request_time[0] = time.time()
-
-        try:
-            # LOGGER.debug("Fetching KEGG batch: %s", batch[:5])  # Show first 5 IDs
-            r = requests.get(url, timeout=30)
-            r.raise_for_status()
-            text = r.text
-
-            # rest.kegg returns concatenated entries; split by 'ENTRY' lines
-            batch_results = {}
-            entries = re.split(r"\n(?=ENTRY\s+R)", text)
-
-            for entry in entries:
-                if not entry.strip():
-                    continue
-                m = re.search(r"ENTRY\s+(R[0-9]+)", entry)
-                if m:
-                    rid = m.group(1)
-                    batch_results[rid] = entry
-
-            fetched_count = len(batch_results)
-            # LOGGER.debug("Fetched %d/%d entries in batch", fetched_count, len(batch))
-
-            # Warn if we didn't get all expected entries
-            if fetched_count < len(batch):
-                missing = [b for b in batch if b not in batch_results]
-                LOGGER.warning(
-                    "Only fetched %d/%d KEGG entries in batch. Missing: %s",
-                    fetched_count,
-                    len(batch),
-                    missing,
-                )
-
-            return batch_results
-
-        except Exception as e:
-            LOGGER.exception("Failed fetching KEGG batch: %s", e)
-            return {}
-
-    # Fetch batches in parallel with rate limiting
-    with ThreadPoolExecutor(max_workers=max_workers) as executor:
-        futures = {executor.submit(fetch_batch, batch): batch for batch in batches}
-
-        for future in tqdm(
-            as_completed(futures), total=len(futures), desc="KEGG batches"
-        ):
-            batch_results = future.result()
-            results.update(batch_results)
-
-    return results
+    del max_workers
+    client = client or KeggClient()
+    try:
+        return client.get_reaction_entries(
+            kegg_ids,
+            batch_size=batch_size,
+            requests_per_second=requests_per_second,
+        )
+    except Exception:
+        LOGGER.exception("Failed fetching KEGG reaction entries")
+        return {}
 
 
 def extract_kegg_reaction_id(reac):
@@ -262,12 +204,20 @@ def extract_kegg_reaction_id(reac):
     return None
 
 
-def main():
+def main(
+    *,
+    biocyc_client: BioCycClientProtocol | None = None,
+    kegg_client: KeggClientProtocol | None = None,
+    ensembl_client: EnsemblClientProtocol | None = None,
+):
     LOGGER.info("Loading model %s", INPUT_MODEL)
     model = cobra.io.read_sbml_model(INPUT_MODEL)
 
     # prepare session for getGPR
     session = setup_biocyc_session()
+    biocyc_client = biocyc_client or BioCycClient(session=session)
+    kegg_client = kegg_client or KeggClient()
+    ensembl_client = ensembl_client or EnsemblClient()
 
     # Load caches
     ensembl_cache = load_cache(ENSEMBL_CACHE_FILE)
@@ -295,7 +245,9 @@ def main():
     missing_kegg = [k for k in kegg_ids if k not in kegg_cache]
     if missing_kegg:
         LOGGER.info("Fetching %d missing KEGG entries in batches", len(missing_kegg))
-        fetched = batch_fetch_kegg_entries(missing_kegg, batch_size=KEGG_BATCH_SIZE)
+        fetched = batch_fetch_kegg_entries(
+            missing_kegg, batch_size=KEGG_BATCH_SIZE, client=kegg_client
+        )
         LOGGER.info(
             "Successfully fetched %d/%d KEGG entries", len(fetched), len(missing_kegg)
         )
@@ -388,7 +340,12 @@ def main():
                 session_local = setup_biocyc_session()
             else:
                 session_local = session_obj
-            res = getGPR(ec_value, session_local)
+            res = getGPR(
+                ec_value,
+                session_local,
+                biocyc_client=biocyc_client,
+                kegg_client=kegg_client,
+            )
             return ec_value, res
         except Exception:
             LOGGER.exception("getGPR failed for %s", ec_value)
@@ -463,7 +420,7 @@ def main():
     to_fetch = [g for g in gene_symbols if g and g not in ensembl_cache]
     LOGGER.info("Fetching %d Ensembl annotations in batches", len(to_fetch))
     if to_fetch:
-        # fetch_ensembl_annotations supports batch fetching; run in smaller batches
+        # Run package-client annotation requests in smaller batches.
         try:
             batches = [
                 to_fetch[i : i + ENSEMBL_BATCH_SIZE]
@@ -471,16 +428,18 @@ def main():
             ]
             for batch in tqdm(batches, desc="Ensembl batches"):
                 try:
-                    fetched = fetch_ensembl_annotations(
-                        batch, batch_size=len(batch), max_workers=10
-                    )
+                    fetched_annotations = ensembl_client.annotate(batch)
+                    fetched = {
+                        identifier: annotation.as_dict()
+                        for identifier, annotation in fetched_annotations.items()
+                    }
                     if fetched:
                         ensembl_cache.update(fetched)
                         save_cache(ENSEMBL_CACHE_FILE, ensembl_cache)
                 except Exception:
-                    LOGGER.exception("fetch_ensembl_annotations sub-batch failed")
+                    LOGGER.exception("Ensembl annotation sub-batch failed")
         except Exception:
-            LOGGER.exception("fetch_ensembl_annotations batch failed")
+            LOGGER.exception("Ensembl annotation batch failed")
 
     # Build a mapping from unique GPR strings to getLocation outputs to avoid repeated calls
     gpr_to_location = {}
@@ -569,9 +528,7 @@ def main():
             q = urllib.parse.quote(query, safe="")
             url = f"https://websvc.biocyc.org/xmlquery?query={q}&detail=low"
             try:
-                r = requests.get(url, timeout=30)
-                r.raise_for_status()
-                text = r.text
+                text = biocyc_client.get_page(url)
                 return url, batch, text
             except Exception:
                 LOGGER.debug("BioVelo fetch failed for batch %s", batch, exc_info=True)
@@ -692,12 +649,7 @@ def main():
                 locations = []
                 for url in candidates:
                     try:
-                        r = session.get(url, timeout=30)
-                        if r.status_code == 404:
-                            LOGGER.debug("getxml 404 for %s", url)
-                            continue
-                        r.raise_for_status()
-                        xml_text = r.text
+                        xml_text = biocyc_client.get_page(url)
                         # Parse XML and extract <location>/<cco> entries
                         try:
                             root = ET.fromstring(xml_text)
@@ -739,12 +691,9 @@ def main():
                             ]
                             for purl in pf_candidates:
                                 try:
-                                    r2 = session.get(purl, timeout=30)
-                                    if r2.status_code == 404:
-                                        continue
-                                    r2.raise_for_status()
+                                    xml_text2 = biocyc_client.get_page(purl)
                                     try:
-                                        root2 = ET.fromstring(r2.text)
+                                        root2 = ET.fromstring(xml_text2)
                                     except Exception:
                                         continue
                                     for loc_elem in root2.findall(".//location"):
@@ -832,9 +781,7 @@ def main():
             key = f"{org}:{frameid}"
             try:
                 url = f"https://websvc.biocyc.org/getxml?{org}:{frameid}&detail=low"
-                response = session.get(url, timeout=10)
-                response.raise_for_status()
-                xml_text = response.text
+                xml_text = biocyc_client.get_page(url)
 
                 # Parse and extract common-name
                 root = ET.fromstring(xml_text)
@@ -1351,6 +1298,7 @@ def main():
                                     location_pkl_file,
                                     session,
                                     ensembl_cache,
+                                    ensembl_client=ensembl_client,
                                 )
                             except Exception:
                                 loc = ({}, {}, {}, {}, 0)

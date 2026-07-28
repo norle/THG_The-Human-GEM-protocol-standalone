@@ -8,6 +8,9 @@ from typing import TYPE_CHECKING
 import pdb
 
 from functions.gpr.auth_gpr import getGPR, setup_biocyc_session
+from thg_protocol.services.biocyc import BioCycClientProtocol
+from thg_protocol.services.ensembl import EnsemblClientProtocol
+from thg_protocol.services.kegg import KeggClientProtocol
 
 if TYPE_CHECKING:  # Avoid circular import at runtime, keep type hints available
     from functions import function_bm_gdb as _bm_mod
@@ -29,12 +32,16 @@ def _loc():
 
 
 class pathway(object):
-    def __init__(self, url, time, ID, urlReferer, PathName):
+    def __init__(self, url, time, ID, urlReferer, PathName, *, kegg_client=None):
         bm = _bm()
-        self.pagina = bm.getHtml(url, time, urlReferer)
+        self.pagina = (
+            kegg_client.get_page(url)
+            if kegg_client is not None
+            else bm.getHtml(url, time, urlReferer)
+        )
         if type(self.pagina) == bytes:
             self.pagina = self.pagina.decode("utf-8")
-        self.link = bm.getLinkPath(self.pagina)
+        self.link = bm.getLinkPath(self.pagina, kegg_client=kegg_client)
         self.ID = ID
         self.PathName = PathName
 
@@ -64,9 +71,15 @@ class pathway(object):
 
 
 class reaction(object):
-    def __init__(self, url, time, ID, path, termdyn, *newparam):
+    def __init__(self, url, time, ID, path, termdyn, *newparam, kegg_client=None):
         bm = _bm()
-        self.pagina = bm.getHtml(url, time)
+        self.pagina = (
+            kegg_client.get_page(url)
+            if kegg_client is not None
+            else bm.getHtml(url, time)
+        )
+        if isinstance(self.pagina, str):
+            self.pagina = self.pagina.encode("utf-8")
         self.link = bm.getReacParam(self.pagina, time)
         self.ID = ID
         self.path = path
@@ -175,10 +188,27 @@ class reaction(object):
 
 
 class gpr(object):
-    def __init__(self, ec, time):
+    def __init__(
+        self,
+        ec,
+        time,
+        *,
+        session=None,
+        biocyc_client: BioCycClientProtocol | None = None,
+        kegg_client: KeggClientProtocol | None = None,
+        ensembl_client: EnsemblClientProtocol | None = None,
+    ):
         self.ec = ec
-        session = setup_biocyc_session()
-        self.GPRPAss = getGPR(self.ec, session)
+        session = session or setup_biocyc_session()
+        self.GPRPAss = getGPR(
+            self.ec,
+            session,
+            biocyc_client=biocyc_client,
+            kegg_client=kegg_client,
+        )
+        if not self.GPRPAss:
+            self.Subcell = ({}, {}, {}, 0)
+            return
         location_module = _loc()
         self.Subcell = location_module.getLocationnew(
             self.GPRPAss[3],
@@ -187,6 +217,7 @@ class gpr(object):
             1,
             "files/bb.pickle",
             session,
+            ensembl_client=ensembl_client,
         )
 
     def EC(self):  # Patway-KEGG
@@ -208,9 +239,12 @@ class gpr(object):
 
 
 class gene(object):
-    def __init__(self, gene, db):
+    def __init__(
+        self, gene, db, *, ensembl_client: EnsemblClientProtocol | None = None
+    ):
         self.gene = gene
         self.db = db
+        self.ensembl_client = ensembl_client
 
     def Name(self):  # Patway-KEGG
         try:
@@ -220,6 +254,9 @@ class gene(object):
 
     def Ensg(self):  # MetaCyc
         try:
+            if self.ensembl_client is not None:
+                annotation = self.ensembl_client.annotate([self.gene]).get(self.gene)
+                return annotation.ensembl if annotation is not None else ""
             iiii2 = re.search(
                 r"gene=([A-Z0-9]+)",
                 str(
@@ -264,18 +301,37 @@ class gene(object):
 
 
 class compound(object):
-    def __init__(self, url, ident, time, EF, specialCompounds, *newparam):
+    def __init__(
+        self,
+        url,
+        ident,
+        time,
+        EF,
+        specialCompounds,
+        *newparam,
+        kegg_client: KeggClientProtocol | None = None,
+    ):
         self.ident = ident
         bm = _bm()
-        pagina_content = bm.getHtml(f"https://rest.kegg.jp/get/{self.ident}", time)
+        pagina_content = (
+            kegg_client.get_page(f"https://rest.kegg.jp/get/{self.ident}")
+            if kegg_client is not None
+            else bm.getHtml(f"https://rest.kegg.jp/get/{self.ident}", time)
+        )
         self.pagina = (
             pagina_content.decode("utf-8")
             if isinstance(pagina_content, bytes)
             else pagina_content
         )
-        self.atributes = bm.getCompParam(
-            self.pagina, self.ident, time, EF, specialCompounds, RxnID=None
-        )
+        if self.pagina.strip().startswith("ENTRY"):
+            self.atributes = bm.getCompParamFromRestAPI(
+                self.pagina, self.ident, time, EF, specialCompounds, RxnID=None,
+                kegg_client=kegg_client,
+            )
+        else:
+            self.atributes = bm.getCompParam(
+                self.pagina, self.ident, time, EF, specialCompounds, RxnID=None
+            )
         # store raw newparam then populate plain attributes
         self.newparam = newparam
         try:
@@ -286,7 +342,14 @@ class compound(object):
 
     @classmethod
     def from_batch_data(
-        cls, ident, pagina_content, time, EF, specialCompounds, *newparam
+        cls,
+        ident,
+        pagina_content,
+        time,
+        EF,
+        specialCompounds,
+        *newparam,
+        kegg_client: KeggClientProtocol | None = None,
     ):
 
         obj = cls.__new__(cls)  # Create instance without calling __init__
@@ -304,7 +367,13 @@ class compound(object):
             bm = _bm()
 
             obj.atributes = bm.getCompParamFromRestAPI(
-                obj.pagina, ident, time, EF, specialCompounds, RxnID=None
+                obj.pagina,
+                ident,
+                time,
+                EF,
+                specialCompounds,
+                RxnID=None,
+                kegg_client=kegg_client,
             )
         else:
             # Use legacy HTML parser

@@ -38,14 +38,50 @@ from functions.gpr.gpr_def import getGPR, setup_biocyc_session
 
 # 👇 import the addtional function
 from functions.gpr.get_location_def import getLocationnew as getLocation
-from functions.ensembl_client import fetch_ensembl_annotations
+from thg_protocol.services.biocyc import BioCycClient, BioCycClientProtocol
+from thg_protocol.services.ensembl import EnsemblClient, EnsemblClientProtocol
+from thg_protocol.services.kegg import KeggClient, KeggClientProtocol
 from datetime import datetime
+
+
+def _cached_ensembl_ids(cache, gene):
+    """Return Ensembl IDs from either supported legacy cache shape."""
+    value = cache.get(gene)
+    if isinstance(value, dict):
+        value = value.get("ensembl")
+    if isinstance(value, str) and value:
+        return [value]
+    if isinstance(value, (list, tuple, set)):
+        return [str(item) for item in value if item]
+    return []
+
+
+def _lookup_ensembl_ids(
+    gene: str,
+    cache: dict,
+    client: EnsemblClientProtocol,
+) -> list[str]:
+    """Resolve one gene through the injected client and update the cache."""
+    cached = _cached_ensembl_ids(cache, gene)
+    if cached:
+        return cached
+
+    annotation = client.annotate([gene]).get(gene)
+    if annotation is None:
+        cache[gene] = []
+        return []
+
+    cache[gene] = annotation.as_dict()
+    return [annotation.ensembl]
 
 if __name__ == "__main__":
 
     USE_CHECKPOINT = False
 
     session = setup_biocyc_session()
+    biocyc_client: BioCycClientProtocol = BioCycClient(session=session)
+    kegg_client: KeggClientProtocol = KeggClient()
+    ensembl_client: EnsemblClientProtocol = EnsemblClient()
 
     # Ensembl annotation cache (persisted across runs to speed up lookups)
     ensembl_cache_file = os.path.join(project_root, "files", "ensembl_cache.pkl")
@@ -376,7 +412,12 @@ if __name__ == "__main__":
 
                         print(ec)
                         if not ec in variables:
-                            new_gpr = getGPR(ec, session)  # new function
+                            new_gpr = getGPR(
+                                ec,
+                                session,
+                                biocyc_client=biocyc_client,
+                                kegg_client=kegg_client,
+                            )
 
                             if new_gpr[-1]:
 
@@ -434,11 +475,12 @@ if __name__ == "__main__":
                                             if unseen:
                                                 # fetch in batches using the shared client
                                                 try:
-                                                    fetched = fetch_ensembl_annotations(
-                                                        unseen,
-                                                        batch_size=50,
-                                                        max_workers=10,
-                                                    )
+                                                    fetched = {
+                                                        identifier: annotation.as_dict()
+                                                        for identifier, annotation in ensembl_client.annotate(
+                                                            unseen
+                                                        ).items()
+                                                    }
                                                     if fetched:
                                                         ensembl_cache.update(fetched)
                                                         try:
@@ -474,6 +516,7 @@ if __name__ == "__main__":
                                         location_pkl_file,
                                         session,
                                         ensembl_cache,
+                                        ensembl_client=ensembl_client,
                                     )
                                     print("new_locations: ", new_locations)
                                     genelist1 = []
@@ -640,38 +683,9 @@ if __name__ == "__main__":
                                     gene = gene.replace(")", "").replace("(", "")
                                     if not gene in variables:
                                         # Prefer cached Ensembl annotations when available
-                                        ensemble = None
-                                        try:
-                                            if ensembl_cache and gene in ensembl_cache:
-                                                val = ensembl_cache[gene]
-                                                if isinstance(val, dict):
-                                                    maybe = val.get("ensembl")
-                                                    if maybe:
-                                                        ensemble = [maybe]
-                                                elif isinstance(val, str):
-                                                    ensemble = [val]
-                                        except Exception:
-                                            ensemble = None
-
-                                        if not ensemble:
-                                            try:
-                                                ensemble = sorted(
-                                                    list(
-                                                        set(
-                                                            re.findall(
-                                                                "ENS[A-Z][0-9]+",
-                                                                str(
-                                                                    urllib.request.urlopen(
-                                                                        "https://www.ensembl.org/Homo_sapiens/Gene/Summary?g="
-                                                                        + gene
-                                                                    ).read()
-                                                                ),
-                                                            )
-                                                        )
-                                                    )
-                                                )
-                                            except Exception:
-                                                ensemble = []
+                                        ensemble = _lookup_ensembl_ids(
+                                            gene, ensembl_cache, ensembl_client
+                                        )
 
                                         variables[gene] = ensemble
                                     else:
@@ -745,38 +759,9 @@ if __name__ == "__main__":
                                     gene = gene.replace(")", "").replace("(", "")
                                     if not gene in variables:
                                         # Try cache first
-                                        ensemble = None
-                                        try:
-                                            if ensembl_cache and gene in ensembl_cache:
-                                                val = ensembl_cache[gene]
-                                                if isinstance(val, dict):
-                                                    maybe = val.get("ensembl")
-                                                    if maybe:
-                                                        ensemble = [maybe]
-                                                elif isinstance(val, str):
-                                                    ensemble = [val]
-                                        except Exception:
-                                            ensemble = None
-
-                                        if not ensemble:
-                                            try:
-                                                ensemble = sorted(
-                                                    list(
-                                                        set(
-                                                            re.findall(
-                                                                "ENS[A-Z][0-9]+",
-                                                                str(
-                                                                    urllib.request.urlopen(
-                                                                        "https://www.ensembl.org/Homo_sapiens/Gene/Summary?g="
-                                                                        + gene
-                                                                    ).read()
-                                                                ),
-                                                            )
-                                                        )
-                                                    )
-                                                )
-                                            except Exception:
-                                                ensemble = []
+                                        ensemble = _lookup_ensembl_ids(
+                                            gene, ensembl_cache, ensembl_client
+                                        )
 
                                         variables[gene] = ensemble
                                     else:

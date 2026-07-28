@@ -539,22 +539,37 @@ Recommended docs:
 
 ### Current Status
 
-Last reviewed: 2026-07-27
+Last reviewed: 2026-07-28
 
-The current default offline/non-solver test selection passes with 49 tests, and
-`ruff check src tests` passes. The package has now passed the local clean-wheel
-and outside-checkout smoke gate. Gapfill and comparison APIs/CLIs now join the
-pathway workflow; the remaining work is continued helper and legacy-script
-migration plus the approved branch-local LFS rewrite and fresh-clone check.
+The last fully validated default offline/non-solver checkpoint passed 49 tests
+and `ruff check src tests`. The current tree now includes the characterized
+metabolite/reaction workflow and its PubChem service boundary in addition to the
+earlier service-boundary tests. Their files pass `compileall`, but the complete
+current test and lint gates remain pending because `pytest`, `ruff`, and the GPR runtime
+dependency `cobra` are unavailable in the active environment. The package has
+passed the local clean-wheel and outside-checkout smoke gate. Gapfill and
+comparison APIs/CLIs now join the pathway workflow, and Ensembl annotation is
+behind an injectable package client. BioCyc and KEGG GPR lookups now use
+injectable package clients. The characterized batch model-builder workflow now
+also receives package clients for KEGG reaction prefetch, BioCyc XML lookups,
+and Ensembl annotation. Remaining service use in deferred workflows must be
+migrated as those workflows are characterized. The single-model builder now
+passes package clients through its GPR, Ensembl prefetch, and
+location-annotation paths. The characterized database-builder workflow now
+passes package clients through its KEGG page/entry, GPR, and Ensembl annotation
+paths. The report-driven annotation figures are now characterized behind an
+import-safe package API with a separate plotting extra; model-dependent and
+hard-coded legacy figures remain.
 
 | Phase | Status | Remaining gate |
 | --- | --- | --- |
-| Phase 0 | Complete | Dependency/artifact policy and source-only legacy namespace decisions are recorded; checkpoint commit remains before the branch-local LFS rewrite. |
-| Phase 1 | Complete | Baseline CI and local clean-wheel/outside-checkout validation are recorded in the progress log. |
-| Phase 2 | In progress | Continue characterized helper moves; introduce injectable clients with network-dependent moves. |
-| Phase 3 | In progress | Initial gapfill, pathway, and comparison APIs/CLIs are import-safe; characterize legacy report contracts and migrate remaining script entry points. |
+| Phase 0 | Complete | Dependency/artifact policy and source-only legacy namespace decisions were recorded before the completed branch-local LFS migration. |
+| Phase 1 | Complete | Baseline CI and local clean-wheel/outside-checkout validation are recorded in the progress log; source-only legacy compatibility tests are an explicit exception to the package-test import rule. |
+| Phase 2 | In progress | Continue characterized helper moves and migrate remaining direct service use as each legacy workflow is characterized; the batch, single-model builder, database-builder, and metabolite/reaction boundaries are now covered. |
+| Phase 3 | In progress | Initial gapfill, pathway, and comparison APIs/CLIs are import-safe; the report-driven figure contract is characterized, while model-dependent figures and remaining script entry points are pending. |
+| Phase 5 | In progress | PubChem, Ensembl, BioCyc, and KEGG package clients exist; run the pending full offline gate and migrate remaining direct service calls in deferred workflows before declaring the phase complete. The characterized database-builder and metabolite/reaction paths now use injectable clients. |
 | Phase 6 | Complete | The approved targeted LFS policy and generated-artifact index cleanup passed on `refactoring-cleanup`; fresh-clone checksums are recorded in the progress log. |
-| Phases 4–5, 7 | Not started | Begin after the relevant earlier-phase gates pass. |
+| Phases 4 and 7 | Not started | Begin after the relevant earlier-phase gates pass. |
 
 ### Open Decisions
 
@@ -611,8 +626,10 @@ Checkpoint commit:
 - Add central pytest config.
 - Remove any pytest `pythonpath = ["src"]` setting so tests exercise the
   installed package rather than importing directly from the source tree.
-- Migrate package tests away from checkout-only `functions.*` imports, unless
-  an explicitly packaged legacy compatibility namespace is approved.
+- Migrate package tests away from checkout-only `functions.*` imports.
+  Source-checkout compatibility tests whose explicit purpose is to verify the
+  legacy `functions` aliases are the only exception; keep them clearly
+  identified, and do not use them as evidence that a built wheel is standalone.
 - Add `ruff` and `black` configuration.
 - Add a `tests/` directory with one trivial import test.
 - Add the first characterization tests for the safest pure functions before
@@ -838,10 +855,11 @@ Checkpoint commits:
 Keep this list limited to pending, reviewable changes. Remove an entry when it
 is completed and record the result in `REFACTORING_PROGRESS.md`.
 
-1. Publish the rewritten `refactoring-cleanup` branch only after coordinating
-   the required force-push and LFS object upload with collaborators.
-2. Continue characterized helper/workflow migration and complete the remaining
-   external-service hardening work.
+1. Run the pending offline pytest/Ruff gates, then complete the remaining
+   model-dependent figure migration and audit direct service use in deferred
+   workflows. The batch, single-model builder, database-builder, and
+   metabolite/reaction boundaries plus the report-driven figure contract are
+   now covered.
 
 ## Definition of Done
 

@@ -46,6 +46,10 @@ cell-specific = [
   "pathos",
   "troppo",
 ]
+figures = [
+  "matplotlib",
+  "seaborn",
+]
 
 [project.scripts]
 thg-gapfill = "thg_protocol.gapfill.cli:main"

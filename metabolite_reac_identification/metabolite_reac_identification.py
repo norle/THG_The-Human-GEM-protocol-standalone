@@ -1,44 +1,79 @@
-import cobra.io
-import numpy as np
-import re
-import os
-import sys
+"""CLI compatibility wrapper for metabolite/reaction identification."""
 
-# Determine the current file's directory and the project root.
-current_dir = os.path.dirname(os.path.abspath(__file__))
-project_root = os.path.join(current_dir, "..")
+from __future__ import annotations
 
-# Add the project root to sys.path to access top-level folders like 'functions' and 'models'
-if project_root not in sys.path:
-    sys.path.append(project_root)
+import argparse
+from pathlib import Path
 
-from functions.function_metabolite_identification import *
-from functions.function_reac_identification import *
-from functions.function_annotate_cobra_model import *
+from thg_protocol.annotation.metabolite_reactions import (
+    run_metabolite_reaction_identification,
+)
 
-model = os.path.join(project_root, "models", "Human-GEM1_19.xml")
-database = os.path.join(project_root, "models", "Human Database.xml")
-
-cobra_model = cobra.io.read_sbml_model(model)
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
 
 
-# Metabolites
+def build_parser() -> argparse.ArgumentParser:
+    """Build the command-line parser without loading COBRA or model files."""
+    parser = argparse.ArgumentParser(
+        description="Annotate a THG model's metabolites and reactions."
+    )
+    parser.add_argument(
+        "--model",
+        type=Path,
+        default=PROJECT_ROOT / "models" / "Human-GEM1_19.xml",
+        help="Input model SBML path.",
+    )
+    parser.add_argument(
+        "--database",
+        type=Path,
+        default=PROJECT_ROOT / "models" / "Human Database.xml",
+        help="Reference database SBML path used for reaction matching.",
+    )
+    parser.add_argument(
+        "--output-dir",
+        type=Path,
+        default=PROJECT_ROOT / "metabolite_reac_identification" / "reports",
+        help="Directory for annotation reports and default model outputs.",
+    )
+    parser.add_argument(
+        "--model-output",
+        type=Path,
+        default=PROJECT_ROOT / "models" / "THG-beta1.1.1.xml",
+        help="Annotated SBML output path.",
+    )
+    parser.add_argument(
+        "--normalized-model-output",
+        type=Path,
+        default=PROJECT_ROOT / "models" / "THG-beta1.1.xml",
+        help="Normalized annotated SBML output path.",
+    )
+    parser.add_argument(
+        "--annotation-delay",
+        type=float,
+        default=1.0,
+        help="Minimum delay between PubChem requests, in seconds.",
+    )
+    return parser
 
-metabolites = gather_metabolites(cobra_model)
-generate_met_annotation(metabolites)
-met_annotation = process_annotation()
+
+def main(argv: list[str] | None = None) -> int:
+    """Run the annotation workflow and return a process exit code."""
+    args = build_parser().parse_args(argv)
+    result = run_metabolite_reaction_identification(
+        args.model,
+        args.database,
+        args.output_dir,
+        model_output_path=args.model_output,
+        normalized_model_output_path=args.normalized_model_output,
+        annotation_delay=args.annotation_delay,
+    )
+    print(
+        "Annotated "
+        f"{result.annotated_metabolite_count}/{result.metabolite_count} metabolites "
+        f"and {result.annotated_reaction_count} reactions."
+    )
+    return 0
 
 
-# Reactions
-
-reac = process_reac(model, "[A-Z]+[0-9]+[a-z]+[0-9]*", "MAM02040", "MAM02039")
-reac = replace_met_id_by_met_kegg(reac, gather_kegg_metabolites(model))
-reac_y = process_reac(database, "([A-Z][0-9]+_?[a-z]+[0-9]*)", "C00080", "C00001")
-jaccard = execute_jaccard(reac_y, reac)
-reac_annotation = process_jaccard(reac_y, reac, jaccard)
-
-
-# SBML
-logging.info("Annotating the model and writing SBML files...")
-
-annotate_cobra_model(cobra_model, met_annotation, reac_annotation)
+if __name__ == "__main__":
+    raise SystemExit(main())

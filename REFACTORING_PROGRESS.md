@@ -3,6 +3,8 @@
 This document records completed work and dated validation snapshots for the
 refactoring described in `REFACTORING_PLAN.md`. It is historical: the current
 status, open decisions, phase gates, and next pull requests live in the plan.
+Later repository-state notes may qualify historical claims when a temporary
+recovery ref or another local-only validation artifact is no longer available.
 
 When adding an entry:
 
@@ -12,6 +14,201 @@ When adding an entry:
 - identify any known follow-up work;
 - include the commit hash once the checkpoint commit exists.
 
+## 2026-07-28
+
+### Current checkpoint packaging validation
+
+- Reviewed the combined service-boundary, metabolite/reaction, and figure API
+  checkpoint against the phase status and remaining gates in
+  `REFACTORING_PLAN.md`.
+- Built the wheel without dependency resolution, installed it into a temporary
+  target outside the checkout, and imported the new annotation, figure, and
+  service APIs from that installed artifact.
+- Validation:
+  - `python -m compileall -q src/thg_protocol build_model functions generate_data-base metabolite_reac_identification tests/unit`
+    passed, with pre-existing invalid-escape warnings in legacy modules.
+  - `pip wheel --no-deps --no-build-isolation .` passed.
+  - `pip install --no-deps --target <temporary-target> <built-wheel>` passed.
+  - Outside-checkout public API smoke testing against the installed wheel
+    passed.
+  - `git diff --check` passed.
+  - Full pytest and Ruff gates remain pending because neither tool is installed
+    in the active environment.
+
+### Report-driven figure workflow characterization
+
+- Characterized the reproducible portion of
+  `generate_figures/create_figure.py`: Excel workbook sheets 4, 5, and 6
+  provide annotation-group tables, which produce the metabolite, reaction, and
+  gene SVG charts.
+- Added `thg_protocol.figures.comparison` with pure annotation-group
+  summaries, explicit report/output paths, structured results, and lazy imports
+  for pandas and plotting dependencies. Added a `figures` optional dependency
+  extra for the rendering environment.
+- Added offline tests for import safety and the legacy cumulative group
+  calculation. The API does not load COBRA models or perform work on import.
+- Validation:
+  - `python -m compileall -q src/thg_protocol/figures tests/unit/test_figures_api.py`
+    passed.
+  - `git diff --check` passed.
+  - A `PYTHONPATH=src` pure-summary API smoke test passed.
+  - The complete offline pytest/Ruff gates remain pending because pytest, Ruff,
+    and COBRA are unavailable in the active environment.
+- Follow-up: migrate the model-dependent and hard-coded legacy figure outputs,
+  then audit remaining direct service calls in deferred workflows.
+
+## 2026-07-28
+
+### Metabolite/reaction workflow service boundary
+
+- Characterized `metabolite_reac_identification/metabolite_reac_identification.py`:
+  it gathers model metabolites, writes the PubChem annotation and failure
+  reports, matches reactions against the reference database, and writes the
+  two legacy SBML outputs.
+- Added `thg_protocol.annotation.metabolite_reactions` with an explicit-path
+  workflow API and structured result. COBRA is imported only when the workflow
+  runs, and the legacy script now provides guarded argparse-based execution
+  with explicit model, database, report, and SBML output paths.
+- Extended `generate_met_annotation` to pass an injected PubChem client to each
+  lookup. The package workflow uses `PubChemClient` by default or a supplied
+  static/fake adapter, so its service path no longer depends on PubChemPy.
+- Moved the model annotation/SBML normalization implementation to
+  `thg_protocol.annotation.model` and retained
+  `functions.function_annotate_cobra_model` as an import-safe compatibility
+  wrapper.
+- Added offline tests for PubChem client propagation and workflow/legacy import
+  safety.
+- Validation:
+  - `python -m compileall -q src/thg_protocol/annotation src/thg_protocol/services metabolite_reac_identification functions/function_annotate_cobra_model.py tests/unit/test_metabolite_annotation_api.py tests/unit/test_metabolite_reaction_workflow.py` passed.
+  - `git diff --check` passed.
+  - A `PYTHONPATH=src` package import/static PubChem smoke test passed.
+  - A `PYTHONPATH=src` legacy script `--help` smoke test passed without COBRA
+    or model files, and a static one-metabolite annotation smoke test passed.
+  - `python -m pytest -m "not slow and not online and not solver and not gurobi and not memote" -q` is blocked because pytest is unavailable, and `ruff check src tests` is blocked because Ruff is unavailable. COBRA is also unavailable; the full offline pytest/Ruff gates and end-to-end SBML workflow remain pending in the development environment.
+- Follow-up: run the pending offline pytest/Ruff gates, then characterize the
+  next deferred workflow and migrate any remaining direct service calls.
+
+## 2026-07-28
+
+### Database-builder service injection
+
+- Characterized `generate_data-base/generate_db.py` as the next deferred
+  workflow after the batch and single-model builders.
+- Extended the injectable KEGG client with generic page and batched-entry
+  operations, including database prefixes, response caching, and static
+  offline fixtures. The existing reaction-entry API remains compatible.
+- Routed the database builder’s KEGG pathway, reaction, compound, and
+  same-as lookups through the injected client. Its GPR construction now
+  receives the package BioCyc and KEGG clients, and location/whole-model gene
+  annotation receives the package Ensembl client.
+- Threaded the client through the legacy `pathway`, `reaction`, `compound`,
+  and `gpr` classes and through KEGG fallback helpers. Callers that do not
+  provide a client retain their previous network fallback behavior.
+- Added offline coverage for static database-builder pages/entries and the
+  production client’s compound batch URL/parsing behavior.
+- Validation:
+  - `python -m compileall -q src/thg_protocol/services functions/class_generate_database.py functions/function_bm_gdb.py generate_data-base/generate_db.py tests/unit/test_biocyc_kegg_clients.py` passed with the pre-existing invalid-escape warnings.
+  - A `PYTHONPATH=src` static KEGG database-boundary smoke test passed.
+  - `python -m pytest --version` confirms pytest is unavailable, and
+    `ruff --version` confirms Ruff is unavailable. COBRA is also unavailable;
+    the full offline pytest/Ruff gates and legacy database-builder runtime
+    remain pending in the development environment.
+- Follow-up: run the pending offline pytest/Ruff gates, then characterize the
+  next deferred workflow, `metabolite_reac_identification`.
+
+## 2026-07-28
+
+### Single-model builder service injection
+
+- Characterized `build_model/build_model.py` as the next deferred workflow
+  after the batch model-builder boundary.
+- Routed its GPR calls through the injectable BioCyc and KEGG package clients,
+  replaced direct Ensembl page lookups with the package Ensembl client, and
+  passed that client into the legacy location helper.
+- Updated `getLocationnew` to prefer its supplied cache/client and retain the
+  old Ensembl URL fallback only for callers that do not provide a client. This
+  keeps existing positional callers compatible while allowing the characterized
+  builder workflows to run with an offline/static Ensembl adapter.
+- Verified the published `refactoring-cleanup` branch at
+  `36dedbd2cb39f7482277a5e79a77c121db4e3caf`, fetched its seven LFS objects,
+  and passed `git lfs fsck refactoring-cleanup`.
+- Validation:
+  - `python -m compileall -q src/thg_protocol/services build_model/build_model.py build_model/build_model_batch.py functions/gpr/get_location_def.py tests/unit/test_biocyc_kegg_clients.py tests/unit/test_ensembl_client.py` passed with the pre-existing invalid-escape warnings.
+  - A static Ensembl/KEGG client smoke test passed.
+  - `pytest` and Ruff are unavailable in the active environment; the pending
+    offline test and lint gates remain unrun. `cobra` is also unavailable, so
+    the legacy builder runtime was not executed.
+- Follow-up: run the full offline pytest/Ruff gates when development
+  dependencies are available, then characterize the next deferred workflow.
+
+### Batch model-builder service injection
+
+- Characterized `build_model/build_model_batch.py` as the next legacy workflow
+  with direct external-service access.
+- Added a cached, retrying KEGG reaction-entry batch operation to
+  `thg_protocol.services.kegg` and routed the legacy batch helper through its
+  injectable client protocol. The static adapter now supports offline reaction
+  entry fixtures.
+- Updated the batch workflow to accept BioCyc, KEGG, and Ensembl clients. Its
+  KEGG reaction prefetch, BioVelo query, BioCyc protein/location XML lookups,
+  and Ensembl annotation prefetch now use those clients. The legacy session is
+  retained only for compatibility with the unchanged `getLocation` call path.
+- Validation:
+  - `python -m compileall -q src/thg_protocol/services build_model/build_model_batch.py tests/unit/test_biocyc_kegg_clients.py tests/unit/test_ensembl_client.py` passed with the pre-existing invalid-escape warning in the legacy batch script.
+  - A `PYTHONPATH=src` static Ensembl/KEGG client smoke test passed.
+  - `python -m pytest --version` and `ruff --version` confirm that pytest and
+    Ruff are unavailable in the active environment; the pending offline test
+    and lint gates remain unrun.
+- Follow-up: migrate the next characterized deferred workflow and run the full
+  offline pytest/Ruff gates once the development dependencies are available.
+
+### BioCyc and KEGG GPR service boundaries
+
+- Added `thg_protocol.services.biocyc` and `thg_protocol.services.kegg` with
+  injectable protocols, retrying and timeout-bound production clients,
+  per-client response caches, normalized request errors, and static offline
+  adapters.
+- Updated the legacy `functions.gpr.gpr_def.getGPR` path to accept the package
+  clients while preserving its existing positional `session` argument. Its
+  BioCyc EC/page lookups and KEGG fallback/link lookups now route through those
+  clients.
+- Added offline static-client coverage, including a legacy GPR call that can
+  run without network access when the GPR dependency set is installed.
+- Validation:
+  - `python -m compileall -q src/thg_protocol/services functions/gpr/gpr_def.py tests/unit/test_biocyc_kegg_clients.py` passed (with pre-existing invalid-escape warnings in the legacy parser).
+  - Direct GPR smoke testing is blocked in this environment because `cobra` is
+    absent; `pytest` and `ruff` are also unavailable. Run the normal offline
+    test and lint gates in the project development environment before a
+    checkpoint commit.
+- Current-tree validation status: this file adds three tests beyond the last
+  fully validated 49-test checkpoint; they have not yet passed a full `pytest`
+  run in the current working tree.
+- Follow-up: migrate the remaining direct service calls when their deferred
+  workflows are characterized.
+
+### Ensembl annotation service boundary
+
+- Moved Ensembl REST access into `thg_protocol.services.ensembl`, with a
+  normalized annotation type, injectable client protocol, production client,
+  static offline adapter, explicit timeout/retry behavior, and per-client
+  request caching.
+- Converted `functions.ensembl_client.fetch_ensembl_annotations` to a thin
+  compatibility wrapper that preserves its dictionary-shaped return value.
+- Added offline coverage for static-client normalization and unknown identifier
+  handling.
+- Validation:
+  - `python -m compileall -q src/thg_protocol/services functions/ensembl_client.py` passed.
+  - A direct package import and static-client lookup passed.
+  - The active environment does not include `pytest` or `ruff`; run the normal
+    offline test and lint gates in the project development environment before a
+    checkpoint commit.
+- Current-tree validation status: this file adds one test beyond the last fully
+  validated 49-test checkpoint; it has not yet passed a full `pytest` run in the
+  current working tree.
+- Follow-up superseded later on 2026-07-28: the BioCyc and KEGG GPR boundaries
+  are recorded above. Remaining direct service calls will move behind those
+  clients as their deferred workflows are characterized.
+
 ## 2026-07-27
 
 ### Branch-local Git LFS migration and artifact cleanup
@@ -19,9 +216,10 @@ When adding an entry:
 - Created checkpoint commits `2750cad` (package and approved artifact policy)
   and `e54c81f` (generated-artifact index cleanup) before rewriting history.
 - Rewrote only the local `refactoring-cleanup` branch. The seven approved
-  canonical model/reference paths are now LFS pointers; the pre-rewrite tip is
-  retained locally as `refactoring-cleanup-pre-lfs` for recovery. No remote refs
-  were changed.
+  canonical model/reference paths are now LFS pointers. At validation time, the
+  pre-rewrite tip was retained in the migration worktree as
+  `refactoring-cleanup-pre-lfs` for recovery. No remote refs were changed by the
+  rewrite operation itself.
 - Generated backups, logs, caches, duplicate models, intermediate reports and
   figures, and large test fixtures were removed from Git tracking but remain in
   the working tree. Final published reports/figures remain ordinary Git files.
@@ -34,8 +232,15 @@ When adding an entry:
 - Rewritten target tip at migration validation: `b23c438`; validation record
   commit: `122b7f8`; final inventory wording commit: `4011255`; pre-rewrite
   recovery tip: `e54c81f`.
-- Follow-up: coordinate the force-push of the rewritten branch and upload its
-  LFS objects before collaborators use the new remote history.
+- Original follow-up: coordinate the force-push of the rewritten branch and
+  upload its LFS objects before collaborators use the new remote history.
+- Repository-state note, 2026-07-28: this checkout no longer contains
+  `refactoring-cleanup-pre-lfs`, and commit `e54c81f` is not available as a
+  local Git object. The local `origin/refactoring-cleanup` tracking ref equals
+  local `HEAD` (`36dedbd`), but it was not refreshed from the network during
+  this review. Verify the live remote ref and all seven LFS objects before any
+  further push. If pre-rewrite recovery is still required, recreate a durable
+  recovery tag or branch from an authoritative clone or backup.
 
 ## 2026-07-27
 
