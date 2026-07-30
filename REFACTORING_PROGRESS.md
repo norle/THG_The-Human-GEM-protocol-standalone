@@ -10,6 +10,8 @@ recovery ref or another local-only validation artifact is no longer available.
 
 ### Checkpoint validation
 
+- Checkpoint commit: `063511b` (`refactor: package workflow boundaries and
+  validation gates`).
 - Editable installation with `--no-build-isolation --no-deps` succeeded in a
   writable temporary environment; package import and installed gapfill help
   passed.
