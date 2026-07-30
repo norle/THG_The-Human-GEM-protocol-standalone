@@ -206,9 +206,16 @@ def build_model(
 
 from .mass_balance import (
     atom10,
+    eq2mat,
+    equation_matrix,
     formula_atoms,
     gcd,
+    inarray,
+    inv,
+    maximumGCD,
+    maximum_gcd,
     missing_atoms,
+    nullity,
     reaction_compare,
     reformulate_glycan_equation,
 )
@@ -227,9 +234,16 @@ __all__ = [
     "build_model",
     "build_model_batch",
     "atom10",
+    "eq2mat",
+    "equation_matrix",
     "formula_atoms",
     "gcd",
+    "inarray",
+    "inv",
+    "maximumGCD",
+    "maximum_gcd",
     "missing_atoms",
+    "nullity",
     "reaction_compare",
     "reformulate_glycan_equation",
 ]

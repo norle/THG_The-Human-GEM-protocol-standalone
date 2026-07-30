@@ -1,3 +1,5 @@
+import numpy as np
+
 from thg_protocol.model_build import (
     atom10,
     formula_atoms,
@@ -5,6 +7,14 @@ from thg_protocol.model_build import (
     reaction_compare,
 )
 from thg_protocol.model_build.mass_balance import reformulate_glycan_equation
+from thg_protocol.model_build.mass_balance import (
+    eq2mat,
+    equation_matrix,
+    inarray,
+    inv,
+    maximumGCD,
+    nullity,
+)
 from thg_protocol.services.kegg import StaticKeggClient
 
 
@@ -28,3 +38,26 @@ def test_reformulate_glycan_equation_assigns_symbols_by_element() -> None:
     assert reformulate_glycan_equation(
         "G00001 -> G00001", client=client
     ) == "A1B2C1 -> A1B2C1"
+
+
+def test_legacy_numeric_mass_balance_helpers_are_package_owned() -> None:
+    assert inarray([1, 2, 0], [3, 6, 0]) == 3
+    assert inarray([1, 2], [3, 5]) == ""
+
+    matrix = equation_matrix("2 H2 + O2 -> 2 H2O")
+    assert matrix.shape == (2, 3)
+    assert matrix.tolist() == [[4.0, 0.0, -4.0], [0.0, 2.0, -2.0]]
+    assert np.array_equal(
+        eq2mat("H2 + O2 -> H2O"), equation_matrix("H2 + O2 -> H2O")
+    )
+
+
+def test_nullity_preserves_independent_rows() -> None:
+    completed, independent = nullity([[1, 0], [2, 0]])
+    assert independent.shape == (1, 2)
+    assert completed.shape == (2, 2)
+
+
+def test_inverse_and_gcd_helpers_are_available_without_solver() -> None:
+    assert np.allclose(inv([[2.0, 0.0], [0.0, 4.0]]), [[0.5, 0.0], [0.0, 0.25]])
+    assert maximumGCD(["2*K", "4*K", "6*K"], "K", 3) == 6

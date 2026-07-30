@@ -9,9 +9,16 @@ from __future__ import annotations
 
 from thg_protocol.model_build.mass_balance import (
     atom10,
+    eq2mat,
+    equation_matrix,
     formula_atoms,
     gcd,
+    inarray,
+    inv,
+    maximumGCD,
+    maximum_gcd,
     missing_atoms,
+    nullity,
     reaction_compare,
 )
 from thg_protocol.glycan import glycan_atoms
@@ -47,7 +54,7 @@ def _deferred(*_args, **_kwargs):
     )
 
 
-inarray = eq2mat = nullity = inv = maximumGCD = _deferred
+# Solver-backed operations remain deferred; these matrix helpers are pure.
 WrapRxnSubsProdParam = UnwrapRxnSubsProdParam = RxnParam2Eq = _deferred
 AddMissingAtom = CountAtom = MB_Core = MB_REM = MB_LP = _deferred
 RxnBalance2 = Proton = Water = add_extra_compound = _deferred
@@ -65,8 +72,10 @@ __all__ = [
     "inarray",
     "eq2mat",
     "nullity",
+    "equation_matrix",
     "inv",
     "maximumGCD",
+    "maximum_gcd",
     "WrapRxnSubsProdParam",
     "UnwrapRxnSubsProdParam",
     "RxnParam2Eq",

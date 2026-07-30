@@ -2,10 +2,13 @@
 
 from __future__ import annotations
 
+import ast
 import math
 import re
 from collections import defaultdict
 from typing import Any
+
+import numpy as np
 
 from thg_protocol.glycan import resolve_glycan_atoms
 from thg_protocol.services.kegg import KeggClientProtocol
@@ -62,6 +65,139 @@ def reaction_compare(first: str, second: str) -> tuple[list[str], list[int]]:
     return new_left + new_right, [-1] * len(new_left) + [1] * len(new_right)
 
 
+def inarray(first: Any, second: Any) -> int | str:
+    """Return the common integer multiplier between two vectors.
+
+    This is the dependency-free portion of the historical mass-balance API.
+    Zero entries in ``first`` must also be zero in ``second``; an empty or
+    non-integral result returns the historical empty-string sentinel.
+    """
+    left = np.asarray(first, dtype=float)
+    right = np.asarray(second, dtype=float)
+    if left.shape != right.shape:
+        return ""
+    mask = ~np.isclose(left, 0)
+    if np.any(~mask & ~np.isclose(right, 0)) or not np.any(mask):
+        return ""
+    ratios = right[mask] / left[mask]
+    if not np.allclose(ratios, ratios[0]) or ratios[0] <= 0:
+        return ""
+    value = float(ratios[0])
+    return int(round(value)) if value.is_integer() else ""
+
+
+def equation_matrix(equation: str) -> np.ndarray:
+    """Build an elemental composition matrix for an equation.
+
+    Columns are compounds in left-to-right equation order and rows are the
+    elements encountered in those compounds. Stoichiometric coefficients are
+    included in the matrix and products have negative signs.
+    """
+    if equation.count("->") != 1:
+        raise ValueError("equation must contain exactly one '->'")
+    terms: list[tuple[int, str]] = []
+    for side, sign in zip(equation.split("->"), (1, -1)):
+        for raw in side.split("+"):
+            token = raw.strip()
+            if not token:
+                continue
+            match = re.fullmatch(r"(?:(\d+(?:\.\d+)?)\s*)?(.+)", token)
+            if not match:
+                raise ValueError(f"invalid equation term: {token}")
+            coefficient = float(match.group(1) or 1) * sign
+            terms.append((coefficient, match.group(2)))
+    parsed = [formula_atoms(formula) for _, formula in terms]
+    if any(not atoms for atoms in parsed):
+        raise ValueError("equation contains an invalid formula")
+    elements = sorted({element for atoms in parsed for element in atoms})
+    return np.array(
+        [
+            [coefficient * atoms.get(element, 0)
+             for (coefficient, _), atoms in zip(terms, parsed)]
+            for element in elements
+        ],
+        dtype=float,
+    )
+
+
+# Historical name retained as a small, pure compatibility alias.
+eq2mat = equation_matrix
+
+
+def nullity(matrix: Any) -> tuple[np.ndarray, np.ndarray]:
+    """Return a row-independent matrix and its nullity-completion matrix."""
+    values = np.asarray(matrix, dtype=float)
+    if values.ndim != 2:
+        raise ValueError("matrix must be two-dimensional")
+    rank = np.linalg.matrix_rank(values)
+    independent: list[np.ndarray] = []
+    current_rank = 0
+    for row in values:
+        candidate = np.vstack(independent + [row]) if independent else row[None, :]
+        new_rank = np.linalg.matrix_rank(candidate)
+        if new_rank > current_rank:
+            independent.append(row)
+            current_rank = new_rank
+    independent_matrix = np.asarray(independent, dtype=float)
+    if independent_matrix.size == 0:
+        independent_matrix = np.empty((0, values.shape[1]))
+    completion = np.zeros((max(values.shape[1] - rank, 0), values.shape[1]))
+    for index in range(completion.shape[0]):
+        completion[index, -(index + 1)] = 1
+    return (
+        np.vstack([independent_matrix, completion]),
+        independent_matrix,
+    )
+
+
+def inv(matrix: Any) -> np.ndarray:
+    """Return the inverse of a square numeric matrix."""
+    values = np.asarray(matrix, dtype=float)
+    if values.ndim != 2 or values.shape[0] != values.shape[1]:
+        raise ValueError("matrix must be square")
+    return np.linalg.inv(values)
+
+
+def maximum_gcd(values: Any, variable: str, value: Any) -> int:
+    """Return the GCD of integer expressions after substituting ``variable``."""
+    evaluated: list[int] = []
+
+    def calculate(expression: str) -> float:
+        operators = {
+            ast.Add: lambda left, right: left + right,
+            ast.Sub: lambda left, right: left - right,
+            ast.Mult: lambda left, right: left * right,
+            ast.Div: lambda left, right: left / right,
+        }
+
+        def visit(node: ast.AST) -> float:
+            if isinstance(node, ast.Expression):
+                return visit(node.body)
+            if isinstance(node, ast.Constant) and isinstance(node.value, (int, float)):
+                return float(node.value)
+            if isinstance(node, ast.UnaryOp) and isinstance(node.op, (ast.UAdd, ast.USub)):
+                result = visit(node.operand)
+                return result if isinstance(node.op, ast.UAdd) else -result
+            if isinstance(node, ast.BinOp) and type(node.op) in operators:
+                return operators[type(node.op)](visit(node.left), visit(node.right))
+            raise ValueError("unsupported expression")
+
+        return visit(ast.parse(expression, mode="eval"))
+
+    for expression in values:
+        text = str(expression).replace(variable, str(value))
+        try:
+            evaluated.append(int(round(calculate(text))))
+        except (SyntaxError, ValueError, TypeError) as error:
+            raise ValueError(f"invalid integer expression: {expression}") from error
+    if not evaluated:
+        return 0
+    return math.gcd(*evaluated)
+
+
+maximumGCD = maximum_gcd
+
+
 def reformulate_glycan_equation(
     equation: str,
     *,
@@ -114,4 +250,11 @@ __all__ = [
     "missing_atoms",
     "reaction_compare",
     "reformulate_glycan_equation",
+    "inarray",
+    "equation_matrix",
+    "eq2mat",
+    "nullity",
+    "inv",
+    "maximum_gcd",
+    "maximumGCD",
 ]
