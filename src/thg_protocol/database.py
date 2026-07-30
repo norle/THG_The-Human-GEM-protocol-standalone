@@ -129,6 +129,23 @@ def reconstruct_model(
             reaction.annotation["pathway"] = pathways_by_reaction[record.id]
         model.add_reactions([reaction])
 
+    # Historical database reconstruction represented pathways as COBRA groups.
+    # Retain that structure for callers of the legacy-pickle compatibility API,
+    # while also keeping the reaction-level annotation above useful to generic
+    # model consumers.
+    if pathways:
+        from cobra.core import Group
+
+        for pathway, reaction_ids in pathways.items():
+            group = Group(str(pathway), name=str(pathway))
+            model.add_groups([group])
+            members = [
+                model.reactions.get_by_id(reaction_id)
+                for reaction_id in reaction_ids
+                if model.reactions.has_id(reaction_id)
+            ]
+            group.add_members(members)
+
     if output_path is not None:
         path = Path(output_path)
         path.parent.mkdir(parents=True, exist_ok=True)
@@ -319,6 +336,8 @@ def reconstruct_model_from_pickle(
         metabolite_ids[str(source_key)] = metabolite_id
         metabolite_ids[str(base_id)] = metabolite_id
 
+    known_metabolite_ids = {record.id for record in metabolite_records}
+
     def compounds(record: Any, method: str, fallback: str) -> list[Any]:
         values = _record_call(record, method)
         if values is None:
@@ -350,6 +369,19 @@ def reconstruct_model_from_pickle(
                     metabolite_id = with_compartment(
                         source_metabolite, reaction_compartment
                     )
+                if metabolite_id not in known_metabolite_ids:
+                    # The historical reconstruction created a minimal
+                    # metabolite when a reaction referenced a compound absent
+                    # from the compartmentalized metabolite list. Preserve
+                    # that compatibility behavior instead of rejecting an
+                    # otherwise usable checkpoint.
+                    metabolite_records.append(
+                        MetaboliteRecord(
+                            metabolite_id,
+                            compartment=reaction_compartment,
+                        )
+                    )
+                    known_metabolite_ids.add(metabolite_id)
                 stoichiometry[metabolite_id] = (
                     stoichiometry.get(metabolite_id, 0.0) + coefficient
                 )

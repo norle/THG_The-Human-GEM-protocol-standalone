@@ -49,6 +49,7 @@ jobs:
             "$smoke_dir/venv/bin/thg-gapfill" --help
             "$smoke_dir/venv/bin/thg-compare" --help
             "$smoke_dir/venv/bin/thg-pathway" --help
+          )
 
   solver:
     if: github.event_name == 'workflow_dispatch' || github.event_name == 'schedule'

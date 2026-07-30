@@ -8,8 +8,8 @@ For development:
 python -m pip install -e ".[dev]"
 ```
 
-Optional dependency groups are defined for docs, solvers, memote, and
-cell-specific workflows.
+Optional dependency groups are defined for database checkpoint compatibility,
+docs, solvers, memote, and cell-specific workflows.
 
 The extras can be installed independently when needed:
 
@@ -18,6 +18,7 @@ python -m pip install 'thg-protocol[solver]'
 python -m pip install 'thg-protocol[memote]'
 python -m pip install 'thg-protocol[cell-specific]'
 python -m pip install 'thg-protocol[docs]'
+python -m pip install 'thg-protocol[database]'
 ```
 
 The installed `thg-gapfill`, `thg-pathway`, and `thg-compare` commands expose

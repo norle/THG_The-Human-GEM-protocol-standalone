@@ -24,6 +24,9 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+database = [
+  "dill",
+]
 dev = [
   "black",
   "build",

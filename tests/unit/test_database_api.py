@@ -106,7 +106,7 @@ def test_reconstruct_model_from_legacy_pickle_bundle(tmp_path):
                 "ID": "R1_c",
                 "Name": "A to B",
                 "subs": [[1, "A", "A"]],
-                "prods": [[1, "B", "B"]],
+                "prods": [[1, "B", "B"], [1, "missing", "missing"]],
                 "GPR": ["gpr", "GENE1"],
                 "EC": ["1.1.1.1"],
             }
@@ -125,6 +125,8 @@ def test_reconstruct_model_from_legacy_pickle_bundle(tmp_path):
     assert model.reactions.R1_c.metabolites[model.metabolites.A_c] == -1
     assert model.reactions.R1_c.gene_reaction_rule == "GENE1"
     assert model.reactions.R1_c.annotation["pathway"] == ["toy pathway"]
+    assert model.metabolites.missing_c.compartment == "c"
+    assert model.groups.get_by_id("toy pathway").members == [model.reactions.R1_c]
     assert output.exists()
 
 
