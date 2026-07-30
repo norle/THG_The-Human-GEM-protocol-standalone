@@ -13,3 +13,12 @@ implement_pathway_files(
 
 The equivalent installed CLI is `thg-pathway`; run `thg-pathway --help` for the
 explicit input and output arguments.
+
+KEGG pathway reaction listings are also available as an explicit, injectable
+workflow:
+
+```python
+from thg_protocol.pathway import list_pathway_reactions
+
+list_pathway_reactions("pathways.tsv", "results/pathway-reactions.tsv", limit=5)
+```

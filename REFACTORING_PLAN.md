@@ -576,6 +576,40 @@ The legacy figure script is an explicit-path wrapper; supplied MEMOTE and
 algorithm score data are required for those optional charts rather than being
 hard-coded. A service-boundary audit records the production-helper boundary;
 historical fixture migration remains a Phase 4 task.
+The legacy network-component and JSON-to-SBML entry points are now thin,
+import-safe wrappers around package APIs. Solver-backed network compaction and
+the remaining historical workflow scripts remain deferred until their explicit
+input/output contracts and characterization coverage are complete.
+KEGG pathway listing and exchange-reaction matching now also have package-owned
+APIs with explicit inputs and injectable clients; their historical entry points
+are compatibility wrappers.
+Dependency-light formula and reaction mass-balance primitives now live under
+`thg_protocol.model_build.mass_balance`; the solver-backed balancing and full
+database-generator orchestration remain separate deferred workflows.
+The KEGG pathway-link parser used by the database builder is package-owned and
+the legacy `getLinkPath` name delegates to it; remaining database helpers are
+still compatibility-bound until their records and outputs are characterized.
+Proportional network compaction is now package-owned as well; blocked-reaction
+filtering remains an explicit solver-dependent option.
+The legacy database generator now exposes deterministic pickle reconstruction
+through an explicit CLI and no longer imports credentialed harvesting code for
+help or module import.
+Archived algorithm helper copies now delegate to package APIs; historical
+solver/model-backed fixtures remain opt-in and outside the default test path.
+The legacy gapfill orchestrator now delegates all supported phase commands to
+`thg_protocol.gapfill.core`; the package CLI is the maintained entry point.
+Archived algorithm report scripts and duplicated pathway/mass-balance/merge
+helpers now use explicit I/O or package compatibility exports. MEMOTE and
+solver-backed checks remain opt-in.
+The legacy consistency module now delegates formula-based checks to
+`thg_protocol.analysis`; MEMOTE-specific checks remain explicit deferred
+operations.
+GPR lookup/parsing now has a package-owned injectable boundary, and the legacy
+authentication/definition modules are compatibility adapters that can be
+imported without COBRA.
+Subcellular location resolution now has the same package-owned injectable
+boundary; the legacy location module is a compatibility adapter with no
+repository-relative lookup by default.
 
 | Phase | Status | Remaining gate |
 | --- | --- | --- |

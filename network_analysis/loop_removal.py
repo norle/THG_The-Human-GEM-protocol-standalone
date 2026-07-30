@@ -1,69 +1,50 @@
-from compaction import full_compaction
-import logging
+"""Compatibility entry point for the solver-backed loop-removal workflow."""
+
+from __future__ import annotations
+
+import argparse
+from pathlib import Path
+from typing import Any
 
 
-def remove_loops(model, no_blocked_reactions=False):
-    """Remove loops from the model by performing full compaction."""
-    _, loop_reactions = full_compaction(model, no_blocked_reactions=False)
+def remove_loops(model: Any, no_blocked_reactions: bool = False) -> tuple[Any, list[Any], list[str]]:
+    """Run the historical compaction algorithm without import-time side effects.
 
-    logging.info(f"Identified {len(loop_reactions)} infeasible loops to remove.")
+    The package connectivity API intentionally does not perform solver-backed
+    loop removal. This compatibility function keeps that optional workflow
+    available while loading its heavy implementation only when called.
+    """
+    from network_analysis.compaction import full_compaction
 
-    loop_individual_reactions = []
-
-    for compacted_reaction in loop_reactions:
-        # Remove all brackets "()"
-        cleaned_reaction = compacted_reaction.id.replace("(", "").replace(")", "")
-        # Split by # and @
-        parts = cleaned_reaction.split("#")
-        for part in parts:
-            subparts = part.split("@")
-            loop_individual_reactions.extend(subparts)
-    logging.info(f"Compacted loops identified: {[reaction.id for reaction in loop_reactions]}")
-    logging.info(f"Individual reactions to remove: {loop_individual_reactions}")
-    logging.info(
-        f"Removing {len(loop_individual_reactions)} reactions involved in infeasible loops."
+    compacted, loop_reactions = full_compaction(
+        model, no_blocked_reactions=no_blocked_reactions
     )
+    reaction_ids: list[str] = []
+    for compacted_reaction in loop_reactions:
+        cleaned = compacted_reaction.id.replace("(", "").replace(")", "")
+        for part in cleaned.split("#"):
+            reaction_ids.extend(part.split("@"))
+    compacted.remove_reactions(reaction_ids)
+    return compacted, loop_reactions, reaction_ids
 
-    model.remove_reactions(loop_individual_reactions)
-    return model, loop_reactions, loop_individual_reactions
+
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("model", type=Path, help="input JSON model")
+    parser.add_argument("output", type=Path, help="output JSON model")
+    parser.add_argument(
+        "--allow-blocked", action="store_true", help="skip blocked-reaction filtering"
+    )
+    args = parser.parse_args(argv)
+
+    from cobra.io import load_json_model, save_json_model
+
+    model = load_json_model(str(args.model))
+    result, _, _ = remove_loops(model, no_blocked_reactions=args.allow_blocked)
+    args.output.parent.mkdir(parents=True, exist_ok=True)
+    save_json_model(result, str(args.output))
+    return 0
 
 
 if __name__ == "__main__":
-    from cobra.io import load_json_model, save_json_model
-    import csv
-
-    logging.basicConfig(level=logging.INFO)
-
-    # model_name = "THG-beta-expanded_251118_transcriptomics"
-    model_name = "iMM904"
-
-    model = load_json_model(f"models/{model_name}.json")
-
-    model.solver = "gurobi"
-    model_no_loops, loops, loop_reactions = remove_loops(
-        model, no_blocked_reactions=False
-    )
-
-    # Save comprehensive loop analysis
-    with open(f"models/{model_name}_loop_analysis.csv", "w", newline="") as csvfile:
-        writer = csv.writer(csvfile)
-
-        # Write summary header
-        writer.writerow(["Loop Removal Analysis Summary"])
-        writer.writerow(["Total compacted loops identified", len(loops)])
-        writer.writerow(["Total individual reactions to remove", len(loop_reactions)])
-        writer.writerow([])
-
-        # Write compacted loops section
-        writer.writerow(["Compacted Loop ID", "Compacted Loop Full ID"])
-        for loop in loops:
-            writer.writerow([loop.id, loop.annotation.get("full_id", "")])
-
-        writer.writerow([])
-
-        # Write individual reactions section
-        writer.writerow(["Individual Reactions to Remove"])
-        for reac in loop_reactions:
-            writer.writerow([reac])
-
-    save_json_model(model_no_loops, f"models/{model_name}_no_loops.json")
+    raise SystemExit(main())

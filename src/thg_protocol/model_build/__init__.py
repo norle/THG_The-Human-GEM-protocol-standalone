@@ -204,6 +204,16 @@ def build_model(
     return report
 
 
+from .mass_balance import (
+    atom10,
+    formula_atoms,
+    gcd,
+    missing_atoms,
+    reaction_compare,
+    reformulate_glycan_equation,
+)
+
+
 def __getattr__(name: str) -> Any:
     if name == "build_model_batch":
         from .batch import build_model_batch
@@ -212,4 +222,14 @@ def __getattr__(name: str) -> Any:
     raise AttributeError(name)
 
 
-__all__ = ["ModelBuildReport", "build_model", "build_model_batch"]
+__all__ = [
+    "ModelBuildReport",
+    "build_model",
+    "build_model_batch",
+    "atom10",
+    "formula_atoms",
+    "gcd",
+    "missing_atoms",
+    "reaction_compare",
+    "reformulate_glycan_equation",
+]

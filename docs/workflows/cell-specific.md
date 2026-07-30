@@ -17,6 +17,17 @@ Activity rows must follow the model reaction order. CSV and MAT inputs are
 supported; MAT files use the `all_Solutions_matrix5` key by default. The
 optional extra remains required for GIMME/Troppo workflows.
 
+Boundary reaction bounds can be matched without annotation services or a
+solver:
+
+```python
+from thg_protocol.cell_specific import match_exchange_reactions
+
+tailored, matched, unmatched, inconsistent = match_exchange_reactions(
+    model_new, model_base, add_reactions=False
+)
+```
+
 Cell-specific model generation depends on the optional `cell-specific` extra:
 
 ```bash

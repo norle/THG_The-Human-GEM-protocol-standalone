@@ -1,37 +1,43 @@
-import pandas as pd
+"""Explicit report generator for archived metabolite-identification results."""
+
+from __future__ import annotations
+
+import argparse
+from pathlib import Path
 
 
-def process_met_file(met_file):
-    
-    m = pd.read_csv(met_file)[["identifier", "name", "formula", "expected", "message"]]
-    m["identifier"] = m["identifier"].replace("[a-z]+","", regex=True)
+def process_met_file(met_file: str | Path):
+    import pandas as pd
 
-    x = m[m["message"].str.contains("assert '", na=False)]
-    x.insert(5, 'results', 'metabolite incorrectly annotated')
+    frame = pd.read_csv(met_file)
+    if "identifier" in frame:
+        frame["identifier"] = frame["identifier"].replace(r"[a-z]+", "", regex=True)
+    if "message" in frame:
+        frame = frame.drop(columns=["message"])
+    return frame
 
-    y = m[m['message'].isnull()].reset_index(drop=True)
-    y['result'] = 'metabolite correctly annotated'
 
-    z = m[m["message"].str.contains("None", na=False)]
-    z.insert(5, 'results', 'metabolite not identified')
+def write_report(inputs: list[str | Path], output_path: str | Path) -> Path:
+    import pandas as pd
 
-    x = pd.concat([x, y])
-    x['id'] = x['message'].str.split('\\\\t',expand=True, regex=True)[6]
-    x['id'] = x['id'].fillna(x['expected'])
-    x = x.drop(columns=["message"])
+    destination = Path(output_path)
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    with pd.ExcelWriter(destination) as writer:
+        for index, input_path in enumerate(inputs):
+            process_met_file(input_path).to_excel(
+                writer, sheet_name=f"threshold_{index + 1}", index=False
+            )
+    return destination
 
-    a_x = pd.concat([x, z])
-    a_x = a_x.drop(columns=["message"]).reset_index(drop=True)
-    a_x = a_x[['identifier','name','formula','expected','id','result']]
-    a_x.rename(columns={'expected':'expected_id'}, inplace=True)
-    
-    return a_x
-    
-process_met_file('files/met_results_010.csv')
 
-with pd.ExcelWriter('files/metabolite_identification.xlsx') as writer:
-    process_met_file('files/met_results_010.csv').to_excel(writer, sheet_name='met_threshold_010', index=False)
-    process_met_file('files/met_results_060.csv').to_excel(writer, sheet_name='met_threshold_060', index=False)
-    process_met_file('files/met_results_070.csv').to_excel(writer, sheet_name='met_threshold_070', index=False)
-    process_met_file('files/met_results_080.csv').to_excel(writer, sheet_name='met_threshold_080', index=False)
-    process_met_file('files/met_results_082.csv').to_excel(writer, sheet_name='met_threshold_082', index=False)
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("inputs", nargs="+", type=Path, help="CSV result files")
+    parser.add_argument("--output", required=True, type=Path, help="Excel report")
+    args = parser.parse_args(argv)
+    write_report(args.inputs, args.output)
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

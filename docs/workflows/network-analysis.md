@@ -13,3 +13,23 @@ write_component_report(results, "results/network/components.json")
 The package path performs connectivity analysis only. Solver-backed cleanup and
 HTML visualization remain optional legacy operations; full-model runs should be
 marked `slow`.
+
+Proportional-reaction compaction is available separately:
+
+```python
+from thg_protocol.analysis import full_compaction
+
+compacted, removed = full_compaction(model)
+```
+
+Blocked-reaction filtering is solver-dependent and only runs when explicitly
+requested.
+
+Formula-based consistency checks are also available without MEMOTE:
+
+```python
+from thg_protocol.analysis import reaction_balance, unbalanced_reactions
+
+reaction_balance(model.reactions[0])
+unbalanced_reactions(model)
+```

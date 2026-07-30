@@ -26,6 +26,16 @@ The API accepts normalized records and writes only to the caller-provided
 output path. KEGG, BioCyc, and Ensembl record collection remains in the
 deferred legacy orchestrator and must use injectable service clients.
 
+KEGG pathway pages can be parsed independently of the orchestrator:
+
+```python
+from thg_protocol.database_parsing import parse_pathway_links
+
+compound_links, reaction_links = parse_pathway_links(
+    kgml_text, client=static_kegg_client
+)
+```
+
 For a file-based workflow, use a JSON bundle containing `model_id`,
 `metabolites`, `reactions`, optional `genes`, and optional `pathways`, then:
 
@@ -47,6 +57,16 @@ from thg_protocol.database import reconstruct_model_from_pickle
 
 reconstruct_model_from_pickle("pre_sbml_pos_comp.pk", output_path="results/model.xml")
 ```
+
+The legacy generator entry point now exposes the same deterministic path:
+
+```bash
+python generate_data-base/generate_db.py \
+  --pickle pre_sbml_pos_comp.pk --output results/model.xml
+```
+
+Running it without `--pickle` reports that credentialed harvesting is deferred
+instead of importing services or writing repository-relative files.
 
 The pickle adapter accepts the historical `mets_cl`, `reactions_cl`, `genes`,
 `pathways`, and `loc` bundle keys. Standard pickle is preferred; the

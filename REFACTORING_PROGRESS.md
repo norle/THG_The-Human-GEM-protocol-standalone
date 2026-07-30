@@ -8,6 +8,95 @@ recovery ref or another local-only validation artifact is no longer available.
 
 ## 2026-07-30
 
+### Legacy network and model-I/O boundaries
+
+- Replaced `network_analysis/find_components.py` with an import-safe
+  compatibility wrapper around `thg_protocol.analysis.network`; legacy
+  solver-cleanup and visualization flags now fail explicitly instead of
+  triggering hidden side effects.
+- Added `thg_protocol.io.convert_json_to_sbml` with explicit input/output
+  paths and converted `utils/json_to_sbml.py` into a thin CLI wrapper.
+- Added compatibility/help coverage for the JSON-to-SBML boundary. Pytest was
+  unavailable in this environment; compile checks and the wrapper `--help`
+  smoke test passed.
+- Replaced `network_analysis/loop_removal.py`'s hard-coded model operation with
+  an explicit model/output CLI and lazy loading of the solver-backed legacy
+  compaction implementation.
+- Added the dependency-light package boundary
+  `thg_protocol.cell_specific.match_exchange_reactions` and reduced
+  `cell_type_specific_model/match_exch_rxns.py` to a compatibility wrapper;
+  annotation lookups, solver optimization, and repository-relative report
+  writes are no longer implicit in that entry point.
+- Added dependency-light mass-balance primitives under
+  `thg_protocol.model_build.mass_balance` with characterization coverage for
+  formula parsing, legacy atom vectors, elemental differences, and reaction
+  comparison. Solver-backed balancing remains an explicit optional layer.
+- Documented the new mass-balance, KEGG pathway-listing, and exchange-matching
+  APIs in the workflow guides, including their explicit-output and injectable-
+  client contracts.
+- Added the package-owned `thg_protocol.database_parsing.parse_pathway_links`
+  parser and routed the legacy `getLinkPath` entry point through it, with
+  static-client fallback coverage for KEGG flat-file reaction listings.
+- Replaced the import-heavy `generate_data-base/generate_db.py` with an
+  explicit compatibility CLI. It now supports deterministic pickle
+  reconstruction through `thg_protocol.database.reconstruct_model_from_pickle`
+  and clearly rejects credentialed harvesting until its checkpoint contract is
+  finalized; `--help` no longer imports COBRA, dill, or legacy services.
+- Added package-owned proportional-reaction compaction under
+  `thg_protocol.analysis.compaction` and reduced the legacy compaction module
+  to a compatibility export. Optional blocked-reaction filtering is lazy and
+  explicit; the default compaction path is offline.
+- Added focused characterization coverage for direction-aware proportional
+  reaction detection.
+- Validation for this checkpoint: all changed Python sources compile,
+  `generate_db.py --help` and `loop_removal.py --help` pass without optional
+  dependencies, package smoke checks pass with static clients, and
+  `git diff --check` is clean. Pytest remains unavailable in the active
+  interpreter.
+- Reduced duplicated archived algorithm helpers to compatibility exports from
+  `thg_protocol.gpr`, `thg_protocol.annotation`, and
+  `thg_protocol.model_build.mass_balance`; the archived mass-balance runner no
+  longer loads a model or writes reports during import.
+- Converted archived GPR, metabolite, and reaction report scripts to explicit
+  input/output CLIs; they no longer read `files/` or write Excel reports during
+  import.
+- Reduced `gapfill/gapfill.py` to a compatibility CLI over
+  `thg_protocol.gapfill.core`, retaining phase1/phase2/phase3/run-all command
+  names while removing dynamic imports of the legacy solver scripts.
+- Replaced the 25k-line legacy `functions/pathway_builder.py` implementation
+  with direct exports from `thg_protocol.pathway.core`; archived pathway
+  callers now exercise the maintained package implementation.
+- Added dependency-light consistency APIs for reaction elemental balance,
+  unbalanced reactions, orphan metabolites, and dead-end metabolites, with
+  characterization coverage independent of MEMOTE and solver extras.
+- Reduced the legacy mass-balance and model-merge helper modules to explicit
+  compatibility boundaries over package APIs. Solver-backed balance variants
+  and historical multi-stage merge variants now fail clearly instead of being
+  imported as production implementations.
+- Reduced the MEMOTE-heavy legacy consistency helper to a compatibility module
+  over the package's formula-based consistency checks; solver/MEMOTE checks are
+  explicit deferred callables rather than import-time dependencies.
+- Latest validation: changed trees compile and package smoke imports pass;
+  `git diff --check` remains clean. Compilation still reports pre-existing
+  invalid-escape warnings in the retained legacy `function_bm_gdb.py` helper;
+  pytest/dependency installation is unavailable in this environment.
+- Added `thg_protocol.gpr.lookup` with injectable BioCyc/KEGG lookup and gene
+  parsing, then reduced `functions/gpr/auth_gpr.py` and `gpr_def.py` to
+  dependency-light compatibility adapters. Static KEGG fallback and empty
+  client lookups now work without importing COBRA.
+- Documented the package GPR lookup boundary and its five-field compatibility
+  result in the annotation workflow guide.
+- GPR checkpoint validation: package and legacy static-client lookups return the
+  expected empty five-field tuple without COBRA; all changed GPR sources
+  compile and `git diff --check` passes.
+- Added `thg_protocol.gpr.location.resolve_locations` with injectable location
+  pages and reduced `functions/gpr/get_location_def.py` to a compatibility
+  adapter. The resolver preserves the historical four-dictionary output shape
+  without importing COBRA or reading repository paths by default.
+- Added package-owned KEGG compound flat-file parsing and routed the legacy
+  `getCompParamFromRestAPI` helper through it, including static-client handling
+  for `REMARK Same as` primary-compound records.
+
 ### Post-commit release gate
 
 - From the committed tree (`37359ef`), the installed/editable package gate

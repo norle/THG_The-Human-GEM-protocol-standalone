@@ -24,6 +24,7 @@ from .core import (
     substitute_compartment_abbreviations,
 )
 from .workflow import implement_pathway, implement_pathway_files
+from .kegg_listing import list_pathway_reactions
 
 __all__ = [
     "add_compartment",
@@ -44,4 +45,5 @@ __all__ = [
     "substitute_compartment_abbreviations",
     "implement_pathway",
     "implement_pathway_files",
+    "list_pathway_reactions",
 ]

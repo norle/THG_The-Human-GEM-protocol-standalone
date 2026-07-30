@@ -111,4 +111,10 @@ def reduce_model_by_activity(
     )
 
 
-__all__ = ["ActivityReductionReport", "reduce_model_by_activity"]
+from .exchange import match_exchange_reactions
+
+__all__ = [
+    "ActivityReductionReport",
+    "reduce_model_by_activity",
+    "match_exchange_reactions",
+]

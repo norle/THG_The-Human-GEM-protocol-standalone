@@ -17,3 +17,14 @@ def __getattr__(name: str):
     from thg_protocol.gpr import ast_gpr
 
     return getattr(ast_gpr, name)
+from .lookup import get_gpr, parse_gene_pairs
+
+__all__ = [
+    "compare_ast",
+    "deduplicate_gpr",
+    "divide_gpr_in_ors",
+    "reduce_gpr",
+    "sanitize_gpr",
+    "get_gpr",
+    "parse_gene_pairs",
+]

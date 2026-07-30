@@ -1,8 +1,24 @@
-from cobra.io import load_json_model, write_sbml_model
+"""Compatibility CLI for JSON-to-SBML conversion.
 
-model_names = ["endoA_251209"]
+The conversion implementation is maintained in :mod:`thg_protocol.io`.
+"""
 
-for model_name in model_names:
+from __future__ import annotations
 
-    model = load_json_model(f"models/{model_name}.json")
-    write_sbml_model(model, f"models/{model_name}.xml")
+import argparse
+from pathlib import Path
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("input", type=Path, help="source COBRA JSON model")
+    parser.add_argument("output", type=Path, help="destination SBML file")
+    args = parser.parse_args(argv)
+    from thg_protocol.io import convert_json_to_sbml
+
+    convert_json_to_sbml(args.input, args.output)
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

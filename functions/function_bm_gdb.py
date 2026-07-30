@@ -1539,6 +1539,16 @@ def ParseNestedParen(string, level):
 
 
 def getLinkPath(page, follow_maps=True, *, kegg_client=None):
+    # Package-owned parser; keep this source-checkout name as a compatibility
+    # alias while the remaining database-builder helpers are migrated.
+    from thg_protocol.database_parsing import parse_pathway_links
+
+    return parse_pathway_links(
+        page, follow_maps=follow_maps, client=kegg_client
+    )
+
+    # Historical implementation retained below until all database-builder
+    # callers have moved to the package API.
     try:
         kegg_client = kegg_client or KeggClient()
         # Collect (reaction_id, type) tuples from KGML-like entry attributes.
@@ -2849,6 +2859,11 @@ def getCompParamFromRestAPI(
     *,
     kegg_client: KeggClientProtocol | None = None,
 ):
+    from thg_protocol.database_parsing import parse_kegg_compound_entry
+
+    return parse_kegg_compound_entry(flat_file_text, ident, client=kegg_client)
+
+    # Historical parser retained below until all database records migrate.
     """
     Extract compound parameters from KEGG REST API flat file format.
     This is a new implementation that works directly with REST API data.

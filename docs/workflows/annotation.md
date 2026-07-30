@@ -13,3 +13,24 @@ The retry compatibility script remains available for existing checkouts:
 ```bash
 python metabolite_reac_identification/metabolite_reac_identification_with_retry.py --help
 ```
+
+EC-number GPR lookup is available through an injectable BioCyc/KEGG boundary:
+
+```python
+from thg_protocol.gpr import get_gpr
+
+result = get_gpr("1.2.3.4", biocyc_client=static_biocyc, kegg_client=static_kegg)
+```
+
+The result preserves the five-field legacy shape while avoiding network access
+when static clients are supplied.
+
+Subcellular GPR rules use the analogous injectable location boundary:
+
+```python
+from thg_protocol.gpr.location import resolve_locations
+
+rules = resolve_locations(
+    gpr, gene_names, gene_ids, location_client=static_location_client
+)
+```

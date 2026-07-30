@@ -56,3 +56,29 @@ def normalize_identifiers(value: str | Sequence[str]) -> list[str]:
     if isinstance(value, str):
         return [value.strip()]
     return [str(identifier).strip() for identifier in value]
+
+
+def glycan_atoms(
+    glycan_id: str,
+    *,
+    client: KeggClientProtocol,
+    record_path: str | None = None,
+) -> list[AtomGroup]:
+    """Resolve glycan atoms and optionally append a historical cache row."""
+    compound_id, formula, atoms = resolve_glycan_atoms(glycan_id, client)
+    if record_path is not None:
+        from pathlib import Path
+
+        path = Path(record_path)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        with path.open("a", encoding="utf-8") as handle:
+            handle.write(f"{glycan_id},{compound_id},{formula}\n")
+    return atoms
+
+
+__all__ = [
+    "glycan_atoms",
+    "normalize_identifiers",
+    "parse_formula",
+    "resolve_glycan_atoms",
+]
