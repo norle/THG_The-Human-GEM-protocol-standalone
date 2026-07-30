@@ -8,6 +8,14 @@ recovery ref or another local-only validation artifact is no longer available.
 
 ## 2026-07-30
 
+### Post-commit release gate
+
+- From the committed tree (`37359ef`), the installed/editable package gate
+  passed `1827 passed, 1 skipped` with GLPK configured; the sole skip is the
+  credential-gated online GPR fixture.
+- Package imports and `thg-gapfill`, `thg-compare`, and `thg-pathway` help
+  smoke tests passed from outside the checkout.
+
 ### Checkpoint validation
 
 - Checkpoint commit: `063511b` (`refactor: package workflow boundaries and
