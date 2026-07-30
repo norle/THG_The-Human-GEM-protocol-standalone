@@ -9,7 +9,6 @@ from typing import Any
 from thg_protocol.services.ensembl import EnsemblClientProtocol
 from thg_protocol.services.location import LocationClient, LocationClientProtocol
 
-
 _LOCATION_PATTERNS = (
     ("Mitochondria", re.compile(r"mitochondri", re.I)),
     ("Nucleus", re.compile(r"nucle(?:us|ar)", re.I)),

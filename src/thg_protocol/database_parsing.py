@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import re
+
 from thg_protocol.services.kegg import KeggClient, KeggClientProtocol
 
 
