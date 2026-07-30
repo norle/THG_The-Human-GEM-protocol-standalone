@@ -26,6 +26,23 @@ The API accepts normalized records and writes only to the caller-provided
 output path. KEGG, BioCyc, and Ensembl record collection remains in the
 deferred legacy orchestrator and must use injectable service clients.
 
+BioCyc compartment caches can be summarized without COBRA or file-system side
+effects by passing their loaded mappings to `summarize_biocyc_compartments`:
+
+```python
+from thg_protocol.database import summarize_biocyc_compartments
+
+summary = summarize_biocyc_compartments(location_cache, name_cache)
+print(summary.unique_names)
+```
+
+The compatibility report script accepts the two pickle paths explicitly:
+
+```bash
+python build_model/print_biocyc_compartments.py \
+  inputs/biovelo_location_cache.pkl inputs/compartment_name_cache.pkl
+```
+
 KEGG pathway pages can be parsed independently of the orchestrator:
 
 ```python

@@ -11,6 +11,7 @@ from thg_protocol.database import (
     reconstruct_model_from_json,
     reconstruct_model_from_pickle,
     reconstruct_model_with_services,
+    summarize_biocyc_compartments,
 )
 from thg_protocol.services.biocyc import StaticBioCycClient
 from thg_protocol.services.ensembl import EnsemblAnnotation, StaticEnsemblClient
@@ -161,3 +162,33 @@ def test_reconstruct_model_with_services_enriches_records_offline(tmp_path):
     }
     assert model.genes.GENE1.annotation["ensembl"] == "ENSG0001"
     assert output.exists()
+
+
+def test_summarize_biocyc_compartments_is_explicit_and_deterministic():
+    summary = summarize_biocyc_compartments(
+        {
+            "P1": [
+                {"orgid": "HUMAN", "frameid": "CCO-CYTOSOL"},
+                {"orgid": "HUMAN", "frameid": "CCO-MITO"},
+            ],
+            "P2": [{"orgid": "OTHER", "frameid": "CCO-CYTOSOL"}],
+            "invalid": "ignored",
+        },
+        {"HUMAN:CCO-CYTOSOL": "cytosol"},
+        sample_size=1,
+    )
+
+    assert summary.entry_count == 3
+    assert summary.frameid_count == 3
+    assert summary.resolved_count == 3
+    assert summary.resolved["HUMAN:CCO-MITO"] == "CCO-MITO"
+    assert summary.unique_names == ("CCO-CYTOSOL", "CCO-MITO", "cytosol")
+    assert len(summary.sample) == 1
+
+
+def test_summarize_biocyc_compartments_zero_sample_size_returns_no_samples():
+    summary = summarize_biocyc_compartments(
+        {"P1": [{"frameid": "CCO-CYTOSOL"}]}, {}, sample_size=0
+    )
+
+    assert summary.sample == ()

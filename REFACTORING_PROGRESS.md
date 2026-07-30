@@ -8,6 +8,124 @@ recovery ref or another local-only validation artifact is no longer available.
 
 ## 2026-07-30
 
+### Legacy compartment comparison boundary
+
+- Replaced `compare_models/compare_compartements.py`'s duplicated comparison
+  implementation and hard-coded model paths with a compatibility wrapper over
+  `thg_protocol.analysis.compare`.
+- The wrapper now requires two explicit model paths and an output directory,
+  supports an explicit `--no-blocked` mode, and retains the historical
+  `comp_compare`, `save_csv`, and helper imports.
+- Added characterization coverage for delegation and the explicit output
+  contract.
+- Validation: Ruff, Python compilation, and `git diff --check` passed. Pytest
+  is unavailable in the active interpreter, so the new tests require the
+  documented development environment gate.
+
+### Explicit annotation CLI inputs
+
+- Removed repository-relative model, database, report, and model-output
+  defaults from both legacy metabolite/reaction annotation wrappers.
+- The wrappers now require model, database, and output-directory arguments;
+  omitted model-output paths are resolved below the supplied output directory
+  by the package workflow.
+- Validation: Ruff, Python compilation, and `git diff --check` passed. Pytest
+  remains unavailable in the active interpreter.
+
+### Cell-specific transcriptomics helpers
+
+- Added `thg_protocol.cell_specific.transcriptomics` with dependency-light
+  extraction and transformation APIs for sGPR rules, Ensembl IDs, indexed GPR
+  rules, RDF gene annotations, and gene-symbol replacement.
+- Exported the helpers from `thg_protocol.cell_specific`; they do not import
+  COBRA, Troppo, solvers, expression matrices, or repository paths.
+- Added characterization coverage using model-like objects and a temporary RDF
+  fixture. Solver-backed activity reduction remains in its explicit package
+  API and the historical orchestration script remains deferred.
+- Validation: Ruff, Python compilation, direct helper smoke tests, and
+  `git diff --check` passed. Pytest remains unavailable in the active
+  interpreter.
+
+### BioCyc compartment-cache boundary
+
+- Added `summarize_biocyc_compartments` and its immutable summary type to the
+  package database API. The function accepts cache mappings directly and does
+  not read files, print output, or depend on COBRA.
+- Replaced `build_model/print_biocyc_compartments.py` with an explicit two-file
+  pickle CLI and help-safe argument parsing.
+- Added deterministic summary characterization coverage, including fallback
+  names, organization IDs, malformed entries, and bounded samples.
+- Validation: Ruff, Python compilation, direct API smoke tests, CLI help, and
+  `git diff --check` passed. Pytest remains unavailable in the active
+  interpreter.
+
+### Explicit model-annotation outputs
+
+- Removed repository-relative output defaults from
+  `functions/function_annotate_cobra_model.py`.
+- The legacy wrapper remains a compatibility delegate, but callers must now
+  provide both regular and normalized model output paths explicitly.
+- Added signature characterization coverage. Ruff, compilation, and diff
+  checks remain clean; pytest is unavailable in the active interpreter.
+
+### JSON model-annotation boundary
+
+- Added `thg_protocol.annotation.model_annotations` with pure JSON annotation
+  inventory and metabolite-extraction APIs.
+- Replaced `functions/analyze_annotations.py` with an explicit model/target
+  compatibility CLI; it no longer loads repository configuration or chooses
+  fallback model paths.
+- Added API and parser characterization coverage and documented the boundary.
+- Validation: Ruff, Python compilation, direct API smoke tests, CLI help, and
+  `git diff --check` passed. Pytest remains unavailable in the active
+  interpreter.
+
+### Legacy import-path cleanup
+
+- Removed `sys.path` mutation from the `functions.config` and
+  `functions.gpr.ast_gpr` compatibility wrappers.
+- Added identity/import characterization coverage so source compatibility now
+  relies on the installed package boundary rather than checkout path injection.
+- Validation: Ruff, Python compilation, direct imports, API smoke tests, and
+  `git diff --check` passed. Pytest remains unavailable in the active
+  interpreter.
+
+### Explicit metabolite-ID database builder
+
+- Reworked `functions/build_id_database.py` so its reusable build operation
+  accepts explicit JSON model, target, and output paths.
+- Removed configuration loading, fallback model paths, and `sys.path` mutation
+  from its executable path; the curated database constant remains available
+  for legacy callers but is no longer silently written on failure.
+- Added characterization coverage and a help smoke test for the explicit CLI.
+- Validation: Ruff, Python compilation, direct API smoke tests, CLI help, and
+  `git diff --check` passed. Pytest remains unavailable in the active
+  interpreter.
+
+### Archived equation-module boundary
+
+- Replaced the import-heavy `functions/equations_bm_gdb.py` archive with
+  compatibility exports backed by the package mass-balance API.
+- Corrected glycan reformulation symbol assignment to preserve the characterized
+  elemental output (`A1B2C1`) and added package/legacy regression coverage.
+- The archived module no longer imports COBRA, SciPy, SymPy, or performs glycan
+  lookups during import.
+- Validation: Ruff, Python compilation, direct static-client behavior checks,
+  and `git diff --check` passed. Pytest remains unavailable in the active
+  interpreter.
+
+### Validation environment update
+
+- Installed the package editable with `--no-deps --no-build-isolation`; package
+  collection now succeeds without `PYTHONPATH` injection.
+- Installed pytest and ran the dependency-free characterization/API subset:
+  `47 passed`.
+- The full default suite still requires the declared `cobra` dependency. Its
+  installation was blocked by the environment approval/usage limit, so the
+  model-backed tests remain unverified in this checkout.
+
+## 2026-07-30
+
 ### Legacy network and model-I/O boundaries
 
 - Replaced `network_analysis/find_components.py` with an import-safe

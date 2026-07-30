@@ -28,6 +28,25 @@ tailored, matched, unmatched, inconsistent = match_exchange_reactions(
 )
 ```
 
+Dependency-light transcriptomics transformations are also available without
+loading the legacy Troppo/GIMME orchestration:
+
+```python
+from thg_protocol.cell_specific import (
+    extract_gene_annotation_pairs,
+    extract_sgpr_rules,
+    replace_gene_symbols,
+)
+
+pairs = extract_gene_annotation_pairs("inputs/model.xml")
+rules = extract_sgpr_rules(model)
+mapped_rules = replace_gene_symbols(model, pairs)
+```
+
+These helpers return transformed rules and mappings; they do not mutate the
+model or access external services. Solver-backed expression workflows remain
+explicit and require the optional extra.
+
 Cell-specific model generation depends on the optional `cell-specific` extra:
 
 ```bash

@@ -4,6 +4,23 @@ The legacy `metabolite_reac_identification` workflow annotates a reference
 model and matches reactions against the reference database. Its characterized
 package entry point is `thg_protocol.annotation.metabolite_reactions`.
 
+JSON model annotation inventories are available through dependency-light APIs:
+
+```python
+from thg_protocol.annotation import (
+    analyze_model_annotations,
+    extract_metabolite_annotations,
+)
+
+counts = analyze_model_annotations("inputs/model.json")
+annotations, missing = extract_metabolite_annotations(
+    "inputs/model.json", ["ATP", "H2O"]
+)
+```
+
+The legacy `functions/analyze_annotations.py` entry point now requires the
+model and target names explicitly and can write an optional JSON report.
+
 Use explicit model, database, report, and SBML output paths. PubChem lookups
 are owned by the injectable package client; tests should use a static client
 and must not require network access.

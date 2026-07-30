@@ -112,9 +112,21 @@ def reduce_model_by_activity(
 
 
 from .exchange import match_exchange_reactions
+from .transcriptomics import (
+    extract_ensembl_ids,
+    extract_gene_annotation_pairs,
+    extract_sgpr_rules,
+    replace_gene_symbols,
+    replace_index_tokens,
+)
 
 __all__ = [
     "ActivityReductionReport",
     "reduce_model_by_activity",
     "match_exchange_reactions",
+    "extract_ensembl_ids",
+    "extract_gene_annotation_pairs",
+    "extract_sgpr_rules",
+    "replace_gene_symbols",
+    "replace_index_tokens",
 ]

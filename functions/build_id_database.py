@@ -328,72 +328,39 @@ def save_database(database, output_path):
     return output_path
 
 
-def main():
-    """Main function - connects to analyze_annotations and creates database."""
-    print("=" * 70)
-    print("STEP 2: BUILDING METABOLITE ID DATABASE")
-    print("=" * 70)
-    
-    try:
-        # Import and run annotation analysis
-        try:
-            from functions.analyze_annotations import extract_metabolite_annotations
-            from functions.config import load_config, get_model_paths
-        except ModuleNotFoundError:
-            # Direct execution - adjust sys.path
-            import sys
-            from pathlib import Path
-            sys.path.insert(0, str(Path(__file__).parent.parent))
-            from functions.analyze_annotations import extract_metabolite_annotations
-            from functions.config import load_config, get_model_paths
-        
-        # Load configuration
-        config = load_config()
-        model_path, _ = get_model_paths(config)
-        targets = config.get('metabolites', {}).get('targets', [])
-        output_path = config.get('metabolites', {}).get('database_file', 'data/metabolite_id_database.json')
-        
-        if not targets:
-            print("✗ Error: No metabolite targets found in config.json")
-            print("  Please add 'metabolites.targets' to config.json")
-            return None
-        
-        print(f"\nExtracting annotations for {len(targets)} metabolites from model...")
-        
-        # Extract annotations
-        metabolite_annotations, not_found = extract_metabolite_annotations(
-            model_path, targets, verbose=False
-        )
-        
-        if not_found:
-            print(f"\n⚠ Warning: {len(not_found)} metabolites not found:")
-            for met in not_found[:5]:  # Show first 5
-                print(f"    - {met}")
-            if len(not_found) > 5:
-                print(f"    ... and {len(not_found) - 5} more")
-        
-        # Build database
-        print(f"\nBuilding database from {len(metabolite_annotations)} annotations...")
-        database = build_database_from_annotations(metabolite_annotations)
-        
-        # Save to file
-        save_database(database, output_path)
-        
-        print("\n" + "=" * 70)
-        print("Database creation complete!")
-        print("=" * 70)
-        
-        return database
-        
-    except Exception as e:
-        print(f"\n✗ Error: {e}")
-        print("\nFalling back to hardcoded database...")
-        print("(Consider fixing config.json and re-running)")
-        
-        # Fallback: save hardcoded database
-        output_path = 'data/metabolite_id_database.json'
-        save_database(METABOLITE_ID_DATABASE, output_path)
-        return METABOLITE_ID_DATABASE
+def build_database_from_model(
+    model_path: str | Path,
+    targets: list[str],
+    output_path: str | Path,
+) -> dict:
+    """Extract explicit targets from a JSON model and write a database."""
+    from thg_protocol.annotation.model_annotations import (
+        extract_metabolite_annotations,
+    )
 
-if __name__ == '__main__':
-    main()
+    annotations, _ = extract_metabolite_annotations(model_path, targets)
+    database = build_database_from_annotations(annotations)
+    save_database(database, output_path)
+    return database
+
+
+def build_parser():
+    import argparse
+
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("model", type=Path, help="Input JSON model path.")
+    parser.add_argument(
+        "--target", action="append", required=True, help="Target metabolite; repeat."
+    )
+    parser.add_argument("--output", type=Path, required=True, help="Output JSON path.")
+    return parser
+
+
+def main(argv: list[str] | None = None) -> int:
+    args = build_parser().parse_args(argv)
+    build_database_from_model(args.model, args.target, args.output)
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

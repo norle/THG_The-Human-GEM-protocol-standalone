@@ -11,6 +11,75 @@ from typing import Any
 
 
 @dataclass(frozen=True)
+class BiocycCompartmentSummary:
+    """Resolved compartment names derived from BioCyc location caches."""
+
+    entry_count: int
+    frameid_count: int
+    resolved_count: int
+    resolved: Mapping[str, str]
+    unique_names: tuple[str, ...]
+    sample: tuple[tuple[str, tuple[Mapping[str, Any], ...]], ...]
+
+
+def summarize_biocyc_compartments(
+    biocyc_locations: Mapping[str, Any],
+    compartment_names: Mapping[str, Any],
+    *,
+    sample_size: int = 10,
+) -> BiocycCompartmentSummary:
+    """Resolve BioCyc frame IDs without reading files or printing output.
+
+    ``biocyc_locations`` maps identifiers to lists of location dictionaries;
+    each location may contain ``orgid`` and ``frameid``.  Missing names fall
+    back to the frame ID, matching the historical report behavior.
+    """
+    if sample_size < 0:
+        raise ValueError("sample_size must be non-negative")
+    frameids: set[tuple[str, str]] = set()
+    for locations in biocyc_locations.values():
+        if not isinstance(locations, list):
+            continue
+        for location in locations:
+            if not isinstance(location, Mapping):
+                continue
+            frameid = location.get("frameid")
+            if frameid:
+                frameids.add((str(location.get("orgid") or "HUMAN"), str(frameid)))
+
+    resolved = {
+        f"{org}:{frameid}": str(compartment_names.get(f"{org}:{frameid}") or frameid)
+        for org, frameid in sorted(frameids)
+    }
+    samples: list[tuple[str, tuple[Mapping[str, Any], ...]]] = []
+    if sample_size == 0:
+        return BiocycCompartmentSummary(
+            entry_count=len(biocyc_locations),
+            frameid_count=len(frameids),
+            resolved_count=len(set(resolved.values())),
+            resolved=resolved,
+            unique_names=tuple(sorted(set(resolved.values()))),
+            sample=(),
+        )
+    for identifier, locations in sorted(biocyc_locations.items()):
+        if not isinstance(locations, list) or not locations:
+            continue
+        valid = tuple(item for item in locations if isinstance(item, Mapping))
+        if valid:
+            samples.append((str(identifier), valid))
+        if len(samples) >= sample_size:
+            break
+    return BiocycCompartmentSummary(
+        entry_count=len(biocyc_locations),
+        frameid_count=len(frameids),
+        resolved_count=len(set(resolved.values())),
+        resolved=resolved,
+        unique_names=tuple(sorted(set(resolved.values()))),
+        sample=tuple(samples),
+    )
+
+
+@dataclass(frozen=True)
 class MetaboliteRecord:
     """Normalized metabolite data consumed by :func:`reconstruct_model`."""
 
@@ -583,6 +652,7 @@ def reconstruct_model_with_services(
 
 
 __all__ = [
+    "BiocycCompartmentSummary",
     "GeneRecord",
     "MetaboliteRecord",
     "ReactionRecord",
@@ -590,4 +660,5 @@ __all__ = [
     "reconstruct_model_from_json",
     "reconstruct_model_from_pickle",
     "reconstruct_model_with_services",
+    "summarize_biocyc_compartments",
 ]

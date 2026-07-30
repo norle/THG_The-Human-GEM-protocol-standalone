@@ -3,6 +3,7 @@ from types import SimpleNamespace
 
 from thg_protocol.analysis.compare import compare_reactions
 from thg_protocol.analysis.compare_cli import main
+from compare_models.compare_compartements import build_parser, comp_compare
 
 
 @dataclass(frozen=True)
@@ -29,3 +30,13 @@ def test_compare_cli_help_is_import_safe(capsys):
     except SystemExit as error:
         assert error.code == 0
     assert "Compare reactions" in capsys.readouterr().out
+
+
+def test_legacy_compartment_comparison_delegates_to_package_api():
+    comparison = comp_compare(model("R1"), model("R1"))
+    assert comparison["c"]["match_stoich_ids"] == ["R1"]
+
+
+def test_legacy_compartment_comparison_requires_explicit_output_dir():
+    actions = {action.dest: action for action in build_parser()._actions}
+    assert actions["output_dir"].required is True

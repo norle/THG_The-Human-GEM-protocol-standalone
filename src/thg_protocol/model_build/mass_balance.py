@@ -81,9 +81,14 @@ def reformulate_glycan_equation(
                 raise ValueError(f"could not resolve glycan formula: {token}")
             identifiers.append(token)
             formulas[token] = atoms
+    elements = dict.fromkeys(
+        group[0][0]
+        for identifier in identifiers
+        for group in formulas[identifier]
+    )
     letters = {
-        identifier: chr(ord("A") + index)
-        for index, identifier in enumerate(dict.fromkeys(identifiers))
+        element: chr(ord("A") + index)
+        for index, element in enumerate(elements)
     }
 
     def render(side: str) -> str:
@@ -91,7 +96,10 @@ def reformulate_glycan_equation(
         for token in side.split("+"):
             token = token.strip()
             values.append(
-                "".join(f"{letters[token]}{group[0][1]}" for group in formulas[token])
+                "".join(
+                    f"{letters[group[0][0]]}{group[0][1]}"
+                    for group in formulas[token]
+                )
             )
         return " + ".join(values)
 

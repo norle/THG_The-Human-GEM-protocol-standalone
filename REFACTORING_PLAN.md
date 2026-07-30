@@ -552,9 +552,14 @@ Recommended docs:
 
 Last reviewed: 2026-07-30
 
+Current working-tree validation: the package is installed editable without
+dependency resolution, and 47 dependency-free characterization/API tests pass.
+The full model-backed gate still requires the declared `cobra` dependency.
+
 The latest fully validated default offline/non-solver checkpoint passed 1827 tests
 with two expected skips and `ruff check src tests`. The current tree includes the characterized
-metabolite/reaction workflow and its PubChem service boundary in addition to the
+metabolite/reaction, JSON model-annotation, and explicit ID-database workflows,
+plus its PubChem service boundary, in addition to the
 earlier service-boundary tests. The retry annotation compatibility script now
 delegates to that package API and injected client. The shared Python 3.12.9
 environment passed the
@@ -576,17 +581,19 @@ The legacy figure script is an explicit-path wrapper; supplied MEMOTE and
 algorithm score data are required for those optional charts rather than being
 hard-coded. A service-boundary audit records the production-helper boundary;
 historical fixture migration remains a Phase 4 task.
-The legacy network-component and JSON-to-SBML entry points are now thin,
+The legacy network-component, compartment-comparison, and JSON-to-SBML entry points are now thin,
 import-safe wrappers around package APIs. Solver-backed network compaction and
 the remaining historical workflow scripts remain deferred until their explicit
 input/output contracts and characterization coverage are complete.
-KEGG pathway listing and exchange-reaction matching now also have package-owned
-APIs with explicit inputs and injectable clients; their historical entry points
+KEGG pathway listing, exchange-reaction matching, and dependency-light
+transcriptomics annotation transformations now also have package-owned APIs
+with explicit inputs and injectable clients where applicable; their historical entry points
 are compatibility wrappers.
 Dependency-light formula and reaction mass-balance primitives now live under
 `thg_protocol.model_build.mass_balance`; the solver-backed balancing and full
 database-generator orchestration remain separate deferred workflows.
-The KEGG pathway-link parser used by the database builder is package-owned and
+The KEGG pathway-link parser used by the database builder is package-owned, and
+the BioCyc compartment-cache summary is package-owned with an explicit CLI;
 the legacy `getLinkPath` name delegates to it; remaining database helpers are
 still compatibility-bound until their records and outputs are characterized.
 Proportional network compaction is now package-owned as well; blocked-reaction
@@ -594,7 +601,7 @@ filtering remains an explicit solver-dependent option.
 The legacy database generator now exposes deterministic pickle reconstruction
 through an explicit CLI and no longer imports credentialed harvesting code for
 help or module import.
-Archived algorithm helper copies now delegate to package APIs; historical
+Archived algorithm and equation/mass-balance helper copies now delegate to package APIs; historical
 solver/model-backed fixtures remain opt-in and outside the default test path.
 The legacy gapfill orchestrator now delegates all supported phase commands to
 `thg_protocol.gapfill.core`; the package CLI is the maintained entry point.

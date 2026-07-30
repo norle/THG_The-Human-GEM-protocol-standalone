@@ -1,4 +1,5 @@
 from functions.gpr.gpr_def import getGPR
+from functions.equations_bm_gdb import Glycan, MissingAtom, Reformulation
 
 from thg_protocol.services.biocyc import StaticBioCycClient
 from thg_protocol.services.ensembl import StaticEnsemblClient
@@ -316,8 +317,6 @@ def test_static_location_client_returns_configured_pages_without_network():
 
 
 def test_legacy_equation_glycan_lookup_uses_static_kegg_client(tmp_path, monkeypatch):
-    from functions.equations_bm_gdb import Glycan, Reformulation
-
     monkeypatch.chdir(tmp_path)
     client = StaticKeggClient(
         pages={
@@ -333,6 +332,21 @@ def test_legacy_equation_glycan_lookup_uses_static_kegg_client(tmp_path, monkeyp
     assert Reformulation("G00001 -> G00001", kegg_client=client) == (
         "A1B2C1 -> A1B2C1"
     )
+
+
+def test_archived_equation_module_import_is_dependency_light():
+    import importlib
+
+    module = importlib.import_module("functions.equations_bm_gdb")
+
+
+def test_equation_wrapper_preserves_missing_atom_alias():
+    import importlib
+
+    module = importlib.import_module("functions.equations_bm_gdb")
+
+    assert module.MissingAtom is MissingAtom
+    assert module.Reformulation is not None
 
 
 def test_legacy_mass_balance_glycan_lookup_uses_static_kegg_client(

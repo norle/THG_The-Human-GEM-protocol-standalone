@@ -5,12 +5,9 @@ from __future__ import annotations
 
 import argparse
 from pathlib import Path
-
 from thg_protocol.annotation.metabolite_reactions import (
     run_metabolite_reaction_identification,
 )
-
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -23,31 +20,29 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--model",
         type=Path,
-        default=PROJECT_ROOT / "models" / "Human-GEM_2022-06-21.xml",
+        required=True,
         help="Input model SBML path.",
     )
     parser.add_argument(
         "--database",
         type=Path,
-        default=PROJECT_ROOT / "models" / "Human Database.xml",
+        required=True,
         help="Reference database SBML path used for reaction matching.",
     )
     parser.add_argument(
         "--output-dir",
         type=Path,
-        default=PROJECT_ROOT / "metabolite_reac_identification" / "reports",
+        required=True,
         help="Directory for annotation reports and default model outputs.",
     )
     parser.add_argument(
         "--model-output",
         type=Path,
-        default=PROJECT_ROOT / "models" / "THG-beta1.1.1.xml",
         help="Annotated SBML output path.",
     )
     parser.add_argument(
         "--normalized-model-output",
         type=Path,
-        default=PROJECT_ROOT / "models" / "THG-beta1.1.xml",
         help="Normalized annotated SBML output path.",
     )
     parser.add_argument(
