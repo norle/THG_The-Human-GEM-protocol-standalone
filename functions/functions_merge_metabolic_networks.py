@@ -43,8 +43,7 @@ project_root = os.path.join(current_dir, "..")
 if project_root not in sys.path:
     sys.path.append(project_root)
 
-from functions.functions_mass_balance import *
-from functions.functions_network_consistency import *
+from functions.functions_mass_balance import RxnBalance2
 
 # Functions
 # Used in several steps
@@ -830,6 +829,7 @@ def network_reactions_merge_2 (network_1, network_2, n1_n2_equivalent_metabolite
     from collections import Counter
 
     tolerance = 1.75 # values between 0 and 2
+    count = 0
     h_in_n_1 = [x.id for x in network_1.metabolites if x.formula == 'H1' or x.formula == 'H' or x.formula == 'H+'] # protons in network_1
     h_in_n_2 = [x.id for x in network_2.metabolites if x.formula == 'H1' or x.formula == 'H' or x.formula == 'H+'] # protons in network_2
 
@@ -2740,4 +2740,3 @@ def delete_not_used_genes (model):
     not_used_genes = [x.id for x in model.genes if x.id not in unique_gene_in_rxn]
     for x in not_used_genes: model.genes.remove(x)
     return model, not_used_genes
-

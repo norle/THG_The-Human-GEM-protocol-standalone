@@ -12,6 +12,10 @@ Run linting with:
 ruff check src tests
 ```
 
+The supported Python range is `>=3.10,<3.13`; CI covers Python 3.10, 3.11,
+and 3.12. The complete release gate is documented in
+[Release validation](release-validation.md).
+
 Before a packaging checkpoint, build and test the wheel from outside the
 checkout. The CI job performs the same import and installed-CLI help smoke
 tests:

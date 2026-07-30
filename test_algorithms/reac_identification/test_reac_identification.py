@@ -7,7 +7,7 @@ import cobra
 import pandas as pd
 import pytest
 
-from functions_reac_identification import (
+from thg_protocol.annotation.reactions import (
     execute_jaccard,
     gather_kegg_metabolites,
     process_reac,

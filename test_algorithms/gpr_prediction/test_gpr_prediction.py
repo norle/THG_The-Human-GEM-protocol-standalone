@@ -7,7 +7,9 @@ import pandas as pd
 import pytest
 import requests
 
-from functions_auth_gpr import getGPR
+from functions.gpr.auth_gpr import getGPR
+
+pytestmark = pytest.mark.online
 
 OP_PAT = re.compile("and|or")
 GPR_FIXTURES = [

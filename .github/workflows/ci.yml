@@ -3,6 +3,9 @@ name: CI
 on:
   push:
   pull_request:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 3 * * 6"
 
 jobs:
   package:
@@ -42,8 +45,39 @@ jobs:
           (
             cd "$smoke_dir"
             "$smoke_dir/venv/bin/python" -c \
-              "import thg_protocol; import thg_protocol.pathway; import thg_protocol.gapfill; import thg_protocol.analysis.compare; print(thg_protocol.__version__)"
+              "import thg_protocol; import thg_protocol.pathway; import thg_protocol.gapfill; import thg_protocol.analysis.compare; import thg_protocol.database; import thg_protocol.model_build; import thg_protocol.merge; import thg_protocol.cell_specific; print(thg_protocol.__version__)"
             "$smoke_dir/venv/bin/thg-gapfill" --help
             "$smoke_dir/venv/bin/thg-compare" --help
             "$smoke_dir/venv/bin/thg-pathway" --help
-          )
+
+  solver:
+    if: github.event_name == 'workflow_dispatch' || github.event_name == 'schedule'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install solver dependencies
+        run: python -m pip install --upgrade pip && python -m pip install -e ".[dev,solver]"
+      - name: Run solver tests
+        run: pytest -m "solver and not gurobi and not memote" || test "$?" -eq 5
+
+  slow-online:
+    if: github.event_name == 'workflow_dispatch' || github.event_name == 'schedule'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install development dependencies
+        run: python -m pip install --upgrade pip && python -m pip install -e ".[dev]"
+      - name: Run slow non-solver tests
+        run: >-
+          pytest -m "slow and not solver and not gurobi and not memote" ||
+          test "$?" -eq 5
+      - name: Run online non-solver tests
+        run: >-
+          pytest -m "online and not slow and not solver and not gurobi and not memote" ||
+          test "$?" -eq 5

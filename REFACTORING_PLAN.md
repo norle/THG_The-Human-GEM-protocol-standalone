@@ -550,10 +550,10 @@ Recommended docs:
 
 ### Current Status
 
-Last reviewed: 2026-07-28
+Last reviewed: 2026-07-29
 
-The last fully validated default offline/non-solver checkpoint passed 49 tests
-and `ruff check src tests`. The current tree includes the characterized
+The latest fully validated default offline/non-solver checkpoint passed 1807 tests
+with two expected skips and `ruff check src tests`. The current tree includes the characterized
 metabolite/reaction workflow and its PubChem service boundary in addition to the
 earlier service-boundary tests. The retry annotation compatibility script now
 delegates to that package API and injected client. The shared Python 3.12.9
@@ -565,8 +565,8 @@ comparison APIs/CLIs now join the pathway workflow, and Ensembl annotation is
 behind an injectable package client. BioCyc and KEGG GPR lookups now use
 injectable package clients. The characterized batch model-builder workflow now
 also receives package clients for KEGG reaction prefetch, BioCyc XML lookups,
-and Ensembl annotation. Remaining service use in deferred workflows must be
-migrated as those workflows are characterized. The single-model builder now
+and Ensembl annotation. The production-helper service audit is now clear; any
+new deferred workflow must continue to receive injected clients. The single-model builder now
 passes package clients through its GPR, Ensembl prefetch, and
 location-annotation paths. The characterized database-builder workflow now
 passes package clients through its KEGG page/entry, GPR, and Ensembl annotation
@@ -574,18 +574,19 @@ paths. The report-driven annotation figures and model-derived comparison
 figures are now behind import-safe package APIs with a separate plotting extra.
 The legacy figure script is an explicit-path wrapper; supplied MEMOTE and
 algorithm score data are required for those optional charts rather than being
-hard-coded. A service-boundary audit records the remaining compatibility
-fallbacks in deferred workflows.
+hard-coded. A service-boundary audit records the production-helper boundary;
+historical fixture migration remains a Phase 4 task.
 
 | Phase | Status | Remaining gate |
 | --- | --- | --- |
 | Phase 0 | Complete | Dependency/artifact policy and source-only legacy namespace decisions were recorded before the completed branch-local LFS migration. |
 | Phase 1 | Complete | Baseline CI and local clean-wheel/outside-checkout validation are recorded in the progress log; source-only legacy compatibility tests are an explicit exception to the package-test import rule. |
-| Phase 2 | In progress | Continue characterized helper moves and migrate remaining direct service use as each legacy workflow is characterized; the batch, single-model builder, database-builder, and metabolite/reaction boundaries are now covered. |
-| Phase 3 | In progress | Initial gapfill, pathway, and comparison APIs/CLIs are import-safe; report-driven and model-derived figure contracts are characterized, while remaining workflow entry points are pending. |
-| Phase 5 | In progress | PubChem, Ensembl, BioCyc, and KEGG package clients exist; the offline gate passes, but remaining direct service calls in deferred workflows must be migrated before declaring the phase complete. The characterized database-builder and metabolite/reaction paths now use injectable clients. |
+| Phase 2 | In progress | The targeted wildcard-import inventory is clean; continue characterized helper moves and reduce remaining legacy utility coupling across the deferred workflows. |
+| Phase 3 | In progress | Gapfill, pathway, comparison, figure, annotation, network-analysis, merge, cell-specific tailoring, and normalized reconstruction APIs are import-safe; package-native service-backed model/database boundaries now exist, while full legacy script replacement remains. |
+| Phase 5 | Complete | PubChem, Ensembl, BioCyc, KEGG, location pages, and legacy upload paths use package-owned injectable clients; the offline gate, static-client characterization, and production-helper audit pass. |
 | Phase 6 | Complete | The approved targeted LFS policy and generated-artifact index cleanup passed on `refactoring-cleanup`; fresh-clone checksums are recorded in the progress log. |
-| Phases 4 and 7 | Not started | Begin after the relevant earlier-phase gates pass. |
+| Phase 4 | In progress | Package API/CLI tests and temporary-output coverage exist; reaction/metabolite historical fixtures and a small model-backed Jaccard characterization are migrated, while credential-gated GPR validation remains. |
+| Phase 7 | In progress | Workflow documentation, installation instructions, MkDocs configuration, release-validation instructions, and opt-in solver/slow/online CI jobs are present; obtain final maintainer approval for the supported dependency matrix and artifact decisions. |
 
 ### Open Decisions
 
@@ -871,11 +872,8 @@ Checkpoint commits:
 Keep this list limited to pending, reviewable changes. Remove an entry when it
 is completed and record the result in `REFACTORING_PROGRESS.md`.
 
-1. Characterize and migrate the remaining legacy database/location service
-   fallbacks identified in `docs/service-boundary-audit.md`: the batch KEGG
-   compatibility helper, the single-model location helper, and legacy database
-   classes/equation helpers. Add static-client tests before removing any
-   fallback.
+1. Run the opt-in BioCyc fixture where credentials are available and obtain
+   maintainer approval for the supported dependency and artifact decisions.
 
 ## Definition of Done
 

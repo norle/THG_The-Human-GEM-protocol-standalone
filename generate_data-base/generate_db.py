@@ -45,14 +45,30 @@ if project_root not in sys.path:
     sys.path.append(project_root)
 
 # reimports for type hints
-from functions.class_generate_database import *
-from functions.class_generate_database import compound as CompoundType
-from functions.class_generate_database import gene as GeneType
-from functions.class_generate_database import reaction as ReactionType
-from functions.pattern_generate_database import *
-from functions.function_bm_gdb import *
-from functions.equations_bm_gdb import *
+from functions.class_generate_database import (
+    compound,
+    gene,
+    gpr,
+    pathway,
+    reaction,
+)
+from functions.class_generate_database import (
+    compound as CompoundType,
+    gene as GeneType,
+    reaction as ReactionType,
+)
+from functions.pattern_generate_database import rxnSubcel
+from functions.function_bm_gdb import compartment_file_to_dict, getRxncons
+from functions.equations_bm_gdb import (
+    RxnParam2Eq,
+    UnwrapRxnSubsProdParam,
+    WrapRxnSubsProdParam,
+    add_extra_compound,
+    convert_to_float,
+    mass_balance,
+)
 from functions.function_bm_gdb import batch_fetch_kegg_entries
+from functions.gpr.auth_gpr import setup_biocyc_session
 from types import MethodType
 from thg_protocol.services.biocyc import BioCycClient, BioCycClientProtocol
 from thg_protocol.services.ensembl import EnsemblClient, EnsemblClientProtocol

@@ -27,8 +27,13 @@ project_root = os.path.join(current_dir, "..")
 if project_root not in sys.path:
     sys.path.append(project_root)
 
-from functions.function_bm_gdb import *
-from functions.equations_bm_gdb import *
+from functions.function_bm_gdb import (
+    compartment_file_to_dict_bm,
+    create_compartments_dict_bm,
+    meltGeneList,
+    update_comp_names_bm,
+)
+from functions.equations_bm_gdb import mass_balance, test_reaction_balance
 
 from functions.gpr.gpr_def import getGPR, setup_biocyc_session
 

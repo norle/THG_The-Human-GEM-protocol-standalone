@@ -1,23 +1,18 @@
 from cobra.io import read_sbml_model, write_sbml_model
 import cobra
 import os
-import urllib.request, urllib.error, urllib.parse
 import re
-import urllib.request, urllib.parse, urllib.error
 import requests
 import copy
 import time
 import traceback
 import itertools
-import pubchempy as pcp
 import string
 import pickle
 from collections import defaultdict
 from itertools import zip_longest
 from cobra import Model, Reaction, Metabolite
 from collections import ChainMap
-import dill
-import pdb
 from typing import List, Optional, Tuple
 import sys
 import logging
@@ -27,19 +22,21 @@ LOGGER = logging.getLogger(__name__)
 # import the functions
 from functions.gpr.gpr_def import getGPR, setup_biocyc_session
 from thg_protocol.services.ensembl import EnsemblClientProtocol
-
-from functions.equations_bm_gdb import *
-
+from thg_protocol.services.location import LocationClient, LocationClientProtocol
 
 # retrieve website with function from getgpr
 
 
-def get_html(request_url: str, session: Optional[requests.Session] = None) -> str:
-    """Fetch an html by perfoming a GET HTTPS request, maybe with session."""
-    if session is not None:
-        return session.get(request_url).text
-    else:
-        return requests.get(request_url).text
+def get_html(
+    request_url: str,
+    session: Optional[requests.Session] = None,
+    *,
+    location_client: Optional[LocationClientProtocol] = None,
+) -> str:
+    """Fetch a location page through the package-owned HTTP boundary."""
+    if location_client is None:
+        location_client = LocationClient(session=session)
+    return location_client.get_page(request_url)
 
 
 def create_dict(gene, e):
@@ -79,6 +76,8 @@ def getLocationnew(
     session: Optional[requests.Session] = None,
     ensembl_cache: Optional[dict] = None,
     ensembl_client: Optional[EnsemblClientProtocol] = None,
+    *,
+    location_client: Optional[LocationClientProtocol] = None,
 ):
     """Finds subcellular location.
     Using a SGPR (or GPR), it identifies the corresponding cellular locations and adapts the location-specific SGPRs accordingly.
@@ -106,6 +105,7 @@ def getLocationnew(
     """
     if session is None:
         session = requests
+    location_client = location_client or LocationClient(session=session)
     try:
         gprgpr = ""
         OtherLocations = ["Other locations"]
@@ -148,7 +148,7 @@ def getLocationnew(
                     + "_HUMAN"
                 )  # location in genome net human
                 # bb = str(getHtml(b, session))  # .decode('utf-8')
-                bb = str(urllib.request.urlopen(b).read())
+                bb = location_client.get_page(b)
                 dd = re.findall("GO:[0-9]+.+?C:(.+?);", bb)
 
                 if not dd:
@@ -185,8 +185,8 @@ def getLocationnew(
                         )  # location in BioCyc human #########################
                         # bb = str(getHtml(b, session))
                         try:
-                            bb = str(urllib.request.urlopen(b).read())
-                        except urllib.error.HTTPError:
+                            bb = location_client.get_page(b)
+                        except Exception:
                             bb = ""
                         if not bb:
                             b = (
@@ -195,8 +195,8 @@ def getLocationnew(
                             )  # location in BioCyc human #########################
                             # bb = str(getHtml(b, session))
                             try:
-                                bb = str(urllib.request.urlopen(b).read())
-                            except urllib.error.HTTPError:
+                                bb = location_client.get_page(b)
+                            except Exception:
                                 bb = ""
                             # bb = str(urllib.request.urlopen(b).read())
 
@@ -234,7 +234,7 @@ def getLocationnew(
                                         + ".txt"
                                     )
                                     # bb = str(getHtml(b, session))
-                                    bb = str(urllib.request.urlopen(b).read())
+                                    bb = location_client.get_page(b)
                                     ddd = re.findall("GO:[0-9]+.+?C:(.+?);", bb)
                                     ddd = [x for x in ddd if "GO" not in x]
                                     dd.extend(ddd)
@@ -252,9 +252,9 @@ def getLocationnew(
                             "http://biocyc.org/gene?orgid=META&id="
                             + genelist2[index].upper()
                         )
-                        btry = get_html(humancyc, session)
+                        btry = location_client.get_page(humancyc)
                         bb_human = str(btry)
-                        btry = get_html(metacyc, session)
+                        btry = location_client.get_page(metacyc)
                         bb_meta = str(btry)
 
                         # Extract the section between "Locations" and "Reactions"
@@ -312,7 +312,7 @@ def getLocationnew(
                             # url = str(
                             #     getHtml(https, session)
                             # )  # str(urllib.request.urlopen(https).read())
-                            url = str(urllib.request.urlopen(https).read())
+                            url = location_client.get_page(https)
                             if re.search(
                                 'uniprot\/([A-Z0-9-]+)">[A-Z0-9-]+<\/a><\/td><td>'
                                 + GeneID
@@ -358,7 +358,7 @@ def getLocationnew(
                                 + "#subcellular_location"
                             )
                             # bb = str(getHtml(b, session))
-                            bb = str(urllib.request.urlopen(b).read())
+                            bb = location_client.get_page(b)
                             ddd = re.findall(
                                 'class="[a-zA-Z_ ]+"><h6>([a-zA-Z ]+)</h6>', bb
                             )
@@ -561,21 +561,17 @@ def getLocationnew(
                         if iiii == LocGPR2[i] and ensembl_client is None:
                             iiii2 = re.search(
                                 "gene=([A-Z0-9]+)",
-                                str(
-                                    urllib.request.urlopen(
+                                    location_client.get_page(
                                         "https://www.genome.jp/dbget-bin/www_bget?hsa+"
                                         + LocGPR2[i]
-                                    ).read()
-                                ),
+                                    ),
                             )  # .group(1)
                             if not iiii2:
                                 iiii2 = re.search(
                                     "(ENSG[0-9]+)",
-                                    str(
-                                        urllib.request.urlopen(
-                                            "https://www.ensembl.org/Homo_sapiens/Gene/Summary?g="
-                                            + LocGPR2[i]
-                                        ).read()
+                                    location_client.get_page(
+                                        "https://www.ensembl.org/Homo_sapiens/Gene/Summary?g="
+                                        + LocGPR2[i]
                                     ),
                                 )
                             if iiii2:

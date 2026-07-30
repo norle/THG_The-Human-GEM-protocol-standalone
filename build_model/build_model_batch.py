@@ -51,7 +51,7 @@ from functions.function_bm_gdb import (
     compartment_file_to_dict_bm,
     update_comp_names_bm,
 )
-from functions.equations_bm_gdb import *
+from functions.equations_bm_gdb import mass_balance, test_reaction_balance
 
 LOGGER = logging.getLogger("build_model_batch")
 logging.basicConfig(
@@ -206,16 +206,53 @@ def extract_kegg_reaction_id(reac):
 
 def main(
     *,
+    input_model: str | os.PathLike[str] | None = None,
+    output_model_final: str | os.PathLike[str] | None = None,
+    output_errors: str | os.PathLike[str] | None = None,
+    cache_dir: str | os.PathLike[str] | None = None,
     biocyc_client: BioCycClientProtocol | None = None,
     kegg_client: KeggClientProtocol | None = None,
     ensembl_client: EnsemblClientProtocol | None = None,
 ):
+    # Keep historical defaults while allowing library callers to supply all
+    # stateful paths explicitly. Local uppercase names preserve the old body
+    # without mutating module-level configuration.
+    INPUT_MODEL = os.fspath(input_model) if input_model is not None else globals()["INPUT_MODEL"]
+    OUTPUT_MODEL_FINAL = (
+        os.fspath(output_model_final)
+        if output_model_final is not None
+        else globals()["OUTPUT_MODEL_FINAL"]
+    )
+    OUTPUT_ERRORS = (
+        os.fspath(output_errors)
+        if output_errors is not None
+        else globals()["OUTPUT_ERRORS"]
+    )
+    cache_root = (
+        os.fspath(cache_dir)
+        if cache_dir is not None
+        else os.path.join(project_root, "files", "caches")
+    )
+    # Library callers may provide paths in a fresh temporary workspace.  The
+    # historical script assumed these directories already existed, which
+    # made the explicit-path API fail before it could materialize even an
+    # empty model.
+    os.makedirs(cache_root, exist_ok=True)
+    for output_path in (OUTPUT_MODEL_FINAL, OUTPUT_ERRORS):
+        output_parent = os.path.dirname(os.path.abspath(output_path))
+        os.makedirs(output_parent, exist_ok=True)
+    ENSEMBL_CACHE_FILE = os.path.join(cache_root, "ensembl_cache_batch.pkl")
+    KEGG_CACHE_FILE = os.path.join(cache_root, "kegg_reaction_cache_batch.pkl")
+    GETGPR_CACHE_FILE = os.path.join(cache_root, "getgpr_cache_batch.pkl")
+
     LOGGER.info("Loading model %s", INPUT_MODEL)
     model = cobra.io.read_sbml_model(INPUT_MODEL)
 
     # prepare session for getGPR
-    session = setup_biocyc_session()
-    biocyc_client = biocyc_client or BioCycClient(session=session)
+    session = None
+    if biocyc_client is None:
+        session = setup_biocyc_session()
+        biocyc_client = BioCycClient(session=session)
     kegg_client = kegg_client or KeggClient()
     ensembl_client = ensembl_client or EnsemblClient()
 
@@ -269,7 +306,7 @@ def main(
     # Include annotation fields from the model
     not_found_kegg = [kid for kid in kegg_ids if kegg_cache.get(kid) is None]
     if not_found_kegg:
-        csv_path = os.path.join(project_root, "files", "kegg_reactions_not_found.csv")
+        csv_path = os.path.join(cache_root, "kegg_reactions_not_found.csv")
         try:
             # Build a mapping from KEGG ID to reaction objects
             kegg_to_reactions = defaultdict(list)
@@ -336,7 +373,7 @@ def main(
             if not verbose:
                 gpr_logger.disabled = True
             # ensure we have a session per call if none provided
-            if session_obj is None:
+            if session_obj is None and biocyc_client is None:
                 session_local = setup_biocyc_session()
             else:
                 session_local = session_obj
@@ -498,10 +535,10 @@ def main(
     # Use BioVelo webservice to resolve gene symbols to BioCyc IDs in batches
     BIOVELO_BATCH_SIZE = 50
     BIOVELO_CACHE_FILE = os.path.join(
-        project_root, "files", "caches", "biovelo_cache.pkl"
+        cache_root, "biovelo_cache.pkl"
     )
     BIOVELO_LOC_CACHE_FILE = os.path.join(
-        project_root, "files", "caches", "biovelo_location_cache.pkl"
+        cache_root, "biovelo_location_cache.pkl"
     )
 
     try:
@@ -756,7 +793,7 @@ def main(
 
     # Cache for compartment frameid -> common name mapping
     COMPARTMENT_NAME_CACHE_FILE = os.path.join(
-        project_root, "files", "compartment_name_cache.pkl"
+        cache_root, "compartment_name_cache.pkl"
     )
     try:
         compartment_name_cache = load_cache(COMPARTMENT_NAME_CACHE_FILE)
@@ -1499,7 +1536,7 @@ def main(
     save_cache(ENSEMBL_CACHE_FILE, ensembl_cache)
     save_cache(KEGG_CACHE_FILE, kegg_cache)
     save_cache(GETGPR_CACHE_FILE, getgpr_cache)
-    save_cache(os.path.join(project_root, "files", "variables_batch.pkl"), variables)
+    save_cache(os.path.join(cache_root, "variables_batch.pkl"), variables)
 
     # Log compartment mapping summary
     LOGGER.info("=" * 60)

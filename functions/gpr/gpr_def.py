@@ -33,7 +33,11 @@ def get_ecnumber_biocyc_html(
 
 
 def get_html(
-    request_url: str, session: Optional[requests.Session] = None, timeout: int = 30
+    request_url: str,
+    session: Optional[requests.Session] = None,
+    timeout: int = 30,
+    *,
+    biocyc_client: BioCycClientProtocol | None = None,
 ) -> str:
     """Fetch an html by perfoming a GET HTTPS request, maybe with session.
 
@@ -42,10 +46,9 @@ def get_html(
         session: Optional requests session to use
         timeout: Timeout in seconds (default: 30)
     """
-    if session is not None:
-        return session.get(request_url, timeout=timeout).text
-    else:
-        return requests.get(request_url, timeout=timeout).text
+    del timeout
+    biocyc_client = biocyc_client or BioCycClient(session=session)
+    return biocyc_client.get_page(request_url)
 
 
 def pattern_match_org(page: str, org: str = "Homo Sapiens") -> List[str]:

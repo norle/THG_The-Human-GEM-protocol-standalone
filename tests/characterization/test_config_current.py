@@ -1,7 +1,7 @@
 import unittest
 from pathlib import Path
 
-from functions import config
+from thg_protocol import config
 
 
 class ConfigCharacterizationTests(unittest.TestCase):

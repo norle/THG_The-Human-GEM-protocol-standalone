@@ -6,6 +6,195 @@ status, open decisions, phase gates, and next pull requests live in the plan.
 Later repository-state notes may qualify historical claims when a temporary
 recovery ref or another local-only validation artifact is no longer available.
 
+## 2026-07-29
+
+### Dependency-light cell-specific tailoring boundary
+
+- Added `thg_protocol.cell_specific.reduce_model_by_activity` with explicit
+  activity input, presence threshold, preserved reaction IDs, output path,
+  orphan cleanup, and an `ActivityReductionReport`.
+- CSV and MAT activity matrices are supported without importing Troppo; the
+  optional extra remains isolated to GIMME/Troppo workflows.
+- Added toy-model coverage and extended CI/release wheel smoke imports and
+  workflow documentation.
+- Validation: cell-specific API tests `2 passed`; Ruff passed for the new
+  package/test.
+
+## 2026-07-29
+
+### Package-native merge workflow
+
+- Added `thg_protocol.merge.merge_models` and
+  `merge_models_from_paths` with explicit model/output inputs, non-mutating
+  ID-based reconciliation, optional isolated-metabolite removal, and a
+  structured `MergeReport`.
+- Added toy-model coverage for temporary SBML/JSON outputs and input-model
+  immutability, and extended the outside-wheel smoke imports and workflow docs.
+- Validation:
+  - Merge API tests: `2 passed`.
+  - Full offline/default gate: `1809 passed, 2 skipped, 4 warnings`.
+  - `ruff check src tests` and `git diff --check` passed.
+  - Fresh wheel build included `thg_protocol.merge`; the wheel imported both
+    merge entry points outside the checkout.
+
+## 2026-07-29
+
+### Phase 7 installation and wheel-smoke documentation
+
+- Added README installation instructions for base, dev, solver, memote,
+  cell-specific, and documentation extras, plus the installed CLI scope.
+- Extended the CI and release-validation outside-wheel smoke imports to cover
+  `thg_protocol.database` and `thg_protocol.model_build`.
+- Validation: CLI/database/model-build focused tests `8 passed`; Ruff and
+  `git diff --check` passed. The previously built wheel imported both new
+  package boundaries outside the checkout.
+- Remaining Phase 7 gates are maintainer approval of the dependency/artifact
+  decisions and the credential-dependent online fixture.
+
+## 2026-07-29
+
+### Legacy wildcard-import cleanup
+
+- Replaced the remaining production wildcard imports in the database builder,
+  model merge helpers, model annotation helper, and location compatibility
+  path with explicit imports.
+- Migrated the archived mass-balance script to import only its maintained
+  `mass_balance` function. The repository-wide wildcard inventory is now
+  empty for the targeted Python trees.
+- Fixed the newly exposed `DefEnsblDB` local-cache initialization and supplied
+  the explicit `RxnBalance2` dependency for merge helpers.
+- Validation:
+  - Affected legacy service/database tests: `25 passed`.
+  - `generate_db.py` passes Ruff undefined-name analysis and all affected files
+    compile.
+  - Full offline/default gate: `1807 passed, 2 skipped, 4 warnings`.
+  - `ruff check src tests` and `git diff --check` passed.
+
+## 2026-07-29
+
+### Package-native service-backed model/database boundaries
+
+- Added `thg_protocol.database.reconstruct_model_with_services` for
+  record-driven reconstruction with injected KEGG, BioCyc, and Ensembl
+  clients. Structured service payloads are normalized to SBML-safe JSON
+  annotation strings before writing.
+- Added `thg_protocol.model_build.build_model` for explicit input/output model
+  files, JSON service caches, error reports, and injectable service clients.
+  The workflow preserves model stoichiometry while enriching matching
+  reaction and gene annotations.
+- Added offline static-client tests covering service enrichment, temporary
+  outputs, cache contents, and SBML reloadability.
+- Validation:
+  - Focused database/model-build tests: `5 passed`.
+  - Full offline/default gate: `1807 passed, 2 skipped, 4 warnings`.
+  - `ruff check src tests` and `git diff --check` passed.
+  - Wheel build succeeded; the wheel imported successfully outside the
+    checkout with the new database/model-build APIs available.
+
+## 2026-07-29
+
+### Explicit batch-builder output boundary
+
+- Completed the explicit-path boundary for the legacy batch model-builder
+  entry point. Caller-provided output and error paths now create their parent
+  directories, the injected cache directory is created automatically, and
+  cache-derived reports and variables remain under that cache directory.
+- Replaced wildcard imports in both model-builder entry points and the
+  location compatibility helper with explicit maintained helper imports.
+- The boundary continues to accept injected BioCyc, KEGG, and Ensembl clients
+  without credential setup or network access.
+- Validation:
+  - `tests/integration/test_build_model_batch_boundary.py`: 1 passed.
+  - Full offline/default gate: `1805 passed, 2 skipped, 4 warnings`.
+  - `ruff check src tests` and `git diff --check` passed.
+- Remaining work is the broader package-native model/database orchestration,
+  historical online fixture execution, and maintainer approval gates.
+
+## 2026-07-29
+
+### Offline and release-validation checkpoint
+
+- Routed the legacy upload branch through `LocationClient.post_page`, adding
+  retry/timeout behavior and a static upload adapter.
+- Added the MkDocs configuration and a documented release-validation gate for
+  the supported Python matrix and outside-checkout wheel smoke test.
+- Validation:
+  - Service-boundary suite: `20 passed, 4 warnings`.
+  - Full default offline suite: `1804 passed, 2 skipped, 4 warnings`.
+  - `ruff check src tests` and `git diff --check` passed.
+  - Built the wheel, installed it with `--no-deps` into a fresh temporary
+    virtualenv outside the checkout, and passed package import plus all three
+    installed CLI `--help` smoke tests.
+- The production-helper service audit is now clear; remaining work is the
+  separate historical integration-test migration and maintainer approval for
+  dependency and artifact decisions.
+- Historical metabolite, GPR, and reaction test modules now import the
+  maintained annotation/compatibility APIs; the live-service cases remain
+  outside the default test path until their fixtures and session setup are
+  moved into `tests/`.
+- Added maintained package-API integration coverage for all 101 archived
+  reaction fixture rows and all 1,614 archived metabolite fixture rows. The
+  BioCyc fixture is represented by a bounded, credential-gated online sample.
+- Validation: the complete default gate now passes `1804 passed, 2 skipped,
+  4 warnings`; skips are the credential-gated BioCyc test and the existing
+  matplotlib-dependent figure test.
+- Remaining Phase 4 work: characterize historical model-backed Jaccard checks
+  and run the opt-in BioCyc fixture where credentials are available.
+
+### Model-backed reaction matching characterization
+
+- Added a small temporary SBML pair that exercises `process_reac` and
+  direction-independent `execute_jaccard` through `thg_protocol.annotation.reactions`.
+- This replaces the archived Jaccard test's unavailable full-model fixtures
+  with a reproducible model-sized characterization while preserving the
+  historical matching contract.
+- Focused validation: the new model-backed integration test passes.
+- Removed the self-import and unused HTTP/debug imports from the legacy pattern
+  and database helper modules as a safe Phase 2 cleanup.
+
+### Network-analysis package boundary
+
+- Added `thg_protocol.analysis.find_network_components` and
+  `write_component_report` with explicit model/output inputs, non-mutating
+  analysis, and JSON report output.
+- Added toy-model coverage and documented the separation between the package
+  connectivity API and optional solver/HTML legacy operations.
+- Kept NetworkX lazy so the package import and installed CLI help smoke tests
+  remain valid in a `--no-deps` clean-wheel environment.
+- Focused validation: network API test and `ruff check src tests` pass.
+
+### Normalized model reconstruction boundary
+
+- Added `thg_protocol.database` records and `reconstruct_model` for explicit
+  metabolite, reaction, gene, pathway, and output-path inputs.
+- The API builds COBRA models without network access and lazily imports COBRA,
+  preserving package import and CLI-help safety when optional runtime
+  dependencies are absent.
+- Added toy-model coverage for annotations, gene rules, pathway metadata,
+  JSON output, and unknown-metabolite validation.
+- Added `reconstruct_model_from_json` with a documented normalized record-bundle
+  schema and explicit output override.
+- Validation: the default gate passes `1804 passed, 2 skipped, 4 warnings`;
+  the rebuilt wheel imports the new API outside the checkout and installed CLI
+  help remains green.
+
+## 2026-07-29
+
+### Legacy service-boundary completion
+
+- Removed raw `urllib` fallbacks from the legacy KEGG pathway-link and primary-
+  compound helpers in `function_bm_gdb.py`; all of these paths now use an
+  injectable `KeggClientProtocol`.
+- Added page-client injection to the legacy location/UniProt compatibility
+  helper and to the older BioCyc GPR definition helper. The legacy BioCyc GPR
+  entry points now pass their injected client through nested page lookups.
+- Added static-client characterization for KEGG pathway fallback, KEGG primary
+  compound resolution, and the legacy BioCyc HTML helper.
+- Validation: service-boundary suite `19 passed, 4 warnings`.
+- Remaining work: migrate the remaining legacy integration tests and complete
+  the final dependency-matrix/release-validation documentation before closing
+  the related plan phases.
+
 When adding an entry:
 
 - use the date on which the validation was performed;
@@ -13,6 +202,258 @@ When adding an entry:
 - record the exact validation commands and results when they are useful;
 - identify any known follow-up work;
 - include the commit hash once the checkpoint commit exists.
+
+## 2026-07-29
+
+### Legacy helper page-client boundary
+
+- Routed the legacy `function_bm_gdb.getHtml` and `getHtmlS` compatibility
+  helpers through the package `LocationClient`, preserving their historical
+  byte-returning behavior and optional upload path.
+- Routed the Ensembl transcript/protein page lookup in
+  `pattern_generate_database.DefMod` through an injectable page client.
+- Added static page-client coverage for both compatibility helpers and the
+  gene modifier output.
+- Validation:
+  - Service-boundary suite: `15 passed`.
+  - Full default offline suite: `80 passed, 1 skipped, 4 warnings`.
+  - `ruff check src tests`, legacy helper compilation, and `git diff --check`
+    passed.
+- Follow-up: migrate the remaining direct URL branches inside the large
+  legacy database parser (`getLinkPath` fallbacks, UniProt lookups, and
+  primary-compound fallback).
+
+## 2026-07-29
+
+### Legacy BioCyc helper entry-point boundary
+
+- Added optional `BioCycClient` injection to the legacy database helper's
+  `getGPR22` and `getGPR_old` entry points, replacing their direct EC-page
+  `urllib` fetches while preserving positional arguments.
+- These helpers now share the same package-owned timeout/retry/cache boundary
+  used by the characterized GPR workflow.
+- Validation:
+  - Service-boundary suite: `14 passed`.
+  - Full default offline suite: `78 passed, 1 skipped, 4 warnings`.
+  - Legacy helper compilation, `ruff check src tests`, and `git diff --check`
+    passed.
+- Follow-up: characterize the larger BioCyc parsing branches that still call
+  the legacy `getHtml`/`urllib` paths.
+
+## 2026-07-29
+
+### Legacy BioCyc GPR client boundary
+
+- Routed the legacy `auth_gpr` BioCyc EC-page and gene-page retrieval through
+  the injectable package `BioCycClient`.
+- Preserved existing session-based callers while adding optional client
+  injection through `getGPR`, `parseGPR`, `get_html`, and
+  `get_ecnumber_biocyc_html`; recursive transferred-EC calls retain both
+  injected service clients.
+- Added static-page coverage for the legacy BioCyc helper path.
+- Validation:
+  - Service-boundary suite: `14 passed`.
+  - Full default offline suite: `78 passed, 1 skipped, 4 warnings`.
+  - `ruff check src tests` and `git diff --check` passed.
+- Follow-up: characterize the remaining large legacy BioCyc parsing branches in
+  `function_bm_gdb.py` and `auth_gpr.py`.
+
+## 2026-07-29
+
+### Legacy auth-GPR KEGG fallback
+
+- Routed the legacy `functions.gpr.auth_gpr` KEGG fallback and generic KEGG
+  lookup helper through the injectable package `KeggClient`.
+- Preserved existing `getGPR` and `fetch_kegg_rest` call signatures while
+  adding optional keyword client injection and recursive propagation.
+- Added static-client coverage for EC-to-human-gene fallback resolution.
+- Validation:
+  - Service-boundary suite: `13 passed`.
+  - `ruff check src tests` passed.
+  - `git diff --check` passed.
+- Follow-up: characterize the remaining large legacy BioCyc parser branches.
+
+## 2026-07-29
+
+### Installed-style CLI subprocess coverage
+
+- Added integration smoke tests that execute each published CLI module with
+  `python -m ... --help` from a temporary directory outside the checkout.
+- This complements the direct `main()` tests and the clean-wheel console-script
+  checks in CI by exercising subprocess argument parsing and import safety.
+- Validation:
+  - CLI subprocess plus characterization tests: `13 passed`.
+  - Full default offline suite: `76 passed, 1 skipped, 4 warnings`.
+  - `ruff check src tests` and `git diff --check` passed.
+
+## 2026-07-29
+
+### Characterization tests migrated to package APIs
+
+- Updated the configuration and reaction-identification characterization suites
+  to import `thg_protocol.config` and
+  `thg_protocol.annotation.reactions` directly.
+- Legacy compatibility behavior remains tested separately; these suites now
+  verify the installed-package-facing implementations rather than checkout
+  helper aliases.
+- Validation:
+  - The migrated characterization tests passed: `10 passed`.
+  - `ruff check src tests` passed.
+  - `git diff --check` passed.
+
+## 2026-07-29
+
+### Installed wheel and CLI smoke gate
+
+- Built both the source distribution and wheel with the current package,
+  including the new glycan and location service modules.
+- Installed the wheel with `--no-deps` into a fresh temporary virtual
+  environment outside the checkout.
+- Verified package imports from `/tmp` and exercised `--help` for
+  `thg-gapfill`, `thg-compare`, and `thg-pathway` without repository files or
+  optional workflow dependencies.
+- Validation passed; the build emitted only the existing setuptools license
+  deprecation warning.
+
+## 2026-07-29
+
+### KEGG-backed glycan parser and mass-balance reformulation
+
+- Added `thg_protocol.glycan` with an explicit atom/count contract recovered
+  from the legacy reformulation call sites, plus KEGG page resolution and
+  formula parsing.
+- Routed both legacy equation and duplicate mass-balance glycan helpers through
+  the shared parser and removed the absent historical `Function.glycan`
+  dependency from mass-balance reformulation.
+- Added static-client coverage for scalar glycan IDs, atom groups, report
+  output, and reformulated equations. Scalar IDs are normalized before lookup
+  so equation whitespace does not change service requests.
+- Validation:
+  - Focused service-boundary suite: `12 passed`.
+  - Default offline suite: `73 passed, 1 skipped, 4 warnings`.
+  - `ruff check src tests` passed.
+- Follow-up: run the installed-wheel CLI subprocess gate and complete any
+  remaining legacy integration-test migration.
+
+## 2026-07-29
+
+### Offline gate validation and legacy import safety
+
+- Made optional PubChem imports lazy/optional in the legacy database helper
+  chain and removed unused optional imports from the location resolver, so the
+  injectable KEGG batch boundary can be imported without PubChemPy or Dill.
+- Validated the accumulated service-boundary and compatibility changes in the
+  available Python 3.12.9 development environment.
+- Validation:
+  - Focused service-boundary suite: `12 passed`.
+  - Default offline suite:
+    `73 passed, 1 skipped, 4 warnings` for
+    `pytest -m "not slow and not online and not solver and not gurobi and not memote" -q`.
+  - `ruff check src tests` passed.
+  - The one skip is the matplotlib-dependent figure rendering test; matplotlib
+    is not installed in this environment.
+- Follow-up: characterize the absent historical `Function.glycan` parser and
+  run the installed-wheel CLI subprocess gate in CI.
+
+## 2026-07-29
+
+### Legacy mass-balance compound compatibility
+
+- Replaced the missing historical `Class` import in
+  `functions/functions_mass_balance.py` with the maintained
+  `functions.class_generate_database.compound` implementation.
+- Threaded the injectable KEGG client through its proton, water, and
+  extra-compound helpers, preserving existing positional arguments.
+- Added the Python 3.12-safe `lib2to3` token fallback and static KEGG coverage
+  for the duplicate glycan helper.
+- The historical `Function.glycan` import used by mass-balance reformulation
+  remains explicitly deferred because no compatible implementation exists in
+  this checkout; it was not replaced with the unrelated report-writing helper.
+- Validation:
+  - `python -m compileall -q functions/functions_mass_balance.py functions/class_generate_database.py tests/unit/test_biocyc_kegg_clients.py`
+    passed with known legacy invalid-escape warnings.
+  - `git diff --check` passed.
+  - Focused pytest and Ruff remain unavailable in the active environment.
+
+## 2026-07-29
+
+### Workflow documentation and opt-in CI gates
+
+- Added workflow documentation for annotation, database generation, model
+  building, merge/network consistency, cell-specific models, figures,
+  network analysis, and MEMOTE/task analysis, and linked every guide from the
+  documentation index.
+- Extended CI with manually dispatchable and scheduled solver, slow, and
+  online jobs while keeping the default matrix offline and non-solver.
+- Updated the plan status: Phases 4 and 7 are now in progress rather than
+  unstarted; their remaining acceptance gates are recorded in the plan.
+- Validation: reviewed the workflow YAML and documentation links; full CI
+  execution is pending because the active environment lacks pytest and Ruff.
+
+## 2026-07-29
+
+### Legacy equation glycan service boundary
+
+- Routed glycan page retrieval in `functions/equations_bm_gdb.py` and the
+  duplicate `functions/functions_mass_balance.py` helper through the package
+  KEGG client instead of direct `urllib` calls.
+- Added optional KEGG-client propagation to equation reformulation and
+  proton/water/extra-compound helpers while preserving existing positional
+  arguments.
+- Added an offline characterization test that verifies glycan lookup and its
+  legacy report output using `StaticKeggClient`.
+- Validation:
+  - `python -m compileall -q functions/equations_bm_gdb.py functions/functions_mass_balance.py tests/unit/test_biocyc_kegg_clients.py`
+    passed with known legacy invalid-escape warnings.
+  - `git diff --check` passed.
+  - No executable `urlopen` calls remain in either equation helper.
+  - Focused pytest and Ruff remain unavailable in the active environment.
+- Follow-up: wire the static client through the remaining legacy mass-balance
+  compound class once that deferred workflow is characterized.
+
+## 2026-07-29
+
+### Injectable location-page service boundary
+
+- Added `thg_protocol.services.location` with a timeout/retry/cache-aware
+  `LocationClient` and `StaticLocationClient` for offline fixtures.
+- Routed the legacy `getLocationnew` workflow and its `get_html` compatibility
+  helper through that client. Existing positional arguments remain valid;
+  `location_client` is an optional keyword and the resolver still returns its
+  original four-dictionary result.
+- Removed executable raw `urllib` lookups from the location helper, including
+  KEGG/UniProt/BioCyc page retrieval and the final Ensembl compatibility lookup.
+- Added static page-adapter coverage and updated the service-boundary audit.
+- Validation:
+  - `python -m compileall -q src/thg_protocol/services/location.py functions/gpr/get_location_def.py tests/unit/test_biocyc_kegg_clients.py`
+    passed with the known legacy invalid-escape warnings.
+  - The static location adapter import/smoke check passed with `PYTHONPATH=src`.
+  - `git diff --check` passed.
+  - Focused pytest and Ruff remain unavailable in the active environment.
+- Follow-up: run the full offline suite in the development environment and
+  characterize the remaining legacy equation-helper service calls.
+
+## 2026-07-29
+
+### Legacy KEGG and database annotation client defaults
+
+- Tightened the legacy batch KEGG compatibility helper so calls that omit a
+  client now use the package `KeggClient`; batching, pacing, retries, caching,
+  and response normalization therefore remain in one service boundary.
+- Updated the legacy database pathway, reaction, compound, and gene helpers to
+  default to package-owned KEGG and Ensembl clients while preserving their
+  existing optional client arguments and call signatures.
+- Added static-client characterization tests for the batch helper and Ensembl
+  gene lookup.
+- Validation:
+  - `python -m compileall -q functions/function_bm_gdb.py functions/class_generate_database.py tests/unit/test_biocyc_kegg_clients.py`
+    passed with the known legacy invalid-escape warnings.
+  - `git diff --check` passed.
+  - The focused pytest command could not run because pytest is not installed in
+    the active environment; run it in the project development environment.
+- Follow-up: migrate the remaining direct HTTP branches in the location helper
+  and legacy equation/database paths, then run the full offline test and Ruff
+  gates.
 
 ## 2026-07-28
 

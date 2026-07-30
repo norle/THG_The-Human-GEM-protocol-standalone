@@ -7,16 +7,14 @@ import re
 # from scipy import linalg
 import time
 import copy
-import pubchempy as pcp
-from functions.class_generate_database import *
-from functions.pattern_generate_database import *
-from functions.equations_bm_gdb import *
-import urllib.request, urllib.error, urllib.parse  # ,cookielib
+try:
+    import pubchempy as pcp
+except ImportError:  # Optional for import-safe database helpers.
+    pcp = None
 import re
-import urllib.request, urllib.parse, urllib.error
-import requests
 import pickle
 import logging
+from thg_protocol.services.location import LocationClient, LocationClientProtocol
 
 # from Class import gpr
 
@@ -591,7 +589,12 @@ def objective():
 
 
 ############### Modifier ###############
-def DefMod(Gene):
+def DefMod(
+    Gene,
+    *,
+    location_client: LocationClientProtocol | None = None,
+):
+    location_client = location_client or LocationClient()
     if Gene.Name():
         GeneID = Gene.Name().replace("[", "").replace("]", "").replace("-", "")
         ID = (
@@ -613,10 +616,8 @@ def DefMod(Gene):
     if Gene.Ensg():
         GeneEnsbl = Gene.Ensg()
         try:
-            z = str(
-                urllib.request.urlopen(
-                    "https://www.ensembl.org/Homo_sapiens/Gene/Summary?g=" + GeneEnsbl
-                ).read()
+            z = location_client.get_page(
+                "https://www.ensembl.org/Homo_sapiens/Gene/Summary?g=" + GeneEnsbl
             )
             y = [
                 '<rdf:li rdf:resource="https://identifiers.org/ensembl/'

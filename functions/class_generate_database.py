@@ -2,15 +2,14 @@
 # -*- coding: utf-8 -*-
 
 import re
-import urllib.request
 from typing import TYPE_CHECKING
 
-import pdb
 
 from functions.gpr.auth_gpr import getGPR, setup_biocyc_session
 from thg_protocol.services.biocyc import BioCycClientProtocol
 from thg_protocol.services.ensembl import EnsemblClientProtocol
-from thg_protocol.services.kegg import KeggClientProtocol
+from thg_protocol.services.kegg import KeggClient, KeggClientProtocol
+from thg_protocol.services.ensembl import EnsemblClient
 
 if TYPE_CHECKING:  # Avoid circular import at runtime, keep type hints available
     from functions import function_bm_gdb as _bm_mod
@@ -34,11 +33,8 @@ def _loc():
 class pathway(object):
     def __init__(self, url, time, ID, urlReferer, PathName, *, kegg_client=None):
         bm = _bm()
-        self.pagina = (
-            kegg_client.get_page(url)
-            if kegg_client is not None
-            else bm.getHtml(url, time, urlReferer)
-        )
+        kegg_client = kegg_client or KeggClient()
+        self.pagina = kegg_client.get_page(url)
         if type(self.pagina) == bytes:
             self.pagina = self.pagina.decode("utf-8")
         self.link = bm.getLinkPath(self.pagina, kegg_client=kegg_client)
@@ -73,11 +69,8 @@ class pathway(object):
 class reaction(object):
     def __init__(self, url, time, ID, path, termdyn, *newparam, kegg_client=None):
         bm = _bm()
-        self.pagina = (
-            kegg_client.get_page(url)
-            if kegg_client is not None
-            else bm.getHtml(url, time)
-        )
+        kegg_client = kegg_client or KeggClient()
+        self.pagina = kegg_client.get_page(url)
         if isinstance(self.pagina, str):
             self.pagina = self.pagina.encode("utf-8")
         self.link = bm.getReacParam(self.pagina, time)
@@ -244,7 +237,7 @@ class gene(object):
     ):
         self.gene = gene
         self.db = db
-        self.ensembl_client = ensembl_client
+        self.ensembl_client = ensembl_client or EnsemblClient()
 
     def Name(self):  # Patway-KEGG
         try:
@@ -254,30 +247,8 @@ class gene(object):
 
     def Ensg(self):  # MetaCyc
         try:
-            if self.ensembl_client is not None:
-                annotation = self.ensembl_client.annotate([self.gene]).get(self.gene)
-                return annotation.ensembl if annotation is not None else ""
-            iiii2 = re.search(
-                r"gene=([A-Z0-9]+)",
-                str(
-                    urllib.request.urlopen(
-                        "https://www.genome.jp/dbget-bin/www_bget?hsa+" + self.gene
-                    ).read()
-                ),
-            )  # .group(1)
-            if not iiii2:
-                iiii2 = re.search(
-                    r"(ENSG[0-9]+)",
-                    str(
-                        urllib.request.urlopen(
-                            "https://www.ensembl.org/Homo_sapiens/Gene/Summary?g="
-                            + self.gene
-                        ).read()
-                    ),
-                )
-            if iiii2:
-                EnsGene = iiii2.group(1)
-            return EnsGene
+            annotation = self.ensembl_client.annotate([self.gene]).get(self.gene)
+            return annotation.ensembl if annotation is not None else ""
         except Exception:
             return ""
 
@@ -313,10 +284,9 @@ class compound(object):
     ):
         self.ident = ident
         bm = _bm()
-        pagina_content = (
-            kegg_client.get_page(f"https://rest.kegg.jp/get/{self.ident}")
-            if kegg_client is not None
-            else bm.getHtml(f"https://rest.kegg.jp/get/{self.ident}", time)
+        kegg_client = kegg_client or KeggClient()
+        pagina_content = kegg_client.get_page(
+            f"https://rest.kegg.jp/get/{self.ident}"
         )
         self.pagina = (
             pagina_content.decode("utf-8")

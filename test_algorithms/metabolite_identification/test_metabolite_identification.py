@@ -3,7 +3,9 @@
 import pytest
 import pandas as pd
 from os.path import join, dirname
-from functions_metabolite_identification import identify_metabolite
+from thg_protocol.annotation.metabolites import identify_metabolite
+
+pytestmark = pytest.mark.online
 
 
 PUBCHEM_FIXTURE = list(

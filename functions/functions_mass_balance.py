@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
 
 from cobra.io import read_sbml_model
-from lib2to3.pgen2.token import GREATER
+try:
+    from lib2to3.pgen2.token import GREATER
+except Exception:  # Python 3.12 removed lib2to3
+    from token import GREATER
 from cmath import isnan
 import sys
 import numpy as np
@@ -31,12 +34,13 @@ from numpy import size  # ,matrix,zeros
 # import scipy.optimize as optimize
 from scipy.optimize import linprog
 from itertools import chain, zip_longest
-import urllib.request
 from functools import reduce
 import traceback
 
 # from math import gcd
 import math
+from thg_protocol.services.kegg import KeggClient, KeggClientProtocol
+from thg_protocol.glycan import normalize_identifiers, resolve_glycan_atoms
 
 
 def gcd(x, y):
@@ -326,9 +330,9 @@ def RxnCompare(eq1, eq2):
 
 
 ### Glycans: Transform a glycan reaction to be MB
-def Reformulation(eq):
-    from Function import glycan
-
+def Reformulation(eq, *, kegg_client: KeggClientProtocol | None = None):
+    def glycan(value):
+        return Glycan(value, kegg_client=kegg_client)
     CompLs = list("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
     # define a dictionary
     GLIdent = []
@@ -1265,39 +1269,35 @@ def RxnBalance2(eq, RxnID):
     )
 
 
-def Glycan(RxnCmp):
+def Glycan(RxnCmp, *, kegg_client: KeggClientProtocol | None = None):
+    kegg_client = kegg_client or KeggClient()
+    results = []
     with open("Glycans", "a") as outfile:
-        for ID in RxnCmp:
+        for ID in normalize_identifiers(RxnCmp):
             try:
-                URL = urllib.request.urlopen(
-                    "https://www.genome.jp/dbget-bin/www_bget?gl:" + ID
-                ).read()
-                CmpID = (
-                    str(re.findall("(C[0-9]+)", str(URL)))
-                    .split(",")[0]
-                    .replace("'", "")
-                    .replace("[", "")
-                    .replace("]", "")
-                )
-                URL = urllib.request.urlopen(
-                    "https://www.genome.jp/entry/" + CmpID
-                ).read()
-                f = (
-                    str(re.findall("(C[0-9]+H[0-9]+[A-Z0-9]+)", str(URL)))
-                    .replace("'", "")
-                    .replace("[", "")
-                    .replace("]", "")
-                )
-                outfile.write(ID + "," + CmpID + "," + f + "\n")
+                CmpID, formula, atoms = resolve_glycan_atoms(ID, kegg_client)
+                outfile.write(ID + "," + CmpID + "," + formula + "\n")
+                results.append(atoms)
             except Exception as error:
                 print(error)
+    return results[0] if len(results) == 1 else results
 
 
 """"Proton"""
 
 
-def Proton(isH, Reaction, time, MetIdent, MetList, EF, specialCompounds):
-    from Class import compound
+def Proton(
+    isH,
+    Reaction,
+    time,
+    MetIdent,
+    MetList,
+    EF,
+    specialCompounds,
+    *,
+    kegg_client: KeggClientProtocol | None = None,
+):
+    from functions.class_generate_database import compound
 
     if isH != 0:
         CompoundID = "C00080"
@@ -1307,7 +1307,12 @@ def Proton(isH, Reaction, time, MetIdent, MetList, EF, specialCompounds):
         ):  # if H+ is not in the list of compounds, include it
             MetIdent = MetIdent + [CompoundID]
             MetList[CompoundID] = compound(
-                MetURL, CompoundID, time, EF, specialCompounds
+                MetURL,
+                CompoundID,
+                time,
+                EF,
+                specialCompounds,
+                kegg_client=kegg_client,
             )
             MetList[CompoundID].AssRxn1 = lambda: ""
             MetList[CompoundID].AssRxn2 = lambda: ""
@@ -1329,8 +1334,18 @@ def Proton(isH, Reaction, time, MetIdent, MetList, EF, specialCompounds):
 """"Water"""
 
 
-def Water(isW, Reaction, time, MetIdent, MetList, EF, specialCompounds):
-    from Class import compound
+def Water(
+    isW,
+    Reaction,
+    time,
+    MetIdent,
+    MetList,
+    EF,
+    specialCompounds,
+    *,
+    kegg_client: KeggClientProtocol | None = None,
+):
+    from functions.class_generate_database import compound
 
     if isW != 0:
         CompoundID = "C00001"
@@ -1340,7 +1355,12 @@ def Water(isW, Reaction, time, MetIdent, MetList, EF, specialCompounds):
         ):  # if H+ is not in the list of compounds, include it
             MetIdent = MetIdent + [CompoundID]
             MetList[CompoundID] = compound(
-                MetURL, CompoundID, time, EF, specialCompounds
+                MetURL,
+                CompoundID,
+                time,
+                EF,
+                specialCompounds,
+                kegg_client=kegg_client,
             )
             MetList[CompoundID].AssRxn1 = lambda: ""
             MetList[CompoundID].AssRxn2 = lambda: ""
@@ -1359,8 +1379,16 @@ def Water(isW, Reaction, time, MetIdent, MetList, EF, specialCompounds):
     return AddMet
 
 
-def add_extra_compound(new_compound, lib, time, EF, specialCompounds):
-    from Class import compound
+def add_extra_compound(
+    new_compound,
+    lib,
+    time,
+    EF,
+    specialCompounds,
+    *,
+    kegg_client: KeggClientProtocol | None = None,
+):
+    from functions.class_generate_database import compound
 
     nc = compound(
         "http://www.kegg.jp/dbget-bin/www_bget?cpd:C00080",
@@ -1369,6 +1397,7 @@ def add_extra_compound(new_compound, lib, time, EF, specialCompounds):
         EF,
         specialCompounds,
         None,
+        kegg_client=kegg_client,
     )
     nc.AssRxn1 = lambda: ""
     nc.AssRxn2 = lambda: ""

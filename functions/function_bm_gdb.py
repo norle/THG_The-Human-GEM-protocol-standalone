@@ -1,14 +1,15 @@
 # -*- coding: utf-8 -*-
-import urllib.request, urllib.error, urllib.parse
+import urllib.parse
 import re
-import urllib.request, urllib.parse, urllib.error
-import requests
 
 import copy
 import time
 import traceback
 import itertools
-import pubchempy as pcp
+try:
+    import pubchempy as pcp
+except ImportError:  # Optional for KEGG-only and import-safety workflows.
+    pcp = None
 import string
 import pickle
 from collections import defaultdict
@@ -17,15 +18,13 @@ import pandas as pd
 import pdb
 import os
 
-from functions.equations_bm_gdb import *
-from functions.class_generate_database import *
-from functions.pattern_generate_database import *
-
 from functions.gpr.auth_gpr import getGPR, setup_biocyc_session
 
 # 👇 import the addtional function
 from functions.gpr.get_location_def import getLocationnew as getLocation
-from thg_protocol.services.kegg import KeggClientProtocol
+from thg_protocol.services.kegg import KeggClient, KeggClientProtocol
+from thg_protocol.services.biocyc import BioCycClient, BioCycClientProtocol
+from thg_protocol.services.location import LocationClient, LocationClientProtocol
 
 
 # Optimized batch fetching functions for KEGG API
@@ -185,78 +184,13 @@ def batch_fetch_kegg_entries(
     --------
     dict : Mapping of entry_id -> parsed page content (pseudo-HTML format)
     """
-    if client is not None:
-        return client.get_entries(
-            entry_ids,
-            database=database,
-            batch_size=batch_size,
-        )
-
-    from concurrent.futures import ThreadPoolExecutor, as_completed
-
-    results = {}
-
-    # Split entry_ids into batches
-    batches = []
-    for i in range(0, len(entry_ids), batch_size):
-        batches.append(entry_ids[i : i + batch_size])
-
-    def fetch_batch(batch):
-        """Fetch a single batch of entries"""
-        try:
-            # Build batch request with proper database prefix
-            if database == "compound":
-                batch_str = "+".join([f"cpd:{eid}" for eid in batch])
-            elif database == "glycan":
-                batch_str = "+".join([f"gl:{eid}" for eid in batch])
-            elif database == "reaction":
-                batch_str = "+".join([f"rn:{eid}" for eid in batch])
-            else:
-                batch_str = "+".join(batch)
-
-            # Use KEGG REST API batch get
-            url = f"https://rest.kegg.jp/get/{batch_str}"
-            response = urllib.request.urlopen(url).read()
-
-            # Handle both bytes and str
-            content = (
-                response.decode("utf-8") if isinstance(response, bytes) else response
-            )
-
-            # Parse the batched response into individual entries
-            # KEGG separates entries with "///"
-            entries = content.split("///")
-
-            # Map entries back to IDs - return flat file format directly
-            batch_results = {}
-            for j, entry_id in enumerate(batch):
-                if j < len(entries) and entries[j].strip():
-                    # Return the flat file format directly
-                    # The compound class will detect this and use the appropriate parser
-                    batch_results[entry_id] = entries[j].strip()
-                else:
-                    batch_results[entry_id] = None
-
-            return batch_results
-
-        except Exception as e:
-            print(f"Warning: Batch fetch failed for {batch}: {e}")
-            import traceback
-
-            print(traceback.format_exc())
-            return {eid: None for eid in batch}
-
-    # Fetch batches concurrently
-    with ThreadPoolExecutor(max_workers=max_workers) as executor:
-        future_to_batch = {
-            executor.submit(fetch_batch, batch): batch for batch in batches
-        }
-
-        for future in as_completed(future_to_batch):
-            batch_results = future.result()
-            results.update(batch_results)
-
-    return results
+    del max_workers  # batching, pacing, and retries belong to the client boundary
+    client = client or KeggClient()
+    return client.get_entries(
+        entry_ids,
+        database=database,
+        batch_size=batch_size,
+    )
 
 
 def compartment_file_to_dict_bm(
@@ -470,6 +404,7 @@ def recondict():
 
 
 def DefEnsblDB(Ensbl):
+    GeneEnsbl = {}
     with open(Ensbl) as DB:
         DB = DB.read()
         for line in DB.split("\n"):
@@ -485,13 +420,19 @@ def DefEnsblDB(Ensbl):
     return GeneEnsbl
 
 
-def getGPR22(ec, time):
+def getGPR22(
+    ec,
+    time,
+    *,
+    biocyc_client: BioCycClientProtocol | None = None,
+):
     try:
         NCBI_ID = "9606"
+        biocyc_client = biocyc_client or BioCycClient()
         page1 = "https://biocyc.org/META/NEW-IMAGE?type=EC-NUMBER&object=EC-" + ec
-        page = str(urllib.request.urlopen(page1).read())
-        page_cp = str(urllib.request.urlopen(page1).read())
-        page_cp = str(urllib.request.urlopen(page1).read())
+        page = str(biocyc_client.get_page(page1))
+        page_cp = str(biocyc_client.get_page(page1))
+        page_cp = str(biocyc_client.get_page(page1))
         page = str(page)
         url = page
         ss = []
@@ -597,7 +538,7 @@ def getGPR22(ec, time):
                         r"<br>\n<a\nhref=\"(http://biocyc.org/gene\?orgid.*)\" ",
                         c3.replace("/gene?orgid", "http://biocyc.org/gene?orgid"),
                     )  # if it is not a complex
-                isopage = getHtml(isourl[0], time)
+                isopage = getHtml(isourl[0], time, page_client=biocyc_client)
                 isopage = str(isopage)
                 d1 = isopage.replace("\n", " ").replace("</a>", "\n</a>")
                 d2 = ""
@@ -609,7 +550,7 @@ def getGPR22(ec, time):
                     )
                     if isourl2:
                         isourl2 = ["http://biocyc.org" + isourl2[0].decode("utf-8")]
-                        isopage2 = getHtml(isourl2[0], time)
+                        isopage2 = getHtml(isourl2[0], time, page_client=biocyc_client)
                         isopage2 = str(isopage2)
                         d2 = re.findall(
                             r"Subunit Composition.+?\[(.+?)</",
@@ -722,7 +663,9 @@ def getGPR22(ec, time):
                                     isourl2 = [
                                         "http://biocyc.org" + isourl2[0].decode("utf-8")
                                     ]
-                                    isopage2 = getHtml(isourl2[0], time)
+                                    isopage2 = getHtml(
+                                        isourl2[0], time, page_client=biocyc_client
+                                    )
                                     isopage2 = str(isopage2)
                                     if re.findall(
                                         r"Subunit Composition.+?\[(.+?)</",
@@ -951,7 +894,7 @@ def getGPR22(ec, time):
             urls4 = re.sub(r"\*[0-9]+", "", urls3)
         else:
             GPRURL22 = "http://www.genome.jp/dbget-bin/www_bget?ec:" + ec
-            GPRPage2 = getHtml(GPRURL22, time)
+            GPRPage2 = getHtml(GPRURL22, time, page_client=biocyc_client)
             GPRPage2 = str(GPRPage2)
             urls0 = re.search("HSA.+?<table", GPRPage2)
             if urls0:
@@ -990,12 +933,20 @@ def getGPR22(ec, time):
         print(error)
 
 
-def getGPR_old(page, ec, time):
+def getGPR_old(
+    page,
+    ec,
+    time,
+    *,
+    biocyc_client: BioCycClientProtocol | None = None,
+):
     try:
         NCBI_ID = "9606"
         if not page:
+            biocyc_client = biocyc_client or BioCycClient()
             page = "https://biocyc.org/META/NEW-IMAGE?type=EC-NUMBER&object=EC-" + ec
-            page = str(urllib.request.urlopen(page).read())
+            page = str(biocyc_client.get_page(page))
+        biocyc_client = biocyc_client or BioCycClient()
         page = str(page)
         page_cp = page
         url = page
@@ -1100,7 +1051,7 @@ def getGPR_old(page, ec, time):
                         r"<br>\n<a\nhref=\"(http://biocyc.org/gene\?orgid.*)\" ",
                         c3.replace("/gene?orgid", "http://biocyc.org/gene?orgid"),
                     )  # if it is not a complex
-                isopage = getHtml(isourl[0], time)
+                isopage = getHtml(isourl[0], time, page_client=biocyc_client)
                 isopage = str(isopage)
                 d1 = isopage.replace("\n", " ").replace("</a>", "\n</a>")
                 d2 = ""
@@ -1112,7 +1063,7 @@ def getGPR_old(page, ec, time):
                     )
                     if isourl2:
                         isourl2 = ["http://biocyc.org" + isourl2[0].decode("utf-8")]
-                        isopage2 = getHtml(isourl2[0], time)
+                        isopage2 = getHtml(isourl2[0], time, page_client=biocyc_client)
                         isopage2 = str(isopage2)
                         d2 = re.findall(
                             r"Subunit Composition.+?\[(.+?)</",
@@ -1225,7 +1176,9 @@ def getGPR_old(page, ec, time):
                                     isourl2 = [
                                         "http://biocyc.org" + isourl2[0].decode("utf-8")
                                     ]
-                                    isopage2 = getHtml(isourl2[0], time)
+                                    isopage2 = getHtml(
+                                        isourl2[0], time, page_client=biocyc_client
+                                    )
                                     isopage2 = str(isopage2)
                                     if re.findall(
                                         r"Subunit Composition.+?\[(.+?)</",
@@ -1454,7 +1407,7 @@ def getGPR_old(page, ec, time):
             urls4 = re.sub(r"\*[0-9]+", "", urls3)
         else:
             GPRURL22 = "http://www.genome.jp/dbget-bin/www_bget?ec:" + ec
-            GPRPage2 = getHtml(GPRURL22, time)
+            GPRPage2 = getHtml(GPRURL22, time, page_client=biocyc_client)
             GPRPage2 = str(GPRPage2)
             # print(GPRURL22)
             # urls0 = sorted(set(str(re.findall(r'(\([A-Za-z0-9]+\))', str(re.findall(r'hsa:............................................',GPRPage2.decode('utf-8'))))).replace("(","").replace(")","").replace("'","").replace(" ","").replace("[","").replace("]","").split(",")))
@@ -1503,19 +1456,28 @@ def getGPR_old(page, ec, time):
 """"Download a HTML code"""
 
 
-def getHtml(url, timeout, referer=False, file_data=[], additional_data={}):
+def getHtml(
+    url,
+    timeout,
+    referer=False,
+    file_data=[],
+    additional_data={},
+    *,
+    page_client: LocationClientProtocol | None = None,
+):
     try:
         if additional_data:
             url += "?" + urllib.parse.urlencode(additional_data)
         if file_data:
             with open(file_data[1], "rb") as f:
-                response = requests.post(url, files={file_data[0]: f})
-                return response.tgext
+                page_client = page_client or LocationClient()
+                return page_client.post_page(url, files={file_data[0]: f}).encode(
+                    "utf-8"
+                )
         else:
-            req = urllib.request.Request(url)
-        if referer:
-            req.add_header("Referer", referer)
-        return urllib.request.urlopen(req).read()
+            del referer
+            page_client = page_client or LocationClient()
+            return page_client.get_page(url).encode("utf-8")
     except Exception as e:
         time.sleep(timeout)
         return ""
@@ -1525,18 +1487,15 @@ def getHtml(url, timeout, referer=False, file_data=[], additional_data={}):
 """"Download a HTMLS code"""
 
 
-def getHtmlS(url, timeout):
+def getHtmlS(
+    url,
+    timeout,
+    *,
+    page_client: LocationClientProtocol | None = None,
+):
     try:
-        hdr = {
-            "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.64 Safari/537.11",
-            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-            #       'Accept-Charset': 'ISO-8859-1,utf-8;q=0.7,*;q=0.3',
-            "Accept-Encoding": "none",
-            "Accept-Language": "en-US,en;q=0.8",
-            "Connection": "keep-alive",
-        }
-        req = urllib.request.Request(url, headers=hdr)
-        return urllib.request.urlopen(req).read()
+        page_client = page_client or LocationClient()
+        return page_client.get_page(url).encode("utf-8")
     except Exception as e:
         time.sleep(timeout)
         print('Exception "' + str(e) + '" in getHtml with URL "' + url + '"')
@@ -1581,6 +1540,7 @@ def ParseNestedParen(string, level):
 
 def getLinkPath(page, follow_maps=True, *, kegg_client=None):
     try:
+        kegg_client = kegg_client or KeggClient()
         # Collect (reaction_id, type) tuples from KGML-like entry attributes.
         urls_set = set()
 
@@ -1632,11 +1592,7 @@ def getLinkPath(page, follow_maps=True, *, kegg_client=None):
                 if pid:
                     try:
                         url = f"https://rest.kegg.jp/get/{pid}"
-                        if kegg_client is not None:
-                            text = kegg_client.get_page(url)
-                        else:
-                            resp = urllib.request.urlopen(url, timeout=10).read()
-                            text = resp.decode("utf-8") if isinstance(resp, bytes) else resp
+                        text = kegg_client.get_page(url)
                         # find all RIDs in the REACTION section
                         rids = sorted(set(re.findall(r'R[0-9]{5,6}', text)))
                         for rid in rids:
@@ -1663,11 +1619,7 @@ def getLinkPath(page, follow_maps=True, *, kegg_client=None):
                                 q = "+".join(chunk)
                                 try:
                                     url = f"https://rest.kegg.jp/link/rn/{q}"
-                                    if kegg_client is not None:
-                                        txt = kegg_client.get_page(url)
-                                    else:
-                                        resp = urllib.request.urlopen(url, timeout=10).read()
-                                        txt = resp.decode('utf-8') if isinstance(resp, bytes) else resp
+                                    txt = kegg_client.get_page(url)
                                     for line in txt.split('\n'):
                                         if not line.strip():
                                             continue
@@ -1704,11 +1656,7 @@ def getLinkPath(page, follow_maps=True, *, kegg_client=None):
                     for pid in linked[:max_linked]:
                         try:
                             url = f"https://rest.kegg.jp/get/{pid}/kgml"
-                            if kegg_client is not None:
-                                text = kegg_client.get_page(url)
-                            else:
-                                resp = urllib.request.urlopen(url, timeout=10).read()
-                                text = resp.decode('utf-8') if isinstance(resp, bytes) else resp
+                            text = kegg_client.get_page(url)
                             # call getLinkPath on the linked map but do not follow maps again
                             try:
                                 _urls2, _urls3 = getLinkPath(
@@ -2301,7 +2249,14 @@ def meltGeneList(listOfgenelists):
     return geneList
 
 
-def getLocation_old(gpr, genelist1, genelist2, time):
+def getLocation_old(
+    gpr,
+    genelist1,
+    genelist2,
+    time,
+    *,
+    page_client: LocationClientProtocol | None = None,
+):
     # 	if genelist2: print(genelist2)
     # 	print(gpr,genelist1,genelist2,time)
     # print(genelist2)
@@ -2309,6 +2264,7 @@ def getLocation_old(gpr, genelist1, genelist2, time):
     ppList = list()
     OtherLocations = ["Other locations"]
     try:
+        page_client = page_client or LocationClient()
         # print(genelist1)
         gpr2 = gpr
         gpr = re.sub(r"\*[0-9]+", "", gpr)
@@ -2353,7 +2309,7 @@ def getLocation_old(gpr, genelist1, genelist2, time):
                     + "_HUMAN"
                 )  # location in genome net human
                 # print(b)
-                bb = str(getHtml(b, time))  # .decode('utf-8')
+                bb = str(getHtml(b, time, page_client=page_client))  # .decode('utf-8')
                 # cc = bb.replace("\nCC","").replace("-!-","\n")
                 # dd = re.findall(r"GO:[0-9]+.*;.*C:(.*);",cc)
                 dd = re.findall("GO:[0-9]+.+?C:(.+?);", bb)
@@ -2419,7 +2375,7 @@ def getLocation_old(gpr, genelist1, genelist2, time):
                         # print(genelist11[index].upper(), re.sub(r"\*[0-9]+" , "", a[m].upper()))
                         # if genelist11[index].upper() != re.sub(r"\*[0-9]+" , "", a[m].upper()):    # !!!????
                         # if b:
-                        bb = str(getHtml(b, time))
+                        bb = str(getHtml(b, time, page_client=page_client))
                         if bb:
                             # print(88)
                             # print(d)
@@ -2477,7 +2433,7 @@ def getLocation_old(gpr, genelist1, genelist2, time):
                                         + ".txt"
                                     )
                                     # print(b)
-                                    bb = str(getHtml(b, time))
+                                    bb = str(getHtml(b, time, page_client=page_client))
                                     ddd = re.findall("GO:[0-9]+.+?C:(.+?);", bb)
                                     # print(ddd)
                                     ddd = [x for x in ddd if not "GO" in x]
@@ -2497,7 +2453,9 @@ def getLocation_old(gpr, genelist1, genelist2, time):
                                 + GeneID
                                 + "&sort=score"
                             )
-                            url = str(urllib.request.urlopen(https).read())
+                            url = str(
+                                getHtml(https, time, page_client=page_client)
+                            )
                             # print(https)
                             if re.search(
                                 'uniprot\/([A-Z0-9-]+)">[A-Z0-9-]+<\/a><\/td><td>'
@@ -2552,7 +2510,7 @@ def getLocation_old(gpr, genelist1, genelist2, time):
                                 + "#subcellular_location"
                             )
                             # print(b)
-                            bb = str(getHtml(b, time))
+                            bb = str(getHtml(b, time, page_client=page_client))
                             ddd = re.findall(
                                 'class="[a-zA-Z_ ]+"><h6>([a-zA-Z ]+)</h6>', bb
                             )
@@ -2914,6 +2872,7 @@ def getCompParamFromRestAPI(
     --------
     tuple : Same format as getCompParam
     """
+    kegg_client = kegg_client or KeggClient()
     try:
         defaultdict = recondict()
 
@@ -2978,15 +2937,7 @@ def getCompParamFromRestAPI(
                 # Fetch the primary compound data
                 try:
                     primary_url = f"https://rest.kegg.jp/get/{urls01}"
-                    if kegg_client is not None:
-                        primary_text = kegg_client.get_page(primary_url)
-                    else:
-                        primary_response = urllib.request.urlopen(primary_url).read()
-                        primary_text = (
-                            primary_response.decode("utf-8")
-                            if isinstance(primary_response, bytes)
-                            else primary_response
-                        )
+                    primary_text = kegg_client.get_page(primary_url)
                     primary_fields = parse_kegg_flat_file(primary_text)
 
                     if "NAME" in primary_fields:
@@ -3172,8 +3123,18 @@ def getCompParamFromRestAPI(
 """"Compound: Extract the links from a HTML page or REST API data"""
 
 
-def getCompParam(page, ident, time, EF, specialCompounds, RxnID):
+def getCompParam(
+    page,
+    ident,
+    time,
+    EF,
+    specialCompounds,
+    RxnID,
+    *,
+    page_client: LocationClientProtocol | None = None,
+):
     try:
+        page_client = page_client or LocationClient()
         # page can be either HTML (legacy) or REST API formatted data
         defaultdict = recondict()
 
@@ -3200,7 +3161,9 @@ def getCompParam(page, ident, time, EF, specialCompounds, RxnID):
                 )  # JCGGDB
                 urls01 = urls01[0]
                 page2 = getHtml(
-                    "http://www.genome.jp/dbget-bin/www_bget?cpd:" + urls01, time
+                    "http://www.genome.jp/dbget-bin/www_bget?cpd:" + urls01,
+                    time,
+                    page_client=page_client,
                 )  # page of the primary compoun
                 urls3 = re.findall(
                     'Name<.span><.th>.n<td class="td21 defd"><div class="cel"><div class="cel">(.+?);?<br>',

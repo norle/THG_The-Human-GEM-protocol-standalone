@@ -26,6 +26,24 @@ implementation checkpoints are tracked in
 [`REFACTORING_PLAN.md`](REFACTORING_PLAN.md) and
 [`REFACTORING_PROGRESS.md`](REFACTORING_PROGRESS.md).
 
+## Installation
+
+Install the package and select only the workflow extras you need:
+
+```bash
+python -m pip install thg-protocol
+python -m pip install "thg-protocol[dev]"            # tests and linting
+python -m pip install "thg-protocol[solver]"         # solver workflows
+python -m pip install "thg-protocol[memote]"         # MEMOTE analysis
+python -m pip install "thg-protocol[cell-specific]" # cell-specific models
+python -m pip install "thg-protocol[docs]"           # MkDocs documentation
+```
+
+The installed commands are `thg-gapfill`, `thg-pathway`, and `thg-compare`.
+See the [installation guide](docs/installation.md) and
+[development guide](docs/development.md) for editable installs and release
+validation.
+
 ## Model Overview
 
 One of the most recent reconstruction of human metabolism (Human1)&ast; was used as reference model to apply our protocol and generate THG. 

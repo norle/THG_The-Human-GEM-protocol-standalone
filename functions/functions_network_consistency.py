@@ -33,11 +33,7 @@ project_root = os.path.join(current_dir, "..")
 if project_root not in sys.path:
     sys.path.append(project_root)
 
-from functions.functions_mass_balance import *
-
-
-
-def test_reaction_balance(eq):  
+def test_reaction_balance(eq):
 	eq=" " + eq # add an extra space at the beginning to avoid problems when defining StCoeff of the first metabolite using reduce func    
 	Ls = list('abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ')
 	#Mass Balance
@@ -540,4 +536,3 @@ def test_find_reactions_unbounded_flux_default_condition(model):
     )
     # TODO: Arbitrary threshold right now! Update after meta study!
     assert ann["metric"] <= 0.1, ann["message"]
-

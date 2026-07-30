@@ -14,6 +14,12 @@ from .ensembl import (
     StaticEnsemblClient,
 )
 from .kegg import KeggClient, KeggClientProtocol, KeggError, StaticKeggClient
+from .location import (
+    LocationClient,
+    LocationClientProtocol,
+    LocationError,
+    StaticLocationClient,
+)
 from .pubchem import (
     PubChemClient,
     PubChemClientProtocol,
@@ -41,4 +47,8 @@ __all__ = [
     "PubChemCompound",
     "PubChemError",
     "StaticPubChemClient",
+    "LocationClient",
+    "LocationClientProtocol",
+    "LocationError",
+    "StaticLocationClient",
 ]

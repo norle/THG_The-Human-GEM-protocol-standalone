@@ -9,6 +9,8 @@ import pandas as pd
 import requests
 
 from functions.gpr.ast_gpr import sanitize_gpr
+from thg_protocol.services.biocyc import BioCycClient, BioCycClientProtocol
+from thg_protocol.services.kegg import KeggClient, KeggClientProtocol
 
 LOGGER = logging.getLogger(__name__)
 logging.getLogger("urllib3.connectionpool").setLevel(logging.WARNING)
@@ -91,20 +93,28 @@ def setup_biocyc_session(
 
 
 def get_ecnumber_biocyc_html(
-    ec_number: str, session: requests.Session, org: str = "META"
+    ec_number: str,
+    session: requests.Session | None = None,
+    org: str = "META",
+    *,
+    biocyc_client: BioCycClientProtocol | None = None,
 ) -> str:
     """Get raw HTML representing a EC entry in BioCyc."""
-    return session.get(
-        f"https://websvc.biocyc.org/{org}/NEW-IMAGE?type=EC-NUMBER&object=EC-{ec_number}"
-    ).text
+    if biocyc_client is None:
+        biocyc_client = BioCycClient(session=session)
+    return biocyc_client.get_ec_html(ec_number, org=org)
 
 
-def get_html(request_url: str, session: Optional[requests.Session] = None) -> str:
+def get_html(
+    request_url: str,
+    session: Optional[requests.Session] = None,
+    *,
+    biocyc_client: BioCycClientProtocol | None = None,
+) -> str:
     """Fetch an html by perfoming a GET HTTPS request, maybe with session."""
-    if session is not None:
-        return session.get(request_url).text
-    else:
-        return requests.get(request_url).text
+    if biocyc_client is None:
+        biocyc_client = BioCycClient(session=session)
+    return biocyc_client.get_page(request_url)
 
 
 def pattern_match_org(page: str, org: str = "Homo Sapiens") -> List[str]:
@@ -161,12 +171,19 @@ def match_biocyc_page(page: str, humancyc: bool = False) -> List[str]:
 
 
 def getGPR(
-    ec_number: str, session: Optional[requests.Session]
+    ec_number: str,
+    session: Optional[requests.Session],
+    *,
+    kegg_client: KeggClientProtocol | None = None,
+    biocyc_client: BioCycClientProtocol | None = None,
 ) -> Optional[Tuple[List[str], str, str, str, str]]:
     """Retrieve GPR given EC-number for BioCyc."""
-    if session is None:
+    if session is None and biocyc_client is None:
         session = setup_biocyc_session()
-    page = get_ecnumber_biocyc_html(ec_number, session, org="HUMAN")
+    biocyc_client = biocyc_client or BioCycClient(session=session)
+    page = get_ecnumber_biocyc_html(
+        ec_number, session, org="HUMAN", biocyc_client=biocyc_client
+    )
     LOGGER.info(f"Page length: {len( page )}")
     urls0 = match_biocyc_page(page, humancyc=True)
     LOGGER.info(f"Urls matched from matched from HUMAN: {len(urls0)}")
@@ -175,22 +192,31 @@ def getGPR(
         ec_number_match = TRANSFERRED_PAT.findall(page)
         if ec_number_match:
             LOGGER.info(f"Trying transferred EC number: {ec_number_match[0]}")
-            gprs = getGPR(ec_number_match[0], session)
+            gprs = getGPR(
+                ec_number_match[0],
+                session,
+                kegg_client=kegg_client,
+                biocyc_client=biocyc_client,
+            )
             if gprs is not None:
                 return gprs
         else:
             pass
     # if failed, try MetaCyc
     if not urls0:
-        page = get_ecnumber_biocyc_html(ec_number, session)
+        page = get_ecnumber_biocyc_html(
+            ec_number, session, biocyc_client=biocyc_client
+        )
         urls0 = match_biocyc_page(page)
         LOGGER.info(f"Urls matched from changed MetaCyc: {len(urls0)}")
     if not urls0:
         LOGGER.warn("Trying Kegg")
         # return fetch_kegg_rest(ec_number)
-        parsed = _fetch_kegg_from_ec_html(ec_number)
+        parsed = _fetch_kegg_from_ec_html(ec_number, kegg_client=kegg_client)
     else:
-        parsed = parseGPR(urls0, page, session)
+        parsed = parseGPR(
+            urls0, page, session, biocyc_client=biocyc_client
+        )
     if parsed[0]:
         a, b, c, d, gpr = parsed
         LOGGER.debug(f"GPR before sanitization: {gpr}")
@@ -200,20 +226,21 @@ def getGPR(
     return parsed
 
 
-def _fetch_kegg_from_ec_html(ec_number: str):
+def _fetch_kegg_from_ec_html(
+    ec_number: str,
+    *,
+    kegg_client: KeggClientProtocol | None = None,
+):
     """Fetch genes for EC number using KEGG REST API instead of HTML scraping."""
     try:
         # Use KEGG REST API to get genes directly linked to EC number
         # First try to get human genes (hsa) directly
-        import urllib.request
+        kegg_client = kegg_client or KeggClient()
 
         # Try direct link from EC to HSA genes
         try:
             ec_to_hsa_url = f"https://rest.kegg.jp/link/hsa/ec:{ec_number}"
-            response = urllib.request.urlopen(ec_to_hsa_url).read()
-            content = (
-                response.decode("utf-8") if isinstance(response, bytes) else response
-            )
+            content = kegg_client.get_page(ec_to_hsa_url)
 
             # Parse response: format is "ec:X.X.X.X\thsa:XXXXX"
             genes = []
@@ -243,12 +270,7 @@ def _fetch_kegg_from_ec_html(ec_number: str):
         if not urls0 or not urls0[0]:
             try:
                 ec_to_mmu_url = f"https://rest.kegg.jp/link/mmu/ec:{ec_number}"
-                response = urllib.request.urlopen(ec_to_mmu_url).read()
-                content = (
-                    response.decode("utf-8")
-                    if isinstance(response, bytes)
-                    else response
-                )
+                content = kegg_client.get_page(ec_to_mmu_url)
 
                 genes = []
                 for line in content.strip().split("\n"):
@@ -309,7 +331,11 @@ def _fetch_kegg_from_ec_html(ec_number: str):
         return ([], "", "", "", "")
 
 
-def fetch_kegg_rest(ec_number: str) -> Optional[Tuple[List[str], str, str, str, str]]:
+def fetch_kegg_rest(
+    ec_number: str,
+    *,
+    kegg_client: KeggClientProtocol | None = None,
+) -> Optional[Tuple[List[str], str, str, str, str]]:
     """Fetch ec-number from kegg and link it to its genes.
 
     Perform the following requests:
@@ -325,8 +351,9 @@ def fetch_kegg_rest(ec_number: str) -> Optional[Tuple[List[str], str, str, str, 
     (human gene Kegg ids) the problem is that gene -> gene symbol
     requires additional parsing.
     """
+    kegg_client = kegg_client or KeggClient()
     ec_to_ko = pd.read_csv(
-        StringIO(get_html(f"https://rest.kegg.jp/link/ko/ec:{ec_number}")),
+        StringIO(kegg_client.get_page(f"https://rest.kegg.jp/link/ko/ec:{ec_number}")),
         sep="\t",
         names=["ec", "ko"],
     )
@@ -334,7 +361,7 @@ def fetch_kegg_rest(ec_number: str) -> Optional[Tuple[List[str], str, str, str, 
 
     ko_to_genes = pd.read_csv(
         StringIO(
-            get_html(
+            kegg_client.get_page(
                 f"https://rest.kegg.jp/link/genes/{'+'.join(ec_to_ko.ko.to_list())}"
             )
         ),
@@ -359,8 +386,13 @@ def fetch_kegg_rest(ec_number: str) -> Optional[Tuple[List[str], str, str, str, 
 
 
 def parseGPR(
-    urls0: List[str], page: str, session: requests.Session
+    urls0: List[str],
+    page: str,
+    session: requests.Session | None = None,
+    *,
+    biocyc_client: BioCycClientProtocol | None = None,
 ) -> Tuple[List[str], str, str, str, str]:
+    biocyc_client = biocyc_client or BioCycClient(session=session)
     urls1 = [
         i for i in reversed(sorted([x[0:][0] for x in urls0], key=len))
     ]  # Sort genes by name lenght
@@ -439,7 +471,11 @@ def parseGPR(
                     + re.findall('^(.*?)"', c3)[0].strip()
                 ]  # if it is taken from HumanCyc
             isopage = str(
-                get_html(isourl[0].replace(" ", "").replace('"', ""), session)
+                get_html(
+                    isourl[0].replace(" ", "").replace('"', ""),
+                    session,
+                    biocyc_client=biocyc_client,
+                )
             )
             d1 = isopage.replace("\n", " ").replace(
                 "</a>", "\n</a>"
@@ -467,7 +503,9 @@ def parseGPR(
                 isourl2 = re.findall(r"/gene-tab.*META&tab=SUMMARY", str(isopage))
                 if isourl2:
                     isourl2 = ["https://websvc.biocyc.org" + isourl2[0]]
-                    isopage2 = str(get_html(isourl2[0], session))
+                    isopage2 = str(
+                        get_html(isourl2[0], session, biocyc_client=biocyc_client)
+                    )
                     d2 = re.findall(
                         r"Subunit Composition</td><td align=LEFT valign=TOP>(.*)",
                         isopage2.replace("<tr><td", "\n").replace("</td></tr>", "\n"),
@@ -484,7 +522,9 @@ def parseGPR(
                     "https://websvc.biocyc.org/gene?orgid=HUMAN&id="
                     + re.findall('^(.*?)"', c3)[0].strip()
                 )  # if it is taken from HumanCyc
-                isopage = str(get_html(isourl, session))
+                isopage = str(
+                    get_html(isourl, session, biocyc_client=biocyc_client)
+                )
                 # isopage = getHtml(isourl)
                 # used_ip = []
                 # isopage = getHtml3(url, used_ip, 10)

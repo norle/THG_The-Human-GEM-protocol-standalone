@@ -13,7 +13,7 @@ constraint set.
 | Solver workflows | PuLP `>=2.7`, swiglpk | `.[solver]` | Opt-in; not part of default test selection |
 | Memote workflows | Memote | `.[memote]` | Opt-in; not part of default test selection |
 | Cell-specific workflows | pathos, troppo | `.[cell-specific]` | Opt-in; compatibility not yet characterized |
-| Documentation | MkDocs, MkDocs Material | `.[docs]` | Opt-in; documentation build not yet configured |
+| Documentation | MkDocs, MkDocs Material | `.[docs]` | Opt-in; `mkdocs.yml` is configured |
 
 The default CI/test contract is offline, non-slow, non-solver, non-Gurobi, and
 non-memote tests. Exact transitive versions should be captured in a supported

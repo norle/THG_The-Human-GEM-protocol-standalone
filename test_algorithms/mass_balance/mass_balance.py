@@ -35,7 +35,7 @@ from cobra.io import read_sbml_model,write_sbml_model
 import math
 import csv
 import pandas as pd
-from equations_mass_balance import *
+from equations_mass_balance import mass_balance
 
 cobra_model = read_sbml_model('models/F-H1-compartments_DB-2022-10-05.xml')
 writer = pd.ExcelWriter('files/mass_balance.xlsx', engine='xlsxwriter')

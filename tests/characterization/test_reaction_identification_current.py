@@ -1,7 +1,8 @@
 import unittest
 
 import pandas as pd
-from functions import function_reac_identification as reactions
+
+from thg_protocol.annotation import reactions
 
 
 class ReactionIdentificationCharacterizationTests(unittest.TestCase):
