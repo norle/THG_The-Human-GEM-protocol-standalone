@@ -6,10 +6,15 @@ run from a clean checkout and keeps the default validation offline.
 ## Local gate
 
 ```bash
-python -m pip install -e ".[dev]"
+python -m pip install -c constraints/py312-glpk.txt -e ".[dev,solver]"
 ruff check src tests
 pytest -m "not slow and not online and not solver and not gurobi and not memote"
 python -m build
+
+# Compatibility wrappers should parse help without repository data.
+python build_model/build_model_batch.py --help
+python generate_data-base/make_model_from_pkl.py --help
+python generate_data-base/resume_db_gen.py --help
 ```
 
 The built wheel must also be installed without dependencies into a temporary
@@ -23,7 +28,7 @@ cd /tmp
 /tmp/thg-wheel-check/venv/bin/python -c \
   "import thg_protocol; import thg_protocol.services"
 /tmp/thg-wheel-check/venv/bin/python -c \
-  "from thg_protocol.database import reconstruct_model_with_services; from thg_protocol.model_build import build_model"
+  "from thg_protocol.database import reconstruct_model_from_pickle, reconstruct_model_with_services; from thg_protocol.model_build import build_model, build_model_batch"
 /tmp/thg-wheel-check/venv/bin/python -c \
   "from thg_protocol.merge import merge_models, merge_models_from_paths"
 /tmp/thg-wheel-check/venv/bin/python -c \

@@ -1,44 +1,58 @@
-import os
-import sys
-import pdb
+"""Compatibility entry point for the installed model-comparison workflow.
 
-# Determine the current file's directory and the project root.
-current_dir = os.path.dirname(os.path.abspath(__file__))
-project_root = os.path.join(current_dir, "..")
-# Add the project root to sys.path to access top-level folders like 'functions' and 'models'
-if project_root not in sys.path:
-    sys.path.append(project_root)
+The historical script created a workbook at import time using repository-local
+model paths.  Keep this path usable for existing callers, but delegate the
+actual work to :mod:`thg_protocol.analysis.compare` and require all paths from
+the command line.
+"""
 
-from functions.functions_compare_models import *
+from __future__ import annotations
 
-
-
-model = read_sbml_model(os.path.join(project_root, "models", "THG-2023-02-25.xml")) # new model
-model2 = read_sbml_model(os.path.join(project_root, "models", "Human-GEM_2022-06-21.xml")) # org. model
+import argparse
+from pathlib import Path
 
 
-Output = xlsxwriter.Workbook(os.path.join(current_dir,"reports", "THG_vs_Human1.xlsx"))
+def build_parser() -> argparse.ArgumentParser:
+    """Build the comparison command-line parser without importing COBRA."""
+    parser = argparse.ArgumentParser(
+        description="Compare reactions in two THG or Human-GEM models."
+    )
+    parser.add_argument("model_a", type=Path, help="First JSON or SBML model.")
+    parser.add_argument("model_b", type=Path, help="Second JSON or SBML model.")
+    parser.add_argument(
+        "--output-dir",
+        type=Path,
+        required=True,
+        help="Directory for machine-readable CSV reports.",
+    )
+    parser.add_argument(
+        "--include-blocked",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help="Also compare copies with universally blocked reactions removed.",
+    )
+    return parser
 
 
-MODEL = Output.add_worksheet("MODEL")
-GROUPS = Output.add_worksheet("GROUPS")
-COMPS = Output.add_worksheet("COMPS")
-METS = Output.add_worksheet("METS")
-METS2 = Output.add_worksheet("METS2")
-RXNS = Output.add_worksheet("RXNS")
-GENES = Output.add_worksheet("GENES")
+def main(argv: list[str] | None = None) -> int:
+    """Run the package comparison API and return an exit status."""
+    args = build_parser().parse_args(argv)
+    from thg_protocol.analysis.compare import compare_models_from_files
+
+    reports = compare_models_from_files(
+        args.model_a,
+        args.model_b,
+        args.output_dir,
+        include_blocked=args.include_blocked,
+    )
+    for name, comparison in reports.items():
+        summary = comparison["_summary"]
+        print(
+            f"{name}: {summary['total_rxns_a']} vs "
+            f"{summary['total_rxns_b']} reactions"
+        )
+    return 0
 
 
-defmodel(model, MODEL, Output, model2)
-defgroup(GROUPS,Output)
-compartment(model, COMPS, Output, model2)
-#metabolite(model, METS, Output, model2)
-metabolite_2(model, METS, Output, model2) # Only for merged models because it accounts for lipidbank annotation
-#metabolite2(model, model2, METS2,Output)
-metabolite2_2(model, model2, METS2,Output) # Only for merged models because it accounts for lipidbank annotation 
-reaction(model, RXNS, Output, model2)
-gene(model2, GENES, Output, model)
-
-
-Output.close()
- 
+if __name__ == "__main__":
+    raise SystemExit(main())

@@ -1,4 +1,5 @@
 import json
+import pickle
 
 import cobra
 
@@ -8,6 +9,7 @@ from thg_protocol.database import (
     ReactionRecord,
     reconstruct_model,
     reconstruct_model_from_json,
+    reconstruct_model_from_pickle,
     reconstruct_model_with_services,
 )
 from thg_protocol.services.biocyc import StaticBioCycClient
@@ -77,6 +79,52 @@ def test_reconstruct_model_from_json_uses_explicit_output_path(tmp_path):
     model = reconstruct_model_from_json(records, output_path=output)
 
     assert model.id == "json-toy"
+    assert output.exists()
+
+
+def test_reconstruct_model_from_legacy_pickle_bundle(tmp_path):
+    records = {
+        "id": "/tmp/models/pickle-toy.xml",
+        "name": "Pickle toy",
+        "loc": {"cytosol": "c"},
+        "mets_cl": {
+            "A": {
+                "ID2": "A",
+                "Subcel": "cytosol",
+                "Name": "A",
+                "Formula1": "C1",
+            },
+            "B": {
+                "ID2": "B",
+                "Subcel": "cytosol",
+                "Name": "B",
+                "Formula1": "C1",
+            },
+        },
+        "reactions_cl": {
+            "R1_c": {
+                "ID": "R1_c",
+                "Name": "A to B",
+                "subs": [[1, "A", "A"]],
+                "prods": [[1, "B", "B"]],
+                "GPR": ["gpr", "GENE1"],
+                "EC": ["1.1.1.1"],
+            }
+        },
+        "genes": {"GENE1": {"Name": "Gene one", "Entrez": "1"}},
+        "pathways": {"toy pathway": "R1"},
+    }
+    records_path = tmp_path / "records.pkl"
+    output = tmp_path / "out" / "model.json"
+    with records_path.open("wb") as handle:
+        pickle.dump(records, handle)
+
+    model = reconstruct_model_from_pickle(records_path, output_path=output)
+
+    assert model.id == "pickle-toy"
+    assert model.reactions.R1_c.metabolites[model.metabolites.A_c] == -1
+    assert model.reactions.R1_c.gene_reaction_rule == "GENE1"
+    assert model.reactions.R1_c.annotation["pathway"] == ["toy pathway"]
     assert output.exists()
 
 

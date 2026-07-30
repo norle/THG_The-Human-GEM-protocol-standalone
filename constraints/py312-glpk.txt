@@ -1,0 +1,17 @@
+# Baseline captured from the Python 3.12 GLPK validation environment on
+# 2026-07-30. This is a reproducibility starting point, not maintainer-approved
+# release policy; update it together with docs/dependency-compatibility.md.
+cobra==0.29.1
+networkx==3.5
+numpy==2.1.3
+optlang==1.8.3
+pandas==2.3.3
+PuLP==3.0.2
+python-libsbml==5.20.4
+requests==2.32.5
+scipy==1.15.2
+swiglpk==5.0.12
+tqdm==4.67.1
+
+# Test runner used for the recorded offline gate.
+pytest==8.4.2

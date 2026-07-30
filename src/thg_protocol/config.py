@@ -8,8 +8,17 @@ from typing import Any
 
 
 def get_project_root() -> Path:
-    """Return the repository root for the current source checkout."""
-    return Path(__file__).resolve().parents[2]
+    """Return the source checkout root, or the installed package directory.
+
+    A wheel has no repository root.  Source checkouts are detected by the
+    plan file marker; installed packages instead return their own directory so
+    callers never resolve paths through an unrelated interpreter prefix.
+    """
+    package_path = Path(__file__).resolve()
+    for parent in package_path.parents:
+        if (parent / "REFACTORING_PLAN.md").exists():
+            return parent
+    return package_path.parent
 
 
 def load_config(config_path: str | Path | None = None) -> dict[str, Any]:

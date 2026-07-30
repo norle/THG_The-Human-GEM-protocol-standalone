@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import pickle
 from collections.abc import Iterable, Mapping
 from dataclasses import dataclass, field, replace
 from pathlib import Path
@@ -195,6 +196,233 @@ def reconstruct_model_from_json(
     )
 
 
+def _record_value(record: Any, name: str, default: Any = None) -> Any:
+    """Read a field from either a mapping or a legacy record object."""
+    if isinstance(record, Mapping):
+        return record.get(name, default)
+    return getattr(record, name, default)
+
+
+def _record_call(record: Any, name: str, default: Any = None) -> Any:
+    value = _record_value(record, name, default)
+    return value() if callable(value) else value
+
+
+def _pickle_items(value: Any) -> list[tuple[Any, Any]]:
+    if value is None:
+        return []
+    if isinstance(value, Mapping):
+        return list(value.items())
+    return list(enumerate(value))
+
+
+def reconstruct_model_from_pickle(
+    records_path: str | Path,
+    *,
+    output_path: str | Path | None = None,
+) -> Any:
+    """Reconstruct a model from the legacy database-generator pickle.
+
+    The supported bundle is a mapping with ``name``/``id``, ``loc``,
+    ``mets_cl`` (or ``mets``), ``reactions_cl`` (or ``reactions``), ``genes``,
+    and ``pathways`` keys. Compound records use ``ID2``, ``Subcel``, ``Name``,
+    ``Formula1``, and ``charge``. Reaction records use ``ID``, ``Name``,
+    ``subs``/``prods`` (or callable ``Substrate``/``Product``), ``GPR``, and
+    ``EC``. This adapter performs no network access; service enrichment remains
+    available through :func:`reconstruct_model_with_services`.
+
+    Standard pickle is attempted first. Pickles created with the historical
+    ``dill`` workflow require ``dill`` to be installed and are loaded through
+    it as a compatibility fallback.
+    """
+    path = Path(records_path)
+    try:
+        with path.open("rb") as handle:
+            payload = pickle.load(handle)
+    except Exception as pickle_error:
+        try:
+            import dill
+        except ImportError as error:  # pragma: no cover - optional dependency
+            raise ValueError(
+                "could not load pickle; install dill for historical database "
+                "pickles"
+            ) from pickle_error
+        try:
+            with path.open("rb") as handle:
+                payload = dill.load(handle)
+        except Exception as error:
+            raise ValueError(f"could not load database pickle: {path}") from error
+
+    if not isinstance(payload, Mapping):
+        raise ValueError("database pickle must contain a mapping")
+
+    raw_model_id = str(payload.get("id") or payload.get("model_id") or "")
+    model_name = str(payload.get("name") or payload.get("model_name") or "")
+    if not raw_model_id:
+        raise ValueError("database pickle requires a non-empty 'id' or 'model_id'")
+    # The generator historically stored the output filename in ``id``. COBRA
+    # model IDs must be stable identifiers, not absolute paths or XML names.
+    model_id = (
+        Path(raw_model_id).stem
+        if "/" in raw_model_id or "\\" in raw_model_id
+        else raw_model_id.removesuffix(".xml")
+    )
+    model_name = model_name or model_id
+
+    locations = payload.get("loc") or payload.get("locations") or {}
+    location_map = {str(key).lower(): str(value) for key, value in locations.items()}
+
+    def compartment(value: Any) -> str:
+        raw = str(value or "c")
+        return location_map.get(raw.lower(), raw)
+
+    def with_compartment(identifier: Any, value: Any) -> str:
+        base = str(identifier)
+        comp = compartment(value)
+        return base if base.endswith(f"_{comp}") else f"{base}_{comp}"
+
+    metabolite_records: list[MetaboliteRecord] = []
+    metabolite_ids: dict[str, str] = {}
+    source_mets = payload.get("mets_cl") or payload.get("metabolites") or payload.get(
+        "mets", {}
+    )
+    for source_key, record in _pickle_items(source_mets):
+        base_id = _record_value(record, "ID2") or _record_value(record, "id")
+        base_id = base_id or source_key
+        source_compartment = _record_value(record, "Subcel", "c")
+        metabolite_id = with_compartment(base_id, source_compartment)
+        annotation_names = {
+            "pubchem.compound": "PubChem",
+            "chebi.compound": "CheBI",
+            "glycomedb": "GlyDB",
+            "jcggdb": "JCGGDB",
+            "inchi": "inchi",
+            "inchikey": "inchikey",
+            "lipidbank": "LipidBank",
+            "lipidmaps": "LIPIDMAPS",
+        }
+        annotation = {
+            target: value
+            for target, source in annotation_names.items()
+            if (value := _record_value(record, source)) not in (None, "", [])
+        }
+        metabolite_records.append(
+            MetaboliteRecord(
+                metabolite_id,
+                compartment=compartment(source_compartment),
+                name=str(_record_call(record, "Name", "") or ""),
+                formula=_record_value(record, "Formula1"),
+                charge=_record_value(record, "charge"),
+                annotation=annotation,
+            )
+        )
+        metabolite_ids[str(source_key)] = metabolite_id
+        metabolite_ids[str(base_id)] = metabolite_id
+
+    def compounds(record: Any, method: str, fallback: str) -> list[Any]:
+        values = _record_call(record, method)
+        if values is None:
+            values = _record_value(record, fallback, [])
+        return list(values or [])
+
+    reaction_records: list[ReactionRecord] = []
+    source_rxns = payload.get("reactions_cl") or payload.get("reactions") or {}
+    for source_key, record in _pickle_items(source_rxns):
+        source_id = _record_value(record, "ID", source_key)
+        reaction_id = str(source_id)
+        reaction_compartment = "c"
+        if "_" in reaction_id:
+            reaction_base, suffix = reaction_id.rsplit("_", 1)
+            reaction_compartment = compartment(suffix)
+            reaction_id = with_compartment(reaction_base, suffix)
+        stoichiometry: dict[str, float] = {}
+        for sign, values in (
+            (-1.0, compounds(record, "Substrate", "subs")),
+            (1.0, compounds(record, "Product", "prods")),
+        ):
+            for item in values:
+                if not isinstance(item, (list, tuple)) or len(item) < 2:
+                    raise ValueError(f"invalid compound entry in reaction {source_id}")
+                coefficient = abs(float(item[0])) * sign
+                source_metabolite = item[2] if len(item) > 2 else item[1]
+                metabolite_id = metabolite_ids.get(str(source_metabolite))
+                if metabolite_id is None:
+                    metabolite_id = with_compartment(
+                        source_metabolite, reaction_compartment
+                    )
+                stoichiometry[metabolite_id] = (
+                    stoichiometry.get(metabolite_id, 0.0) + coefficient
+                )
+        raw_gpr = _record_call(record, "GPR", ("", "")) or ("", "")
+        if isinstance(raw_gpr, (list, tuple)):
+            s_gpr = str(raw_gpr[0]) if raw_gpr else ""
+            gene_rule = str(raw_gpr[1]) if len(raw_gpr) > 1 else ""
+        else:
+            s_gpr, gene_rule = "", str(raw_gpr)
+        gene_rule = gene_rule.replace("[", "").replace("]", "")
+        raw_ec = _record_call(record, "EC", []) or []
+        ec = raw_ec[0] if isinstance(raw_ec, (list, tuple)) and raw_ec else raw_ec
+        annotation = {"ec-code": ec} if ec else {}
+        if s_gpr and s_gpr != "[]":
+            annotation["sGPR"] = s_gpr
+        reaction_records.append(
+            ReactionRecord(
+                reaction_id,
+                stoichiometry,
+                name=str(_record_call(record, "Name", "") or ""),
+                lower_bound=0.0 if bool(_record_call(record, "Termodyn", False)) else -1000.0,
+                gene_reaction_rule=gene_rule,
+                annotation=annotation,
+            )
+        )
+
+    gene_records = []
+    for source_key, record in _pickle_items(payload.get("genes", {})):
+        gene_id = str(source_key)
+        gene_records.append(
+            GeneRecord(
+                gene_id,
+                name=str(_record_call(record, "Name", "") or ""),
+                annotation={
+                    key: value
+                    for key, source in (
+                        ("ncbigene", "Entrez"),
+                        ("uniprot", "Uniprot"),
+                    )
+                    if (value := _record_call(record, source)) not in (None, "", [])
+                },
+            )
+        )
+
+    reaction_ids = {record.id for record in reaction_records}
+    pathways: dict[str, list[str]] = {}
+    for pathway, members in (payload.get("pathways", {}) or {}).items():
+        values = str(members).split() if isinstance(members, str) else list(members)
+        normalized_members: list[str] = []
+        for value in values:
+            member = str(value)
+            if member not in reaction_ids:
+                candidates = [
+                    reaction_id
+                    for reaction_id in reaction_ids
+                    if reaction_id == f"{member}_c"
+                    or reaction_id.startswith(f"{member}_")
+                ]
+                member = candidates[0] if len(candidates) == 1 else member
+            normalized_members.append(member)
+        pathways[str(pathway)] = normalized_members
+
+    return reconstruct_model(
+        model_id,
+        metabolite_records,
+        reaction_records,
+        gene_records,
+        model_name=model_name,
+        pathways=pathways,
+        output_path=output_path,
+    )
+
+
 def reconstruct_model_with_services(
     model_id: str,
     metabolites: Iterable[MetaboliteRecord],
@@ -328,5 +556,6 @@ __all__ = [
     "ReactionRecord",
     "reconstruct_model",
     "reconstruct_model_from_json",
+    "reconstruct_model_from_pickle",
     "reconstruct_model_with_services",
 ]

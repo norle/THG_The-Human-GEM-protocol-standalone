@@ -59,7 +59,9 @@ jobs:
         with:
           python-version: "3.12"
       - name: Install solver dependencies
-        run: python -m pip install --upgrade pip && python -m pip install -e ".[dev,solver]"
+        run: >-
+          python -m pip install --upgrade pip &&
+          python -m pip install -c constraints/py312-glpk.txt -e ".[dev,solver]"
       - name: Run solver tests
         run: pytest -m "solver and not gurobi and not memote" || test "$?" -eq 5
 

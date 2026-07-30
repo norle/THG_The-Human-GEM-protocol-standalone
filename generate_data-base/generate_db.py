@@ -20,6 +20,57 @@ To change logging level, modify the level parameter in logging.basicConfig():
     logging.basicConfig(level=logging.WARNING) # Minimal output
 
 """
+from __future__ import annotations
+
+import argparse
+import sys
+
+
+def _build_help_parser() -> argparse.ArgumentParser:
+    """Describe the deferred generator without importing heavy dependencies."""
+    parser = argparse.ArgumentParser(
+        description=(
+            "Generate a THG database from credentialed KEGG/BioCyc/Ensembl "
+            "sources. The harvesting workflow remains legacy and checkpointed."
+        )
+    )
+    parser.add_argument(
+        "--pathways",
+        metavar="PATH",
+        help="Pathway input list used by the legacy harvester.",
+    )
+    parser.add_argument(
+        "--compounds",
+        metavar="PATH",
+        help="Extra-compounds reference table.",
+    )
+    parser.add_argument(
+        "--extra-formula",
+        metavar="PATH",
+        help="Extra-formula reference table.",
+    )
+    parser.add_argument("--output", metavar="PATH", help="Output model path.")
+    parser.add_argument(
+        "--checkpoint", metavar="PATH", help="Checkpoint path for resuming work."
+    )
+    parser.add_argument(
+        "--max-reactions",
+        type=int,
+        metavar="N",
+        help="Optional debug limit for reactions processed.",
+    )
+    return parser
+
+
+# Keep ``--help`` usable in a minimal environment. The actual invocation below
+# remains the historical credentialed workflow until its inputs and checkpoint
+# contract are fully parameterized.
+if __name__ == "__main__" and any(
+    argument in {"-h", "--help"} for argument in sys.argv[1:]
+):
+    _build_help_parser().parse_args()
+    raise SystemExit(0)
+
 import copy
 import logging
 import os

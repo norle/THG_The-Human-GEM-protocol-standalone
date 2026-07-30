@@ -204,4 +204,12 @@ def build_model(
     return report
 
 
-__all__ = ["ModelBuildReport", "build_model"]
+def __getattr__(name: str) -> Any:
+    if name == "build_model_batch":
+        from .batch import build_model_batch
+
+        return build_model_batch
+    raise AttributeError(name)
+
+
+__all__ = ["ModelBuildReport", "build_model", "build_model_batch"]

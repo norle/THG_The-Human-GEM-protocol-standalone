@@ -6,6 +6,161 @@ status, open decisions, phase gates, and next pull requests live in the plan.
 Later repository-state notes may qualify historical claims when a temporary
 recovery ref or another local-only validation artifact is no longer available.
 
+## 2026-07-30
+
+### Checkpoint validation
+
+- Editable installation with `--no-build-isolation --no-deps` succeeded in a
+  writable temporary environment; package import and installed gapfill help
+  passed.
+- The intended checkpoint commit was attempted but `.git/index.lock` cannot be
+  created because this workspace exposes `.git` read-only. All validated
+  changes remain in the working tree for maintainer staging.
+
+### Dependency-free generator help surface
+
+- Added an early `generate_data-base/generate_db.py --help` path that does not
+  import COBRA, dill, or legacy service modules.
+- The help text exposes the intended pathway/reference/output/checkpoint inputs
+  while explicitly identifying the credentialed harvesting implementation as
+  deferred until its execution contract is parameterized.
+- Added subprocess coverage; help, compile, YAML, and diff checks passed.
+- The expanded offline suite passed `1826 passed, 2 skipped`.
+
+### Legacy pickle-shape hardening
+
+- Normalized generator pickles that store an output path in `id` to a stable
+  model identifier, and resolved pathway members that omit compartment suffixes
+  against reconstructed reaction IDs.
+- Extended the characterization fixture to cover both legacy shapes.
+- Focused database tests passed `5`; the installed-wheel offline suite passed
+  `1825 passed, 2 skipped` after the change.
+
+### Dependency reproducibility baseline
+
+- Added `constraints/py312-glpk.txt`, capturing the runtime and test versions
+  used by the validated Python 3.12 offline gate.
+- Updated the compatibility matrix, development guide, and release-validation
+  instructions to use the baseline while retaining maintainer approval as a
+  release prerequisite for Python 3.10/3.11 and other solver combinations.
+- Wired the opt-in Python 3.12 solver CI job to install from this baseline;
+  the cross-version package matrix remains range-based.
+- Validation of the constraints/docs edits: `git diff --check` passed; package
+  tests remain covered by the previously recorded installed-wheel gate.
+
+### Model-build and database API documentation
+
+- Documented `build_model_batch` and `reconstruct_model_from_pickle` in the
+  workflow guides and usage examples.
+- Extended release-validation instructions with package imports and recovery/
+  batch compatibility help checks.
+- Documentation changes preserve the explicit distinction between deterministic
+  reconstruction/recovery and the credentialed live database harvester.
+
+### Import-safe database recovery paths
+
+- Replaced `generate_data-base/resume_db_gen.py` with the same explicit
+  package-backed pickle reconstruction contract as `make_model_from_pkl.py`.
+- Both recovery scripts now parse `--help` without importing legacy generator
+  modules, mutating `sys.path`, or reading repository-local files.
+- Validation: default installed-wheel offline suite `1825 passed, 2 skipped`;
+  help, compile checks, and `git diff --check` passed.
+
+### Package-native batch model builder
+
+- Added `thg_protocol.model_build.build_model_batch` as the maintained batch
+  boundary, reusing the injectable service-backed model builder and preserving
+  the historical cache filenames for migration compatibility.
+- Replaced the 1700-line import-heavy `build_model/build_model_batch.py` with a
+  parameterized wrapper that retains its keyword-call compatibility and adds a
+  safe CLI parser.
+- Added package and compatibility tests for explicit inputs, injected static
+  clients, outputs, caches, and help behavior.
+- Validation: installed-wheel offline suite `1824 passed, 2 skipped`; wheel
+  import, CLI help, compile checks, and `git diff --check` passed.
+
+### Package-owned database pickle reconstruction
+
+- Added `thg_protocol.database.reconstruct_model_from_pickle`, an explicit
+  compatibility adapter for the generator bundle schema (`mets_cl`,
+  `reactions_cl`, `genes`, `pathways`, and `loc`). It normalizes legacy
+  compound/reaction records into the typed package reconstruction API and does
+  not perform network access.
+- Standard pickle loading is supported with an optional `dill` fallback for
+  historical serialized objects.
+- Replaced `generate_data-base/make_model_from_pkl.py` and
+  `resume_db_gen.py` with explicit input/output wrappers; both recovery paths
+  now use the same package API and no longer import `generate_db.py` at runtime.
+- Added a small pickle characterization fixture.
+- Validation: installed-wheel offline suite `1822 passed, 2 skipped`; package
+  import, CLI help, compile checks, and `git diff --check` passed.
+
+### Import-safe figure compatibility wrapper
+
+- Removed the legacy figure wrapper's `sys.path` mutation and top-level package
+  imports; plotting, COBRA, and figure APIs are now loaded only after parsing
+  arguments.
+- Extended the installed-style subprocess help coverage to the figure entry
+  point. Help, compile checks, and `git diff --check` passed.
+
+### Legacy cell-specific reduction entry point
+
+- Replaced the import-heavy `cell_type_specific_model/model_reduce.py` script
+  with an explicit model/activity/output wrapper around
+  `thg_protocol.cell_specific.reduce_model_by_activity`.
+- Activity thresholds, preserved reaction IDs, and MAT matrix keys are now
+  command-line inputs; model loading and package imports are lazy so `--help`
+  works without COBRA or solver setup.
+- Gapfilling is no longer an implicit side effect of model reduction; it is
+  documented as a separate workflow boundary.
+- Added subprocess help coverage; help, compile checks, and `git diff --check`
+  passed.
+
+### Installed-wheel validation and configuration portability
+
+- Made `thg_protocol.config.get_project_root()` locate the repository marker
+  in a source checkout and return the installed package directory otherwise.
+- Marked the repository-marker assertion as source-checkout-only so installed
+  wheel tests do not depend on checkout files.
+- Built and installed a wheel into a temporary environment outside the
+  checkout. With COBRA configured to GLPK before collection, the default
+  offline gate passed: `1818 passed, 2 skipped`.
+- Ruff is not installed in the available environments; compile checks and
+  `git diff --check` remain available validation.
+
+### Legacy single-model builder entry point
+
+- Replaced the import-heavy, fixed-path `build_model/build_model.py` script
+  with an explicit input/output compatibility CLI backed by
+  `thg_protocol.model_build.build_model`.
+- Cache and error-report locations are now optional explicit arguments, and
+  parser help does not import COBRA or service clients.
+- Extended subprocess help coverage; compile checks, help output, and
+  `git diff --check` passed.
+
+### Legacy merge entry point
+
+- Replaced the import-time merge/network-consistency script with an
+  explicit-path wrapper around `thg_protocol.merge.merge_models_from_paths`.
+- The compatibility command now supports optional isolated-metabolite cleanup
+  without wildcard imports, `sys.path` mutation, or fixed repository paths.
+- Extended subprocess help coverage to the merge entry point; compile checks,
+  help output, and `git diff --check` passed.
+
+### Legacy comparison and pathway entry points
+
+- Replaced the import-time `compare_models/compare_models.py` workbook script
+  with an explicit-path compatibility CLI backed by
+  `thg_protocol.analysis.compare` and machine-readable CSV reports.
+- Replaced the interactive, repository-relative pathway script with a thin
+  wrapper around `thg_protocol.pathway.workflow.implement_pathway_files`.
+- Both legacy entry points now expose import-safe `--help` output and perform
+  no model loading, prompting, or filesystem writes during import.
+- Added subprocess coverage for both compatibility entry points.
+- Validation in the current environment: both help commands, Python compile
+  checks, and `git diff --check` passed. The configured pytest/Ruff environment
+  was unavailable in this checkout (`pytest` is not installed).
+
 ## 2026-07-29
 
 ### Dependency-light cell-specific tailoring boundary

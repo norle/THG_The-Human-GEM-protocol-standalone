@@ -14,15 +14,28 @@ report = build_model(
 )
 ```
 
+Batch-oriented callers can use the same service boundary and retain the
+historical cache filenames needed by existing automation:
+
+```python
+from thg_protocol.model_build import build_model_batch
+
+report = build_model_batch(
+    "input.xml",
+    "results/model.xml",
+    cache_dir="results/cache",
+    output_errors="results/errors.tsv",
+)
+```
+
 It accepts injectable BioCyc, KEGG, and Ensembl clients for offline tests and
 writes all generated caches and reports to caller-provided locations. The
 normalized database workflow also exposes
 `thg_protocol.database.reconstruct_model_with_services` for record-driven
 construction.
 
-The single and batch model builders remain compatibility workflows while their
-reusable reconstruction core is exposed as
-`thg_protocol.database.reconstruct_model`. Their service calls can receive
+The single and batch model builders now delegate to package APIs; the legacy
+scripts remain compatibility entry points. Their service calls can receive
 package-owned BioCyc, KEGG, and Ensembl clients, which makes offline tests
 possible.
 

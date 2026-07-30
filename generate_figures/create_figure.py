@@ -9,18 +9,7 @@ from __future__ import annotations
 
 import argparse
 import json
-import sys
 from pathlib import Path
-
-# Keep direct checkout execution usable while the package is installed by the
-# normal workflow. This source-path fallback is limited to the legacy wrapper.
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
-
-from thg_protocol.figures import (
-    NamedModel,
-    generate_annotation_comparison_figures,
-    generate_model_comparison_figures,
-)
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -79,6 +68,11 @@ def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
 
     from cobra.io import read_sbml_model
+    from thg_protocol.figures import (
+        NamedModel,
+        generate_annotation_comparison_figures,
+        generate_model_comparison_figures,
+    )
 
     named_models = tuple(
         NamedModel(name, read_sbml_model(path)) for name, path in args.model
