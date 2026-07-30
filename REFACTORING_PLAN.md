@@ -4,21 +4,22 @@ This document captures the current maintainability issues in the repository and
 lays out an implementation plan for turning it into a maintainable Python
 package with tests, documentation, and large-file handling through Git LFS.
 
-This document is the authoritative source for current decisions, open work,
-phase gates, and next pull requests. Dated implementation notes and validation
-snapshots belong in `REFACTORING_PROGRESS.md`.
+This document is the authoritative source for architectural decisions, phase
+gates, and the definition of done. The concise implementation, validation,
+blocker, and next-work snapshot belongs in `CURRENT_STATE.md`. Git history is
+the detailed historical record.
 
 ## Plan Maintenance
 
-- Update the "last reviewed" date whenever the status table or open decisions
-  change.
-- Keep only pending work and durable architectural decisions in this file.
-- Record completed implementation details and historical test counts in
-  `REFACTORING_PROGRESS.md`.
-- Remove completed entries from "Next Pull Requests" instead of retaining them
-  as historical suggestions.
+- Update the review date in `CURRENT_STATE.md` whenever implementation status,
+  validation evidence, blockers, or next work changes.
+- Keep durable architectural decisions, phase gates, and acceptance criteria in
+  this file.
+- Keep `CURRENT_STATE.md` concise; do not recreate a chronological progress
+  diary.
+- Use Git history for detailed implementation chronology.
 - Do not mark a phase complete until every acceptance criterion for that phase
-  has passed and the result has been recorded in the progress log.
+  has passed and the result has been recorded in `CURRENT_STATE.md`.
 
 ## Commit and Pull Request Checkpoints
 
@@ -35,7 +36,7 @@ work session that completes a validated boundary.
 
 Never include unrelated working-tree changes in an agent-created commit. If a
 validation tool is unavailable, run the strongest available checks, record the
-limitation in the progress log, and keep the commit narrowly scoped.
+limitation in `CURRENT_STATE.md`, and keep the commit narrowly scoped.
 
 - Commit the approved baseline inventories and decisions before moving more
   code.
@@ -51,15 +52,14 @@ limitation in the progress log, and keep the commit narrowly scoped.
   dedicated commit.
 - Commit documentation and CI changes alongside the behavior or gate they
   describe when practical, rather than deferring all documentation to the end.
-- Record the checkpoint commit hash in `REFACTORING_PROGRESS.md` after
-  validation.
+- Record the latest significant validated checkpoint in `CURRENT_STATE.md`.
 
 Before each checkpoint commit:
 
 1. Review `git diff` and exclude unrelated working-tree changes.
 2. Run the validation commands for the affected phase.
-3. Update the current status and next pull requests in this plan.
-4. Add a dated progress-log entry with the validation result.
+3. Update phase gates in this plan if an architectural decision changed.
+4. Update `CURRENT_STATE.md` with the validation result and next work.
 5. Use a message that names the completed boundary, for example
    `refactor: move reaction annotation API`.
 
@@ -80,16 +80,18 @@ approval, recorded affected refs, and fresh-clone verification.
 - Improve documentation for installation, usage, development, and data/model
   management.
 
-## Current Issues
+## Original Baseline Issues
+
+This section preserves the issues that motivated the refactor. It is not a
+current status report; resolved and remaining items are summarized in
+`CURRENT_STATE.md`.
 
 ### Repository Layout (baseline reviewed 2026-07-13)
 
 - Source code, scripts, generated models, logs, reports, notebooks, caches, and
   backups are mixed together.
-- Package metadata and central pytest configuration now exist in
-  `pyproject.toml`; the remaining Phase 1 gate is validating them against an
-  installed wheel. Older implementation observations are retained in
-  `REFACTORING_PROGRESS.md`.
+- Package metadata and central pytest configuration did not exist in the
+  original baseline.
 - Several directories are not valid or ideal Python package names:
   - `generate_data-base` contains a hyphen.
   - `merge_metabolic_netowrks_and_network_consistency` is misspelled.
@@ -157,7 +159,7 @@ than accidentally resolving local files.
 ├── pyproject.toml
 ├── README.md
 ├── REFACTORING_PLAN.md
-├── REFACTORING_PROGRESS.md
+├── CURRENT_STATE.md
 ├── docs/
 │   ├── index.md
 │   ├── installation.md
@@ -322,6 +324,12 @@ that an editable install can mask.
   later cleanup phase.
 - Existing import paths may remain temporarily as thin compatibility wrappers
   during migration, but new code should import from `thg_protocol`.
+- A compatibility wrapper must preserve the supported behavior of the legacy
+  entry point, not only its import name. If behavior cannot be preserved, keep
+  the legacy implementation lazily accessible until a replacement exists, or
+  record an approved deprecation/removal decision with a migration path.
+- An unconditional `NotImplementedError` is a deferred or removed behavior and
+  must not be counted as a completed compatibility migration.
 
 ### CLI Principles
 
@@ -550,84 +558,20 @@ Recommended docs:
 
 ### Current Status
 
-Last reviewed: 2026-07-30
-
-Current working-tree validation: the package is installed editable without
-dependency resolution, and 47 dependency-free characterization/API tests pass.
-The full model-backed gate still requires the declared `cobra` dependency.
-
-The latest fully validated default offline/non-solver checkpoint passed 1827 tests
-with two expected skips and `ruff check src tests`. The current tree includes the characterized
-metabolite/reaction, JSON model-annotation, and explicit ID-database workflows,
-plus its PubChem service boundary, in addition to the
-earlier service-boundary tests. The retry annotation compatibility script now
-delegates to that package API and injected client. The shared Python 3.12.9
-environment passed the
-default offline suite with 68 tests and one matplotlib-dependent skip, and
-`ruff check src tests` passed. The package has passed the local clean-wheel and
-outside-checkout smoke gate. Gapfill and
-comparison APIs/CLIs now join the pathway workflow, and Ensembl annotation is
-behind an injectable package client. BioCyc and KEGG GPR lookups now use
-injectable package clients. The characterized batch model-builder workflow now
-also receives package clients for KEGG reaction prefetch, BioCyc XML lookups,
-and Ensembl annotation. The production-helper service audit is now clear; any
-new deferred workflow must continue to receive injected clients. The single-model builder now
-passes package clients through its GPR, Ensembl prefetch, and
-location-annotation paths. The characterized database-builder workflow now
-passes package clients through its KEGG page/entry, GPR, and Ensembl annotation
-paths. The report-driven annotation figures and model-derived comparison
-figures are now behind import-safe package APIs with a separate plotting extra.
-The legacy figure script is an explicit-path wrapper; supplied MEMOTE and
-algorithm score data are required for those optional charts rather than being
-hard-coded. A service-boundary audit records the production-helper boundary;
-historical fixture migration remains a Phase 4 task.
-The legacy network-component, compartment-comparison, and JSON-to-SBML entry points are now thin,
-import-safe wrappers around package APIs. Solver-backed network compaction and
-the remaining historical workflow scripts remain deferred until their explicit
-input/output contracts and characterization coverage are complete.
-KEGG pathway listing, exchange-reaction matching, and dependency-light
-transcriptomics annotation transformations now also have package-owned APIs
-with explicit inputs and injectable clients where applicable; their historical entry points
-are compatibility wrappers.
-Dependency-light formula and reaction mass-balance primitives now live under
-`thg_protocol.model_build.mass_balance`; the solver-backed balancing and full
-database-generator orchestration remain separate deferred workflows.
-The KEGG pathway-link parser used by the database builder is package-owned, and
-the BioCyc compartment-cache summary is package-owned with an explicit CLI;
-the legacy `getLinkPath` name delegates to it; remaining database helpers are
-still compatibility-bound until their records and outputs are characterized.
-Proportional network compaction is now package-owned as well; blocked-reaction
-filtering remains an explicit solver-dependent option.
-The legacy database generator now exposes deterministic pickle reconstruction
-through an explicit CLI and no longer imports credentialed harvesting code for
-help or module import.
-Archived algorithm and equation/mass-balance helper copies now delegate to package APIs; historical
-solver/model-backed fixtures remain opt-in and outside the default test path.
-The legacy gapfill orchestrator now delegates all supported phase commands to
-`thg_protocol.gapfill.core`; the package CLI is the maintained entry point.
-Archived algorithm report scripts and duplicated pathway/mass-balance/merge
-helpers now use explicit I/O or package compatibility exports. MEMOTE and
-solver-backed checks remain opt-in.
-The legacy consistency module now delegates formula-based checks to
-`thg_protocol.analysis`; MEMOTE-specific checks remain explicit deferred
-operations.
-GPR lookup/parsing now has a package-owned injectable boundary, and the legacy
-authentication/definition modules are compatibility adapters that can be
-imported without COBRA.
-Subcellular location resolution now has the same package-owned injectable
-boundary; the legacy location module is a compatibility adapter with no
-repository-relative lookup by default.
+The operational status, validation evidence, blockers, and next reviewable pull
+requests are maintained in `CURRENT_STATE.md`. This plan records only the phase
+gates and durable decisions.
 
 | Phase | Status | Remaining gate |
 | --- | --- | --- |
-| Phase 0 | Complete | Dependency/artifact policy and source-only legacy namespace decisions were recorded before the completed branch-local LFS migration. |
-| Phase 1 | Complete | Baseline CI and local clean-wheel/outside-checkout validation are recorded in the progress log; source-only legacy compatibility tests are an explicit exception to the package-test import rule. |
-| Phase 2 | In progress | The targeted wildcard-import inventory is clean; continue characterized helper moves and reduce remaining legacy utility coupling across the deferred workflows. |
-| Phase 3 | In progress | Gapfill, pathway, comparison, figure, annotation, network-analysis, merge, cell-specific tailoring, and normalized reconstruction APIs are import-safe; package-native service-backed model/database boundaries now exist, while full legacy script replacement remains. |
-| Phase 5 | Complete | PubChem, Ensembl, BioCyc, KEGG, location pages, and legacy upload paths use package-owned injectable clients; the offline gate, static-client characterization, and production-helper audit pass. |
-| Phase 6 | Complete | The approved targeted LFS policy and generated-artifact index cleanup passed on `refactoring-cleanup`; fresh-clone checksums are recorded in the progress log. |
-| Phase 4 | In progress | Package API/CLI tests and temporary-output coverage exist; reaction/metabolite historical fixtures and a small model-backed Jaccard characterization are migrated, while credential-gated GPR validation remains. |
-| Phase 7 | In progress | Workflow documentation, installation instructions, MkDocs configuration, release-validation instructions, and opt-in solver/slow/online CI jobs are present; obtain final maintainer approval for the supported dependency matrix and artifact decisions. |
+| Phase 0 | Complete | None. Baseline ownership and compatibility decisions are recorded. |
+| Phase 1 | Complete | None. Packaging, CI, wheel, and outside-checkout gates have recorded passing checkpoints. |
+| Phase 2 | In progress | Finish legacy utility decoupling and remove remaining checkout-path mutation. |
+| Phase 3 | In progress | Preserve, replace, or formally retire every deferred legacy behavior; finish remaining script parameterization. |
+| Phase 4 | In progress | Migrate or formally archive historical suites and cover preserved/deprecated workflow contracts. |
+| Phase 5 | Complete | Keep the established client-boundary rule for newly migrated workflows. |
+| Phase 6 | Complete | Verify the seven LFS objects when publishing or cloning from a new remote. |
+| Phase 7 | In progress | Approve the dependency matrix, decide package configuration data, and pass the final release gate. |
 
 ### Open Decisions
 
@@ -762,6 +706,10 @@ For each major script:
 - Ensure `--help` works without optional heavy dependencies or model files.
 - Add a `[project.scripts]` entry only after the command is import-safe,
   parameterized, and covered by a help smoke test.
+- Inventory its historical public functions and CLI options. Preserve them,
+  replace them with characterized package behavior, or formally deprecate and
+  retire them. Do not replace maintained behavior with an unapproved deferred
+  error.
 
 Initial targets:
 
@@ -809,6 +757,10 @@ Checkpoint commits:
 - Add CLI tests using `tmp_path` for installed commands.
 - Add workflow API tests that call Python functions directly without shelling
   out.
+- Formally archive historical suites that no longer describe maintained
+  behavior; do not leave their ownership ambiguous outside central collection.
+- Add contract tests for any legacy behavior retained during migration and for
+  the documented error/migration path of approved removals.
 
 Validation:
 
@@ -910,11 +862,9 @@ Checkpoint commits:
 
 ## Next Pull Requests
 
-Keep this list limited to pending, reviewable changes. Remove an entry when it
-is completed and record the result in `REFACTORING_PROGRESS.md`.
-
-1. Run the opt-in BioCyc fixture where credentials are available and obtain
-   maintainer approval for the supported dependency and artifact decisions.
+The ordered, reviewable work queue is maintained in `CURRENT_STATE.md` so it
+stays beside current validation evidence and blockers. This plan defines the
+gates that determine when those items are complete.
 
 ## Definition of Done
 
@@ -936,3 +886,7 @@ The refactor can be considered successful when:
 - Generated artifacts are ignored or written outside the source tree.
 - Documentation explains installation, development, model/data handling, and the
   main Python and CLI workflows.
+- Every deferred legacy behavior has been preserved, replaced, or covered by an
+  approved and documented deprecation/removal decision.
+- All maintained tests are owned by the central marked test structure; excluded
+  historical suites are explicitly archived.
