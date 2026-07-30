@@ -1,10 +1,8 @@
 import json
 
 from functions.analyze_annotations import build_parser
-from functions.build_id_database import (
-    build_database_from_model,
-    build_parser as database_parser,
-)
+from functions.build_id_database import build_database_from_model
+from functions.build_id_database import build_parser as database_parser
 from thg_protocol.annotation import (
     analyze_model_annotations,
     extract_metabolite_annotations,

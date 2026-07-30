@@ -63,7 +63,11 @@ def extract_metabolite_annotations(
         values = match.get("annotation", {})
         if isinstance(values, Mapping):
             for key, value in values.items():
-                annotation[str(key)] = value[0] if isinstance(value, list) and len(value) == 1 else value
+                annotation[str(key)] = (
+                    value[0]
+                    if isinstance(value, list) and len(value) == 1
+                    else value
+                )
         for key in ("inchi", "inchikey"):
             if key in match:
                 annotation[key] = match[key]

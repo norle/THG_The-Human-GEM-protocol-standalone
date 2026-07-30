@@ -96,7 +96,7 @@ def equation_matrix(equation: str) -> np.ndarray:
     if equation.count("->") != 1:
         raise ValueError("equation must contain exactly one '->'")
     terms: list[tuple[int, str]] = []
-    for side, sign in zip(equation.split("->"), (1, -1)):
+    for side, sign in zip(equation.split("->"), (1, -1), strict=True):
         for raw in side.split("+"):
             token = raw.strip()
             if not token:
@@ -113,7 +113,7 @@ def equation_matrix(equation: str) -> np.ndarray:
     return np.array(
         [
             [coefficient * atoms.get(element, 0)
-             for (coefficient, _), atoms in zip(terms, parsed)]
+             for (coefficient, _), atoms in zip(terms, parsed, strict=True)]
             for element in elements
         ],
         dtype=float,
@@ -175,7 +175,9 @@ def maximum_gcd(values: Any, variable: str, value: Any) -> int:
                 return visit(node.body)
             if isinstance(node, ast.Constant) and isinstance(node.value, (int, float)):
                 return float(node.value)
-            if isinstance(node, ast.UnaryOp) and isinstance(node.op, (ast.UAdd, ast.USub)):
+            if isinstance(node, ast.UnaryOp) and isinstance(
+                node.op, (ast.UAdd, ast.USub)
+            ):
                 result = visit(node.operand)
                 return result if isinstance(node.op, ast.UAdd) else -result
             if isinstance(node, ast.BinOp) and type(node.op) in operators:

@@ -1,9 +1,10 @@
 from dataclasses import dataclass
 from types import SimpleNamespace
 
+from compare_models.compare_compartements import build_parser, comp_compare
+
 from thg_protocol.analysis.compare import compare_reactions
 from thg_protocol.analysis.compare_cli import main
-from compare_models.compare_compartements import build_parser, comp_compare
 
 
 @dataclass(frozen=True)

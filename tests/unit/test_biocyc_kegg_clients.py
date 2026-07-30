@@ -1,5 +1,5 @@
-from functions.gpr.gpr_def import getGPR
 from functions.equations_bm_gdb import Glycan, MissingAtom, Reformulation
+from functions.gpr.gpr_def import getGPR
 
 from thg_protocol.services.biocyc import StaticBioCycClient
 from thg_protocol.services.ensembl import StaticEnsemblClient
@@ -259,7 +259,9 @@ def test_kegg_reaction_batches_never_exceed_ten_identifiers():
     client = KeggClient(session=session, retries=0)
     identifiers = [f"R{identifier:05d}" for identifier in range(1, 12)]
 
-    assert sorted(client.get_reaction_entries(identifiers, batch_size=50)) == identifiers
+    assert sorted(
+        client.get_reaction_entries(identifiers, batch_size=50)
+    ) == identifiers
     assert len(session.calls) == 2
     assert all(call[0].count("rn:") <= 10 for call in session.calls)
 
@@ -337,7 +339,7 @@ def test_legacy_equation_glycan_lookup_uses_static_kegg_client(tmp_path, monkeyp
 def test_archived_equation_module_import_is_dependency_light():
     import importlib
 
-    module = importlib.import_module("functions.equations_bm_gdb")
+    importlib.import_module("functions.equations_bm_gdb")
 
 
 def test_equation_wrapper_preserves_missing_atom_alias():

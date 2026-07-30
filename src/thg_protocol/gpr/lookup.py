@@ -17,7 +17,10 @@ def parse_gene_pairs(page: str) -> list[tuple[str, str]]:
     )
     pairs: set[tuple[str, str]] = set()
     for pattern in patterns:
-        pairs.update((symbol.strip(), identifier.strip()) for symbol, identifier in re.findall(pattern, page, re.I))
+        pairs.update(
+            (symbol.strip(), identifier.strip())
+            for symbol, identifier in re.findall(pattern, page, re.I)
+        )
     return sorted(pairs)
 
 

@@ -6,7 +6,6 @@ from thg_protocol.model_build import (
     missing_atoms,
     reaction_compare,
 )
-from thg_protocol.model_build.mass_balance import reformulate_glycan_equation
 from thg_protocol.model_build.mass_balance import (
     eq2mat,
     equation_matrix,
@@ -14,6 +13,7 @@ from thg_protocol.model_build.mass_balance import (
     inv,
     maximumGCD,
     nullity,
+    reformulate_glycan_equation,
 )
 from thg_protocol.services.kegg import StaticKeggClient
 

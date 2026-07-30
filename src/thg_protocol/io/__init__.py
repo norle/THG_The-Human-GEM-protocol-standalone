@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any
 
 
 def convert_json_to_sbml(input_path: str | Path, output_path: str | Path) -> Path:

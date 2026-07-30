@@ -17,7 +17,7 @@ def __getattr__(name: str):
     from thg_protocol.gpr import ast_gpr
 
     return getattr(ast_gpr, name)
-from .lookup import get_gpr, parse_gene_pairs
+from .lookup import get_gpr, parse_gene_pairs  # noqa: E402
 
 __all__ = [
     "compare_ast",

@@ -111,8 +111,8 @@ def reduce_model_by_activity(
     )
 
 
-from .exchange import match_exchange_reactions
-from .transcriptomics import (
+from .exchange import match_exchange_reactions  # noqa: E402
+from .transcriptomics import (  # noqa: E402
     extract_ensembl_ids,
     extract_gene_annotation_pairs,
     extract_sgpr_rules,

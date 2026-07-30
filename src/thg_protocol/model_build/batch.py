@@ -45,7 +45,7 @@ def build_model_batch(
     filenames are retained so existing batch automation can resume safely;
     package-owned JSON caches remain the source of annotation state.
     """
-    from . import ModelBuildReport, build_model
+    from . import build_model
 
     destination = Path(output_path)
     cache_root = (

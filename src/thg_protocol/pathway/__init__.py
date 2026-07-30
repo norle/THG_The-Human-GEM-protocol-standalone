@@ -23,8 +23,8 @@ from .core import (
     select_pathway_metabolites,
     substitute_compartment_abbreviations,
 )
-from .workflow import implement_pathway, implement_pathway_files
 from .kegg_listing import list_pathway_reactions
+from .workflow import implement_pathway, implement_pathway_files
 
 __all__ = [
     "add_compartment",

@@ -204,7 +204,7 @@ def build_model(
     return report
 
 
-from .mass_balance import (
+from .mass_balance import (  # noqa: E402
     atom10,
     eq2mat,
     equation_matrix,
@@ -212,8 +212,8 @@ from .mass_balance import (
     gcd,
     inarray,
     inv,
-    maximumGCD,
     maximum_gcd,
+    maximumGCD,
     missing_atoms,
     nullity,
     reaction_compare,

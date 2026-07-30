@@ -1,7 +1,8 @@
+from types import SimpleNamespace
+
 import cobra
 import numpy as np
 from scipy.io import savemat
-from types import SimpleNamespace
 
 from thg_protocol.cell_specific import (
     extract_ensembl_ids,

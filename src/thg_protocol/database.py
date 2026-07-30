@@ -328,7 +328,7 @@ def reconstruct_model_from_pickle(
     except Exception as pickle_error:
         try:
             import dill
-        except ImportError as error:  # pragma: no cover - optional dependency
+        except ImportError:  # pragma: no cover - optional dependency
             raise ValueError(
                 "could not load pickle; install dill for historical database "
                 "pickles"
@@ -471,7 +471,11 @@ def reconstruct_model_from_pickle(
                 reaction_id,
                 stoichiometry,
                 name=str(_record_call(record, "Name", "") or ""),
-                lower_bound=0.0 if bool(_record_call(record, "Termodyn", False)) else -1000.0,
+                lower_bound=(
+                    0.0
+                    if bool(_record_call(record, "Termodyn", False))
+                    else -1000.0
+                ),
                 gene_reaction_rule=gene_rule,
                 annotation=annotation,
             )
