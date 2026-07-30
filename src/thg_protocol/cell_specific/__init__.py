@@ -26,7 +26,9 @@ def _activity_matrix(activity: Any, *, matrix_key: str) -> Any:
     if isinstance(activity, (str, Path)):
         path = Path(activity)
         if path.suffix.lower() == ".csv":
-            return np.loadtxt(path, delimiter=",")
+            # ``ndmin`` preserves a single column as reaction rows instead of
+            # letting ``loadtxt`` collapse it into a one-dimensional vector.
+            return np.loadtxt(path, delimiter=",", ndmin=2)
         if path.suffix.lower() == ".mat":
             from scipy.io import loadmat
 

@@ -42,7 +42,7 @@ class KeggClientProtocol(Protocol):
         self,
         kegg_ids: Iterable[str],
         *,
-        batch_size: int = 50,
+        batch_size: int = 10,
         requests_per_second: float = 3,
     ) -> dict[str, str]: ...
 
@@ -90,7 +90,7 @@ class StaticKeggClient:
         self,
         kegg_ids: Iterable[str],
         *,
-        batch_size: int = 50,
+        batch_size: int = 10,
         requests_per_second: float = 3,
     ) -> dict[str, str]:
         return self.get_entries(
@@ -153,7 +153,7 @@ class KeggClient:
         self,
         kegg_ids: Iterable[str],
         *,
-        batch_size: int = 50,
+        batch_size: int = 10,
         requests_per_second: float = 3,
     ) -> dict[str, str]:
         """Fetch and parse one or more KEGG reaction entries.
@@ -165,7 +165,7 @@ class KeggClient:
         return self.get_entries(
             kegg_ids,
             database="reaction",
-            batch_size=batch_size,
+            batch_size=min(batch_size, 10),
             requests_per_second=requests_per_second,
         )
 
@@ -182,6 +182,9 @@ class KeggClient:
         if requests_per_second <= 0:
             raise ValueError("requests_per_second must be positive")
 
+        # KEGG's multi-entry ``get`` endpoint accepts at most ten identifiers.
+        # Keep callers that historically supplied a larger value safe as well.
+        batch_size = min(batch_size, 10)
         identifiers = list(dict.fromkeys(str(kegg_id).strip() for kegg_id in kegg_ids))
         identifiers = [identifier for identifier in identifiers if identifier]
         results: dict[str, str] = {}

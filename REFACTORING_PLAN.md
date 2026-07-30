@@ -550,9 +550,9 @@ Recommended docs:
 
 ### Current Status
 
-Last reviewed: 2026-07-29
+Last reviewed: 2026-07-30
 
-The latest fully validated default offline/non-solver checkpoint passed 1807 tests
+The latest fully validated default offline/non-solver checkpoint passed 1809 tests
 with two expected skips and `ruff check src tests`. The current tree includes the characterized
 metabolite/reaction workflow and its PubChem service boundary in addition to the
 earlier service-boundary tests. The retry annotation compatibility script now

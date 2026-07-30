@@ -1,5 +1,6 @@
 import cobra
 import numpy as np
+from scipy.io import savemat
 
 from thg_protocol.cell_specific import reduce_model_by_activity
 
@@ -53,3 +54,19 @@ def test_reduce_model_by_activity_removes_zero_presence_rows():
     assert not tailored.reactions.has_id("R2")
     assert report.removed_reactions == 1
     assert report.orphan_metabolites_removed == 0
+
+
+def test_reduce_model_by_activity_loads_single_sample_csv_and_mat(tmp_path):
+    model = cobra.Model("cell")
+    model.add_reactions([cobra.Reaction("R1"), cobra.Reaction("R2")])
+    activity = np.array([[1], [0]])
+    csv_path = tmp_path / "activity.csv"
+    mat_path = tmp_path / "activity.mat"
+    np.savetxt(csv_path, activity, delimiter=",")
+    savemat(mat_path, {"all_Solutions_matrix5": activity})
+
+    for path in (csv_path, mat_path):
+        tailored, report = reduce_model_by_activity(model, path)
+        assert tailored.reactions.has_id("R1")
+        assert not tailored.reactions.has_id("R2")
+        assert report.removed_reactions == 1

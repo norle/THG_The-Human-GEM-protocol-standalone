@@ -21,3 +21,21 @@ def test_network_components_are_structured_and_non_mutating(tmp_path):
     assert len(results["components"]) == 2
     assert results["component_info"][0]["reaction_count"] == 1
     assert report.read_text().startswith("{\n")
+
+
+def test_network_components_keep_same_named_reactions_and_metabolites_distinct():
+    model = cobra.Model("collision")
+    metabolite = cobra.Metabolite("shared", compartment="c")
+    reaction = cobra.Reaction("shared")
+    reaction.add_metabolites({metabolite: -1})
+    model.add_reactions([reaction])
+
+    results = find_network_components(model)
+
+    assert results["graph"].number_of_nodes() == 2
+    assert set(results["graph"].nodes) == {
+        ("metabolite", "shared"),
+        ("reaction", "shared"),
+    }
+    assert results["component_info"][0]["reaction_count"] == 1
+    assert results["component_info"][0]["metabolite_count"] == 1

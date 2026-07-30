@@ -27,29 +27,31 @@ def find_network_components(model: Any) -> dict[str, Any]:
 
     model_copy = model.copy()
     graph = nx.DiGraph()
-    metabolite_ids = {met.id for met in model_copy.metabolites}
-    reaction_ids = {reaction.id for reaction in model_copy.reactions}
+    metabolite_ids = {("metabolite", met.id) for met in model_copy.metabolites}
+    reaction_ids = {("reaction", reaction.id) for reaction in model_copy.reactions}
 
     for metabolite in model_copy.metabolites:
-        graph.add_node(metabolite.id, bipartite="metabolite")
+        graph.add_node(("metabolite", metabolite.id), bipartite="metabolite")
     for reaction in model_copy.reactions:
-        graph.add_node(reaction.id, bipartite="reaction")
+        reaction_node = ("reaction", reaction.id)
+        graph.add_node(reaction_node, bipartite="reaction")
         for metabolite, coefficient in reaction.metabolites.items():
+            metabolite_node = ("metabolite", metabolite.id)
             if coefficient < 0:
-                graph.add_edge(metabolite.id, reaction.id)
+                graph.add_edge(metabolite_node, reaction_node)
             elif coefficient > 0:
-                graph.add_edge(reaction.id, metabolite.id)
+                graph.add_edge(reaction_node, metabolite_node)
 
     components = sorted(
         nx.weakly_connected_components(graph), key=len, reverse=True
     )
     component_info = []
     compartments = {
-        metabolite.id: getattr(metabolite, "compartment", None)
+        ("metabolite", metabolite.id): getattr(metabolite, "compartment", None)
         for metabolite in model_copy.metabolites
     }
     reaction_compartments = {
-        reaction.id: set(getattr(reaction, "compartments", ()))
+        ("reaction", reaction.id): set(getattr(reaction, "compartments", ()))
         for reaction in model_copy.reactions
     }
     for index, component in enumerate(components, start=1):
@@ -59,8 +61,8 @@ def find_network_components(model: Any) -> dict[str, Any]:
             for node in component & metabolite_ids
             if compartments[node]
         }
-        for reaction_id in component & reaction_ids:
-            component_compartments.update(reaction_compartments[reaction_id])
+        for reaction_node in component & reaction_ids:
+            component_compartments.update(reaction_compartments[reaction_node])
         component_info.append(
             {
                 "index": index,

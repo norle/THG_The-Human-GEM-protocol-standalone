@@ -236,6 +236,33 @@ def test_kegg_reaction_batch_is_parsed_and_cached():
     assert len(session.calls) == 1
 
 
+def test_kegg_reaction_batches_never_exceed_ten_identifiers():
+    class Response:
+        text = "".join(
+            f"ENTRY       R{identifier:05d}\\nNAME        example\\n///\\n"
+            for identifier in range(1, 12)
+        )
+
+        def raise_for_status(self):
+            return None
+
+    class Session:
+        def __init__(self):
+            self.calls = []
+
+        def get(self, url, timeout):
+            self.calls.append((url, timeout))
+            return Response()
+
+    session = Session()
+    client = KeggClient(session=session, retries=0)
+    identifiers = [f"R{identifier:05d}" for identifier in range(1, 12)]
+
+    assert sorted(client.get_reaction_entries(identifiers, batch_size=50)) == identifiers
+    assert len(session.calls) == 2
+    assert all(call[0].count("rn:") <= 10 for call in session.calls)
+
+
 def test_kegg_database_batch_uses_database_prefix():
     class Response:
         status_code = 200
