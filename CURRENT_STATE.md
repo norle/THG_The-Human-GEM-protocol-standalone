@@ -18,8 +18,8 @@ remaining gate is a current-head CI rerun for the supported matrix.
 ## Repository Snapshot
 
 - Branch: `refactoring-cleanup`
-- Reviewed commit: `d21cf04` (`refactor: finalize compatibility and dependency gates`)
-- Working tree at review: clean before this status update
+- Reviewed commit: `1078124` (`docs: record release gate evidence`)
+- Working tree at review: clean
 - Package layout: `src/thg_protocol`
 - Installed commands: `thg-gapfill`, `thg-pathway`, and `thg-compare`
 - Supported Python range currently declared: `>=3.10,<3.13`
