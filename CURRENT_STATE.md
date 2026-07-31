@@ -18,7 +18,7 @@ historical-test ownership rather than an architectural rewrite.
 ## Repository Snapshot
 
 - Branch: `refactoring-cleanup`
-- Reviewed commit: `e7d934c` (`refactor legacy workflow boundaries`)
+- Reviewed commit: `1141e78` (`refactor: complete legacy compatibility boundaries`)
 - Working tree at review: clean
 - Package layout: `src/thg_protocol`
 - Installed commands: `thg-gapfill`, `thg-pathway`, and `thg-compare`
