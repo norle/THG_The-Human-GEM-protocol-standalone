@@ -3,6 +3,10 @@
 Quick test script to run a BioVelo xmlquery against the BioCyc web service
 and extract the <string> values returned (e.g. subcellular-location).
 
+This is an archived source-checkout diagnostic, not an installed package
+workflow or release-gate test. Use the injected package service clients for
+maintained workflows.
+
 Example (default):
     python build_model/test_biovelo_query.py --org HUMAN --gene TP53
 

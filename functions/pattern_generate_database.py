@@ -1,5 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+"""Archived database pattern generator; not an installed API."""
+
 # import urllib2
 import re
 

@@ -1,4 +1,6 @@
 # Import libs
+"""Archived one-round PTR solver workflow; unsupported by the installed API."""
+
 from __future__ import print_function
 import cobra
 import cobra.io

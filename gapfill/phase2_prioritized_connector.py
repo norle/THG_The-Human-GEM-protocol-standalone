@@ -6,6 +6,8 @@ on component graph. Writes `selected_connectors.csv` to `gapfill/files/` and
 adds the reactions to the unconnected model, saving a Phase-2 model JSON.
 
 Run from repository root: `python3 gapfill/phase2_prioritized_connector.py`
+
+This module is archived source-checkout behavior and is not an installed CLI.
 """
 import csv
 import os

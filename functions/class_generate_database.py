@@ -1,6 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+"""Archived database-generator object model; not an installed API."""
+
 import re
 from typing import TYPE_CHECKING
 

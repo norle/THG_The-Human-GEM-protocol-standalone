@@ -10,6 +10,7 @@ nav:
   - Dependency compatibility: dependency-compatibility.md
   - Data and model files: data-and-model-files.md
   - Legacy workflow status: legacy-workflows.md
+  - Legacy API inventory: legacy-api-inventory.md
   - Python API contracts: api-contracts.md
   - Workflows:
       - Gapfill: workflows/gapfill.md

@@ -2,6 +2,9 @@
 """
 Unified Pathway Network Visualization Tool
 
+Archived source-checkout renderer; not an installed CLI. Use
+:mod:`thg_protocol.figures` for maintained figure generation.
+
 Generate different types of network visualizations for any pathway:
   0: Generate all visualizations (default)
   1: D3.js interactive HTML (force-directed layout)

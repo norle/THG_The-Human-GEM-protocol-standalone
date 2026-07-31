@@ -7,6 +7,8 @@ for a component-pair: Type A > Type B > Type C.
 Outputs:
  - `gapfill/files/selected_minimal_connectors.csv`
  - model saved to `models/base/THG-beta-batch_251106_phase2_minimal_connected.json`
+
+This module is archived source-checkout behavior and is not an installed CLI.
 """
 import csv
 import os

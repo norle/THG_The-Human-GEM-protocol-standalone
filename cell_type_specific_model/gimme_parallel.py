@@ -1,3 +1,5 @@
+"""Archived solver/pathos GIMME workflow; unsupported by the installed API."""
+
 import os
 import numpy as np
 import pandas as pd

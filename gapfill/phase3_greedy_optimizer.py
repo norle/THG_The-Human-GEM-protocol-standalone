@@ -9,6 +9,9 @@ Outputs:
  - `models/base/THG-beta-batch_251106_phase3_connected.json`
 
 Run: `python3 gapfill/phase3_greedy_optimizer.py`
+
+This module is archived solver-backed source-checkout behavior and is not an
+installed CLI.
 """
 import csv
 import os

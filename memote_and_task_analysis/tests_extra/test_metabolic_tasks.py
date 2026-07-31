@@ -2,6 +2,9 @@
 
 Memote custom tests are defined at the beginning,
 followed by the logic of the tests.
+
+This historical suite is archived, not installed, and excluded from the
+default release gate.
 """
 
 from os.path import dirname, join

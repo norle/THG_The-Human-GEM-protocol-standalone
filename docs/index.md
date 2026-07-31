@@ -1,7 +1,8 @@
 # THG Protocol
 
-This documentation will track the package migration described in
-`REFACTORING_PLAN.md`.
+This documentation tracks the package migration described in
+`REFACTORING_PLAN.md` and its executable closeout in
+`REFACTORING_PLAN_NEXT.md` at the repository root.
 
 Start with:
 
@@ -12,6 +13,7 @@ Start with:
 - [Dependency compatibility](dependency-compatibility.md)
 - [Data and model files](data-and-model-files.md)
 - [Legacy workflow status](legacy-workflows.md)
+- [Legacy API inventory](legacy-api-inventory.md)
 - [Python API contracts](api-contracts.md)
 - [Publish the Git LFS migration in a standalone repository](git-lfs-standalone-repository.md)
 

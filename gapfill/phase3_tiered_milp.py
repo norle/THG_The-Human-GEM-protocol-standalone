@@ -1,4 +1,6 @@
-"""Phase-3 Tiered Component-wise MILP optimizer.
+"""Archived solver-backed source-checkout workflow; not an installed CLI.
+
+Phase-3 Tiered Component-wise MILP optimizer.
 
 This approach solves the gap-filling problem using a lexicographic/tiered strategy:
 1. First, use only Type A candidates (both endpoints are dead-ends)

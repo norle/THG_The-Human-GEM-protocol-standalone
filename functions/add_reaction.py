@@ -3,6 +3,9 @@
 Helper script to add a new reaction to config.json
 
 Usage:
+
+This source-checkout helper is archived and is not part of the installed
+package contract.
     python3 add_reaction.py
 
 The script will prompt for all necessary information and add the reaction to config.json

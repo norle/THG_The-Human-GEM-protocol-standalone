@@ -2,6 +2,10 @@
 
 This is a copy of the previous `connect_components.py` with the same behavior
 but now named `phase1_connect_components.py` to be called from `gapfill.py`.
+
+This module is archived source-checkout behavior and is not an installed CLI.
+The supported replacement is the deterministic JSON workflow in
+:mod:`thg_protocol.gapfill`.
 """
 
 from cobra.io import load_json_model

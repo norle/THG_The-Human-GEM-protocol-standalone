@@ -1,4 +1,6 @@
-"""Phase-3 Sink MILP - Uses ORIGINAL component assignments from Phase 1.
+"""Archived solver-backed source-checkout workflow; not an installed CLI.
+
+Phase-3 Sink MILP - Uses ORIGINAL component assignments from Phase 1.
 
 This version preserves the original component structure from the unconnected model,
 so we can track which reactions belonged to each isolated component and test if

@@ -1,4 +1,4 @@
-"""Metabolic task data model."""
+"""Archived optional MEMOTE/task data model; not an installed API."""
 from dataclasses import dataclass
 from enum import Enum, auto
 from typing import Optional

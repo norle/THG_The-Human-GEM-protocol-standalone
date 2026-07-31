@@ -1,4 +1,6 @@
-"""Phase-3 MILP-based blocked-reaction coverage optimizer.
+"""Archived solver-backed source-checkout workflow; not an installed CLI.
+
+Phase-3 MILP-based blocked-reaction coverage optimizer.
 
 This approach is based on the insight that adding a reversible PTR can only
 expand the feasible flux space, never shrink it. Therefore:

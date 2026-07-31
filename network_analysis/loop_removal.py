@@ -1,4 +1,4 @@
-"""Compatibility entry point for the solver-backed loop-removal workflow."""
+"""Archived solver-backed loop-removal workflow; not an installed API."""
 
 from __future__ import annotations
 

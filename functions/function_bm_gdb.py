@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+"""Archived credentialed database harvester; not an installed API."""
+
 import urllib.parse
 import re
 

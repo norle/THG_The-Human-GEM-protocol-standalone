@@ -1,3 +1,8 @@
+"""Archived plotting helpers; not an installed API.
+
+Use :mod:`thg_protocol.figures` for maintained figure generation.
+"""
+
 import cobra
 import pandas as pd 
 from collections import defaultdict

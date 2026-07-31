@@ -1,4 +1,6 @@
 # Script for transcriptomics analysis
+"""Archived model-specific transcriptomics workflow; not an installed CLI."""
+
 import numpy as np
 from cobra.io import read_sbml_model, load_json_model
 import os

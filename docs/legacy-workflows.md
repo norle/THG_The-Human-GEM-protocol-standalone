@@ -4,6 +4,11 @@ The package APIs under `thg_protocol` are the supported interface. The files
 listed here remain in the source checkout for historical reproducibility, but
 are not included in wheels and are not part of the installed release contract.
 
+The complete file, symbol, consumer, evidence, and removal-condition
+inventory is [`legacy-api-inventory.md`](legacy-api-inventory.md). This page is
+the short operational summary; an unlisted legacy Python file is a review
+failure, not an implicit archive decision.
+
 ## Replaced compatibility surfaces
 
 - `functions/functions_mass_balance.py` delegates formula parsing and positive
@@ -51,3 +56,27 @@ central tests, while full-model, solver, and online cases must be invoked
 explicitly and marked before they can become release-gate tests. They are not
 collected by the default `testpaths` configuration and are not evidence for the
 offline wheel gate.
+
+The archive command/status is explicit: run the representative package
+characterization with `pytest tests/integration/test_legacy_algorithm_apis.py`,
+and run historical suites only by naming their paths. A future maintainer must
+either migrate a case into `tests/` with an appropriate marker and fixture, or
+record an owner and command before deleting the historical suite.
+
+The archive owner is the THG repository maintainers. The documented, opt-in
+commands are:
+
+- `pytest test_algorithms/gpr_prediction`
+- `pytest test_algorithms/mass_balance`
+- `pytest test_algorithms/metabolite_identification`
+- `pytest test_algorithms/reac_identification`
+- `pytest memote_and_task_analysis/tests_extra -m memote`
+
+These commands may require full-size model files, optional solver packages, or
+credentials. They are intentionally not part of the default release gate.
+
+## Maintained import policy
+
+Package code under `src/thg_protocol` must not import legacy namespaces. The
+executable check is `tests/unit/test_legacy_import_policy.py`; compatibility
+imports are kept in separately named tests and source-checkout adapters only.

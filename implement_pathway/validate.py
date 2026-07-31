@@ -2,6 +2,9 @@
 """
 Unified Cytoskeleton Validation and Testing Tool
 
+Archived full-model source-checkout workflow; not installed-package or
+default release-gate evidence.
+
 Run comprehensive validations and tests on cytoskeleton implementation:
   0: Run ALL validations (default)
   1: Quick validation (model structure + FBA)

@@ -1,3 +1,5 @@
+"""Archived workbook comparison helpers; not an installed API."""
+
 from cobra import Model, Reaction, Metabolite
 from cobra.io import read_sbml_model
 import re

@@ -1,4 +1,4 @@
-"""Evaluation of Metabolic Tasks."""
+"""Archived optional MEMOTE/task evaluation; not an installed API."""
 import re
 
 import cobra

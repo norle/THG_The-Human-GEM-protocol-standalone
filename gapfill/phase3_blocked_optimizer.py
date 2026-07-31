@@ -9,6 +9,9 @@ when `max_additions` is reached.
 Outputs:
  - `gapfill/files/selected_phase3_blocked_connectors.csv`
  - `models/base/THG-beta-batch_251106_phase3_blocked_connected.json`
+
+This module is archived solver-backed source-checkout behavior and is not an
+installed CLI.
 """
 import csv
 import os

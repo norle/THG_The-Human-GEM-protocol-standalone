@@ -1,4 +1,6 @@
-"""Phase-3 Component-wise MILP optimizer.
+"""Archived solver-backed source-checkout workflow; not an installed CLI.
+
+Phase-3 Component-wise MILP optimizer.
 
 This approach solves the gap-filling problem by treating each isolated component
 separately, dramatically reducing the computational burden.
