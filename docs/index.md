@@ -12,6 +12,7 @@ Start with:
 - [Dependency compatibility](dependency-compatibility.md)
 - [Data and model files](data-and-model-files.md)
 - [Legacy workflow status](legacy-workflows.md)
+- [Python API contracts](api-contracts.md)
 - [Publish the Git LFS migration in a standalone repository](git-lfs-standalone-repository.md)
 
 Workflow guides:

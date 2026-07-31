@@ -84,12 +84,12 @@ Later dependency-free checks on the current refactoring line recorded:
 | --- | --- | --- |
 | 0. Baseline and decisions | Complete | None. Artifact ownership and the source-only legacy namespace policy are recorded. |
 | 1. Packaging and tooling | Complete | None. Packaging, CI, wheel, and outside-checkout gates have recorded passing checkpoints. |
-| 2. Pure utility migration | In progress | Finish public API contract documentation and remaining legacy test imports. |
+| 2. Pure utility migration | In progress | Finish remaining legacy test imports. |
 | 3. Workflow APIs and entry points | In progress | Complete the archived-workflow review and release-path documentation. |
 | 4. Integration and CLI tests | In progress | Migrate or formally archive historical test suites and add coverage for preserved/deprecated workflow contracts. |
 | 5. External service hardening | Complete | Keep the client-boundary rule for any newly migrated workflow. |
 | 6. Artifacts and Git LFS | Complete | Verify the seven LFS objects when publishing or cloning from a new remote. |
-| 7. Documentation and CI expansion | In progress | Approve the dependency matrix, decide package configuration data, and run the final release gate. |
+| 7. Documentation and CI expansion | In progress | Approve the dependency matrix and run the final clean-clone release gate. |
 
 ## Important Remaining Gaps
 
@@ -123,9 +123,11 @@ central tests; the remaining duplicated suites need a final archive decision.
 
 ### 4. Public API contracts
 
-The package contains substantially more public surface than its user-facing
-API documentation currently defines. Promoted APIs still need consistent
-documentation of:
+The promoted workflow contracts and package-data decision are documented in
+[`docs/api-contracts.md`](docs/api-contracts.md). Remaining work is to keep
+those contracts aligned as additional APIs are promoted.
+
+Promoted APIs must consistently document:
 
 - Accepted model and record types.
 - Return schemas.
