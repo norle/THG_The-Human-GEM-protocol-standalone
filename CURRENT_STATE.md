@@ -18,7 +18,7 @@ remaining gate is a current-head CI rerun for the supported matrix.
 ## Repository Snapshot
 
 - Branch: `refactoring-cleanup`
-- Reviewed commit: `bf3824c` (`docs: align release snapshot checkpoint`)
+- Reviewed commit: `63cbbf6` (`refactor: require explicit annotation paths`)
 - Working tree at review: clean
 - Package layout: `src/thg_protocol`
 - Installed commands: `thg-gapfill`, `thg-pathway`, and `thg-compare`
@@ -50,6 +50,9 @@ remaining gate is a current-head CI rerun for the supported matrix.
   KEGG, and location-page operations.
 - Explicit input/output paths for the maintained CLIs and many legacy entry
   points.
+- Promoted metabolite annotation APIs now require explicit input/output paths;
+  the source-checkout compatibility wrapper retains the historical default
+  path and is covered by a dedicated contract test.
 - Targeted Git LFS migration and generated-artifact index cleanup.
 - Workflow, installation, development, artifact, dependency, and release
   documentation.
@@ -88,7 +91,8 @@ Later dependency-free checks on the current refactoring line recorded:
 - Python 3.10 source distribution and wheel builds passed on 2026-07-31.
   The no-dependency wheel installed outside the checkout and passed package,
   workflow, database/model-build, merge, cell-specific, and all three CLI help
-  smoke checks.
+  smoke checks; the rebuilt wheel also exposes the explicit annotation-path
+  signatures.
 - Git LFS verification passed: all seven approved LFS files are present,
   `git lfs fsck` is clean, and a fresh local clone checked out all seven files
   with content matching the source tree.
