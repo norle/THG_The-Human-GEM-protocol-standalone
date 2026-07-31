@@ -1,15 +1,18 @@
 # Tests
 
-The first tests in this repository are characterization tests. They describe
-how selected current production modules behave before the package layout is
-changed.
+The maintained tests in this directory exercise the installed
+`thg_protocol` package. Characterization and compatibility tests also cover
+selected legacy `functions.*` entry points while those source-checkout
+wrappers remain supported.
 
-Run them from the repository root without installing the project:
+Run the central suite from the repository root after installing the package's
+development extra:
 
 ```bash
-python -m unittest discover -s tests
+pytest -m "not slow and not online and not solver and not gurobi and not memote"
 ```
 
-These tests intentionally import current modules such as `functions.config`.
-During the refactor, keep the expected behavior stable while moving the
-implementation into `thg_protocol` modules or compatibility wrappers.
+Historical suites under `test_algorithms/` are archived and are not part of
+the central pytest collection. New tests should import `thg_protocol`; tests
+that import `functions.*` must explicitly verify a documented compatibility
+contract.

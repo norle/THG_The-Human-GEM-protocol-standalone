@@ -13,11 +13,20 @@ paths supplied by the caller.
 | `thg_protocol.merge.merge_models` | Two COBRA models | Returns a copied model and `MergeReport`; inputs are not mutated. Optional serialization uses `output_path`. |
 | `thg_protocol.cell_specific.reduce_model_by_activity` | COBRA model and CSV/MAT/matrix activity data | Returns a copied model and `ActivityReductionReport`; optional serialization uses `output_path`. |
 | `thg_protocol.model_build.build_model` | Input/output model paths and optional service clients | Returns `ModelBuildReport`; caches and error reports are written only under explicit or output-relative paths. |
+| `thg_protocol.annotation.metabolites.generate_met_annotation` | Metabolite records, an explicit annotation output path, and an optional PubChem client | Returns annotated and unresolved records; writes the annotation and failure reports beside the supplied output path. |
+| `thg_protocol.annotation.metabolites.process_annotation` | An explicit tab-separated annotation path | Returns a normalized annotation mapping; reads only the supplied file and does not write output. |
+| `thg_protocol.annotation.metabolite_reactions.run_metabolite_reaction_identification` | Model path, database path, output directory, and optional PubChem client | Returns `MetaboliteReactionResult`; writes model, annotation, and failure files only under the supplied output locations. |
 
 Service-backed APIs accept a `*ClientProtocol` implementation. Production
 clients own timeout, retry, pacing, cache, authentication, and response
 normalization; static clients in `thg_protocol.services` provide offline test
 adapters. Core package imports do not construct clients or make requests.
+
+The source-checkout compatibility wrapper
+`functions.function_metabolite_identification` retains the historical default
+annotation path for callers that omit an output path. New package callers must
+provide paths explicitly; package APIs do not silently write into repository
+directories.
 
 ## Package data decision
 

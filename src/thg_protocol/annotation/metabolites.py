@@ -244,7 +244,7 @@ def identify_metabolite(
 
 def generate_met_annotation(
     met_list: List[Tuple[str, str, str, str]],
-    out: str | Path | None = None,
+    out: str | Path,
     delay_between_requests: float = 1.0,
     checkpoint_interval: int = 10,
     resume: bool = True,
@@ -275,7 +275,7 @@ def generate_met_annotation(
     anotated: list[tuple[str, str, str, str]]
         list of anotated metabolites
     """
-    out = os.fspath(out or global_met_annotation_file())
+    out = os.fspath(out)
     unnanotated, annotated = [], []
     api_failures = []  # Track API/temporary failures separately
     total = len(met_list)
@@ -356,7 +356,7 @@ def remove_null_value(d):
     }
 
 
-def process_annotation(annotation_file: str | Path | None = None) -> Dict:
+def process_annotation(annotation_file: str | Path) -> Dict:
     """Generate metabolite annotation file.
 
     Parameters
@@ -364,7 +364,7 @@ def process_annotation(annotation_file: str | Path | None = None) -> Dict:
     annotation_file: str
         Tab-separated file, generated with `generate_met_annotation`
     """
-    annotation_file = os.fspath(annotation_file or global_met_annotation_file())
+    annotation_file = os.fspath(annotation_file)
     print(f"Processing annotation file: {annotation_file}")
     variableFile = pd.read_csv(annotation_file, sep="\t", header=None)
     variableFile[5] = variableFile[5].str.extract("(CHEBI:[0-9]+)", expand=True)
