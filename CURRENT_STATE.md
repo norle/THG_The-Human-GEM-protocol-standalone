@@ -3,23 +3,26 @@
 Last reviewed: 2026-07-31
 
 This document is the concise operational snapshot for the refactoring described
-in `REFACTORING_PLAN.md`. It replaces the chronological progress diary. Update
-it when implementation status, validation evidence, blockers, or the next
-reviewable work changes. Git history remains the source for detailed historical
-implementation notes.
+in `REFACTORING_PLAN.md`, with closeout requirements in
+`REFACTORING_PLAN_NEXT.md`. It replaces the chronological progress diary.
+Update it when implementation status, validation evidence, blockers, or the
+next reviewable work changes. Git history remains the source for detailed
+historical implementation notes.
 
 ## Overall Assessment
 
 The refactor remains feasible and is architecturally sound. Packaging, service
 boundaries, CI, Git LFS ownership, installed workflows, and explicit legacy
-behavior decisions are in place. Local release validation is complete; the only
-remaining gate is a current-head CI rerun for the supported matrix.
+behavior decisions are in place. The legacy inventory, contract groups,
+archival ownership, and maintained-import policy are now recorded. Local
+release validation is complete; the only release gate not evidenced from the
+current checkout is a current-head CI rerun for the supported matrix.
 
 ## Repository Snapshot
 
 - Branch: `refactoring-cleanup`
-- Reviewed commit: `c8c5d4a` (`ci: run all supported Python jobs`)
-- Working tree at review: clean
+- Reviewed commit: `4ce9977` (`docs: record matrix execution policy`)
+- Working tree at review: closeout inventory/contract changes are in progress
 - Package layout: `src/thg_protocol`
 - Installed commands: `thg-gapfill`, `thg-pathway`, and `thg-compare`
 - Supported Python range currently declared: `>=3.10,<3.13`
@@ -57,6 +60,17 @@ remaining gate is a current-head CI rerun for the supported matrix.
 - Targeted Git LFS migration and generated-artifact index cleanup.
 - Workflow, installation, development, artifact, dependency, and release
   documentation.
+- Complete legacy Python inventory in `docs/legacy-api-inventory.md`, including
+  exact paths, symbols, package replacements, status, evidence, consumers, and
+  removal conditions for all 82 source-checkout files.
+- Contract groups for legacy parity, intentional migration differences, and
+  archived workflow ownership in `docs/api-contracts.md` and
+  `docs/legacy-workflows.md`.
+- Executable `tests/unit/test_legacy_import_policy.py` gate preventing package
+  imports from legacy namespaces and checking inventory coverage.
+- Dedicated `tests/unit/test_legacy_compatibility_exports.py` parity checks for
+  package-owned re-export symbols, plus executable archived-workflow docstring
+  status checks.
 
 ## Validation Evidence
 
@@ -78,6 +92,19 @@ Later dependency-free checks on the current refactoring line recorded:
 - `ruff check src tests`: clean on 2026-07-31.
 - Default offline suite: `1858 passed, 2 skipped` on Python 3.12 with the
   pinned GLPK constraints.
+- Current checkout closeout gate: `1880 passed, 2 skipped` under Python 3.12,
+  with the exact inventory manifest, maintained-import, compatibility-export,
+  deterministic adapter, and CLI contract checks included; Ruff is clean for
+  `src tests`.
+- The same current checkout passed the complete default suite under the
+  available Python 3.10.12 environment: `1880 passed, 2 skipped`.
+- The three installed-command compatibility checks pass for the legacy CLI
+  option/help contract under Python 3.10 and 3.12.
+- The focused inventory, compatibility-export, deterministic-adapter, CLI, and
+  CI-policy gates pass: `22 passed` under both Python 3.10.12 and Python 3.12.9.
+- No-isolation `python -m build` completed successfully on the current
+  checkout; the rebuilt wheel passed outside-checkout imports and all three
+  installed CLI help checks.
 - Unit/integration gates passed: `127 passed, 1 skipped` for the unit and
   characterization paths, and `1848 passed, 2 skipped` for unit plus
   integration tests. Python 3.10 and 3.11 constraint dry-runs resolved.
@@ -145,7 +172,8 @@ package release contract.
 Pytest is configured to collect `tests/`. Historical suites under
 `test_algorithms/` and additional MEMOTE tests remain outside the default
 collection path. Useful annotation and algorithm fixtures are represented by
-central tests; the remaining duplicated suites need a final archive decision.
+central tests. The remaining suites are explicitly archived under THG
+maintainer ownership with opt-in commands in `docs/legacy-workflows.md`.
 
 ### 4. Public API contracts
 
@@ -161,13 +189,19 @@ Promoted APIs must consistently document:
 - Filesystem and network side effects.
 - Raised errors and optional dependencies.
 
+The current promoted API set is covered by the `C1`–`C9` contract groups in
+`docs/api-contracts.md`; new promotions must extend the corresponding group and
+inventory evidence.
+
 ### 5. Release decisions
 
 - Python 3.10 now has the exact editable-install, Ruff, default offline-suite,
   build, and outside-wheel evidence recorded above.
 - Python 3.11 is not installed locally; its matching current-head CI job is the
-  remaining evidence source. The prior all-version success and the current
-  local regression coverage are recorded above.
+  remaining evidence source. No GitHub Actions run is associated with local
+  `HEAD` `4ce9977`; the branch has not published the closeout changes. The
+  prior all-version success and current local regression coverage are recorded
+  above.
 - The clean-clone release gate against the approved Python 3.10–3.12
   constraints and all seven LFS checks passed locally.
 
@@ -187,7 +221,8 @@ refactoring progress.
 ## Completion Criteria
 
 The refactor is complete when the definition of done in
-`REFACTORING_PLAN.md` passes and:
+`REFACTORING_PLAN_NEXT.md` (and the carried-forward requirements from
+`REFACTORING_PLAN.md`) passes and:
 
 - No maintained workflow silently loses historical behavior.
 - Every intentionally removed behavior has an approved and documented
