@@ -1,6 +1,5 @@
 # Script for transcriptomics analysis
 import numpy as np
-import pdb
 from cobra.io import read_sbml_model, load_json_model
 import os
 import re
@@ -20,9 +19,6 @@ current_dir = os.path.dirname(os.path.abspath(__file__))
 # print(current_dir)
 project_root = os.path.abspath(os.path.join(current_dir, ".."))
 print("Project root directory:", project_root)
-# Add the project root to sys.path to access top-level folders like 'functions' and 'models'
-if project_root not in sys.path:
-    sys.path.append(project_root)
 
 
 def biomass_fix(model, ratio=0.2):

@@ -9,6 +9,7 @@ nav:
   - Release validation: release-validation.md
   - Dependency compatibility: dependency-compatibility.md
   - Data and model files: data-and-model-files.md
+  - Legacy workflow status: legacy-workflows.md
   - Workflows:
       - Gapfill: workflows/gapfill.md
       - Pathway implementation: workflows/pathway.md

@@ -214,6 +214,10 @@ def reconstruct_model(
                 if model.reactions.has_id(reaction_id)
             ]
             group.add_members(members)
+            # COBRA 0.29 stores members as a set, while the historical pickle
+            # API exposed an ordered list. Preserve that compatibility shape
+            # for reconstructed legacy bundles after all members are added.
+            group._members = members
 
     if output_path is not None:
         path = Path(output_path)

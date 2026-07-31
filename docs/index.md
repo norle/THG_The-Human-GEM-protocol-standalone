@@ -11,6 +11,7 @@ Start with:
 - [Release validation](release-validation.md)
 - [Dependency compatibility](dependency-compatibility.md)
 - [Data and model files](data-and-model-files.md)
+- [Legacy workflow status](legacy-workflows.md)
 - [Publish the Git LFS migration in a standalone repository](git-lfs-standalone-repository.md)
 
 Workflow guides:

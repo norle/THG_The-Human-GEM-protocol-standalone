@@ -21,8 +21,6 @@ Examples:
 import sys
 from pathlib import Path
 
-# Add parent directory to path for shared functions module
-sys.path.insert(0, str(Path(__file__).parent.parent))
 import sys
 import os
 import json
@@ -30,7 +28,7 @@ import argparse
 from collections import defaultdict
 
 # Import config loader
-from functions.config import load_config, get_model_paths
+from thg_protocol.config import load_config, get_model_paths
 
 # Global variables (will be set by command line args or defaults)
 PATHWAY_CONFIG = None

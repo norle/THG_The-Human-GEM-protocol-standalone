@@ -1,6 +1,6 @@
 # THG Protocol Refactoring: Current State
 
-Last reviewed: 2026-07-30
+Last reviewed: 2026-07-31
 
 This document is the concise operational snapshot for the refactoring described
 in `REFACTORING_PLAN.md`. It replaces the chronological progress diary. Update
@@ -11,15 +11,9 @@ implementation notes.
 ## Overall Assessment
 
 The refactor remains feasible and is architecturally sound. Packaging, service
-boundaries, CI, Git LFS ownership, and the first installed workflows are in
-place. The project is now closer to stabilization than to an architectural
-rewrite.
-
-The refactor is not complete. The main risk is behavioral: several legacy
-functions and workflow options have been converted to explicit deferred errors
-before equivalent package behavior exists. Import safety has improved, but a
-source-compatible name that raises `NotImplementedError` is not a behavioral
-compatibility wrapper.
+boundaries, CI, Git LFS ownership, installed workflows, and explicit legacy
+behavior decisions are in place. The remaining work is release hardening and
+historical-test ownership rather than an architectural rewrite.
 
 ## Repository Snapshot
 
@@ -43,9 +37,15 @@ compatibility wrapper.
   lookup, pathway implementation, gapfill, comparison, model reconstruction,
   model building, merge primitives, network analysis, figures, cell-specific
   helpers, model I/O, and formula-level mass balance.
-- Dependency-free legacy mass-balance numerics (`inarray`, `eq2mat`, and
-  `nullity`) now live in `thg_protocol.model_build.mass_balance` and are
-  re-exported by the legacy adapter; solver-backed balancing remains deferred.
+- Dependency-free legacy mass-balance numerics and positive equation balancing
+  now live in `thg_protocol.model_build.mass_balance` and are re-exported by
+  the legacy adapter.
+- Legacy merge, consistency, network-cleanup, and visualization options now
+  delegate to package APIs or require explicit output paths; their supported
+  scope is recorded in `docs/legacy-workflows.md`.
+- Promoted metabolite annotation now uses the package PubChem client for both
+  injected and default lookups without importing PubChemPy or mutating global
+  proxy state.
 - Injectable clients and static test adapters for PubChem, Ensembl, BioCyc,
   KEGG, and location-page operations.
 - Explicit input/output paths for the maintained CLIs and many legacy entry
@@ -71,11 +71,12 @@ Later dependency-free checks on the current refactoring line recorded:
 - Direct import, compilation, CLI-help, and static-client checks for subsequent
   workflow-boundary changes.
 
-The current review environment has pytest but does not have the declared
-`cobra` base dependency or Ruff. The full default suite therefore stops during
-collection with seven `ModuleNotFoundError: cobra` errors, and lint cannot be
-rerun here. This is an environment limitation, not a recorded test regression,
-but the current commit still needs the full clean-environment gate.
+- `ruff check src tests`: clean on 2026-07-31.
+- Default offline suite: `1854 passed, 2 skipped` on Python 3.12 with the
+  pinned GLPK constraints.
+- `python -m build`: source distribution and wheel built successfully.
+- A no-dependency wheel installed outside the checkout imported all package
+  areas and passed all three installed CLI `--help` smoke tests.
 
 ## Phase Status
 
@@ -83,8 +84,8 @@ but the current commit still needs the full clean-environment gate.
 | --- | --- | --- |
 | 0. Baseline and decisions | Complete | None. Artifact ownership and the source-only legacy namespace policy are recorded. |
 | 1. Packaging and tooling | Complete | None. Packaging, CI, wheel, and outside-checkout gates have recorded passing checkpoints. |
-| 2. Pure utility migration | In progress | Finish legacy utility decoupling and remove remaining checkout-path mutation. |
-| 3. Workflow APIs and entry points | In progress | Preserve, replace, or formally retire every deferred legacy behavior; finish remaining script parameterization. |
+| 2. Pure utility migration | In progress | Finish public API contract documentation and remaining legacy test imports. |
+| 3. Workflow APIs and entry points | In progress | Complete the archived-workflow review and release-path documentation. |
 | 4. Integration and CLI tests | In progress | Migrate or formally archive historical test suites and add coverage for preserved/deprecated workflow contracts. |
 | 5. External service hardening | Complete | Keep the client-boundary rule for any newly migrated workflow. |
 | 6. Artifacts and Git LFS | Complete | Verify the seven LFS objects when publishing or cloning from a new remote. |
@@ -94,8 +95,10 @@ but the current commit still needs the full clean-environment gate.
 
 ### 1. Behavior preservation and deprecation
 
-The following surfaces currently expose names or options whose historical
-behavior is deferred:
+The former unconditional deferred errors have been replaced with package-backed
+compatibility adapters. Their exact scope and the explicitly archived
+solver-heavy workflows are documented in
+[`docs/legacy-workflows.md`](docs/legacy-workflows.md).
 
 - Solver-backed mass balancing.
 - Historical multi-stage merge variants.
@@ -111,22 +114,23 @@ For each surface, choose one of these outcomes:
 3. Approve a breaking removal, document the migration path, emit a deprecation
    period where practical, and remove the misleading compatibility claim.
 
-Do not count an unconditional deferred error as a completed migration.
+The remaining review is to characterize those adapter contracts in the central
+test tree and approve which historical suites are retained only as archives.
 
 ### 2. Remaining legacy coupling
 
-Some cell-specific scripts still mutate `sys.path` and import `pdb`.
-Pathway validation and visualization scripts still contain repository-relative
-paths. These scripts need explicit input/output contracts or an explicit
-archived/unsupported designation.
+The remaining solver-heavy cell-specific and pathway diagnostic scripts are
+explicitly archived/unsupported for installed use; the designation and package
+replacements are recorded in `docs/legacy-workflows.md`. Their historical
+output conventions remain local workflow behavior and are not part of the
+package release contract.
 
 ### 3. Historical test ownership
 
 Pytest is configured to collect `tests/`. Historical suites under
 `test_algorithms/` and additional MEMOTE tests remain outside the default
-collection path. Migrate useful characterization cases into `tests/`, mark
-large/online/solver cases appropriately, and formally archive duplicated test
-helpers.
+collection path. Useful annotation and algorithm fixtures are represented by
+central tests; the remaining duplicated suites need a final archive decision.
 
 ### 4. Public API contracts
 
@@ -149,18 +153,11 @@ documentation of:
 
 ## Next Reviewable Pull Requests
 
-1. Inventory deferred legacy behavior and classify every item as preserve,
-   replace, deprecate, or remove. Restore lazy access where continued
-   compatibility is required.
-2. Finish explicit-path/import-safe conversion of the remaining cell-specific
-   and pathway scripts, or mark them as archived with documented replacements.
-3. Migrate the remaining valuable `test_algorithms/` and MEMOTE fixtures into
-   the central marked test structure.
-4. Complete public API contracts and approve the dependency matrix and package
+1. Characterize the new compatibility adapters and finish the remaining
+   valuable `test_algorithms/` and MEMOTE fixture migration.
+2. Complete public API contracts and approve the dependency matrix and package
    data decision.
-5. Run the clean-clone release gate: install declared dependencies, run Ruff
-   and the full default suite, build the wheel, test it outside the checkout,
-   verify CLI help, and verify all seven Git LFS objects.
+3. Run the clean-clone release gate, including seven Git LFS object checks.
 
 The credential-gated BioCyc fixture should be run when credentials are
 available, but it does not replace the work above and should not block offline

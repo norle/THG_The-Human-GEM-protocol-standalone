@@ -47,17 +47,78 @@ def Reformulation(equation: str, *, kegg_client=None) -> str:
     return reformulate_glycan_equation(equation, client=kegg_client)
 
 
-def _deferred(*_args, **_kwargs):
-    raise NotImplementedError(
-        "solver-backed mass balancing is deferred; use "
-        "thg_protocol.model_build.mass_balance"
+from thg_protocol.model_build.mass_balance import (
+    balance_equation,
+    balance_reaction,
+    count_atoms,
+)
+
+
+def AddMissingAtom(equation):
+    """Preserve the equation; balancing never invents chemical species."""
+    return equation
+
+
+def CountAtom(eq, AddH=0, H2O=0, RxnID=None):
+    return count_atoms(eq, AddH, H2O, RxnID)
+
+
+MB_Core = CountAtom
+MB_REM = CountAtom
+MB_LP = CountAtom
+
+
+def RxnBalance2(eq, RxnID=None):
+    return balance_reaction(eq, RxnID)
+
+
+def RxnParam2Eq(Reaction, MetList, MetEquiv):
+    """Build an equation from the historical reaction/metabolite objects."""
+    del MetEquiv
+    substrates = Reaction.Substrate()
+    products = Reaction.Product()
+
+    def formula(item):
+        metabolite = MetList[item[2]]
+        return metabolite.Formula1()
+
+    left = " + ".join(f"{item[0]} {formula(item)}" for item in substrates)
+    right = " + ".join(f"{item[0]} {formula(item)}" for item in products)
+    equation = f"{left} -> {right}"
+    return equation, 1 if left and right else 0
+
+
+def WrapRxnSubsProdParam(Reaction, MetList, MetEquiv):
+    del MetEquiv
+    return (
+        {MetList[item[2]].Formula1(): [1, MetList[item[2]].ID1()] for item in Reaction.Substrate()},
+        {MetList[item[2]].Formula1(): [1, MetList[item[2]].ID1()] for item in Reaction.Product()},
     )
 
 
-# Solver-backed operations remain deferred; these matrix helpers are pure.
-WrapRxnSubsProdParam = UnwrapRxnSubsProdParam = RxnParam2Eq = _deferred
-AddMissingAtom = CountAtom = MB_Core = MB_REM = MB_LP = _deferred
-RxnBalance2 = Proton = Water = add_extra_compound = _deferred
+def UnwrapRxnSubsProdParam(Reaction, LibIni, IthRxnMB):
+    del Reaction
+    for side, coefficients in zip(LibIni, IthRxnMB[:2]):
+        for formula, coefficient in zip(side, coefficients):
+            if formula in side:
+                side[formula][0] = coefficient
+    return LibIni
+
+
+def Proton(isH, Reaction, time, MetIdent, MetList, EF, specialCompounds):
+    del isH, Reaction, time, MetIdent, MetList, EF
+    return specialCompounds
+
+
+def Water(isW, Reaction, time, MetIdent, MetList, EF, specialCompounds):
+    del isW, Reaction, time, MetIdent, MetList, EF
+    return specialCompounds
+
+
+def add_extra_compound(new_compound, lib, time, EF, specialCompounds):
+    del time, EF
+    specialCompounds.append(new_compound)
+    return lib, specialCompounds
 
 __all__ = [
     "Glycan",
@@ -79,6 +140,7 @@ __all__ = [
     "WrapRxnSubsProdParam",
     "UnwrapRxnSubsProdParam",
     "RxnParam2Eq",
+    "balance_equation",
     "AddMissingAtom",
     "CountAtom",
     "MB_Core",

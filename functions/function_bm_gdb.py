@@ -15,7 +15,6 @@ import pickle
 from collections import defaultdict
 from itertools import zip_longest
 import pandas as pd
-import pdb
 import os
 
 from functions.gpr.auth_gpr import getGPR, setup_biocyc_session

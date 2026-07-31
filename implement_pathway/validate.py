@@ -31,8 +31,6 @@ Examples:
 import sys
 from pathlib import Path
 
-# Add parent directory to path for shared functions module
-sys.path.insert(0, str(Path(__file__).parent.parent))
 import sys
 import os
 import json
@@ -43,7 +41,7 @@ from collections import defaultdict
 from datetime import datetime
 
 # Import config loader
-from functions.config import load_config, get_model_paths
+from thg_protocol.config import load_config, get_model_paths
 
 # Try to import COBRApy
 try:
@@ -87,7 +85,7 @@ def build_compartment_mapping(model, config):
         dict: Mapping from config abbreviation to model abbreviation
               e.g., {'er': 'r', 'gl': 'gl', 'c': 'c'}
     """
-    from functions.config import resolve_all_compartments
+    from thg_protocol.config import resolve_all_compartments
 
     # Get resolved compartments
     resolved_compartments = resolve_all_compartments(model, config)
@@ -378,9 +376,8 @@ def validate_unit_tests(model_path=None, config_path=None):
     if model_path is None:
         model_path = OUTPUT_MODEL_PATH
 
-    # Import functions
-    sys.path.insert(0, os.path.dirname(__file__))
-    from functions.pathway_builder import (
+    # Import package-owned matching helpers.
+    from thg_protocol.pathway import (
         find_metabolite_robust,
         find_metabolite_by_annotation,
     )
@@ -790,7 +787,7 @@ def validate_integration(model_path=None, config_path=None):
     # Test 3: Metabolite matching
     print("\n3. Metabolite matching pipeline...")
     try:
-        from functions.pathway_builder import find_metabolite_robust
+        from thg_protocol.pathway import find_metabolite_robust
 
         # Load model as JSON for pathway_builder function
         with open(model_path, "r") as f:

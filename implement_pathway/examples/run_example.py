@@ -10,14 +10,14 @@ Run from the implement_pathway directory:
     python3 examples/run_example.py
 """
 
-import sys
 from pathlib import Path
 
-# Add parent directory to path for functions module
-sys.path.insert(0, str(Path(__file__).parent.parent.parent))
-
-from functions import pathway_builder, analyze_annotations, build_id_database
-from functions.config import load_config
+from thg_protocol.annotation.model_annotations import extract_metabolite_annotations
+from thg_protocol.pathway import (
+    add_compartment,
+    create_compartment_metabolites,
+    create_compartment_reactions,
+)
 import json
 import os
 from datetime import datetime
@@ -86,8 +86,8 @@ def main():
         targets = config['metabolites']['targets']
         print(f"  Analyzing {len(targets)} target metabolites...")
         
-        metabolite_annotations, not_found = analyze_annotations.extract_metabolite_annotations(
-            str(model_path), targets, verbose=False
+        metabolite_annotations, not_found = extract_metabolite_annotations(
+            model_path, targets
         )
         
         print(f"  ✓ Found annotations for {len(metabolite_annotations)} metabolites")
@@ -95,7 +95,10 @@ def main():
             print(f"  ⚠ {len(not_found)} metabolites not found: {', '.join(not_found)}")
         
         # Build database
-        id_database = build_id_database.build_database_from_annotations(metabolite_annotations)
+        # The package API already returns the normalized identifier mapping
+        # consumed by the pathway builder; no checkout-only database helper is
+        # needed for this small example.
+        id_database = metabolite_annotations
         
         # Save database
         with open(database_path, 'w') as f:
@@ -133,7 +136,7 @@ def main():
     comp_abbrev = compartments[0]['abbreviation']
     comp_name = compartments[0]['name']
     
-    model, abbrev_used, already_exists = pathway_builder.add_compartment(
+    model, abbrev_used, already_exists = add_compartment(
         model, comp_abbrev, comp_name
     )
     
@@ -149,7 +152,7 @@ def main():
     print("STEP 5: Creating metabolites")
     print("-" * 70)
     
-    met_count = pathway_builder.create_compartment_metabolites(
+    met_count = create_compartment_metabolites(
         model, id_database, abbrev_used, config, 'cytoskeleton_specific'
     )
     
@@ -162,7 +165,7 @@ def main():
     print("STEP 6: Creating reactions")
     print("-" * 70)
     
-    rxn_count = pathway_builder.create_compartment_reactions(
+    rxn_count = create_compartment_reactions(
         model, id_database, abbrev_used, config
     )
     

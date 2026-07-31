@@ -4,7 +4,6 @@ import pandas as pd
 import cobra
 from concurrent.futures import ProcessPoolExecutor
 from cobra.util import create_stoichiometric_matrix
-import pdb
 from cobra.flux_analysis import flux_variability_analysis
 import multiprocessing
 import sys
@@ -15,9 +14,6 @@ from tqdm import tqdm
 # Determine the current file's directory and the project root.
 current_dir = os.path.dirname(os.path.abspath(__file__))
 project_root = os.path.join(current_dir, "..")
-# Add the project root to sys.path to access top-level folders like 'functions' and 'models'
-if project_root not in sys.path:
-    sys.path.append(project_root)
 
 
 # === Global per-process worker state (initialized once per worker) ===

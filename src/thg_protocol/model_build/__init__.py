@@ -206,6 +206,9 @@ def build_model(
 
 from .mass_balance import (  # noqa: E402
     atom10,
+    balance_equation,
+    balance_reaction,
+    count_atoms,
     eq2mat,
     equation_matrix,
     formula_atoms,
@@ -234,6 +237,9 @@ __all__ = [
     "build_model",
     "build_model_batch",
     "atom10",
+    "balance_equation",
+    "balance_reaction",
+    "count_atoms",
     "eq2mat",
     "equation_matrix",
     "formula_atoms",

@@ -19,8 +19,6 @@ from typing import TYPE_CHECKING, Dict, List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
-import requests
-
 if TYPE_CHECKING:
     import cobra
 
@@ -187,143 +185,66 @@ def identify_metabolite(
         Tab-separated str. If None, the metabolite was not identified.
 
     """
-    # The injectable path is deterministic and is used by offline tests and
-    # callers that provide a configured service adapter.
-    if client is not None:
-        compound = client.get_compound(name)
-        if compound is None or formula_similarity(formula, compound.molecular_formula) < threshold:
-            return None
-        synonyms = compound.synonyms or (name,)
-        metabolite = max(synonyms, key=lambda synonym: difflib.SequenceMatcher(None, name.lower(), synonym.lower()).ratio())
-        kegg = next((synonym for synonym in synonyms if re.fullmatch(r"[CG][0-9]{5}", synonym)), "")
-        lipidmaps = next((synonym for synonym in synonyms if re.fullmatch(r"L[A-Z]{3}[0-9]+", synonym)), "")
-        chebi = next((synonym for synonym in synonyms if re.fullmatch(r"CHEBI:[0-9]+", synonym)), "")
-        return "\t".join([metabolite, "", compound.molecular_formula, lipidmaps, kegg, chebi, str(compound.cid), "", compound.inchikey, compound.inchi, "", iden]) + "\n"
+    # The package client owns HTTP, retries, pacing, caching, and response
+    # normalization.  In particular, this workflow never imports PubChemPy or
+    # changes process-wide proxy environment variables.
+    del use_proxy
+    if client is None:
+        from thg_protocol.services.pubchem import PubChemClient
 
-    # Keep the legacy PubChemPy adapter available for callers that have not yet
-    # migrated, but import it only when a real lookup is requested.
+        client = PubChemClient(retries=max(0, max_retries))
     try:
-        import pubchempy as pcp
-    except ImportError as error:
-        raise RuntimeError("PubChem lookup requires pubchempy or an injected client") from error
+        compound = client.get_compound(name)
+    except Exception as error:  # network failures are an unresolved match
+        LOGGER.warning("PubChem lookup failed for %s: %s", name, error)
+        return None
+    if compound is None or formula_similarity(formula, compound.molecular_formula) < threshold:
+        return None
 
-    # Add rate limiting to avoid PubChem API throttling
-    time.sleep(0.2)  # 200ms delay between requests
-    
-    CompoundID = None
-    met_result = None
-
-    # Configure requests session with proxy if available
-    if use_proxy and PROXY_CONFIG:
-        import urllib.request
-
-        if "http" in PROXY_CONFIG:
-            os.environ["HTTP_PROXY"] = PROXY_CONFIG["http"]
-        if "https" in PROXY_CONFIG:
-            os.environ["HTTPS_PROXY"] = PROXY_CONFIG["https"]
-
-    # Retry logic with exponential backoff for PubChem API calls
-    retry_count = 0
-    while retry_count < max_retries:
-        try:
-            CompoundID = pcp.get_cids(name.strip(), "name")
-            break
-        except Exception as e:
-            if "503" in str(e) or "ServerBusy" in str(e):
-                retry_count += 1
-                if retry_count < max_retries:
-                    wait_time = 2 ** retry_count  # Exponential backoff: 2, 4, 8 seconds
-                    LOGGER.warning(f"PubChem busy, waiting {wait_time}s before retry {retry_count}/{max_retries}")
-                    time.sleep(wait_time)
-                else:
-                    LOGGER.warning(f"Failed after {max_retries} retries for {name}")
-                    return None
-            else:
-                LOGGER.warning(f"Error getting CID for {name}: {e}")
-                return None
-
-    # Retry with alternative name format if first attempt failed
-    if not CompoundID:
-        LOGGER.warning("get_cids did not work")
-        time.sleep(0.2)
-        try:
-            CompoundID = pcp.get_cids(re.sub(r"[\(\)]", "", name), "name")
-        except Exception as e:
-            LOGGER.warning(f"get_cids extra error: {e}")
-            return None
-    
-    # Fetch compound details if we have a CID
-    if CompoundID:
-        try:
-            time.sleep(0.2)
-            Compound = pcp.Compound.from_cid(CompoundID)
-        except Exception as e:
-            LOGGER.warning(f"Error getting compound from CID: {e}")
-            return None
-            
-        molecular_formula = Compound.molecular_formula
-
-        if formula_similarity(formula, molecular_formula) >= threshold:
-            try:
-                time.sleep(0.2)
-                Compound = pcp.Compound.from_cid(CompoundID)
-            except Exception as e:
-                LOGGER.warning(f"Error getting detailed compound info: {e}")
-                return None
-            CompoundID = Compound.cid
-            synonyms = Compound.synonyms
-            Metabolite = sorted(
-                [
-                    [
-                        difflib.SequenceMatcher(
-                            None, name.lower(), synonym.lower()
-                        ).ratio(),
-                        synonym,
-                    ]
-                    for synonym in synonyms
-                ]
-            )[-1][1]
-            Kegg = "".join(list(filter(re.compile("[CG][0-9]{5}$").match, synonyms)))
-            LIPIDMAPSID = "".join(
-                list(filter(re.compile("L[A-Z]{3}[0-9]+$").match, synonyms))
-            )
-            CHEBI = "".join(list(filter(re.compile("CHEBI:[0-9]+$").match, synonyms)))
-            inchi = Compound.inchi
-            inchikey = Compound.inchikey
-            met_result = (
-                Metabolite
-                + "\t"
-                + ""
-                + "\t"
-                + molecular_formula
-                + "\t"
-                + LIPIDMAPSID
-                + "\t"
-                + Kegg
-                + "\t"
-                + CHEBI
-                + "\t"
-                + str(CompoundID)
-                + "\t"
-                + ""
-                + "\t"
-                + inchikey
-                + "\t"
-                + inchi
-                + "\t"
-                + ""
-                + "\t"
-                + iden
-                + "\n"
-            )
-    else:
-        LOGGER.warning("get_cids extra did not work")
-    return met_result
+    synonyms = compound.synonyms or (name,)
+    metabolite = max(
+        synonyms,
+        key=lambda synonym: difflib.SequenceMatcher(
+            None, name.lower(), synonym.lower()
+        ).ratio(),
+    )
+    kegg = next(
+        (synonym for synonym in synonyms if re.fullmatch(r"[CG][0-9]{5}", synonym)),
+        "",
+    )
+    lipidmaps = next(
+        (
+            synonym
+            for synonym in synonyms
+            if re.fullmatch(r"L[A-Z]{3}[0-9]+", synonym)
+        ),
+        "",
+    )
+    chebi = next(
+        (synonym for synonym in synonyms if re.fullmatch(r"CHEBI:[0-9]+", synonym)),
+        "",
+    )
+    return "\t".join(
+        [
+            metabolite,
+            "",
+            compound.molecular_formula,
+            lipidmaps,
+            kegg,
+            chebi,
+            str(compound.cid),
+            "",
+            compound.inchikey,
+            compound.inchi,
+            "",
+            iden,
+        ]
+    ) + "\n"
 
 
 def generate_met_annotation(
     met_list: List[Tuple[str, str, str, str]],
-    out: str = global_met_annotation_file(),
+    out: str | Path | None = None,
     delay_between_requests: float = 1.0,
     checkpoint_interval: int = 10,
     resume: bool = True,
@@ -354,7 +275,7 @@ def generate_met_annotation(
     anotated: list[tuple[str, str, str, str]]
         list of anotated metabolites
     """
-    out = os.fspath(out)
+    out = os.fspath(out or global_met_annotation_file())
     unnanotated, annotated = [], []
     api_failures = []  # Track API/temporary failures separately
     total = len(met_list)
@@ -435,7 +356,7 @@ def remove_null_value(d):
     }
 
 
-def process_annotation(annotation_file: str = global_met_annotation_file()) -> Dict:
+def process_annotation(annotation_file: str | Path | None = None) -> Dict:
     """Generate metabolite annotation file.
 
     Parameters
@@ -443,6 +364,7 @@ def process_annotation(annotation_file: str = global_met_annotation_file()) -> D
     annotation_file: str
         Tab-separated file, generated with `generate_met_annotation`
     """
+    annotation_file = os.fspath(annotation_file or global_met_annotation_file())
     print(f"Processing annotation file: {annotation_file}")
     variableFile = pd.read_csv(annotation_file, sep="\t", header=None)
     variableFile[5] = variableFile[5].str.extract("(CHEBI:[0-9]+)", expand=True)

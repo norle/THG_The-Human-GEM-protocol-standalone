@@ -6,12 +6,24 @@ import ast
 import math
 import re
 from collections import defaultdict
+from fractions import Fraction
 from typing import Any
 
-import numpy as np
+try:  # Keep package and CLI help imports safe in a no-dependencies wheel check.
+    import numpy as np
+except ImportError:  # pragma: no cover - exercised by clean-wheel smoke tests
+    np = None  # type: ignore[assignment]
 
 from thg_protocol.glycan import resolve_glycan_atoms
 from thg_protocol.services.kegg import KeggClientProtocol
+
+
+def _numpy():
+    if np is None:
+        raise RuntimeError(
+            "numeric mass-balance helpers require the 'numpy' dependency"
+        )
+    return np
 
 
 def gcd(left: int, right: int) -> int:
@@ -72,8 +84,9 @@ def inarray(first: Any, second: Any) -> int | str:
     Zero entries in ``first`` must also be zero in ``second``; an empty or
     non-integral result returns the historical empty-string sentinel.
     """
-    left = np.asarray(first, dtype=float)
-    right = np.asarray(second, dtype=float)
+    numpy = _numpy()
+    left = numpy.asarray(first, dtype=float)
+    right = numpy.asarray(second, dtype=float)
     if left.shape != right.shape:
         return ""
     mask = ~np.isclose(left, 0)
@@ -110,7 +123,8 @@ def equation_matrix(equation: str) -> np.ndarray:
     if any(not atoms for atoms in parsed):
         raise ValueError("equation contains an invalid formula")
     elements = sorted({element for atoms in parsed for element in atoms})
-    return np.array(
+    numpy = _numpy()
+    return numpy.array(
         [
             [coefficient * atoms.get(element, 0)
              for (coefficient, _), atoms in zip(terms, parsed, strict=True)]
@@ -120,28 +134,108 @@ def equation_matrix(equation: str) -> np.ndarray:
     )
 
 
+def balance_equation(equation: str) -> tuple[list[float], list[float]]:
+    """Return the smallest positive elemental-balance coefficients.
+
+    The equation syntax is the same as :func:`equation_matrix`; coefficients
+    already present in the input are treated as part of the formula token and
+    are therefore best supplied as ``2 H2`` rather than ``H2`` with a
+    separately fixed coefficient.  A positive null-space vector is required:
+    equations that cannot be balanced without adding compounds return two
+    empty lists instead of silently changing their chemistry.
+    """
+    matrix = equation_matrix(equation)
+    if matrix.shape[1] == 0:
+        return [], []
+    numpy = _numpy()
+    _, _, vh = numpy.linalg.svd(matrix)
+    vector = vh[-1]
+    if numpy.all(vector < 0):
+        vector = -vector
+    if numpy.any(vector <= 1e-10) or not numpy.allclose(
+        matrix @ vector, 0, atol=1e-8
+    ):
+        return [], []
+
+    fractions = [Fraction(float(value)).limit_denominator(10000) for value in vector]
+    denominator = math.lcm(*(fraction.denominator for fraction in fractions))
+    integers = [
+        fraction.numerator * denominator // fraction.denominator
+        for fraction in fractions
+    ]
+    divisor = math.gcd(*[abs(value) for value in integers if value])
+    if not divisor:
+        return [], []
+    values = [float(value // divisor) for value in integers]
+    left_count = len(equation.split("->", 1)[0].split("+"))
+    return values[:left_count], values[left_count:]
+
+
+def count_atoms(
+    equation: str, add_h: int = 0, water: int = 0, reaction_id: Any = None
+) -> tuple[list[float], list[float], str]:
+    """Compatibility implementation of the historical ``CountAtom`` helper."""
+    del add_h, water, reaction_id
+    left, right = balance_equation(equation)
+    return left, right, equation
+
+
+def balance_reaction(equation: str, reaction_id: Any = None) -> tuple[Any, ...]:
+    """Return the historical eleven-field reaction-balance result.
+
+    This dependency-free implementation reports an unbalanced equation when
+    no positive elemental solution exists.  It does not invent proton or
+    water terms; callers that need that chemistry must add them explicitly.
+    """
+    del reaction_id
+    left, right = balance_equation(equation)
+    terms = equation.split("->", 1)
+    left_ids = [term.strip().split()[-1] for term in terms[0].split("+")]
+    right_ids = [term.strip().split()[-1] for term in terms[1].split("+")]
+    balanced = bool(left and right)
+    if not balanced:
+        left = [1.0] * len(left_ids)
+        right = [1.0] * len(right_ids)
+    return (
+        left,
+        right,
+        0,
+        0,
+        [],
+        [],
+        left_ids,
+        right_ids,
+        equation,
+        equation,
+        1 if balanced else 2,
+    )
+
+
 # Historical name retained as a small, pure compatibility alias.
 eq2mat = equation_matrix
 
 
 def nullity(matrix: Any) -> tuple[np.ndarray, np.ndarray]:
     """Return a row-independent matrix and its nullity-completion matrix."""
-    values = np.asarray(matrix, dtype=float)
+    numpy = _numpy()
+    values = numpy.asarray(matrix, dtype=float)
     if values.ndim != 2:
         raise ValueError("matrix must be two-dimensional")
-    rank = np.linalg.matrix_rank(values)
+    rank = numpy.linalg.matrix_rank(values)
     independent: list[np.ndarray] = []
     current_rank = 0
     for row in values:
-        candidate = np.vstack(independent + [row]) if independent else row[None, :]
-        new_rank = np.linalg.matrix_rank(candidate)
+        candidate = (
+            numpy.vstack(independent + [row]) if independent else row[None, :]
+        )
+        new_rank = numpy.linalg.matrix_rank(candidate)
         if new_rank > current_rank:
             independent.append(row)
             current_rank = new_rank
-    independent_matrix = np.asarray(independent, dtype=float)
+    independent_matrix = numpy.asarray(independent, dtype=float)
     if independent_matrix.size == 0:
-        independent_matrix = np.empty((0, values.shape[1]))
-    completion = np.zeros((max(values.shape[1] - rank, 0), values.shape[1]))
+        independent_matrix = numpy.empty((0, values.shape[1]))
+    completion = numpy.zeros((max(values.shape[1] - rank, 0), values.shape[1]))
     for index in range(completion.shape[0]):
         completion[index, -(index + 1)] = 1
     return (
@@ -152,10 +246,11 @@ def nullity(matrix: Any) -> tuple[np.ndarray, np.ndarray]:
 
 def inv(matrix: Any) -> np.ndarray:
     """Return the inverse of a square numeric matrix."""
-    values = np.asarray(matrix, dtype=float)
+    numpy = _numpy()
+    values = numpy.asarray(matrix, dtype=float)
     if values.ndim != 2 or values.shape[0] != values.shape[1]:
         raise ValueError("matrix must be square")
-    return np.linalg.inv(values)
+    return numpy.linalg.inv(values)
 
 
 def maximum_gcd(values: Any, variable: str, value: Any) -> int:
@@ -254,6 +349,9 @@ __all__ = [
     "reformulate_glycan_equation",
     "inarray",
     "equation_matrix",
+    "balance_equation",
+    "count_atoms",
+    "balance_reaction",
     "eq2mat",
     "nullity",
     "inv",

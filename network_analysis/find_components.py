@@ -23,19 +23,37 @@ def find_network_components(
 ) -> dict[str, Any]:
     """Analyze connectivity through the maintained package API.
 
-    ``cleanup`` and ``visualize`` are retained for call compatibility. They
-    raise a clear error instead of silently running the old solver-backed and
-    HTML side effects; callers should use explicit package workflows for those
-    operations.
+    ``cleanup`` removes isolated metabolites from the returned copy.  When
+    ``visualize`` is requested, the maintained JSON component report is
+    written to ``viz_output_path``.  These compatibility options are now
+    explicit and deterministic; solver-backed cleanup and HTML rendering are
+    not performed implicitly.
     """
-    if cleanup or visualize:
-        raise NotImplementedError(
-            "cleanup/visualize are legacy options; use "
-            "thg_protocol.analysis.network for analysis and reporting"
-        )
     from thg_protocol.analysis.network import find_network_components as analyze
+    from thg_protocol.analysis.network import write_component_report
 
     result = analyze(model)
+    if cleanup:
+        isolated = [
+            metabolite
+            for metabolite in result["model"].metabolites
+            if not metabolite.reactions
+        ]
+        result["model"].remove_metabolites(isolated, destructive=False)
+        result = analyze(result["model"])
+    if visualize:
+        if viz_output_path is None:
+            raise ValueError("viz_output_path is required when visualize=True")
+        write_component_report(result, viz_output_path)
+    if cleanup and cleanup_save_path is not None:
+        from cobra.io import save_json_model, write_sbml_model
+
+        destination = Path(cleanup_save_path)
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        if destination.suffix.lower() == ".json":
+            save_json_model(result["model"], str(destination))
+        else:
+            write_sbml_model(result["model"], str(destination))
     if verbose:
         print(
             f"Number of weakly connected components: "
