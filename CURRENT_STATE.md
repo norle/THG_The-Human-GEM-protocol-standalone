@@ -18,7 +18,7 @@ historical-test ownership rather than an architectural rewrite.
 ## Repository Snapshot
 
 - Branch: `refactoring-cleanup`
-- Reviewed commit: `1141e78` (`refactor: complete legacy compatibility boundaries`)
+- Reviewed commit: `d21cf04` (`refactor: finalize compatibility and dependency gates`)
 - Working tree at review: clean
 - Package layout: `src/thg_protocol`
 - Installed commands: `thg-gapfill`, `thg-pathway`, and `thg-compare`
@@ -80,6 +80,11 @@ Later dependency-free checks on the current refactoring line recorded:
 - `python -m build`: source distribution and wheel built successfully.
 - A no-dependency wheel installed outside the checkout imported all package
   areas and passed all three installed CLI `--help` smoke tests.
+- Python 3.10 dependency installation completed in `/tmp/thg-py310-venv` using
+  the project constraints; `thg_protocol` and `cobra` import successfully.
+- Git LFS verification passed: all seven approved LFS files are present,
+  `git lfs fsck` is clean, and a fresh local clone checked out all seven files
+  with content matching the source tree.
 
 ## Phase Status
 
@@ -92,7 +97,7 @@ Later dependency-free checks on the current refactoring line recorded:
 | 4. Integration and CLI tests | Complete | None. Central adapter contracts and historical-suite ownership are documented. |
 | 5. External service hardening | Complete | Keep the client-boundary rule for any newly migrated workflow. |
 | 6. Artifacts and Git LFS | Complete | Verify the seven LFS objects when publishing or cloning from a new remote. |
-| 7. Documentation and CI expansion | In progress | Run the final clean-clone release gate against the approved matrix. |
+| 7. Documentation and CI expansion | In progress | Run the final supported-matrix test gate: Python 3.10 locally, Python 3.11 in CI, plus the clean-clone/LFS check. |
 
 ## Important Remaining Gaps
 
@@ -141,12 +146,22 @@ Promoted APIs must consistently document:
 
 ### 5. Release decisions
 
+- Python 3.10 is installed and import-checked, but the full default offline
+  suite and Ruff check still need to be run in that environment.
+- Python 3.11 is not installed locally; its matching CI job is the evidence
+  source for that interpreter.
 - Run the clean-clone release gate against the approved Python 3.10–3.12
-  constraints and verify the seven LFS objects from a fresh clone.
+  constraints and verify the seven LFS objects from a fresh clone. The LFS
+  portion has already passed.
 
 ## Next Reviewable Pull Requests
 
-1. Run the clean-clone release gate, including seven Git LFS object checks.
+1. Run Ruff and the default offline suite with
+   `/tmp/thg-py310-venv/bin/python` (the environment is already installed).
+2. Confirm the Python 3.11 CI job and rerun/record the final clean-clone
+   release gate if needed.
+3. Update this snapshot with the final matrix results, then mark Phase 7
+   complete only when every release criterion is evidenced.
 
 The credential-gated BioCyc fixture should be run when credentials are
 available, but it does not replace the work above and should not block offline
