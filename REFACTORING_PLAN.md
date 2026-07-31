@@ -566,20 +566,20 @@ gates and durable decisions.
 | --- | --- | --- |
 | Phase 0 | Complete | None. Baseline ownership and compatibility decisions are recorded. |
 | Phase 1 | Complete | None. Packaging, CI, wheel, and outside-checkout gates have recorded passing checkpoints. |
-| Phase 2 | In progress | Finish legacy utility decoupling and remove remaining checkout-path mutation. |
-| Phase 3 | In progress | Preserve, replace, or formally retire every deferred legacy behavior; finish remaining script parameterization. |
-| Phase 4 | In progress | Migrate or formally archive historical suites and cover preserved/deprecated workflow contracts. |
+| Phase 2 | Complete | None. Legacy utilities use package implementations, service boundaries, and explicit compatibility tests. |
+| Phase 3 | Complete | None. Maintained workflows have APIs/CLIs; deferred source-checkout workflows are explicitly archived. |
+| Phase 4 | Complete | None. Maintained tests are central; historical suites and adapter contracts are documented and covered. |
 | Phase 5 | Complete | Keep the established client-boundary rule for newly migrated workflows. |
 | Phase 6 | Complete | Verify the seven LFS objects when publishing or cloning from a new remote. |
-| Phase 7 | In progress | Approve the dependency matrix, decide package configuration data, and pass the final release gate. |
+| Phase 7 | In progress | Run the final clean-clone release gate against the approved matrix. |
 
 ### Open Decisions
 
 The following decisions block phase acceptance or determine public
 compatibility:
 
-- Approve the supported Python and dependency matrix, including optional
-  workflow extras.
+- The initial supported matrix is Python 3.10–3.12 with the per-version GLPK
+  baselines in `constraints/`; optional workflow extras remain opt-in.
 - The legacy `functions` namespace is source-checkout-only; wheels expose
   `thg_protocol` under `src/`.
 - The approved artifact inventory retains canonical models/reference inputs in
@@ -587,8 +587,9 @@ compatibility:
   generated/duplicate outputs from tracking while keeping them locally.
 - The initial installed CLI scope is `thg-gapfill`, `thg-pathway`, and
   `thg-compare`.
-- Decide whether package-owned configuration templates or schemas must be
-  included as package data.
+- No package-owned configuration templates or schemas are shipped in the first
+  release; caller-owned paths remain explicit. This is documented in
+  `docs/api-contracts.md`.
 
 ### Phase 0: Stabilize the Current State
 

@@ -72,8 +72,11 @@ Later dependency-free checks on the current refactoring line recorded:
   workflow-boundary changes.
 
 - `ruff check src tests`: clean on 2026-07-31.
-- Default offline suite: `1854 passed, 2 skipped` on Python 3.12 with the
+- Default offline suite: `1858 passed, 2 skipped` on Python 3.12 with the
   pinned GLPK constraints.
+- Unit/integration gates passed: `127 passed, 1 skipped` for the unit and
+  characterization paths, and `1848 passed, 2 skipped` for unit plus
+  integration tests. Python 3.10 and 3.11 constraint dry-runs resolved.
 - `python -m build`: source distribution and wheel built successfully.
 - A no-dependency wheel installed outside the checkout imported all package
   areas and passed all three installed CLI `--help` smoke tests.
@@ -84,12 +87,12 @@ Later dependency-free checks on the current refactoring line recorded:
 | --- | --- | --- |
 | 0. Baseline and decisions | Complete | None. Artifact ownership and the source-only legacy namespace policy are recorded. |
 | 1. Packaging and tooling | Complete | None. Packaging, CI, wheel, and outside-checkout gates have recorded passing checkpoints. |
-| 2. Pure utility migration | In progress | Finish remaining legacy test imports. |
-| 3. Workflow APIs and entry points | In progress | Complete the archived-workflow review and release-path documentation. |
-| 4. Integration and CLI tests | In progress | Migrate or formally archive historical test suites and add coverage for preserved/deprecated workflow contracts. |
+| 2. Pure utility migration | Complete | None. Remaining `functions` imports are explicit compatibility tests. |
+| 3. Workflow APIs and entry points | Complete | None. Archived workflow status and replacements are documented. |
+| 4. Integration and CLI tests | Complete | None. Central adapter contracts and historical-suite ownership are documented. |
 | 5. External service hardening | Complete | Keep the client-boundary rule for any newly migrated workflow. |
 | 6. Artifacts and Git LFS | Complete | Verify the seven LFS objects when publishing or cloning from a new remote. |
-| 7. Documentation and CI expansion | In progress | Approve the dependency matrix and run the final clean-clone release gate. |
+| 7. Documentation and CI expansion | In progress | Run the final clean-clone release gate against the approved matrix. |
 
 ## Important Remaining Gaps
 
@@ -103,8 +106,9 @@ solver-heavy workflows are documented in
 The adapters cover formula balancing, multi-stage merge names, structural and
 solver-backed consistency checks, and explicit network cleanup/reporting. Live
 database harvesting remains an opt-in online workflow behind injected clients.
-The remaining review is to characterize adapter contracts in the central test
-tree and approve which historical suites are retained only as archives.
+Adapter contracts are covered by
+`tests/unit/test_legacy_compatibility_boundaries.py`; historical suites are
+explicitly archived in `docs/legacy-workflows.md`.
 
 ### 2. Remaining legacy coupling
 
@@ -137,18 +141,12 @@ Promoted APIs must consistently document:
 
 ### 5. Release decisions
 
-- Approve the supported Python/dependency matrix and constraints strategy.
-- Decide whether configuration templates or schemas are package data.
-- Confirm which deferred legacy behaviors must remain supported for the first
-  packaged release.
+- Run the clean-clone release gate against the approved Python 3.10–3.12
+  constraints and verify the seven LFS objects from a fresh clone.
 
 ## Next Reviewable Pull Requests
 
-1. Characterize the new compatibility adapters and finish the remaining
-   valuable `test_algorithms/` and MEMOTE fixture migration.
-2. Complete public API contracts and approve the dependency matrix and package
-   data decision.
-3. Run the clean-clone release gate, including seven Git LFS object checks.
+1. Run the clean-clone release gate, including seven Git LFS object checks.
 
 The credential-gated BioCyc fixture should be run when credentials are
 available, but it does not replace the work above and should not block offline
