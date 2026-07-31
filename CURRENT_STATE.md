@@ -18,7 +18,7 @@ remaining gate is a current-head CI rerun for the supported matrix.
 ## Repository Snapshot
 
 - Branch: `refactoring-cleanup`
-- Reviewed commit: `1078124` (`docs: record release gate evidence`)
+- Reviewed commit: `bf3824c` (`docs: align release snapshot checkpoint`)
 - Working tree at review: clean
 - Package layout: `src/thg_protocol`
 - Installed commands: `thg-gapfill`, `thg-pathway`, and `thg-compare`
