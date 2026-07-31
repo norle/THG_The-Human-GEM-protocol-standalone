@@ -100,22 +100,11 @@ compatibility adapters. Their exact scope and the explicitly archived
 solver-heavy workflows are documented in
 [`docs/legacy-workflows.md`](docs/legacy-workflows.md).
 
-- Solver-backed mass balancing.
-- Historical multi-stage merge variants.
-- Network cleanup and visualization options.
-- Credentialed live database harvesting.
-- MEMOTE/solver-backed consistency helpers.
-
-For each surface, choose one of these outcomes:
-
-1. Keep the old implementation available through a lazy compatibility adapter
-   until the package replacement is tested.
-2. Implement and characterize the package replacement.
-3. Approve a breaking removal, document the migration path, emit a deprecation
-   period where practical, and remove the misleading compatibility claim.
-
-The remaining review is to characterize those adapter contracts in the central
-test tree and approve which historical suites are retained only as archives.
+The adapters cover formula balancing, multi-stage merge names, structural and
+solver-backed consistency checks, and explicit network cleanup/reporting. Live
+database harvesting remains an opt-in online workflow behind injected clients.
+The remaining review is to characterize adapter contracts in the central test
+tree and approve which historical suites are retained only as archives.
 
 ### 2. Remaining legacy coupling
 
