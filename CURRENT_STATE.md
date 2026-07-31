@@ -18,7 +18,7 @@ remaining gate is a current-head CI rerun for the supported matrix.
 ## Repository Snapshot
 
 - Branch: `refactoring-cleanup`
-- Reviewed commit: `63cbbf6` (`refactor: require explicit annotation paths`)
+- Reviewed commit: `c8c5d4a` (`ci: run all supported Python jobs`)
 - Working tree at review: clean
 - Package layout: `src/thg_protocol`
 - Installed commands: `thg-gapfill`, `thg-pathway`, and `thg-compare`
@@ -32,7 +32,8 @@ remaining gate is a current-head CI rerun for the supported matrix.
 - Setuptools packaging, dependency extras, central pytest markers, Ruff/Black
   configuration, MkDocs documentation, and a `src/` layout.
 - Python 3.10–3.12 CI with lint, default offline tests, source/wheel builds,
-  outside-checkout imports, and installed CLI help checks.
+  outside-checkout imports, and installed CLI help checks. The package matrix
+  uses `fail-fast: false` so every supported interpreter reports its result.
 - Package APIs and compatibility boundaries for annotation, GPR parsing and
   lookup, pathway implementation, gapfill, comparison, model reconstruction,
   model building, merge primitives, network analysis, figures, cell-specific
