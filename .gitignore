@@ -25,6 +25,8 @@ run_subset.log
 
 models/
 files/
+!files/pathway/
+!files/pathway/**
 files/caches/
 files/*cache*
 files/*checkpoint*

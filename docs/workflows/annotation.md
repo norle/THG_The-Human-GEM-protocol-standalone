@@ -18,18 +18,12 @@ annotations, missing = extract_metabolite_annotations(
 )
 ```
 
-The legacy `functions/analyze_annotations.py` entry point now requires the
-model and target names explicitly and can write an optional JSON report.
+The package annotation APIs require explicit model and target inputs and can
+write an optional JSON report.
 
 Use explicit model, database, report, and SBML output paths. PubChem lookups
 are owned by the injectable package client; tests should use a static client
 and must not require network access.
-
-The retry compatibility script remains available for existing checkouts:
-
-```bash
-python metabolite_reac_identification/metabolite_reac_identification_with_retry.py --help
-```
 
 EC-number GPR lookup is available through an injectable BioCyc/KEGG boundary:
 

@@ -202,6 +202,98 @@ tools/list_pathway_reactions.py
 utils/json_to_sbml.py
 ```
 
+## Final removal manifest
+
+The historical rows above describe the pre-removal compatibility decisions.
+This manifest is authoritative after the closeout: every listed source file
+was removed from its checkout directory, and maintained behavior is owned by
+`src/thg_protocol` or `tests/`.
+
+```text
+build_model/build_model.py | Removed | Batch 2
+build_model/build_model_batch.py | Removed | Batch 2
+build_model/print_biocyc_compartments.py | Removed | Batch 1
+build_model/test_biovelo_query.py | Removed | Batch 3
+cell_type_specific_model/gimme_parallel.py | Removed | Batch 3
+cell_type_specific_model/match_exch_rxns.py | Removed | Batch 1
+cell_type_specific_model/model_reduce.py | Removed | Batch 2
+cell_type_specific_model/ptr_multi_round.py | Removed | Batch 3
+cell_type_specific_model/ptr_one_round.py | Removed | Batch 3
+cell_type_specific_model/transcriptomics.py | Removed | Batch 3
+compare_models/compare_compartements.py | Removed | Batch 2
+compare_models/compare_models.py | Removed | Batch 2
+functions/__init__.py | Removed | Batch 1
+functions/add_reaction.py | Removed | Batch 3
+functions/analyze_annotations.py | Removed | Batch 1
+functions/build_id_database.py | Removed | Batch 2
+functions/class_generate_database.py | Removed | Batch 3
+functions/config.py | Removed | Batch 1
+functions/ensembl_client.py | Removed | Batch 2
+functions/equations_bm_gdb.py | Removed | Batch 2
+functions/function_annotate_cobra_model.py | Removed | Batch 2
+functions/function_bm_gdb.py | Removed | Batch 3
+functions/function_metabolite_identification.py | Removed | Batch 2
+functions/function_reac_identification.py | Removed | Batch 1
+functions/functions_compare_models.py | Removed | Batch 3
+functions/functions_create_figure.py | Removed | Batch 3
+functions/functions_mass_balance.py | Removed | Batch 2
+functions/functions_merge_metabolic_networks.py | Removed | Batch 2
+functions/functions_network_consistency.py | Removed | Batch 2
+functions/gpr/__init__.py | Removed | Batch 1
+functions/gpr/ast_gpr.py | Removed | Batch 1
+functions/gpr/auth_gpr.py | Removed | Batch 2
+functions/gpr/get_location_def.py | Removed | Batch 2
+functions/gpr/gpr_def.py | Removed | Batch 2
+functions/pathway_builder.py | Removed | Batch 1
+functions/pattern_generate_database.py | Removed | Batch 3
+gapfill/gapfill.py | Removed | Batch 2
+gapfill/phase1_connect_components.py | Removed | Batch 3
+gapfill/phase2_minimal_connector.py | Removed | Batch 3
+gapfill/phase2_prioritized_connector.py | Removed | Batch 3
+gapfill/phase3_blocked_optimizer.py | Removed | Batch 3
+gapfill/phase3_component_milp.py | Removed | Batch 3
+gapfill/phase3_greedy_optimizer.py | Removed | Batch 3
+gapfill/phase3_milp_optimizer.py | Removed | Batch 3
+gapfill/phase3_sink_milp_original.py | Removed | Batch 3
+gapfill/phase3_tiered_milp.py | Removed | Batch 3
+generate_data-base/generate_db.py | Removed | Batch 2
+generate_data-base/make_model_from_pkl.py | Removed | Batch 2
+generate_data-base/resume_db_gen.py | Removed | Batch 2
+generate_figures/create_figure.py | Removed | Batch 2
+implement_pathway/examples/run_example.py | Removed | Batch 3
+implement_pathway/pathway_implementation.py | Removed | Batch 2
+implement_pathway/validate.py | Removed | Batch 3
+implement_pathway/visualize.py | Removed | Batch 3
+memote_and_task_analysis/metabolic_tasks/__init__.py | Removed | Batch 3
+memote_and_task_analysis/metabolic_tasks/evaluation.py | Removed | Batch 3
+memote_and_task_analysis/metabolic_tasks/task.py | Removed | Batch 3
+memote_and_task_analysis/tests_extra/metabolic_tasks/__init__.py | Removed | Batch 4
+memote_and_task_analysis/tests_extra/metabolic_tasks/evaluation.py | Removed | Batch 4
+memote_and_task_analysis/tests_extra/metabolic_tasks/task.py | Removed | Batch 4
+memote_and_task_analysis/tests_extra/test_metabolic_tasks.py | Removed | Batch 4
+merge_metabolic_netowrks_and_network_consistency/merge_metabolic_networks.py | Removed | Batch 2
+metabolite_reac_identification/metabolite_reac_identification.py | Removed | Batch 2
+metabolite_reac_identification/metabolite_reac_identification_with_retry.py | Removed | Batch 2
+network_analysis/compaction.py | Removed | Batch 1
+network_analysis/find_components.py | Removed | Batch 2
+network_analysis/loop_removal.py | Removed | Batch 3
+test_algorithms/gpr_prediction/functions_ast_gpr.py | Removed | Batch 4
+test_algorithms/gpr_prediction/functions_auth_gpr.py | Removed | Batch 4
+test_algorithms/gpr_prediction/gpr_prediction.py | Removed | Batch 4
+test_algorithms/gpr_prediction/test_gpr_prediction.py | Removed | Batch 4
+test_algorithms/mass_balance/equations_mass_balance.py | Removed | Batch 4
+test_algorithms/mass_balance/mass_balance.py | Removed | Batch 4
+test_algorithms/metabolite_identification/functions_metabolite_identification.py | Removed | Batch 4
+test_algorithms/metabolite_identification/metabolite_identification.py | Removed | Batch 4
+test_algorithms/metabolite_identification/test_metabolite_identification.py | Removed | Batch 4
+test_algorithms/reac_identification/files/conftest.py | Removed | Batch 4
+test_algorithms/reac_identification/functions_reac_identification.py | Removed | Batch 4
+test_algorithms/reac_identification/reac_identification.py | Removed | Batch 4
+test_algorithms/reac_identification/test_reac_identification.py | Removed | Batch 4
+tools/list_pathway_reactions.py | Removed | Batch 1
+utils/json_to_sbml.py | Removed | Batch 1
+```
+
 ## Caller policy and removal checklist
 
 Intentional adapter imports are isolated in explicitly named compatibility

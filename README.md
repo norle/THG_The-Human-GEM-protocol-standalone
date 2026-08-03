@@ -26,6 +26,8 @@ in [`REFACTORING_PLAN.md`](REFACTORING_PLAN.md), and the executable closeout
 plan is [`REFACTORING_PLAN_NEXT.md`](REFACTORING_PLAN_NEXT.md). The concise
 implementation and validation snapshot is in
 [`CURRENT_STATE.md`](CURRENT_STATE.md).
+The subsequent Python-removal plan is
+[`REFACTORING_PLAN_LEGACY_REMOVAL.md`](REFACTORING_PLAN_LEGACY_REMOVAL.md).
 
 ## Installation
 

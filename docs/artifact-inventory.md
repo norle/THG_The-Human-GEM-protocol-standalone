@@ -71,6 +71,35 @@ are removed from Git tracking but retained in the working tree locally.
 The following explicit lists are authoritative for the LFS and tracking change.
 All files remain available in the current working tree after index removal.
 
+## Legacy-directory closure
+
+The checkout-only directories listed in `REFACTORING_PLAN_LEGACY_REMOVAL.md`
+were closed without retaining an artifact-owned directory. Preserved content
+was relocated to these canonical owners:
+
+| Former owner | Canonical destination | Disposition |
+| --- | --- | --- |
+| `compare_models/reports/` | `supplementary_material/model_comparisons/` | preserved comparison report and readme |
+| `generate_figures/figures/` | `supplementary_material/figures/generate_figures/` | preserved figures |
+| `implement_pathway/config/`, `data/`, `examples/` | `files/pathway/` | preserved inputs and configuration |
+| `implement_pathway/docs/`, `figures/`, `reports/` | `supplementary_material/pathway/` | preserved published and historical outputs |
+| `memote_and_task_analysis/tests_extra/data/` | `tests/fixtures/memote/` | preserved task inputs |
+| `metabolite_reac_identification/reports/` | `supplementary_material/metabolite_reaction/` | preserved annotation report snapshot |
+| `network_analysis/component_visualization_template.html` | `docs/assets/` | preserved documented template |
+| `test_algorithms/*/files/` | `tests/fixtures/legacy_characterization/` | preserved deterministic characterization inputs |
+
+Checkout-only READMEs, requirements files, generated caches, duplicate model
+fixtures, bytecode, and historical scripts were explicitly retired after the
+package APIs and maintained fixtures took ownership of their supported cases.
+The moved files retain their original bytes; the SHA-256 table above remains
+the checksum record for files that were previously inventoried.
+
+The closure section supersedes the earlier `pending` disposition text for
+former legacy paths: relocated files are owned by the destinations listed
+above, while generated reports, duplicate model fixtures, caches, and checkout
+documentation are retired. The executable closure checks in
+`tests/unit/test_legacy_import_policy.py` verify the destination set.
+
 ### Git LFS
 
 - `files/ensembl`

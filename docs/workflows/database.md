@@ -23,8 +23,8 @@ only the KEGG/BioCyc/Ensembl annotations represented by the supplied records,
 then delegates to the same deterministic reconstruction core.
 
 The API accepts normalized records and writes only to the caller-provided
-output path. KEGG, BioCyc, and Ensembl record collection remains in the
-deferred legacy orchestrator and must use injectable service clients.
+output path. KEGG, BioCyc, and Ensembl record collection remains behind
+injectable service clients.
 
 BioCyc compartment caches can be summarized without COBRA or file-system side
 effects by passing their loaded mappings to `summarize_biocyc_compartments`:
@@ -34,13 +34,6 @@ from thg_protocol.database import summarize_biocyc_compartments
 
 summary = summarize_biocyc_compartments(location_cache, name_cache)
 print(summary.unique_names)
-```
-
-The compatibility report script accepts the two pickle paths explicitly:
-
-```bash
-python build_model/print_biocyc_compartments.py \
-  inputs/biovelo_location_cache.pkl inputs/compartment_name_cache.pkl
 ```
 
 KEGG pathway pages can be parsed independently of the orchestrator:
@@ -62,8 +55,8 @@ from thg_protocol.database import reconstruct_model_from_json
 reconstruct_model_from_json("records.json", output_path="results/model.xml")
 ```
 
-Legacy database-generator checkpoints can be reconstructed without importing
-the credentialed harvesting workflow:
+Historical database checkpoints can be reconstructed without importing a
+credentialed harvesting workflow:
 
 ```bash
 python -m pip install "thg-protocol[database]"
@@ -74,16 +67,6 @@ from thg_protocol.database import reconstruct_model_from_pickle
 
 reconstruct_model_from_pickle("pre_sbml_pos_comp.pk", output_path="results/model.xml")
 ```
-
-The legacy generator entry point now exposes the same deterministic path:
-
-```bash
-python generate_data-base/generate_db.py \
-  --pickle pre_sbml_pos_comp.pk --output results/model.xml
-```
-
-Running it without `--pickle` reports that credentialed harvesting is deferred
-instead of importing services or writing repository-relative files.
 
 The pickle adapter accepts the historical `mets_cl`, `reactions_cl`, `genes`,
 `pathways`, and `loc` bundle keys. Standard pickle is preferred; the

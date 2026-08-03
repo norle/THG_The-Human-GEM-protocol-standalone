@@ -2,7 +2,8 @@
 
 This documentation tracks the package migration described in
 `REFACTORING_PLAN.md` and its executable closeout in
-`REFACTORING_PLAN_NEXT.md` at the repository root.
+`REFACTORING_PLAN_NEXT.md` at the repository root. The follow-up removal
+sequence is defined in `REFACTORING_PLAN_LEGACY_REMOVAL.md`.
 
 Start with:
 

@@ -11,10 +11,10 @@ ruff check src tests
 pytest -m "not slow and not online and not solver and not gurobi and not memote"
 python -m build
 
-# Compatibility wrappers should parse help without repository data.
-python build_model/build_model_batch.py --help
-python generate_data-base/make_model_from_pkl.py --help
-python generate_data-base/resume_db_gen.py --help
+# Installed commands should parse help without repository data.
+thg-gapfill --help
+thg-pathway --help
+thg-compare --help
 ```
 
 The built wheel must also be installed without dependencies into a temporary

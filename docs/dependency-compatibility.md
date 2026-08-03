@@ -20,3 +20,9 @@ The default CI/test contract is offline, non-slow, non-solver, non-Gurobi, and
 non-memote tests. Solver jobs use the matching Python 3.12 GLPK baseline; the
 Python-version files pin the direct workflow stack while allowing the dev extra
 to resolve its own tooling dependencies.
+
+## Closed checkout workflows
+
+The former checkout-specific requirements files were retired with their
+source directories. Supported dependency choices are represented by the
+extras above and by the installed commands.

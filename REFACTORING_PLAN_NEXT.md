@@ -7,12 +7,40 @@ decisions. This document is the executable closeout plan for:
 1. proving that supported `src/thg_protocol` behavior covers the legacy
    checkout interfaces;
 2. documenting any intentional behavior changes;
-3. removing the legacy Python implementations once no longer needed; and
+3. removing every legacy checkout directory after its code and contents have
+   been migrated or explicitly retired; and
 4. completing the remaining release and CI gates.
 
 The legacy directories must not be deleted merely because equivalent-looking
 functions exist in `src`. Deletion is allowed only after the parity, reference,
 and release gates in this document pass.
+
+## Required final directory state
+
+This closeout has a directory-level end state: no legacy checkout directory
+may remain in the final repository. `Equivalent`, `Intentional difference`, and
+`Archived` are temporary statuses used while executing the removal batches;
+they are not permission to retain a legacy directory indefinitely.
+
+The exact removal batches, artifact disposition, caller migration, and
+verification commands are defined in
+[`REFACTORING_PLAN_LEGACY_REMOVAL.md`](REFACTORING_PLAN_LEGACY_REMOVAL.md).
+That plan is part of this closeout and must be followed to completion.
+
+The final removal manifest must make these top-level directories absent:
+
+`build_model/`, `cell_type_specific_model/`, `compare_models/`, `functions/`,
+`gapfill/`, `generate_data-base/`, `generate_figures/`, `implement_pathway/`,
+`memote_and_task_analysis/`,
+`merge_metabolic_netowrks_and_network_consistency/`,
+`metabolite_reac_identification/`, `network_analysis/`, `test_algorithms/`,
+`tools/`, and `utils/`.
+
+This does not authorize silent loss of research material. Before a directory
+is closed, each non-Python file must be moved to an approved canonical
+artifact location or explicitly retired with its checksum and disposition
+recorded. A legacy directory containing artifacts is not considered removed
+until those contents have been dealt with and the directory itself is gone.
 
 ## Current baseline
 
@@ -172,15 +200,18 @@ Exit gate:
 - No compatibility wrapper is needed by the supported test suite except those
   listed in the inventory.
 
-## Phase E: Deprecate and remove legacy Python implementations
+## Phase E: Remove legacy implementations and close every legacy directory
 
-After Phases A–D pass, remove legacy implementations in small, reviewable
-groups. The order should be:
+After Phases A–D pass, execute the full directory-removal plan in
+`REFACTORING_PLAN_LEGACY_REMOVAL.md` in small, reviewable groups. The order is:
 
 1. duplicate pure utilities;
 2. wrappers whose parity tests now target package APIs;
 3. migrated workflow scripts;
-4. archived scripts that have an explicit unsupported/removal decision.
+4. archived scripts and historical test suites after their replacement or
+   explicit retirement decision;
+5. non-Python contents and empty directories, so every directory in the final
+   removal manifest is absent.
 
 Before each deletion group:
 
@@ -203,8 +234,12 @@ After each deletion group:
 - run installed CLI `--help` smoke tests;
 - inspect the diff for accidental artifact or API removal.
 
-The final legacy-removal commit must include an updated inventory showing all
-entries as removed, archived, or intentionally retained.
+The final legacy-removal commit must include the exact path manifest, updated
+artifact checksums/dispositions, and an inventory showing every former legacy
+entry as `Removed` or as a preserved artifact relocated outside the legacy
+directories. No compatibility adapter, archived workflow, README, fixture, or
+generated report may be left behind solely to keep one of the legacy
+directories alive.
 
 ## Phase F: Complete the original plan’s remaining release gates
 
@@ -223,9 +258,12 @@ Decide the final status of duplicated suites under `test_algorithms/` and the
 additional MEMOTE checks. Either:
 
 - migrate maintained cases into `tests/` with markers and fixtures; or
-- archive them explicitly with documented commands and ownership.
+- record an explicit retirement decision, then remove the archived source
+  suites in the legacy-removal batches.
 
-They must not remain ambiguous or be treated as default release evidence.
+An archive decision is documentation for the migration/removal step, not a
+reason to retain the legacy directories. They must not remain ambiguous or be
+treated as default release evidence.
 
 ### F3. API contract maintenance
 
@@ -252,9 +290,12 @@ This closeout is complete when all of the following are true:
 - Every legacy Python symbol has an inventory entry and a defined contract.
 - Every replacement has parity evidence or a documented intentional difference.
 - Maintained callers use `thg_protocol`, not legacy imports.
-- Legacy implementations that have passed their removal gates are deleted.
-- Remaining legacy files are explicitly archived, retained as documented
-  compatibility adapters, or removed; none are unexplained.
+- Every directory in the final removal manifest is deleted after its contents
+  are migrated or explicitly retired.
+- No legacy Python implementation, compatibility adapter, archived workflow,
+  or historical test suite remains outside `src/` and maintained `tests/`.
+- Preserved artifacts have approved canonical destinations outside the legacy
+  directories; none are retained merely as a reason to keep a legacy folder.
 - No supported workflow silently loses historical behavior.
 - Default tests pass without network access or full-size model files.
 - The supported Python 3.10–3.12 CI matrix passes on the current head.

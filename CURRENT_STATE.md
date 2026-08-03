@@ -1,6 +1,6 @@
 # THG Protocol Refactoring: Current State
 
-Last reviewed: 2026-07-31
+Last reviewed: 2026-08-03
 
 This document is the concise operational snapshot for the refactoring described
 in `REFACTORING_PLAN.md`, with closeout requirements in
@@ -11,24 +11,22 @@ historical implementation notes.
 
 ## Overall Assessment
 
-The refactor remains feasible and is architecturally sound. Packaging, service
-boundaries, CI, Git LFS ownership, installed workflows, and explicit legacy
-behavior decisions are in place. The legacy inventory, contract groups,
-archival ownership, and maintained-import policy are now recorded. Local
-release validation is complete; the only release gate not evidenced from the
-current checkout is a current-head CI rerun for the supported matrix.
+The package migration and legacy-directory closeout are implemented. All 15
+legacy checkout directories and their 82 Python files are absent; maintained
+tests use package APIs, and preserved artifacts have canonical destinations.
+Local release validation is complete; the only release gate not evidenced from
+the current checkout is a hosted current-head Python 3.10–3.12 matrix run.
 
 ## Repository Snapshot
 
 - Branch: `refactoring-cleanup`
 - Reviewed commit: `4ce9977` (`docs: record matrix execution policy`)
-- Working tree at review: closeout inventory/contract changes are in progress
+- Working tree at review: legacy directory closeout and artifact relocation are implemented
 - Package layout: `src/thg_protocol`
 - Installed commands: `thg-gapfill`, `thg-pathway`, and `thg-compare`
 - Supported Python range currently declared: `>=3.10,<3.13`
 - Canonical large artifacts: seven targeted Git LFS paths
-- Legacy `functions` namespace: source-checkout compatibility only; not shipped
-  in wheels
+- Legacy checkout namespaces: removed; not shipped in wheels
 
 ## Implemented
 
@@ -41,36 +39,29 @@ current checkout is a current-head CI rerun for the supported matrix.
   lookup, pathway implementation, gapfill, comparison, model reconstruction,
   model building, merge primitives, network analysis, figures, cell-specific
   helpers, model I/O, and formula-level mass balance.
-- Dependency-free legacy mass-balance numerics and positive equation balancing
-  now live in `thg_protocol.model_build.mass_balance` and are re-exported by
-  the legacy adapter.
-- Legacy merge, consistency, network-cleanup, and visualization options now
-  delegate to package APIs or require explicit output paths; their supported
-  scope is recorded in `docs/legacy-workflows.md`.
+- Dependency-free mass-balance numerics and positive equation balancing live in
+  `thg_protocol.model_build.mass_balance`.
+- Merge, consistency, network, visualization, annotation, database, pathway,
+  and cell-specific workflows are owned by package APIs.
 - Promoted metabolite annotation now uses the package PubChem client for both
   injected and default lookups without importing PubChemPy or mutating global
   proxy state.
 - Injectable clients and static test adapters for PubChem, Ensembl, BioCyc,
   KEGG, and location-page operations.
-- Explicit input/output paths for the maintained CLIs and many legacy entry
-  points.
-- Promoted metabolite annotation APIs now require explicit input/output paths;
-  the source-checkout compatibility wrapper retains the historical default
-  path and is covered by a dedicated contract test.
+- Explicit input/output paths for maintained CLIs and package workflows.
+- Promoted metabolite annotation APIs require explicit input/output paths.
 - Targeted Git LFS migration and generated-artifact index cleanup.
 - Workflow, installation, development, artifact, dependency, and release
   documentation.
-- Complete legacy Python inventory in `docs/legacy-api-inventory.md`, including
-  exact paths, symbols, package replacements, status, evidence, consumers, and
-  removal conditions for all 82 source-checkout files.
+- Complete legacy Python inventory and final removal manifest in
+  `docs/legacy-api-inventory.md` for all 82 former source-checkout files.
 - Contract groups for legacy parity, intentional migration differences, and
   archived workflow ownership in `docs/api-contracts.md` and
   `docs/legacy-workflows.md`.
-- Executable `tests/unit/test_legacy_import_policy.py` gate preventing package
-  imports from legacy namespaces and checking inventory coverage.
-- Dedicated `tests/unit/test_legacy_compatibility_exports.py` parity checks for
-  package-owned re-export symbols, plus executable archived-workflow docstring
-  status checks.
+- Executable `tests/unit/test_legacy_import_policy.py` gate asserting package
+  import boundaries and absence of all 15 legacy directories.
+- Package-owned export checks and relocated characterization fixtures under
+  `tests/`.
 
 ## Validation Evidence
 
@@ -109,6 +100,10 @@ Later dependency-free checks on the current refactoring line recorded:
   characterization paths, and `1848 passed, 2 skipped` for unit plus
   integration tests. Python 3.10 and 3.11 constraint dry-runs resolved.
 - `python -m build`: source distribution and wheel built successfully.
+- Current checkout default suite: `1838 passed, 2 skipped` under Python 3.12
+  after legacy-directory removal; the skips are optional online and figures
+  dependencies.
+- Current checkout removal policy and package export gates: `19 passed`.
 - A no-dependency wheel installed outside the checkout imported all package
   areas and passed all three installed CLI `--help` smoke tests.
 - Python 3.10 dependency installation completed in `/tmp/thg-py310-venv` using
@@ -136,44 +131,35 @@ Later dependency-free checks on the current refactoring line recorded:
 | --- | --- | --- |
 | 0. Baseline and decisions | Complete | None. Artifact ownership and the source-only legacy namespace policy are recorded. |
 | 1. Packaging and tooling | Complete | None. Packaging, CI, wheel, and outside-checkout gates have recorded passing checkpoints. |
-| 2. Pure utility migration | Complete | None. Remaining `functions` imports are explicit compatibility tests. |
-| 3. Workflow APIs and entry points | Complete | None. Archived workflow status and replacements are documented. |
-| 4. Integration and CLI tests | Complete | None. Central adapter contracts and historical-suite ownership are documented. |
+| 2. Pure utility migration | Complete | None. Legacy utility namespaces are removed. |
+| 3. Workflow APIs and entry points | Complete | None. Archived workflows are removed and replacements are documented. |
+| 4. Integration and CLI tests | Complete | None. Central package contracts own maintained behavior. |
 | 5. External service hardening | Complete | Keep the client-boundary rule for any newly migrated workflow. |
 | 6. Artifacts and Git LFS | Complete | Verify the seven LFS objects when publishing or cloning from a new remote. |
-| 7. Documentation and CI expansion | In progress | Run the supported matrix on the current head; local Python 3.10, prior Python 3.11/3.12 CI, wheel, and clean-clone/LFS gates pass. |
+| 7. Documentation and CI expansion | In progress | Run the supported matrix on the current head; local package and wheel gates pass. |
 
 ## Important Remaining Gaps
 
 ### 1. Behavior preservation and deprecation
 
-The former unconditional deferred errors have been replaced with package-backed
-compatibility adapters. Their exact scope and the explicitly archived
-solver-heavy workflows are documented in
+Former deferred workflows now have package replacements or explicit retirement
+decisions documented in
 [`docs/legacy-workflows.md`](docs/legacy-workflows.md).
 
-The adapters cover formula balancing, multi-stage merge names, structural and
-solver-backed consistency checks, and explicit network cleanup/reporting. Live
-database harvesting remains an opt-in online workflow behind injected clients.
-Adapter contracts are covered by
-`tests/unit/test_legacy_compatibility_boundaries.py`; historical suites are
-explicitly archived in `docs/legacy-workflows.md`.
+Formula balancing, merge, structural consistency, network reports, and live
+service boundaries are package-owned. Historical fixture data is retained only
+under canonical artifact paths.
 
 ### 2. Remaining legacy coupling
 
-The remaining solver-heavy cell-specific and pathway diagnostic scripts are
-explicitly archived/unsupported for installed use; the designation and package
-replacements are recorded in `docs/legacy-workflows.md`. Their historical
-output conventions remain local workflow behavior and are not part of the
-package release contract.
+Solver-heavy cell-specific and pathway diagnostic scripts were retired; their
+package replacements and unsupported status are recorded in
+`docs/legacy-workflows.md`.
 
 ### 3. Historical test ownership
 
-Pytest is configured to collect `tests/`. Historical suites under
-`test_algorithms/` and additional MEMOTE tests remain outside the default
-collection path. Useful annotation and algorithm fixtures are represented by
-central tests. The remaining suites are explicitly archived under THG
-maintainer ownership with opt-in commands in `docs/legacy-workflows.md`.
+Pytest collects `tests/`; representative historical inputs were relocated to
+`tests/fixtures`, and duplicate historical Python suites were removed.
 
 ### 4. Public API contracts
 
@@ -197,11 +183,11 @@ inventory evidence.
 
 - Python 3.10 now has the exact editable-install, Ruff, default offline-suite,
   build, and outside-wheel evidence recorded above.
+- The system `python3.10` interpreter is present, but its current environment
+  has no pytest; the current-head 3.10 result therefore remains a hosted CI
+  gate rather than a local rerun.
 - Python 3.11 is not installed locally; its matching current-head CI job is the
-  remaining evidence source. No GitHub Actions run is associated with local
-  `HEAD` `4ce9977`; the branch has not published the closeout changes. The
-  prior all-version success and current local regression coverage are recorded
-  above.
+  remaining evidence source. The branch has not published the closeout changes.
 - The clean-clone release gate against the approved Python 3.10–3.12
   constraints and all seven LFS checks passed locally.
 
@@ -227,7 +213,6 @@ The refactor is complete when the definition of done in
 - No maintained workflow silently loses historical behavior.
 - Every intentionally removed behavior has an approved and documented
   deprecation/removal decision.
-- Remaining legacy scripts are parameterized, thin adapters or explicitly
-  archived.
+- Former legacy scripts and historical suites are removed.
 - The central test suite owns all maintained behavior.
 - A clean clone passes the supported release matrix and LFS verification.

@@ -34,10 +34,10 @@ normalized database workflow also exposes
 `thg_protocol.database.reconstruct_model_with_services` for record-driven
 construction.
 
-The single and batch model builders now delegate to package APIs; the legacy
-scripts remain compatibility entry points. Their service calls can receive
-package-owned BioCyc, KEGG, and Ensembl clients, which makes offline tests
-possible.
+The single and batch model builders are package APIs. Their service calls can
+receive package-owned BioCyc, KEGG, and Ensembl clients, which makes offline
+tests possible. The former checkout scripts and README were retired after
+this migration.
 
 Normalized JSON record bundles can be reconstructed with
 `thg_protocol.database.reconstruct_model_from_json`; the output path is
