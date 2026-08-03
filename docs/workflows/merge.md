@@ -19,8 +19,8 @@ inputs. The legacy solver/MEMOTE consistency routines remain separate and
 should be run through their opt-in workflow.
 
 The merge and network-consistency workflow combines a reconstructed network
-with an existing GEM and checks the resulting model. It remains a deferred
-legacy workflow and is not currently exposed as an installed CLI.
+with an existing GEM and checks the resulting model. It is exposed as package
+APIs rather than as a separate installed CLI.
 
 Use small toy models for unit tests; reserve full GEMs and solver-backed
 consistency checks for marked integration or solver jobs.

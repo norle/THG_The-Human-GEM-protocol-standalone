@@ -11,8 +11,8 @@ write_component_report(results, "results/network/components.json")
 ```
 
 The package path performs connectivity analysis only. Solver-backed cleanup and
-HTML visualization remain optional legacy operations; full-model runs should be
-marked `slow`.
+HTML visualization are optional operations outside the default package gate;
+full-model runs should be marked `slow`.
 
 Proportional-reaction compaction is available separately:
 

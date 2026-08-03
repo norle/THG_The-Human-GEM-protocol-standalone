@@ -8,10 +8,12 @@ record even after LFS conversion or index removal. The approved LFS paths are
 now pointers on `refactoring-cleanup`; generated paths are no longer tracked.
 
 The provenance field is intentionally conservative: the repository records the
-current blob but not a source URL or generation recipe. Paths classified as
+current blob but not a source URL or generation recipe. The first table is the
+historical pre-closeout source record; its `pending` review values are
+superseded by the explicit final dispositions below. Paths classified as
 canonical/reference inputs are retained through Git LFS; final published
 reports and figures remain ordinary Git files; generated and duplicate outputs
-are removed from Git tracking but retained in the working tree locally.
+are retired rather than used to keep a legacy directory alive.
 
 | Path | Bytes | SHA-256 | Proposed handling | Provenance | Normal clone |
 | --- | ---: | --- | --- | --- | --- |
@@ -88,6 +90,11 @@ was relocated to these canonical owners:
 | `network_analysis/component_visualization_template.html` | `docs/assets/` | preserved documented template |
 | `test_algorithms/*/files/` | `tests/fixtures/legacy_characterization/` | preserved deterministic characterization inputs |
 
+The opt-in GPR characterization inputs are likewise owned by
+`tests/fixtures/legacy_characterization/gpr_prediction/files/`; the historical
+test implementation and its checkout directory were retired. Empty/generated
+mass-balance scratch files were retired rather than promoted to fixtures.
+
 Checkout-only READMEs, requirements files, generated caches, duplicate model
 fixtures, bytecode, and historical scripts were explicitly retired after the
 package APIs and maintained fixtures took ownership of their supported cases.
@@ -98,12 +105,14 @@ The closure section supersedes the earlier `pending` disposition text for
 former legacy paths: relocated files are owned by the destinations listed
 above, while generated reports, duplicate model fixtures, caches, and checkout
 documentation are retired. The executable closure checks in
-`tests/unit/test_legacy_import_policy.py` verify the destination set.
+`tests/unit/test_legacy_import_policy.py` verify the destination set. The
+canonical pathway input tree is tracked, and its large input is covered by the
+LFS rule at its new path.
 
 ### Git LFS
 
 - `files/ensembl`
-- `implement_pathway/examples/inputs/endoA_250917_3.json`
+- `files/pathway/inputs/endoA_250917_3.json`
 - `models/Human Database.xml`
 - `models/Human-GEM_2022-06-21.xml`
 - `models/THG-2023-02-25.xml`
@@ -112,11 +121,11 @@ documentation are retired. The executable closure checks in
 
 ### Ordinary Git: final published deliverables
 
-- `compare_models/reports/THG_vs_Human1.xlsx`
+- `supplementary_material/model_comparisons/THG_vs_Human1.xlsx`
 - `files/MEMOTE_model_THG_endoA_reduced_2506.html`
-- `implement_pathway/docs/glycocalix.pdf`
-- `implement_pathway/figures/Glycocalyx_Cytoskeleton_network.png`
-- `implement_pathway/figures/Glycocalyx_Cytoskeleton_network_plotly.html`
+- `supplementary_material/pathway/docs/glycocalix.pdf`
+- `supplementary_material/pathway/figures/Glycocalyx_Cytoskeleton_network.png`
+- `supplementary_material/pathway/figures/Glycocalyx_Cytoskeleton_network_plotly.html`
 - `supplementary_material/Supplementary_deadends_and_TRs.xlsx`
 
 ### Remove from Git, retain locally

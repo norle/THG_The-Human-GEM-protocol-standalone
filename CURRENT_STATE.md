@@ -20,11 +20,12 @@ the current checkout is a hosted current-head Python 3.10–3.12 matrix run.
 ## Repository Snapshot
 
 - Branch: `refactoring-cleanup`
-- Reviewed commit: `dc32a9e` (`refactor: remove legacy checkout implementations`)
-- Working tree at review: clean after the logical closeout commits
+- Reviewed commit: `2626038` (`fix: close out canonical pathway artifacts`)
+- Working tree at review: clean after the canonical-artifact closeout commit
 - Logical closeout commits: `c8f85a3` (documentation and artifact ownership),
   `77634e6` (maintained test migration), and `dc32a9e` (legacy implementation
-  removal and artifact relocation)
+  removal and artifact relocation), followed by `2626038` (canonical artifact
+  tracking and closeout documentation)
 - Package layout: `src/thg_protocol`
 - Installed commands: `thg-gapfill`, `thg-pathway`, and `thg-compare`
 - Supported Python range currently declared: `>=3.10,<3.13`
@@ -61,6 +62,9 @@ the current checkout is a hosted current-head Python 3.10–3.12 matrix run.
 - Contract groups for legacy parity, intentional migration differences, and
   archived workflow ownership in `docs/api-contracts.md` and
   `docs/legacy-workflows.md`.
+- Canonical pathway inputs/configuration are tracked under `files/pathway/`;
+  the large input uses the relocated LFS path and is no longer hidden by the
+  repository-wide `files/` ignore rule.
 - Executable `tests/unit/test_legacy_import_policy.py` gate asserting package
   import boundaries and absence of all 15 legacy directories.
 - Package-owned export checks and relocated characterization fixtures under
@@ -107,6 +111,14 @@ Later dependency-free checks on the current refactoring line recorded:
   after legacy-directory removal; the skips are optional online and figures
   dependencies.
 - Current checkout removal policy and package export gates: `19 passed`.
+- The exact default offline command from the CI failure report passes after
+  the artifact-tracking fix: `1838 passed, 2 skipped` under Python 3.12.
+- The focused legacy-closure and CI-policy gates pass: `9 passed`; Ruff is
+  clean for `src tests`.
+- `git lfs fsck` passes with all seven approved objects, including the
+  relocated `files/pathway/inputs/endoA_250917_3.json` path. The rebuilt wheel
+  installs outside the checkout and all three installed CLI `--help` checks
+  pass.
 - A no-dependency wheel installed outside the checkout imported all package
   areas and passed all three installed CLI `--help` smoke tests.
 - Python 3.10 dependency installation completed in `/tmp/thg-py310-venv` using
@@ -127,6 +139,10 @@ Later dependency-free checks on the current refactoring line recorded:
   and failed its Python 3.11 job on the legacy COBRA group-member shape; that
   compatibility fix is present in current commit `d21cf04` and passes the
   current Python 3.10 suite. A current-head CI rerun is still required.
+- The latest reported Python 3.10 failure was caused by the migrated pathway
+  directories being ignored and therefore absent from a clean checkout. The
+  canonical files are now tracked and the LFS attribute points to their new
+  path; rerun the hosted matrix on the resulting head.
 
 ## Phase Status
 

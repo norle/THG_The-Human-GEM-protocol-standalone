@@ -13,7 +13,7 @@ together when a dependency changes.
 | Development | Black, build, pytest, pytest-cov, Ruff | `.[dev]` | CI installs; local baseline pins pytest |
 | Solver workflows | PuLP `>=2.7`, swiglpk | `.[solver]` | Opt-in; not part of default test selection |
 | Memote workflows | Memote | `.[memote]` | Opt-in; not part of default test selection |
-| Cell-specific workflows | pathos, troppo | `.[cell-specific]` | Opt-in; compatibility not yet characterized |
+| Cell-specific workflows | pathos, troppo | `.[cell-specific]` | Opt-in; package boundary covered, solver-heavy runs remain optional |
 | Documentation | MkDocs, MkDocs Material | `.[docs]` | Opt-in; `mkdocs.yml` is configured |
 
 The default CI/test contract is offline, non-slow, non-solver, non-Gurobi, and

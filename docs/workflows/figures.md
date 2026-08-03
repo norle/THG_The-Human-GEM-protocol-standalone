@@ -8,5 +8,6 @@ the optional plotting extra:
 python -m pip install 'thg-protocol[figures]'
 ```
 
-The legacy figure script is an explicit-path compatibility wrapper. Optional
-MEMOTE and algorithm score data must be supplied rather than hard-coded.
+The former legacy figure script was retired with the checkout-only workflows.
+Optional MEMOTE and algorithm score data must be supplied rather than
+hard-coded.

@@ -22,11 +22,9 @@ clients own timeout, retry, pacing, cache, authentication, and response
 normalization; static clients in `thg_protocol.services` provide offline test
 adapters. Core package imports do not construct clients or make requests.
 
-The source-checkout compatibility wrapper
-`functions.function_metabolite_identification` retains the historical default
-annotation path for callers that omit an output path. New package callers must
-provide paths explicitly; package APIs do not silently write into repository
-directories.
+The former source-checkout annotation wrapper was retired. New package callers
+must provide paths explicitly; package APIs do not silently write into
+repository directories.
 
 ## Contract groups used by the legacy inventory
 
@@ -53,7 +51,7 @@ The following differences are part of the supported migration path and are
 tested rather than accidental:
 
 - package annotation and model-building APIs require explicit output paths;
-  only the source-checkout metabolite wrapper retains its historical default;
+  the retired source-checkout wrappers are not supported;
 - package merge returns a copied model and `MergeReport` instead of legacy
   positional overlap lists;
 - package cleanup and visualization require explicit report/model paths;

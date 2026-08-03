@@ -53,6 +53,6 @@ Cell-specific model generation depends on the optional `cell-specific` extra:
 python -m pip install 'thg-protocol[cell-specific]'
 ```
 
-This workflow remains compatibility-only. Keep downloaded model inputs and
-generated outputs outside the source tree, and characterize external service
-calls with static fixtures before promoting a package API.
+Keep downloaded model inputs and generated outputs outside the source tree.
+Characterize external service calls with static fixtures; the package APIs do
+not make live requests implicitly.

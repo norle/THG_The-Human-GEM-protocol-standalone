@@ -38,8 +38,9 @@ in [`docs/api-contracts.md`](api-contracts.md).
 
 ## Compatibility symbols
 
-This is the complete supported symbol list for retained compatibility modules.
-Names not listed here are not supported legacy imports.
+The table preserves the complete pre-removal supported symbol list. The
+compatibility modules themselves are now removed; names not listed here were
+never supported legacy imports.
 
 | Exact legacy path/import path | Symbols | Package replacement | Status | Evidence / consumers | Removal condition |
 | --- | --- | --- | --- | --- | --- |
@@ -83,8 +84,8 @@ This is not a whole-workflow parity claim.
 
 For every path in this section, all top-level functions, classes, aliases, and
 CLI entry points are classified as archived/no replacement; none is an
-installed package symbol. Files remain for historical reproducibility and
-require a separate removal decision.
+installed package symbol. The rows preserve the historical ownership and
+retirement decision; the source files were removed in the final manifest.
 
 | Exact checkout path(s) | Symbol classification | Status | Evidence / consumers | Removal condition |
 | --- | --- | --- | --- | --- |

@@ -56,6 +56,5 @@ missing_atoms("H2 + O2 -> H2O")
 Use `reformulate_glycan_equation` with an injected KEGG client when glycan
 resolution is needed.
 
-Run the legacy scripts only with explicit input and output paths, and keep
-large model inputs outside ordinary generated test fixtures. Credentials are
-read from environment variables or local configuration outside Git.
+Keep large model inputs outside ordinary generated test fixtures. Credentials
+are read from environment variables or local configuration outside Git.

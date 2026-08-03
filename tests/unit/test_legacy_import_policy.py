@@ -27,8 +27,10 @@ LEGACY_DIRECTORIES = (
 CANONICAL_ARTIFACTS = (
     "supplementary_material/model_comparisons/THG_vs_Human1.xlsx",
     "supplementary_material/figures/generate_figures",
-    "files/pathway/config",
-    "files/pathway/inputs",
+    "files/pathway/config/config_glycocalyx_cytoskeleton.json",
+    "files/pathway/config/pathway-specific/config_hyaluronan.json",
+    "files/pathway/inputs/config_example.json",
+    "files/pathway/inputs/endoA_250917_3.json",
     "supplementary_material/pathway/reports",
     "tests/fixtures/memote/data",
     "supplementary_material/metabolite_reaction/met_annotation.tsv",
@@ -70,6 +72,15 @@ def test_all_legacy_directories_are_closed():
 def test_closed_directory_artifacts_have_canonical_owners():
     missing = [path for path in CANONICAL_ARTIFACTS if not (ROOT / path).exists()]
     assert not missing, "relocated artifacts are missing: " + ", ".join(missing)
+
+
+def test_relocated_pathway_artifacts_are_tracked_at_their_canonical_paths():
+    attributes = (ROOT / ".gitattributes").read_text(encoding="utf-8")
+    ignore_rules = (ROOT / ".gitignore").read_text(encoding="utf-8")
+
+    assert "files/pathway/inputs/endoA_250917_3.json filter=lfs" in attributes
+    assert "implement_pathway/examples/inputs/endoA_250917_3.json" not in attributes
+    assert "!/files/pathway/**" in ignore_rules
 
 
 def test_inventory_records_every_removed_legacy_python_file():

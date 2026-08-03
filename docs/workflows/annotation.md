@@ -1,8 +1,8 @@
 # Metabolite and reaction identification
 
-The legacy `metabolite_reac_identification` workflow annotates a reference
-model and matches reactions against the reference database. Its characterized
-package entry point is `thg_protocol.annotation.metabolite_reactions`.
+The former `metabolite_reac_identification` workflow annotated a reference
+model and matched reactions against the reference database. Its maintained
+replacement is `thg_protocol.annotation.metabolite_reactions`.
 
 JSON model annotation inventories are available through dependency-light APIs:
 
