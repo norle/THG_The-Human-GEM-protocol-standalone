@@ -6,8 +6,8 @@ overview](workflow-overview.md).
 
 | I want to... | Guide | Main result |
 | --- | --- | --- |
-| Create a model from normalized records or a saved record bundle | [Database reconstruction](workflows/database.md) | JSON or SBML model |
-| Enrich a model with external biological information | [Model building](workflows/model-build.md) | Annotated model, caches, and error report |
+| Create a model from normalized records or a saved record bundle | [Model reconstruction](workflows/database.md) | JSON or SBML model |
+| Enrich a model with external biological information | [Model enrichment](workflows/model-build.md) | Annotated model, caches, and error report |
 | Check or add identifiers and GPR information | [Annotation](workflows/annotation.md) | Annotation inventory or updated information |
 | Add a defined pathway | [Pathway implementation](workflows/pathway.md) | Revised JSON model |
 | Find transport candidates for compartment-specific dead ends | [Gapfill](workflows/gapfill.md) | Candidate and selection reports plus revised model |

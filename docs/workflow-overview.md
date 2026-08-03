@@ -1,93 +1,45 @@
-# From records to a usable human GEM
+# Model operations
 
-THG Protocol supports a model-building workflow in which each stage produces a
-model or report that you can inspect, keep, and use in the next stage. You do
-not need every stage: start with the input you have and choose the operations
-that answer your biological question.
+Use this page to choose an operation based on the input you have and the
+result you need. Operations can be run independently. A model or report written
+by one operation can be used as input to another where the format is supported.
 
-```text
-records or an existing model
-            |
-            v
-build or prepare a model
-            |
-            +--> annotate (when identifiers or GPRs are incomplete)
-            |
-            v
-curate the network: add pathways, close gaps, or merge content
-            |
-            v
-check and compare the result
-            |
-            +--> tailor to a cell type
-            |
-            v
-share reports and figures
-```
+## Construct or enrich a model
 
-## 1. Start with your input
-
-Choose the route that matches what you already have.
-
-| If you have... | Use THG Protocol to... | Output |
+| Starting input | Operation | Result |
 | --- | --- | --- |
-| Normalized metabolite and reaction records | [Reconstruct a model](workflows/database.md) | A new JSON or SBML model |
-| A JSON or SBML model | [Build or enrich it](workflows/model-build.md) | An annotated model and optional error report |
-| Two models | [Compare them](workflows/comparison.md) before deciding what to retain | Per-compartment CSV reports |
+| Normalized metabolite and reaction records | [Model reconstruction](workflows/database.md) | A JSON or SBML model |
+| JSON or SBML model | [Model enrichment](workflows/model-build.md) | An enriched model, optional caches, and an error report |
+| JSON or SBML model with incomplete identifiers or GPRs | [Annotation](workflows/annotation.md) | Annotation inventory, updated information, or GPR candidates |
 
-The [quickstart](quickstart.md) demonstrates the smallest version of the
-record-to-model route with an offline example.
+Model reconstruction works from local normalized records. Model enrichment and
+some annotation operations can use external biological databases; those guides
+state when clients, network access, or credentials are required.
 
-## 2. Make the model more informative
+## Change model content
 
-Use [annotation](workflows/annotation.md) when you need to inventory existing
-identifiers, fill in metabolite or reaction annotations, or resolve gene–protein–reaction
-(GPR) rules. Annotation can be part of model building or a focused task on an
-existing model. Lookups that use external resources are supplied explicitly,
-so you stay in control of the data sources and credentials.
-
-## 3. Curate the network
-
-Choose one or more curation steps depending on the change you want to make.
-
-| Goal | Workflow | What it does |
+| Starting input | Operation | Result |
 | --- | --- | --- |
-| Add a known biological process | [Pathway implementation](workflows/pathway.md) | Applies reactions and compartments from your pathway configuration to a JSON model. |
-| Connect compatible compartment-specific metabolites | [Gapfill](workflows/gapfill.md) | Proposes and selects transport candidates, then writes a revised JSON model. |
-| Combine complementary models | [Merge](workflows/merge.md) | Creates a merged copy and records which content was added or retained. |
+| JSON model and pathway configuration | [Pathway implementation](workflows/pathway.md) | A model with the configured reactions and compartments |
+| JSON model with compartment-specific dead ends | [Gapfill](workflows/gapfill.md) | Transport candidates, selection reports, and a revised model |
+| Two compatible JSON or SBML models | [Merge](workflows/merge.md) | A merged model and merge report |
 
-Save the output from each curation step as the input to the next one. This
-makes it straightforward to review changes and reproduce the sequence later.
+## Inspect, compare, or derive output
 
-## 4. Check the result
+| Starting input | Operation | Result |
+| --- | --- | --- |
+| Loaded COBRA model | [Network analysis](workflows/network-analysis.md) | Connectivity, balance, and compaction results |
+| Two JSON or SBML models | [Model comparison](workflows/comparison.md) | CSV reports of reaction and stoichiometry differences |
+| Model and activity or expression data | [Cell-specific models](workflows/cell-specific.md) | A reduced model and reduction report |
+| Models or report tables | [Figures and reports](workflows/figures.md) | Summaries and optional SVG figures |
+| Model and optional solver setup | [MEMOTE and task analysis](workflows/memote.md) | MEMOTE and task-analysis reports |
 
-Use [network analysis](workflows/network-analysis.md) to find disconnected
-components, compact redundant reactions, and check formula-based balance.
-Use [model comparison](workflows/comparison.md) to quantify how a curated
-model differs from a reference or an earlier version. For an optional broader
-quality assessment, run [MEMOTE and task analysis](workflows/memote.md).
+Network analysis runs locally for connectivity and formula-balance checks.
+Solver-backed checks, cell-specific methods, MEMOTE, and rendering are optional
+capabilities; see [installation](installation.md) before using them.
 
-These checks answer different questions: connectivity finds isolated parts of
-the network; balance identifies reactions with inconsistent formulas; and
-comparison identifies changed reaction content.
+## First example
 
-## 5. Adapt and communicate
-
-When expression or activity measurements are available, create a focused model
-with the [cell-specific workflow](workflows/cell-specific.md). Then use
-[figures and reports](workflows/figures.md) to summarize models and render
-publication-ready SVG figures.
-
-## A practical first pass
-
-For many projects, the shortest useful route is:
-
-1. Reconstruct a model from records, or load an existing model.
-2. Add one pathway or run gapfill for a defined connectivity problem.
-3. Check balance and connected components.
-4. Compare the result with the starting model.
-5. Save the model and reports together in a project results directory.
-
-The [task guides](usage.md) help you jump directly to an individual operation;
-the [API reference](api/index.md) is useful when you are ready to automate the
-same workflow in Python.
+The [five-minute quickstart](quickstart.md) reconstructs a small model from
+normalized records and checks its balance. For an individual guide selected by
+your goal rather than input type, use the [task guides](usage.md).

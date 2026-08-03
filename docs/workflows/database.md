@@ -1,6 +1,6 @@
-# Database generation
+# Model reconstruction
 
-Use database reconstruction when normalized records, JSON bundles, or a
+Use model reconstruction when normalized records, JSON bundles, or a
 historical pickle checkpoint are the authoritative input.
 
 The normalized reconstruction core is available without network access:

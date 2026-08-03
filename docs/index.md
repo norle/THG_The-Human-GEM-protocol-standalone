@@ -1,37 +1,45 @@
 # THG Protocol
 
-THG Protocol helps you construct, curate, assess, and compare human
-genome-scale metabolic models (GEMs). It is designed for a workflow where you
-keep ownership of your models, configurations, and resulting reports.
+THG Protocol is a Python package and command-line toolset for constructing,
+curating, analysing, and comparing human genome-scale metabolic models (GEMs).
 
-## What can I do with it?
+## What it does
 
-- Build a model from normalized metabolite and reaction records.
-- Improve an existing model with annotations, pathways, gapfill candidates, or
-  content from another model.
-- Check network connectivity and reaction balance, then compare versions of a
-  model.
-- Create a cell-specific model and summarize results in reports or figures.
+- Reconstruct a COBRA model from normalized metabolite and reaction records.
+- Annotate model metabolites, reactions, and gene--protein--reaction (GPR)
+  rules.
+- Add configured pathways, identify transport gapfill candidates, and merge
+  model content.
+- Check network connectivity, reaction balance, and redundant reactions.
+- Compare model versions, derive cell-specific models, and produce reports or
+  SVG figures.
+
+## Inputs and outputs
+
+The tools accept normalized records, JSON or SBML models, and, for specific
+operations, pathway configurations or measurement data. They write models,
+CSV reports, caches, and optional SVG figures to paths supplied by the caller.
+Format and dependency requirements are documented in each task guide.
+
+## Choose an operation
+
+| If you need to... | Use |
+| --- | --- |
+| Create a model from records | [Model reconstruction](workflows/database.md) |
+| Add or inspect biological annotations | [Annotation](workflows/annotation.md) |
+| Change model content | [Pathway implementation](workflows/pathway.md), [gapfill](workflows/gapfill.md), or [merge](workflows/merge.md) |
+| Inspect or compare models | [Network analysis](workflows/network-analysis.md) or [model comparison](workflows/comparison.md) |
+| Create a reduced model or visual output | [Cell-specific models](workflows/cell-specific.md) or [figures and reports](workflows/figures.md) |
 
 ## Start here
 
-- Follow the [five-minute quickstart](quickstart.md) to create a small model.
-- Read the [full workflow overview](workflow-overview.md) to see how the
-  individual tasks fit together.
-- Go straight to the [task guides](usage.md) if you already know what you need
-  to do.
-
-## How THG fits into a project
-
-You can start from normalized records or from an existing JSON/SBML model.
-Each workflow writes its result to a location you choose, so models and reports
-can be reviewed and used as inputs to subsequent steps. Some capabilities,
-such as live database lookups, optimization, and plotting, require optional
-dependencies; their guides explain when they are needed.
-
-For concrete input formats and data locations, see [data and model
-files](data-and-model-files.md). For function-level details, use the [API
-reference](api/index.md).
+- Follow the [five-minute quickstart](quickstart.md) to reconstruct a small
+  model.
+- Use the [task guides](usage.md) to select a specific operation.
+- Read the [workflow overview](workflow-overview.md) for the available
+  operations and their inputs and outputs.
+- Use the [API reference](api/index.md) for Python interfaces and the
+  [installation guide](installation.md) for optional dependencies.
 
 ## Research use
 

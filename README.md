@@ -80,7 +80,7 @@ thg-compare model_a.json model_b.json --output-dir results/compare
 ## Documentation
 
 - [Documentation home](docs/index.md)
-- [Full workflow overview](docs/workflow-overview.md)
+- [Model operations overview](docs/workflow-overview.md)
 - [Task guides](docs/usage.md)
 - [API reference](docs/api/index.md)
 - [Data and model files](docs/data-and-model-files.md)

@@ -1,7 +1,7 @@
-# Model building
+# Model enrichment
 
-Use model building to enrich an existing JSON or SBML model with information
-from BioCyc, KEGG, and Ensembl. It writes the enriched model, caches collected
+Use model enrichment to add information from BioCyc, KEGG, and Ensembl to an
+existing JSON or SBML model. It writes the enriched model, caches collected
 information when requested, and records any problems for review.
 
 For a single model, use `thg_protocol.model_build.build_model`:
@@ -32,7 +32,7 @@ report = build_model_batch(
 
 You can supply BioCyc, KEGG, and Ensembl clients to control how information is
 looked up. For record-driven construction rather than enrichment of an existing
-model, use [database reconstruction](database.md).
+model, use [model reconstruction](database.md).
 
 Formula-only mass-balance helpers are available without COBRA or a solver:
 

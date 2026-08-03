@@ -47,23 +47,22 @@ nav:
   - Get started:
       - Installation: installation.md
       - Five-minute quickstart: quickstart.md
-      - Full workflow overview: workflow-overview.md
-      - Examples: examples/README.md
-  - Use THG Protocol:
-      - Task guides: usage.md
-      - How the pieces fit together: architecture.md
+      - Choose a task: usage.md
+      - Model operations overview: workflow-overview.md
+  - Guides:
+      - Operations and data flow: architecture.md
       - Gapfill: workflows/gapfill.md
       - Pathway implementation: workflows/pathway.md
       - Model comparison: workflows/comparison.md
       - Annotation: workflows/annotation.md
-      - Database generation: workflows/database.md
-      - Model build: workflows/model-build.md
+      - Model reconstruction: workflows/database.md
+      - Model enrichment: workflows/model-build.md
       - Merge and consistency: workflows/merge.md
       - Cell-specific models: workflows/cell-specific.md
       - Figures and reports: workflows/figures.md
       - Network analysis: workflows/network-analysis.md
       - MEMOTE and task analysis: workflows/memote.md
-  - API reference:
+  - Python and command-line reference:
       - Overview: api/index.md
       - Core and I/O: api/core.md
       - Database and model construction: api/construction.md
@@ -73,12 +72,12 @@ nav:
       - Analysis: api/analysis.md
       - Figures: api/figures.md
       - CLI commands: api/cli.md
-  - Developer and maintainer reference:
+  - Maintainer reference:
       - Development: development.md
       - Documentation contribution: documentation-contributing.md
       - Release validation: release-validation.md
       - Dependency compatibility: dependency-compatibility.md
-      - Data and model files: data-and-model-files.md
+  - Repository records:
       - Repository map: repository-map.md
       - Tracked artifact inventory: artifact-inventory.md
       - Service boundary audit: service-boundary-audit.md
@@ -86,7 +85,3 @@ nav:
       - Python API contracts: api-contracts.md
       - Legacy workflow status: legacy-workflows.md
       - Legacy API inventory: legacy-api-inventory.md
-      - Original refactoring plan: plans/REFACTORING_PLAN.md
-      - Legacy removal plan: plans/REFACTORING_PLAN_LEGACY_REMOVAL.md
-      - Refactoring closeout plan: plans/REFACTORING_PLAN_NEXT.md
-      - Documentation implementation plan: plans/DOCUMENTATION_IMPLEMENTATION_PLAN.md

@@ -1,13 +1,13 @@
-# How the pieces fit together
+# Operations and data flow
 
-THG Protocol is organized around the artifacts in a model-curation project:
-records and models go in; revised models, reports, and figures come out.
+THG Protocol reads model records, JSON or SBML models, and workflow-specific
+configuration. Its operations produce revised models, reports, and figures.
 
 ```text
 records / JSON or SBML models / pathway configuration
                          |
                          v
-        build, annotate, and curate a model
+        construct, annotate, and curate a model
                          |
                          v
        compare, check, tailor, and summarize it
@@ -16,27 +16,25 @@ records / JSON or SBML models / pathway configuration
              models, reports, and figures
 ```
 
-Construction turns normalized records into a model. Annotation adds or checks
-biological identifiers. Pathway implementation, gapfill, and merging make
-defined changes to model content. Analysis helps you judge the result;
-cell-specific modeling and figures adapt or communicate it.
+Construction turns normalized records into a model. Annotation checks or adds
+biological identifiers. Pathway implementation, gapfill, and merging change
+model content. Analysis inspects the resulting model; cell-specific modelling
+and figures create derived models or visual output.
 
-The [workflow overview](workflow-overview.md) explains when to use each stage.
+The [task guides](usage.md) describe when to use each operation.
 
 ## Inputs and outputs
 
-You choose the paths for input models, output models, caches, and reports.
-This makes it natural to keep an auditable project structure: preserve the
-starting model, save each curated version, and retain the report that explains
-each change. JSON and SBML are supported where noted in the individual guides.
+You supply the paths for input models, output models, caches, and reports.
+JSON and SBML are supported where noted in the individual guides. A workflow
+does not overwrite the input model unless its guide explicitly says so.
 
 ## Optional capabilities
 
-Most structural workflows work locally. External biological databases are used
-only for workflows that request annotation or enrichment; they may need network
-access and credentials. Solver-backed quality checks, cell-specific methods,
-MEMOTE, and figure rendering are optional and documented with the workflow
-that uses them.
+Most structural workflows run locally. Annotation and model-building operations
+can use external biological databases and may require network access or
+credentials. Solver-backed quality checks, cell-specific methods, MEMOTE, and
+figure rendering are optional; each relevant guide identifies its requirements.
 
 For implementation details, service-client behavior, and mutation guarantees,
 see the [API reference](api/index.md).
