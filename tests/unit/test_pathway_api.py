@@ -1,6 +1,3 @@
-import functions
-from functions import pathway_builder as legacy_pathway
-
 import thg_protocol.pathway as pathway
 
 
@@ -9,19 +6,6 @@ def test_pathway_api_exposes_legacy_public_helper_names():
     assert "check_pathway_exists" in pathway.__all__
     assert "get_next_metabolite_id" in pathway.__all__
     assert "get_next_reaction_id" in pathway.__all__
-
-
-def test_legacy_functions_namespace_reexports_package_pathway_api():
-    assert functions.add_compartment is pathway.add_compartment
-    assert functions.check_pathway_exists is pathway.check_pathway_exists
-    assert functions.get_next_metabolite_id is pathway.get_next_metabolite_id
-    assert functions.get_next_reaction_id is pathway.get_next_reaction_id
-
-
-def test_legacy_pathway_module_reuses_package_pure_helpers():
-    assert legacy_pathway.add_compartment is pathway.add_compartment
-    assert legacy_pathway.find_metabolite_robust is pathway.find_metabolite_robust
-    assert legacy_pathway.parse_reaction_equation is pathway.parse_reaction_equation
 
 
 def test_pathway_helpers_preserve_current_pure_behavior():
@@ -215,7 +199,7 @@ def test_create_compartment_metabolites_promotes_targets_and_configured_entries(
     assert model["metabolites"][-1]["annotation"] == {"chebi": "123"}
 
 
-def test_create_compartment_reactions_uses_package_builder_and_legacy_alias():
+def test_create_compartment_reactions_uses_package_builder():
     model = {
         "compartments": {"c": "cytosol"},
         "metabolites": [
@@ -232,7 +216,3 @@ def test_create_compartment_reactions_uses_package_builder_and_legacy_alias():
 
     assert pathway.create_compartment_reactions(model, {}, "c", config) == 1
     assert model["reactions"][0]["id"] == "MAR00001"
-    assert (
-        legacy_pathway.create_compartment_reactions
-        is pathway.create_compartment_reactions
-    )

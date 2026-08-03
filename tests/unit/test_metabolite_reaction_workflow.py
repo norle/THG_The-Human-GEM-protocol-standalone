@@ -1,5 +1,4 @@
 import importlib
-import inspect
 
 import pytest
 
@@ -15,15 +14,6 @@ def test_metabolite_reaction_workflow_import_is_safe_without_cobra():
     )
 
     assert callable(workflow.run_metabolite_reaction_identification)
-
-
-def test_legacy_annotation_wrapper_is_import_safe():
-    legacy = importlib.import_module("functions.function_annotate_cobra_model")
-
-    assert callable(legacy.annotate_cobra_model)
-    parameters = inspect.signature(legacy.annotate_cobra_model).parameters
-    assert parameters["out_file1"].default is inspect.Parameter.empty
-    assert parameters["out_file2"].default is inspect.Parameter.empty
 
 
 def test_retry_annotations_uses_static_client_and_rewrites_failures(tmp_path):

@@ -1,7 +1,5 @@
 import inspect
 
-from functions import function_metabolite_identification as legacy_metabolites
-
 import thg_protocol.annotation.metabolites as metabolites
 from thg_protocol.services.pubchem import PubChemCompound, StaticPubChemClient
 
@@ -21,18 +19,6 @@ def test_metabolite_annotation_api_exposes_characterized_helper_names():
         .parameters["annotation_file"]
         .default
         is inspect.Parameter.empty
-    )
-
-
-def test_metabolite_annotation_legacy_wrapper_reexports_package_api():
-    assert legacy_metabolites.identify_metabolite is metabolites.identify_metabolite
-    assert legacy_metabolites.formula_similarity is metabolites.formula_similarity
-    assert legacy_metabolites.process_annotation is not metabolites.process_annotation
-    assert (
-        inspect.signature(legacy_metabolites.process_annotation)
-        .parameters["annotation_file"]
-        .default
-        is None
     )
 
 

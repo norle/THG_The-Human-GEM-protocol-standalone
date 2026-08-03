@@ -8,10 +8,6 @@ def test_pathway_package_reexports_core_helpers():
     assert "core.py" in core.__file__
 
 
-def test_mutation_heavy_workflows_are_exposed_and_legacy_compatible():
+def test_mutation_heavy_workflows_are_exposed():
     assert callable(pathway.create_compartment_metabolites)
     assert callable(pathway.create_compartment_reactions)
-    assert (
-        __import__("functions").create_compartment_metabolites
-        is pathway.create_compartment_metabolites
-    )

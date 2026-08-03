@@ -59,17 +59,3 @@ def test_resolve_compartment_abbreviation_reports_missing_compartment():
         "existing_abbrev": None,
         "name": "peroxisome",
     }
-
-
-def test_legacy_functions_config_wrapper_exports_package_api():
-    from functions import config as legacy_config
-
-    assert legacy_config.load_config is config.load_config
-    assert legacy_config.get_model_paths is config.get_model_paths
-
-
-def test_legacy_functions_package_imports_without_pathway_side_effects():
-    import functions
-
-    assert functions.load_config is config.load_config
-    assert "add_compartment" in functions.__all__

@@ -1,9 +1,8 @@
-"""Executable gates for the legacy inventory and package import boundary."""
+"""Executable gates for the final legacy-directory removal."""
 
 from __future__ import annotations
 
 import ast
-import warnings
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -25,34 +24,16 @@ LEGACY_DIRECTORIES = (
     "tools",
     "utils",
 )
-LEGACY_MODULE_ROOTS = tuple(LEGACY_DIRECTORIES)
-ARCHIVED_WORKFLOWS = (
-    "build_model/test_biovelo_query.py",
-    "cell_type_specific_model/gimme_parallel.py",
-    "cell_type_specific_model/ptr_multi_round.py",
-    "cell_type_specific_model/ptr_one_round.py",
-    "cell_type_specific_model/transcriptomics.py",
-    "functions/add_reaction.py",
-    "functions/class_generate_database.py",
-    "functions/function_bm_gdb.py",
-    "functions/functions_compare_models.py",
-    "functions/functions_create_figure.py",
-    "functions/pattern_generate_database.py",
-    "gapfill/phase1_connect_components.py",
-    "gapfill/phase2_minimal_connector.py",
-    "gapfill/phase2_prioritized_connector.py",
-    "gapfill/phase3_blocked_optimizer.py",
-    "gapfill/phase3_component_milp.py",
-    "gapfill/phase3_greedy_optimizer.py",
-    "gapfill/phase3_milp_optimizer.py",
-    "gapfill/phase3_sink_milp_original.py",
-    "gapfill/phase3_tiered_milp.py",
-    "implement_pathway/validate.py",
-    "implement_pathway/visualize.py",
-    "memote_and_task_analysis/metabolic_tasks/evaluation.py",
-    "memote_and_task_analysis/metabolic_tasks/task.py",
-    "memote_and_task_analysis/tests_extra/test_metabolic_tasks.py",
-    "network_analysis/loop_removal.py",
+CANONICAL_ARTIFACTS = (
+    "supplementary_material/model_comparisons/THG_vs_Human1.xlsx",
+    "supplementary_material/figures/generate_figures",
+    "files/pathway/config",
+    "files/pathway/inputs",
+    "supplementary_material/pathway/reports",
+    "tests/fixtures/memote/data",
+    "supplementary_material/metabolite_reaction/met_annotation.tsv",
+    "docs/assets/component_visualization_template.html",
+    "tests/fixtures/legacy_characterization/reac_identification/files/ec-number.tsv",
 )
 
 
@@ -71,7 +52,7 @@ def test_package_code_does_not_import_legacy_namespaces():
     violations = []
     for path in (ROOT / "src/thg_protocol").rglob("*.py"):
         for line, module in _imported_modules(path):
-            if module.split(".", 1)[0] in LEGACY_MODULE_ROOTS:
+            if module.split(".", 1)[0] in LEGACY_DIRECTORIES:
                 violations.append(f"{path.relative_to(ROOT)}:{line}: {module}")
 
     assert not violations, "maintained package imports legacy code:\n" + "\n".join(
@@ -79,25 +60,26 @@ def test_package_code_does_not_import_legacy_namespaces():
     )
 
 
-def test_inventory_lists_every_legacy_python_file():
+def test_all_legacy_directories_are_closed():
+    remaining = [
+        directory for directory in LEGACY_DIRECTORIES if (ROOT / directory).exists()
+    ]
+    assert not remaining, "legacy directories remain: " + ", ".join(remaining)
+
+
+def test_closed_directory_artifacts_have_canonical_owners():
+    missing = [path for path in CANONICAL_ARTIFACTS if not (ROOT / path).exists()]
+    assert not missing, "relocated artifacts are missing: " + ", ".join(missing)
+
+
+def test_inventory_records_every_removed_legacy_python_file():
     inventory = INVENTORY.read_text(encoding="utf-8")
-    files = []
-    for directory in LEGACY_DIRECTORIES:
-        files.extend(
-            path.relative_to(ROOT).as_posix()
-            for path in (ROOT / directory).rglob("*.py")
-        )
-
-    assert len(files) == 82
-    missing = sorted(path for path in files if path not in inventory)
-    assert not missing, "legacy files missing from inventory:\n" + "\n".join(missing)
-
-    manifest_header = "## Complete exact-file manifest"
-    manifest = inventory.split(manifest_header, 1)[1].split("```text", 1)[1]
-    manifest = manifest.split("```", 1)[0]
-    listed = [line.strip() for line in manifest.splitlines() if line.strip()]
-    assert len(listed) == len(set(listed)) == 82
-    assert set(listed) == set(files)
+    manifest = inventory.split("## Final removal manifest", 1)[1]
+    manifest = manifest.split("```text", 1)[1].split("```", 1)[0]
+    lines = [line.strip() for line in manifest.splitlines() if line.strip()]
+    paths = [line.split(" | ", 1)[0] for line in lines]
+    assert len(paths) == len(set(paths)) == 82
+    assert all(" | Removed | " in line for line in lines)
 
 
 def test_inventory_and_contracts_define_the_required_evidence_fields():
@@ -125,22 +107,3 @@ def test_closeout_plan_is_referenced_by_supported_documentation():
     for relative_path in ("README.md", "docs/index.md", "CURRENT_STATE.md"):
         text = (ROOT / relative_path).read_text(encoding="utf-8")
         assert "REFACTORING_PLAN_NEXT.md" in text
-
-
-def test_archived_workflows_declare_their_unsupported_status_in_docstrings():
-    missing_status = []
-    for relative_path in ARCHIVED_WORKFLOWS:
-        with warnings.catch_warnings():
-            # Historical scripts contain invalid escape sequences in regular
-            # expressions. Their source status, not warning hygiene, is what
-            # this syntax-only audit is checking.
-            warnings.simplefilter("ignore")
-            tree = ast.parse((ROOT / relative_path).read_text(encoding="utf-8"))
-        docstring = (ast.get_docstring(tree) or "").lower()
-        if "archived" not in docstring or "installed" not in docstring:
-            missing_status.append(relative_path)
-
-    assert not missing_status, (
-        "archived workflows lack explicit module status:\n"
-        + "\n".join(missing_status)
-    )

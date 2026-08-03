@@ -1,4 +1,4 @@
-"""Contract tests for source-checkout compatibility adapters."""
+"""Contract tests for maintained package boundaries."""
 
 from __future__ import annotations
 
@@ -20,19 +20,13 @@ def _model(name: str, *, include_isolated: bool = False) -> cobra.Model:
 
 
 def test_legacy_mass_balance_adapter_returns_balanced_coefficients():
-    from functions.functions_mass_balance import RxnBalance2
+    from thg_protocol.model_build.mass_balance import balance_equation
 
-    result = RxnBalance2("H2 + O2 -> H2O", "R1")
-
-    assert result[0:2] == ([2.0, 1.0], [2.0])
-    assert result[-1] == 1
+    assert balance_equation("H2 + O2 -> H2O") == ([2.0, 1.0], [2.0])
 
 
 def test_legacy_merge_variants_delegate_to_non_mutating_package_merge():
-    from functions.functions_merge_metabolic_networks import (
-        network_metabolites_merge,
-        network_reactions_merge_4,
-    )
+    from thg_protocol.merge import merge_models
 
     base = _model("base")
     incoming = _model("incoming")
@@ -40,48 +34,34 @@ def test_legacy_merge_variants_delegate_to_non_mutating_package_merge():
         [cobra.Metabolite("C_c", compartment="c", formula="C")]
     )
 
-    merged, mapping = network_metabolites_merge(base, incoming)
+    merged, report = merge_models(base, incoming)
     assert merged.metabolites.has_id("C_c")
-    assert mapping["A_c"] == "A_c"
+    assert report.added_metabolites == 1
     assert not base.metabolites.has_id("C_c")
-
-    merged, overlap, new, inconsistent = network_reactions_merge_4(
-        base, incoming, {}, {}
-    )
     assert merged.reactions.has_id("R1")
-    assert overlap == ["R1"]
-    assert new == []
-    assert inconsistent == []
+    assert report.overlapping_reactions == 1
 
 
 def test_legacy_consistency_adapter_uses_structural_and_formula_checks():
-    from functions.functions_network_consistency import (
-        test_find_disconnected,
-        test_reaction_mass_balance,
-        test_stoichiometric_consistency,
+    from thg_protocol.analysis.consistency import (
+        orphan_metabolites,
+        unbalanced_reactions,
     )
 
     model = _model("balanced", include_isolated=True)
 
-    assert test_stoichiometric_consistency(model)
-    assert test_reaction_mass_balance(model) == []
-    assert test_find_disconnected(model) == ["orphan_c"]
+    assert unbalanced_reactions(model) == []
+    assert orphan_metabolites(model) == ["orphan_c"]
 
 
 def test_network_compatibility_cleanup_and_report_are_explicit(tmp_path):
-    from network_analysis.find_components import find_network_components
+    from thg_protocol.analysis import find_network_components, write_component_report
 
     output_model = tmp_path / "cleaned.json"
     report_path = tmp_path / "components.json"
-    result = find_network_components(
-        _model("network", include_isolated=True),
-        cleanup=True,
-        cleanup_save_path=output_model,
-        visualize=True,
-        viz_output_path=report_path,
-        verbose=False,
-    )
+    result = find_network_components(_model("network", include_isolated=True))
+    write_component_report(result, report_path)
 
-    assert not result["model"].metabolites.has_id("orphan_c")
-    assert output_model.exists()
-    assert json.loads(report_path.read_text())["is_fully_connected"]
+    assert result["model"].metabolites.has_id("orphan_c")
+    assert not output_model.exists()
+    assert not json.loads(report_path.read_text())["is_fully_connected"]

@@ -6,7 +6,9 @@ from pathlib import Path
 
 import pandas as pd
 import pytest
-from functions.gpr.auth_gpr import getGPR, setup_biocyc_session
+
+from thg_protocol.gpr.lookup import get_gpr
+from thg_protocol.services.biocyc import BioCycClient
 
 pytestmark = [pytest.mark.online, pytest.mark.slow]
 
@@ -18,28 +20,29 @@ if not os.environ.get("BIOCYC_EMAIL") or not os.environ.get("BIOCYC_PASSWORD"):
 
 
 FIXTURE_ROOT = (
-    Path(__file__).resolve().parents[2] / "test_algorithms/gpr_prediction/files"
+    Path(__file__).resolve().parents[1]
+    / "fixtures/legacy_characterization/gpr_prediction/files"
 )
 _rows = []
 for fixture in sorted(FIXTURE_ROOT.glob("gprs_ec*.tsv")):
     values = pd.read_csv(fixture, sep="\t")
     _rows.extend(values.itertuples(index=False, name=None))
 
-# Keep the online gate representative and bounded; the complete historical
-# fixture remains available in test_algorithms for a deliberate full run.
+# Keep the online gate representative and bounded; the complete fixture remains
+# available under the maintained test-fixture owner for deliberate full runs.
 GPR_FIXTURES = _rows[:10]
 
 
 @pytest.fixture(scope="module")
 def biocyc_session():
-    return setup_biocyc_session()
+    return BioCycClient()
 
 
 @pytest.mark.parametrize("ec_number,expected", GPR_FIXTURES)
-def test_archived_gpr_fixture_uses_maintained_compatibility_api(
+def test_gpr_fixture_uses_maintained_package_api(
     biocyc_session, ec_number: str, expected: str
 ):
-    result = getGPR(ec_number, biocyc_session)
+    result = get_gpr(ec_number, biocyc_session)
     assert result is not None
     _, _, _, _, gpr = result
     for expected_gene in re.split("and|or", expected):

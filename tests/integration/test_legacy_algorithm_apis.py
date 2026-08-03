@@ -13,7 +13,7 @@ from thg_protocol.annotation.reactions import (
 )
 from thg_protocol.services.pubchem import PubChemCompound, StaticPubChemClient
 
-FIXTURE_ROOT = Path(__file__).resolve().parents[2] / "test_algorithms"
+FIXTURE_ROOT = Path(__file__).resolve().parents[1] / "fixtures/legacy_characterization"
 REACTION_FIXTURES = list(
     pd.read_csv(
         FIXTURE_ROOT / "reac_identification/files/ec-number.tsv", sep="\t"

@@ -1,5 +1,3 @@
-from functions import function_reac_identification as legacy_reactions
-
 from thg_protocol.annotation import reactions
 
 
@@ -10,14 +8,6 @@ def test_reaction_annotation_api_exposes_characterized_helper_names():
 
 
 def test_reaction_annotation_api_exposes_characterized_helpers():
-    assert reactions.jaccard(["a", "b"], ["b", "c"]) == legacy_reactions.jaccard(
-        ["a", "b"], ["b", "c"]
-    )
-    assert (
-        reactions.execute_jaccard.__name__
-        == legacy_reactions.execute_jaccard.__name__
-    )
-    assert (
-        reactions.identify_reaction.__name__
-        == legacy_reactions.identify_reaction.__name__
-    )
+    assert reactions.jaccard(["a", "b"], ["b", "c"]) == 1 / 3
+    assert reactions.execute_jaccard.__module__ == "thg_protocol.annotation.reactions"
+    assert reactions.identify_reaction.__module__ == "thg_protocol.annotation.reactions"
