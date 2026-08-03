@@ -20,8 +20,11 @@ the current checkout is a hosted current-head Python 3.10–3.12 matrix run.
 ## Repository Snapshot
 
 - Branch: `refactoring-cleanup`
-- Reviewed commit: `4ce9977` (`docs: record matrix execution policy`)
-- Working tree at review: legacy directory closeout and artifact relocation are implemented
+- Reviewed commit: `dc32a9e` (`refactor: remove legacy checkout implementations`)
+- Working tree at review: clean after the logical closeout commits
+- Logical closeout commits: `c8f85a3` (documentation and artifact ownership),
+  `77634e6` (maintained test migration), and `dc32a9e` (legacy implementation
+  removal and artifact relocation)
 - Package layout: `src/thg_protocol`
 - Installed commands: `thg-gapfill`, `thg-pathway`, and `thg-compare`
 - Supported Python range currently declared: `>=3.10,<3.13`
@@ -83,11 +86,11 @@ Later dependency-free checks on the current refactoring line recorded:
 - `ruff check src tests`: clean on 2026-07-31.
 - Default offline suite: `1858 passed, 2 skipped` on Python 3.12 with the
   pinned GLPK constraints.
-- Current checkout closeout gate: `1880 passed, 2 skipped` under Python 3.12,
+- Pre-removal checkout closeout gate: `1880 passed, 2 skipped` under Python 3.12,
   with the exact inventory manifest, maintained-import, compatibility-export,
   deterministic adapter, and CLI contract checks included; Ruff is clean for
   `src tests`.
-- The same current checkout passed the complete default suite under the
+- The pre-removal package checkout passed the complete default suite under the
   available Python 3.10.12 environment: `1880 passed, 2 skipped`.
 - The three installed-command compatibility checks pass for the legacy CLI
   option/help contract under Python 3.10 and 3.12.
