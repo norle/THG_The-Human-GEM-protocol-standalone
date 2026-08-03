@@ -1,7 +1,8 @@
 # Model comparison
 
-Use comparison to measure reaction-ID and stoichiometric overlap by
-compartment.
+Use comparison to see how two models differ in reaction IDs and stoichiometry,
+including differences by compartment. It is useful before a merge and after a
+curation step, when you want a report of what changed.
 
 Reaction IDs and stoichiometry can be compared per compartment through the
 Python API or `thg-compare`:
@@ -25,6 +26,7 @@ reports = compare_models_from_files(
 
 ## Prerequisites, output, and troubleshooting
 
-Inputs may be JSON or SBML. Reports are CSV files under the explicit output
-directory and the return value contains raw structured data. Blocked filtering
-uses COBRA's solver path; disable it for deterministic structural comparison.
+Inputs may be JSON or SBML. Reports are CSV files under the output directory,
+and the Python function also returns structured data. Blocked-reaction
+filtering requires COBRA's solver path; use `--no-include-blocked` when you
+only need structural comparison.

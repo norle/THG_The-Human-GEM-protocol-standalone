@@ -1,7 +1,8 @@
 # Merge and network consistency
 
-Use merge when a base model should be enriched by a second model while
-preserving ownership of both inputs.
+Use merge when a base model should be enriched with content from a second
+model. The input models remain unchanged, and the merge report shows what was
+added or retained.
 
 The package-native merge boundary accepts two COBRA models and returns a
 non-mutating merged copy with an explicit report:
@@ -18,15 +19,8 @@ merged, report = merge_models(
 ```
 
 For file-based workflows, use `merge_models_from_paths` with SBML or JSON
-inputs. The legacy solver/MEMOTE consistency routines remain separate and
-should be run through their opt-in workflow.
-
-The merge and network-consistency workflow combines a reconstructed network
-with an existing GEM and checks the resulting model. It is exposed as package
-APIs rather than as a separate installed CLI.
-
-Use small toy models for unit tests; reserve full GEMs and solver-backed
-consistency checks for marked integration or solver jobs.
+inputs. Follow the merge with [network analysis](network-analysis.md) to check
+the connectivity and balance of the result.
 
 ## Prerequisites, output, and troubleshooting
 

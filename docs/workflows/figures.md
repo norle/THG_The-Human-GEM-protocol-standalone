@@ -1,19 +1,16 @@
 # Figures and reports
 
-Use the figure APIs to turn explicit model summaries or report tables into
-reproducible SVG outputs.
+Use the figure APIs to turn model summaries or report tables into SVG figures
+that you can include in a report or publication.
 
-Figure workflows accept explicit model and report paths through
-`thg_protocol.figures`. Report summaries are dependency-light; rendering uses
+Report summaries are available through `thg_protocol.figures`; rendering needs
 the optional plotting extra:
 
 ```bash
 python -m pip install 'thg-protocol[figures]'
 ```
 
-The former legacy figure script was retired with the checkout-only workflows.
-Optional MEMOTE and algorithm score data must be supplied rather than
-hard-coded.
+Supply any MEMOTE or algorithm-score data you want to visualize.
 
 ```python
 from thg_protocol.figures.models import summarize_model_components

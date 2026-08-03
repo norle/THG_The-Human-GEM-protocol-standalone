@@ -1,39 +1,42 @@
 # THG Protocol
 
-THG Protocol is a Python package for reconstructing, curating, annotating,
-comparing, and analyzing human genome-scale metabolic models. The maintained
-package boundary is deterministic by default: callers provide input, output,
-cache, and report paths, while network services and optional solvers are
-injected explicitly.
+THG Protocol helps you construct, curate, assess, and compare human
+genome-scale metabolic models (GEMs). It is designed for a workflow where you
+keep ownership of your models, configurations, and resulting reports.
 
-## Choose a starting point
+## What can I do with it?
 
-- New users: [five-minute quickstart](quickstart.md).
-- Workflow users: [workflow guides](usage.md) and the [architecture overview](architecture.md).
-- Python developers: [API reference](api/index.md) and [development guide](development.md).
-- Artifact maintainers: [repository map](repository-map.md) and [artifact inventory](artifact-inventory.md).
+- Build a model from normalized metabolite and reaction records.
+- Improve an existing model with annotations, pathways, gapfill candidates, or
+  content from another model.
+- Check network connectivity and reaction balance, then compare versions of a
+  model.
+- Create a cell-specific model and summarize results in reports or figures.
 
-The intended GitHub Pages URL is
-<https://norle.github.io/THG_The-Human-GEM-protocol-standalone/>. It becomes
-live after the repository Pages source is enabled for GitHub Actions and the
-default-branch deployment succeeds. Builds are strict and examples run without
-credentials, solvers, large model files, or live services.
+## Start here
 
-## Supported entry points
+- Follow the [five-minute quickstart](quickstart.md) to create a small model.
+- Read the [full workflow overview](workflow-overview.md) to see how the
+  individual tasks fit together.
+- Go straight to the [task guides](usage.md) if you already know what you need
+  to do.
 
-The installed commands are `thg-gapfill`, `thg-pathway`, and `thg-compare`.
-The [API reference](api/index.md) covers every maintained module under
-`thg_protocol`, while the [workflow section](usage.md) explains when to use
-each interface.
+## How THG fits into a project
 
-Historical checkout workflows and preserved outputs remain documented under
-[maintainer and legacy](legacy-workflows.md); they are not release interfaces.
-The broader migration context is recorded in the repository-root
-`REFACTORING_PLAN.md`, `REFACTORING_PLAN_NEXT.md`, and
-`REFACTORING_PLAN_LEGACY_REMOVAL.md` files.
+You can start from normalized records or from an existing JSON/SBML model.
+Each workflow writes its result to a location you choose, so models and reports
+can be reviewed and used as inputs to subsequent steps. Some capabilities,
+such as live database lookups, optimization, and plotting, require optional
+dependencies; their guides explain when they are needed.
 
-## Citation and lineage
+For concrete input formats and data locations, see [data and model
+files](data-and-model-files.md). For function-level details, use the [API
+reference](api/index.md).
+
+## Research use
 
 Please cite [biosustain/THG](https://github.com/biosustain/THG) when using THG
-in research. This standalone repository preserves the Git LFS migration and
-publishing procedure in the [standalone repository runbook](git-lfs-standalone-repository.md).
+in research.
+
+Development, release, legacy, and repository-maintenance information is kept
+in the [developer and maintainer section](development.md).

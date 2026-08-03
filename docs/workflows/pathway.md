@@ -1,10 +1,10 @@
 # Pathway implementation
 
-Use this workflow to apply a caller-authored pathway configuration to a JSON
-model. It does not discover or silently download pathway definitions.
+Use this workflow to add a defined biological pathway to a JSON model. You
+provide the pathway configuration and metabolite-ID lookup table, so the
+reactions and compartments being added are explicit and reviewable.
 
-The import-safe pathway API transforms JSON model mappings without network
-access or repository-relative output paths:
+In Python, apply the configuration with:
 
 ```python
 from thg_protocol.pathway import implement_pathway_files
@@ -22,8 +22,7 @@ thg-pathway --model model.json --config pathway.json \
   --database metabolite_ids.json --output results/pathway.json
 ```
 
-KEGG pathway reaction listings are also available as an explicit, injectable
-workflow:
+If you need a small reaction listing for a set of KEGG pathways, use:
 
 ```python
 from thg_protocol.pathway import list_pathway_reactions

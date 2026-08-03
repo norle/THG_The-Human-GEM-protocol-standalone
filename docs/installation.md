@@ -1,26 +1,41 @@
 # Installation
 
-The package migration uses a `src/` layout and Python `>=3.10,<3.13`.
-
-For development:
+THG Protocol supports Python 3.10–3.12. Install it from a repository checkout:
 
 ```bash
-python -m pip install -e ".[dev]"
+git clone https://github.com/norle/THG_The-Human-GEM-protocol-standalone.git
+cd THG_The-Human-GEM-protocol-standalone
+python -m venv .venv
+source .venv/bin/activate
+python -m pip install --upgrade pip
+python -m pip install -e .
 ```
 
-Optional dependency groups are defined for database checkpoint compatibility,
-docs, solvers, memote, and cell-specific workflows.
-
-The extras can be installed independently when needed:
+This installs the core workflows and the `thg-gapfill`, `thg-pathway`, and
+`thg-compare` commands. Confirm that a command is available with:
 
 ```bash
-python -m pip install 'thg-protocol[solver]'
-python -m pip install 'thg-protocol[memote]'
-python -m pip install 'thg-protocol[cell-specific]'
-python -m pip install 'thg-protocol[docs]'
-python -m pip install 'thg-protocol[database]'
+thg-gapfill --help
 ```
 
-The installed `thg-gapfill`, `thg-pathway`, and `thg-compare` commands expose
-the stable workflows documented in [Usage](usage.md). Their `--help` output is
-safe to run without model files or optional solver/network dependencies.
+## Optional capabilities
+
+Install an extra only when your chosen workflow needs it:
+
+| Extra | Use it for |
+| --- | --- |
+| `database` | Reading historical pickle checkpoints |
+| `solver` | Solver-backed workflows |
+| `memote` | MEMOTE and task analysis |
+| `cell-specific` | Troppo-based cell-specific workflows |
+| `figures` | Rendering figures |
+
+For example:
+
+```bash
+python -m pip install -e '.[figures]'
+```
+
+The relevant [task guide](usage.md) states any additional requirements. Users
+building the package, documentation, or test environment should see
+[development](development.md).

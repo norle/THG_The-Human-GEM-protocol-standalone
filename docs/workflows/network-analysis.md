@@ -1,10 +1,10 @@
 # Network analysis
 
-Use network analysis to inspect connectivity and deterministic reaction
-compaction before optional solver-backed cleanup.
+Use network analysis to inspect connectivity, identify formula-balance issues,
+and compact redundant reactions. Run it after constructing, merging, or
+curating a model to understand the consequences of your changes.
 
-Network components are available through an import-safe package API. It accepts
-a caller-owned COBRA model and does not mutate it:
+Find connected components in a loaded COBRA model:
 
 ```python
 from thg_protocol.analysis import find_network_components, write_component_report
@@ -13,9 +13,8 @@ results = find_network_components(model)
 write_component_report(results, "results/network/components.json")
 ```
 
-The package path performs connectivity analysis only. Solver-backed cleanup and
-HTML visualization are optional operations outside the default package gate;
-full-model runs should be marked `slow`.
+Component analysis does not change the model. Solver-backed cleanup and HTML
+visualization are optional operations for larger investigations.
 
 Proportional-reaction compaction is available separately:
 

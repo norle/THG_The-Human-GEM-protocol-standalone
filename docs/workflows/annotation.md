@@ -1,13 +1,10 @@
 # Metabolite and reaction identification
 
-Use annotation APIs to inventory model identifiers, enrich metabolites or
-reactions, and resolve GPR rules through explicit service clients.
+Use annotation to inventory model identifiers, enrich metabolites or reactions,
+and resolve gene–protein–reaction (GPR) rules. This is useful when you need to
+understand how complete a model is before using it for curation or analysis.
 
-The former `metabolite_reac_identification` workflow annotated a reference
-model and matched reactions against the reference database. Its maintained
-replacement is `thg_protocol.annotation.metabolite_reactions`.
-
-JSON model annotation inventories are available through dependency-light APIs:
+For a JSON model, start by checking the annotations already present:
 
 ```python
 from thg_protocol.annotation import (
@@ -21,14 +18,12 @@ annotations, missing = extract_metabolite_annotations(
 )
 ```
 
-The package annotation APIs require explicit model and target inputs and can
-write an optional JSON report.
+The annotation functions can write an optional JSON report. Provide the model,
+annotation targets, and any output path needed for your project. PubChem and
+other external lookups require an appropriate client and may need network
+access or credentials.
 
-Use explicit model, database, report, and SBML output paths. PubChem lookups
-are owned by the injectable package client; tests should use a static client
-and must not require network access.
-
-EC-number GPR lookup is available through an injectable BioCyc/KEGG boundary:
+Resolve GPR candidates from an EC number with BioCyc and KEGG:
 
 ```python
 from thg_protocol.gpr import get_gpr
@@ -36,10 +31,7 @@ from thg_protocol.gpr import get_gpr
 result = get_gpr("1.2.3.4", biocyc_client=static_biocyc, kegg_client=static_kegg)
 ```
 
-The result preserves the five-field legacy shape while avoiding network access
-when static clients are supplied.
-
-Subcellular GPR rules use the analogous injectable location boundary:
+For subcellular GPR rules, resolve locations separately:
 
 ```python
 from thg_protocol.gpr.location import resolve_locations
@@ -51,8 +43,7 @@ rules = resolve_locations(
 
 ## Prerequisites, output, and troubleshooting
 
-Provide an explicit model, annotation targets, and optional report/output
-paths. Static service clients make the default tests deterministic; live
-clients require credentials, network access, and service-specific rate limits.
-Missing fields are reported as unmatched targets. Check identifier namespaces
-and compartment metadata when a lookup returns no result.
+Provide a model, annotation targets, and optional report/output paths. Live
+clients may require credentials, network access, and service-specific rate
+limits. Missing fields are reported as unmatched targets; check identifier
+namespaces and compartment metadata when a lookup returns no result.

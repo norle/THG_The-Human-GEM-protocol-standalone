@@ -44,19 +44,14 @@ plugins:
               - "!^_"
 nav:
   - Home: index.md
-  - Quickstart: quickstart.md
-  - Examples: examples/README.md
-  - Concepts:
-      - Architecture and data flow: architecture.md
-      - Repository map: repository-map.md
-  - Installation: installation.md
-  - Guides:
-      - Usage: usage.md
-      - Development: development.md
-      - Documentation contribution: documentation-contributing.md
-      - Release validation: release-validation.md
-      - Dependency compatibility: dependency-compatibility.md
-  - Workflows:
+  - Get started:
+      - Installation: installation.md
+      - Five-minute quickstart: quickstart.md
+      - Full workflow overview: workflow-overview.md
+      - Examples: examples/README.md
+  - Use THG Protocol:
+      - Task guides: usage.md
+      - How the pieces fit together: architecture.md
       - Gapfill: workflows/gapfill.md
       - Pathway implementation: workflows/pathway.md
       - Model comparison: workflows/comparison.md
@@ -78,12 +73,16 @@ nav:
       - Analysis: api/analysis.md
       - Figures: api/figures.md
       - CLI commands: api/cli.md
-  - Repository and artifacts:
+  - Developer and maintainer reference:
+      - Development: development.md
+      - Documentation contribution: documentation-contributing.md
+      - Release validation: release-validation.md
+      - Dependency compatibility: dependency-compatibility.md
       - Data and model files: data-and-model-files.md
+      - Repository map: repository-map.md
       - Tracked artifact inventory: artifact-inventory.md
       - Service boundary audit: service-boundary-audit.md
       - Git LFS standalone repository: git-lfs-standalone-repository.md
-  - Maintainer and legacy:
       - Python API contracts: api-contracts.md
       - Legacy workflow status: legacy-workflows.md
       - Legacy API inventory: legacy-api-inventory.md

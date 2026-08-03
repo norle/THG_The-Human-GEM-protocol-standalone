@@ -1,30 +1,26 @@
-# Usage
+# Task guides
 
-Reusable workflow code is exposed through the `thg_protocol` Python API. The
-JSON gapfill and pathway workflows, and reaction-level model comparison, can
-be used without relying on repository-relative output directories:
+Use these guides to choose the THG Protocol operation that matches your next
+piece of work. For the usual order of operations, see [the full workflow
+overview](workflow-overview.md).
 
-```python
-from thg_protocol.gapfill import run_pipeline
-from thg_protocol.pathway import implement_pathway_files
-from thg_protocol.analysis.compare import compare_models_from_files
-from thg_protocol.model_build import build_model_batch
-from thg_protocol.database import reconstruct_model_from_pickle
+| I want to... | Guide | Main result |
+| --- | --- | --- |
+| Create a model from normalized records or a saved record bundle | [Database reconstruction](workflows/database.md) | JSON or SBML model |
+| Enrich a model with external biological information | [Model building](workflows/model-build.md) | Annotated model, caches, and error report |
+| Check or add identifiers and GPR information | [Annotation](workflows/annotation.md) | Annotation inventory or updated information |
+| Add a defined pathway | [Pathway implementation](workflows/pathway.md) | Revised JSON model |
+| Find transport candidates for compartment-specific dead ends | [Gapfill](workflows/gapfill.md) | Candidate and selection reports plus revised model |
+| Combine two models | [Merge and consistency](workflows/merge.md) | Merged model and merge report |
+| Compare model versions or references | [Model comparison](workflows/comparison.md) | CSV comparison reports |
+| Inspect connectivity, balance, or redundant reactions | [Network analysis](workflows/network-analysis.md) | Analysis results and optional report |
+| Derive a model for a cell type | [Cell-specific models](workflows/cell-specific.md) | Tailored model and reduction report |
+| Present model or report summaries | [Figures and reports](workflows/figures.md) | SVG figures and summaries |
+| Run broader quality diagnostics | [MEMOTE and task analysis](workflows/memote.md) | MEMOTE/task reports |
 
-gapfill = run_pipeline("model.json", "results/gapfill")
-pathway = implement_pathway_files(
-    "model.json", "pathway.json", "metabolite_ids.json", "results/pathway.json"
-)
-reports = compare_models_from_files("model_a.json", "model_b.json", "results/compare")
-batch_report = build_model_batch("input.xml", "results/batch.xml", cache_dir="results/cache")
-reconstruct_model_from_pickle("records.pk", output_path="results/reconstructed.xml")
-```
+## Command-line workflows
 
-Existing top-level scripts remain available during the migration. New command
-line entry points will be added only after their workflow modules are
-import-safe, parameterized, and covered by help smoke tests.
-
-Installed command-line workflows:
+Three common workflows are also available from the command line:
 
 ```bash
 thg-gapfill --model model.json --output-dir results/gapfill
@@ -32,3 +28,7 @@ thg-pathway --model model.json --config pathway.json \
   --database metabolite_ids.json --output results/pathway.json
 thg-compare model_a.json model_b.json --output-dir results/compare
 ```
+
+Each guide describes the expected inputs, generated files, and common issues.
+For Python automation, use the corresponding functions in the [API
+reference](api/index.md).
