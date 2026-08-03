@@ -1,0 +1,21 @@
+# Installed commands
+
+The package installs three commands. All have import-safe `--help` output and
+require explicit input and output paths for actual work.
+
+| Command | Python entry point | Purpose |
+| --- | --- | --- |
+| `thg-gapfill` | `thg_protocol.gapfill.cli:main` | Deterministic three-phase JSON gapfill |
+| `thg-pathway` | `thg_protocol.pathway.cli:main` | Apply a pathway configuration to a JSON model |
+| `thg-compare` | `thg_protocol.analysis.compare_cli:main` | Compare model reactions and write CSV reports |
+
+Run these commands from any directory after installation:
+
+```bash
+thg-gapfill --help
+thg-pathway --help
+thg-compare --help
+```
+
+The [workflow pages](../usage.md) contain CLI examples and the generated
+reference pages contain the parser and error contracts.

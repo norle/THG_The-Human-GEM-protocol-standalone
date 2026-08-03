@@ -1,0 +1,16 @@
+{
+  "id": "docs-toy-comparison",
+  "name": "Documentation comparison toy model",
+  "genes": [],
+  "compartments": {"c": "cytosol", "e": "extracellular"},
+  "metabolites": [
+    {"id": "A_c", "name": "A", "compartment": "c", "formula": "C1H2"},
+    {"id": "A_e", "name": "A", "compartment": "e", "formula": "C1H2"},
+    {"id": "B_c", "name": "B", "compartment": "c", "formula": "C1H2"},
+    {"id": "B_e", "name": "B", "compartment": "e", "formula": "C1H2"}
+  ],
+  "reactions": [
+    {"id": "R_c", "name": "A to B in cytosol", "metabolites": {"A_c": -1, "B_c": 1}},
+    {"id": "R_new", "name": "New extracellular reaction", "metabolites": {"A_e": -1, "B_e": 1}}
+  ]
+}

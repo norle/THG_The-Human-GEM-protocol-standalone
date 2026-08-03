@@ -1,0 +1,6 @@
+{
+  "pathway_name": "Documentation pathway",
+  "compartments": [{"name": "documentation space", "abbreviation": "d"}],
+  "metabolites": {"targets": []},
+  "reactions": []
+}

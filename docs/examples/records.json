@@ -1,0 +1,13 @@
+{
+  "model_id": "docs-toy",
+  "model_name": "Documentation toy model",
+  "metabolites": [
+    {"id": "a_c", "name": "A", "compartment": "c", "formula": "C1H2", "annotation": {"chebi": "CHEBI:1"}},
+    {"id": "b_c", "name": "B", "compartment": "c", "formula": "C1H2"}
+  ],
+  "reactions": [
+    {"id": "R_A_to_B", "name": "A to B", "stoichiometry": {"a_c": -1, "b_c": 1}, "gene_reaction_rule": "GENE1"}
+  ],
+  "genes": [{"id": "GENE1", "name": "Documentation gene"}],
+  "pathways": {"documentation": ["R_A_to_B"]}
+}

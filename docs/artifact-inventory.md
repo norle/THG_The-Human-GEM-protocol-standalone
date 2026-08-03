@@ -1,5 +1,8 @@
 # Tracked Artifact Inventory (Approved disposition)
 
+The machine-readable checksum list is available as
+[`canonical-artifact-checksums.txt`](canonical-artifact-checksums.txt).
+
 This inventory was generated from the current Git checkout on 2026-07-27 and
 the disposition was approved by the maintainer on 2026-07-27.
 It includes every tracked file at least 1 MiB before cleanup. Checksums are

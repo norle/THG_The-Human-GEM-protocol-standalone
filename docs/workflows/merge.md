@@ -1,5 +1,8 @@
 # Merge and network consistency
 
+Use merge when a base model should be enriched by a second model while
+preserving ownership of both inputs.
+
 The package-native merge boundary accepts two COBRA models and returns a
 non-mutating merged copy with an explicit report:
 
@@ -24,3 +27,11 @@ APIs rather than as a separate installed CLI.
 
 Use small toy models for unit tests; reserve full GEMs and solver-backed
 consistency checks for marked integration or solver jobs.
+
+## Prerequisites, output, and troubleshooting
+
+Inputs must be compatible COBRA models or JSON/SBML files. The result is a
+copied merged model and a `MergeReport`; optional output is written to the
+explicit path. Overlapping IDs retain base stoichiometry and receive non-empty
+incoming metadata. Inspect the report before enabling isolated-metabolite
+removal.

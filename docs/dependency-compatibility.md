@@ -1,8 +1,8 @@
 # Dependency Compatibility Matrix
 
 This is the initial compatibility inventory requested by the refactoring plan.
-The GLPK baselines are recorded in
-[`constraints/`](../constraints/). They are the release-validation policy for
+The GLPK baselines are recorded in the repository-root `constraints/` directory.
+They are the release-validation policy for
 the declared Python 3.10–3.12 range; update the matching file and CI matrix
 together when a dependency changes.
 

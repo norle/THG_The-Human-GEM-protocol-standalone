@@ -1,5 +1,8 @@
 # Network analysis
 
+Use network analysis to inspect connectivity and deterministic reaction
+compaction before optional solver-backed cleanup.
+
 Network components are available through an import-safe package API. It accepts
 a caller-owned COBRA model and does not mutate it:
 
@@ -33,3 +36,10 @@ from thg_protocol.analysis import reaction_balance, unbalanced_reactions
 reaction_balance(model.reactions[0])
 unbalanced_reactions(model)
 ```
+
+## Prerequisites, output, and troubleshooting
+
+Provide a loaded COBRA model and an explicit JSON report path when persistence
+is needed. Component analysis returns a graph and connectivity summary without
+mutation. An unexpectedly disconnected model usually indicates missing
+transport reactions or compartment-specific IDs; inspect `component_info`.

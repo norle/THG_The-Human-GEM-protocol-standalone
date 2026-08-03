@@ -1,33 +1,39 @@
 # THG Protocol
 
-This documentation tracks the package migration described in
-`REFACTORING_PLAN.md` and its executable closeout in
-`REFACTORING_PLAN_NEXT.md` at the repository root. The follow-up removal
-sequence is defined in `REFACTORING_PLAN_LEGACY_REMOVAL.md`.
+THG Protocol is a Python package for reconstructing, curating, annotating,
+comparing, and analyzing human genome-scale metabolic models. The maintained
+package boundary is deterministic by default: callers provide input, output,
+cache, and report paths, while network services and optional solvers are
+injected explicitly.
 
-Start with:
+## Choose a starting point
 
-- [Installation](installation.md)
-- [Usage](usage.md)
-- [Development](development.md)
-- [Release validation](release-validation.md)
-- [Dependency compatibility](dependency-compatibility.md)
-- [Data and model files](data-and-model-files.md)
-- [Legacy workflow status](legacy-workflows.md)
-- [Legacy API inventory](legacy-api-inventory.md)
-- [Python API contracts](api-contracts.md)
-- [Publish the Git LFS migration in a standalone repository](git-lfs-standalone-repository.md)
+- New users: [five-minute quickstart](quickstart.md).
+- Workflow users: [workflow guides](usage.md) and the [architecture overview](architecture.md).
+- Python developers: [API reference](api/index.md) and [development guide](development.md).
+- Artifact maintainers: [repository map](repository-map.md) and [artifact inventory](artifact-inventory.md).
 
-Workflow guides:
+The intended GitHub Pages URL is
+<https://norle.github.io/THG_The-Human-GEM-protocol-standalone/>. It becomes
+live after the repository Pages source is enabled for GitHub Actions and the
+default-branch deployment succeeds. Builds are strict and examples run without
+credentials, solvers, large model files, or live services.
 
-- [Gapfill](workflows/gapfill.md)
-- [Pathway implementation](workflows/pathway.md)
-- [Model comparison](workflows/comparison.md)
-- [Metabolite and reaction identification](workflows/annotation.md)
-- [Database generation](workflows/database.md)
-- [Model building](workflows/model-build.md)
-- [Merge and network consistency](workflows/merge.md)
-- [Cell-specific models](workflows/cell-specific.md)
-- [Figures and reports](workflows/figures.md)
-- [Network analysis](workflows/network-analysis.md)
-- [MEMOTE and task analysis](workflows/memote.md)
+## Supported entry points
+
+The installed commands are `thg-gapfill`, `thg-pathway`, and `thg-compare`.
+The [API reference](api/index.md) covers every maintained module under
+`thg_protocol`, while the [workflow section](usage.md) explains when to use
+each interface.
+
+Historical checkout workflows and preserved outputs remain documented under
+[maintainer and legacy](legacy-workflows.md); they are not release interfaces.
+The broader migration context is recorded in the repository-root
+`REFACTORING_PLAN.md`, `REFACTORING_PLAN_NEXT.md`, and
+`REFACTORING_PLAN_LEGACY_REMOVAL.md` files.
+
+## Citation and lineage
+
+Please cite [biosustain/THG](https://github.com/biosustain/THG) when using THG
+in research. This standalone repository preserves the Git LFS migration and
+publishing procedure in the [standalone repository runbook](git-lfs-standalone-repository.md).

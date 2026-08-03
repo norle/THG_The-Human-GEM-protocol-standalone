@@ -1,5 +1,9 @@
 # Cell-specific models
 
+Use the dependency-light core to reduce a model from an activity matrix; use
+the optional Troppo workflows only when their solver and expression semantics
+are required.
+
 The dependency-light tailoring core is available without Troppo:
 
 ```python
@@ -56,3 +60,10 @@ python -m pip install 'thg-protocol[cell-specific]'
 Keep downloaded model inputs and generated outputs outside the source tree.
 Characterize external service calls with static fixtures; the package APIs do
 not make live requests implicitly.
+
+## Prerequisites, output, and troubleshooting
+
+Activity rows must exactly follow reaction order. The output is a copied model
+and an `ActivityReductionReport`; no input model is mutated. A row-count error
+means the matrix and model order do not match. A MAT input must contain
+`all_Solutions_matrix5` unless `matrix_key` is changed.

@@ -1,5 +1,8 @@
 # Database generation
 
+Use database reconstruction when normalized records, JSON bundles, or a
+historical pickle checkpoint are the authoritative input.
+
 The normalized reconstruction core is available without network access:
 
 ```python
@@ -76,3 +79,10 @@ network access.
 Before running the workflow, provide the required reference tables and an
 explicit output location. Do not commit generated database files, caches, or
 credentials.
+
+## Prerequisites, output, and troubleshooting
+
+The normalized API requires record IDs and stoichiometry that reference known
+metabolites. It returns a COBRA model and, when requested, writes JSON or SBML
+to the explicit output path. Malformed bundles raise a validation error before
+output is written.

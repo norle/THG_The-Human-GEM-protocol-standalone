@@ -54,3 +54,4 @@ tests/fixtures/legacy_characterization/mass_balance/files/
 /run_full.log
 /files/model_variables.pkl
 /models/base/
+site/

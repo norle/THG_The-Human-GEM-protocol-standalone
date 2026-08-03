@@ -1,17 +1,61 @@
 site_name: THG Protocol
 site_description: Tools for constructing and analyzing human genome-scale metabolic models.
+site_url: https://norle.github.io/THG_The-Human-GEM-protocol-standalone/
 docs_dir: docs
+theme:
+  name: material
+  features:
+    - navigation.sections
+    - navigation.top
+    - search.highlight
+    - search.share
+    - content.code.copy
+  icon:
+    repo: fontawesome/brands/github
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      toggle:
+        icon: fontawesome/solid/sun
+        name: Use dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      toggle:
+        icon: fontawesome/solid/moon
+        name: Use light mode
+repo_url: https://github.com/norle/THG_The-Human-GEM-protocol-standalone
+repo_name: norle/THG_The-Human-GEM-protocol-standalone
+edit_uri: edit/refactoring-cleanup/docs/
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          options:
+            docstring_style: google
+            show_source: true
+            show_root_heading: true
+            show_root_full_path: false
+            members_order: source
+            show_signature_annotations: true
+            separate_signature: true
+            inherited_members: true
+            filters:
+              - "!^_"
 nav:
   - Home: index.md
+  - Quickstart: quickstart.md
+  - Examples: examples/README.md
+  - Concepts:
+      - Architecture and data flow: architecture.md
+      - Repository map: repository-map.md
   - Installation: installation.md
-  - Usage: usage.md
-  - Development: development.md
-  - Release validation: release-validation.md
-  - Dependency compatibility: dependency-compatibility.md
-  - Data and model files: data-and-model-files.md
-  - Legacy workflow status: legacy-workflows.md
-  - Legacy API inventory: legacy-api-inventory.md
-  - Python API contracts: api-contracts.md
+  - Guides:
+      - Usage: usage.md
+      - Development: development.md
+      - Documentation contribution: documentation-contributing.md
+      - Release validation: release-validation.md
+      - Dependency compatibility: dependency-compatibility.md
   - Workflows:
       - Gapfill: workflows/gapfill.md
       - Pathway implementation: workflows/pathway.md
@@ -19,8 +63,27 @@ nav:
       - Annotation: workflows/annotation.md
       - Database generation: workflows/database.md
       - Model build: workflows/model-build.md
-      - Merge and network consistency: workflows/merge.md
+      - Merge and consistency: workflows/merge.md
       - Cell-specific models: workflows/cell-specific.md
       - Figures and reports: workflows/figures.md
       - Network analysis: workflows/network-analysis.md
       - MEMOTE and task analysis: workflows/memote.md
+  - API reference:
+      - Overview: api/index.md
+      - Core and I/O: api/core.md
+      - Database and model construction: api/construction.md
+      - Annotation and GPR: api/annotation.md
+      - Services: api/services.md
+      - Workflows: api/workflows.md
+      - Analysis: api/analysis.md
+      - Figures: api/figures.md
+      - CLI commands: api/cli.md
+  - Repository and artifacts:
+      - Data and model files: data-and-model-files.md
+      - Tracked artifact inventory: artifact-inventory.md
+      - Service boundary audit: service-boundary-audit.md
+      - Git LFS standalone repository: git-lfs-standalone-repository.md
+  - Maintainer and legacy:
+      - Python API contracts: api-contracts.md
+      - Legacy workflow status: legacy-workflows.md
+      - Legacy API inventory: legacy-api-inventory.md

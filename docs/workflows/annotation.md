@@ -1,5 +1,8 @@
 # Metabolite and reaction identification
 
+Use annotation APIs to inventory model identifiers, enrich metabolites or
+reactions, and resolve GPR rules through explicit service clients.
+
 The former `metabolite_reac_identification` workflow annotated a reference
 model and matched reactions against the reference database. Its maintained
 replacement is `thg_protocol.annotation.metabolite_reactions`.
@@ -45,3 +48,11 @@ rules = resolve_locations(
     gpr, gene_names, gene_ids, location_client=static_location_client
 )
 ```
+
+## Prerequisites, output, and troubleshooting
+
+Provide an explicit model, annotation targets, and optional report/output
+paths. Static service clients make the default tests deterministic; live
+clients require credentials, network access, and service-specific rate limits.
+Missing fields are reported as unmatched targets. Check identifier namespaces
+and compartment metadata when a lookup returns no result.

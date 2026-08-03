@@ -1,5 +1,8 @@
 # Model building
 
+Use model building to annotate an existing JSON or SBML model through the
+injectable BioCyc, KEGG, and Ensembl boundaries.
+
 The package-native file workflow is available through
 `thg_protocol.model_build.build_model`:
 
@@ -58,3 +61,10 @@ resolution is needed.
 
 Keep large model inputs outside ordinary generated test fixtures. Credentials
 are read from environment variables or local configuration outside Git.
+
+## Prerequisites, output, and troubleshooting
+
+The input must be JSON or SBML. The output is an annotated model, JSON service
+caches, and an optional error report under caller-selected paths. Pass static
+clients for offline runs. If a service error is reported, inspect the error
+file and cache contents before retrying with the same cache directory.
