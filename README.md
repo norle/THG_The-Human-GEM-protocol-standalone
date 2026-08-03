@@ -84,6 +84,7 @@ thg-compare model_a.json model_b.json --output-dir results/compare
 - [Task guides](docs/usage.md)
 - [API reference](docs/api/index.md)
 - [Data and model files](docs/data-and-model-files.md)
+- [Refactoring closeout plan](docs/plans/REFACTORING_PLAN_NEXT.md)
 
 Developer, release, repository, and legacy information is kept separately in the [developer and maintainer reference](docs/development.md).
 

@@ -3,8 +3,8 @@
 Last reviewed: 2026-08-03
 
 This document is the concise operational snapshot for the refactoring described
-in `REFACTORING_PLAN.md`, with closeout requirements in
-`REFACTORING_PLAN_NEXT.md`. It replaces the chronological progress diary.
+in `docs/plans/REFACTORING_PLAN.md`, with closeout requirements in
+`docs/plans/REFACTORING_PLAN_NEXT.md`. It replaces the chronological progress diary.
 Update it when implementation status, validation evidence, blockers, or the
 next reviewable work changes. Git history remains the source for detailed
 historical implementation notes.
@@ -238,8 +238,8 @@ refactoring progress.
 ## Completion Criteria
 
 The refactor is complete when the definition of done in
-`REFACTORING_PLAN_NEXT.md` (and the carried-forward requirements from
-`REFACTORING_PLAN.md`) passes and:
+`docs/plans/REFACTORING_PLAN_NEXT.md` (and the carried-forward requirements from
+`docs/plans/REFACTORING_PLAN.md`) passes and:
 
 - No maintained workflow silently loses historical behavior.
 - Every intentionally removed behavior has an approved and documented

@@ -65,13 +65,13 @@ When updating this plan:
 
 The repository already contains:
 
-- [MkDocs configuration](mkdocs.yml).
+- MkDocs configuration: `mkdocs.yml`.
 - Existing user, developer, release, artifact, legacy, and workflow pages in
-  [`docs/`](docs/).
-- Python package code under [`src/thg_protocol/`](src/thg_protocol/).
-- A broad test suite under [`tests/`](tests/).
+  [`docs/`](../index.md).
+- Python package code under `src/thg_protocol/`.
+- A broad test suite under `tests/`.
 - Existing GitHub Actions package validation in
-  [`.github/workflows/ci.yml`](.github/workflows/ci.yml).
+  `.github/workflows/ci.yml`.
 
 The main documentation gaps are:
 
@@ -91,9 +91,9 @@ The main documentation gaps are:
 ### Tasks
 
 - [x] Add `mkdocstrings[python]` to the `docs` extra in
-  [`pyproject.toml`](pyproject.toml).
+  `pyproject.toml`.
 - [x] Configure MkDocs Material for search, code examples, navigation, and
-  source links in [`mkdocs.yml`](mkdocs.yml).
+  source links in `mkdocs.yml`.
 - [x] Make `mkdocs build --strict` the required local documentation build.
 - [x] Add all relevant existing pages to the navigation, including artifact,
   service-boundary, and Git LFS documentation.
@@ -130,7 +130,7 @@ Organize the site into clear audiences and tasks:
 
 ### Tasks
 
-- [x] Turn [`docs/index.md`](docs/index.md) into a useful landing page.
+- [x] Turn [`docs/index.md`](../index.md) into a useful landing page.
 - [x] Add a five-minute quickstart using a small model fixture.
 - [x] Add an architecture/data-flow page explaining how construction,
   annotation, services, analysis, and reporting fit together.
@@ -141,10 +141,10 @@ Organize the site into clear audiences and tasks:
 
 **Evidence / notes:**
 
-Landing page: [`docs/index.md`](docs/index.md). Quickstart and concepts:
-[`docs/quickstart.md`](docs/quickstart.md),
-[`docs/architecture.md`](docs/architecture.md), and
-[`docs/repository-map.md`](docs/repository-map.md).
+Landing page: [`docs/index.md`](../index.md). Quickstart and concepts:
+[`docs/quickstart.md`](../quickstart.md),
+[`docs/architecture.md`](../architecture.md), and
+[`docs/repository-map.md`](../repository-map.md).
 
 ## Phase 3 — API and code reference
 
@@ -179,7 +179,7 @@ architecture documentation rather than presented as supported interfaces.
 
 **Evidence / notes:**
 
-The generated reference is grouped under [`docs/api/`](docs/api/). A local
+The generated reference is grouped under [`docs/api/`](../api/index.md). A local
 module audit found all 47 `src/thg_protocol` modules represented in the API
 pages; `mkdocs build --strict` rendered them successfully.
 
@@ -214,9 +214,8 @@ calls in the default documentation test suite.
 
 **Evidence / notes:**
 
-Workflow pages are under [`docs/workflows/`](docs/workflows/), fixtures under
-[`docs/examples/`](docs/examples/), and executable coverage is in
-[`tests/docs/test_examples.py`](tests/docs/test_examples.py). The test suite
+Workflow pages are under `docs/workflows/`, fixtures under `docs/examples/`,
+and executable coverage is in `tests/docs/test_examples.py`. The test suite
 uses temporary output paths and static clients; optional solver/MEMOTE guidance
 is documented but excluded from the offline gate.
 
@@ -238,10 +237,10 @@ is documented but excluded from the offline gate.
 **Evidence / notes:**
 
 Artifact ownership is documented in
-[`docs/artifact-inventory.md`](docs/artifact-inventory.md),
-[`docs/data-and-model-files.md`](docs/data-and-model-files.md),
-[`docs/service-boundary-audit.md`](docs/service-boundary-audit.md), and
-[`docs/git-lfs-standalone-repository.md`](docs/git-lfs-standalone-repository.md).
+[`docs/artifact-inventory.md`](../artifact-inventory.md),
+[`docs/data-and-model-files.md`](../data-and-model-files.md),
+[`docs/service-boundary-audit.md`](../service-boundary-audit.md), and
+[`docs/git-lfs-standalone-repository.md`](../git-lfs-standalone-repository.md).
 
 ## Phase 6 — Documentation validation and CI
 
@@ -249,7 +248,7 @@ Artifact ownership is documented in
 **Last updated:** 2026-08-03
 **Owner / PR:** Codex / local implementation
 
-Create [`.github/workflows/docs.yml`](.github/workflows/docs.yml) that:
+Create `.github/workflows/docs.yml` that:
 
 - [x] Runs on pull requests.
 - [x] Runs on pushes to the default branch.
@@ -271,7 +270,7 @@ Create [`.github/workflows/docs.yml`](.github/workflows/docs.yml) that:
 
 **Evidence / notes:**
 
-[`docs.yml`](.github/workflows/docs.yml) validates pull requests, pushes, and
+`.github/workflows/docs.yml` validates pull requests, pushes, and
 manual runs; it installs the docs extra, builds strictly, and runs
 `pytest tests/docs`. Local evidence: 2 docs tests passed, 1,845 offline package
 tests passed (with 2 expected skips), and strict MkDocs build passed. A link

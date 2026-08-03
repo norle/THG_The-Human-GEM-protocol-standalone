@@ -158,9 +158,10 @@ than accidentally resolving local files.
 .
 ├── pyproject.toml
 ├── README.md
-├── REFACTORING_PLAN.md
 ├── CURRENT_STATE.md
 ├── docs/
+│   ├── plans/
+│   │   └── REFACTORING_PLAN.md
 │   ├── index.md
 │   ├── installation.md
 │   ├── usage.md
@@ -611,7 +612,7 @@ compatibility:
 
 Deliverables:
 
-- `REFACTORING_PLAN.md`
+- `docs/plans/REFACTORING_PLAN.md`
 - Initial issue list in GitHub or a local checklist.
 - Dependency inventory and proposed extras.
 - Large-file inventory and proposed LFS/ignore policy.

@@ -39,4 +39,6 @@ Please cite [biosustain/THG](https://github.com/biosustain/THG) when using THG
 in research.
 
 Development, release, legacy, and repository-maintenance information is kept
-in the [developer and maintainer section](development.md).
+in the [developer and maintainer section](development.md). The active
+[refactoring closeout plan](plans/REFACTORING_PLAN_NEXT.md) is maintained with
+the other implementation plans.

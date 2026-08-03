@@ -86,3 +86,7 @@ nav:
       - Python API contracts: api-contracts.md
       - Legacy workflow status: legacy-workflows.md
       - Legacy API inventory: legacy-api-inventory.md
+      - Original refactoring plan: plans/REFACTORING_PLAN.md
+      - Legacy removal plan: plans/REFACTORING_PLAN_LEGACY_REMOVAL.md
+      - Refactoring closeout plan: plans/REFACTORING_PLAN_NEXT.md
+      - Documentation implementation plan: plans/DOCUMENTATION_IMPLEMENTATION_PLAN.md

@@ -16,7 +16,7 @@ def get_project_root() -> Path:
     """
     package_path = Path(__file__).resolve()
     for parent in package_path.parents:
-        if (parent / "REFACTORING_PLAN.md").exists():
+        if (parent / "docs" / "plans" / "REFACTORING_PLAN.md").exists():
             return parent
     return package_path.parent
 
