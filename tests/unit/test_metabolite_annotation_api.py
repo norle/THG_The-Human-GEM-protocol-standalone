@@ -22,6 +22,12 @@ def test_metabolite_annotation_api_exposes_characterized_helper_names():
     )
 
 
+def test_legacy_annotation_file_helper_uses_canonical_snapshot():
+    assert metabolites.global_met_annotation_file().endswith(
+        "supplementary_material/metabolite_reaction/met_annotation.tsv"
+    )
+
+
 def test_generate_met_annotation_passes_an_injected_pubchem_client(tmp_path):
     output = tmp_path / "met_annotation.tsv"
     client = StaticPubChemClient(

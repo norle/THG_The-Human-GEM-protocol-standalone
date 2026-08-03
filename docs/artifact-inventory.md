@@ -106,6 +106,9 @@ former legacy paths: relocated files are owned by the destinations listed
 above, while generated reports, duplicate model fixtures, caches, and checkout
 documentation are retired. The executable closure checks in
 `tests/unit/test_legacy_import_policy.py` verify the destination set. The
+complete SHA-256 manifest for tracked relocated artifacts is maintained in
+[`docs/canonical-artifact-checksums.txt`](canonical-artifact-checksums.txt);
+the large pathway input remains covered by the separate Git LFS gate. The
 canonical pathway input tree is tracked, and its large input is covered by the
 LFS rule at its new path.
 

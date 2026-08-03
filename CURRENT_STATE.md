@@ -20,8 +20,9 @@ the current checkout is a hosted current-head Python 3.10–3.12 matrix run.
 ## Repository Snapshot
 
 - Branch: `refactoring-cleanup`
-- Reviewed commit: `2626038` (`fix: close out canonical pathway artifacts`)
-- Working tree at review: clean after the canonical-artifact closeout commit
+- Reviewed commit: `b9cd6e9` (`fix: close out canonical pathway artifacts`)
+- Working tree at review: one intentional supplementary-notebook migration is
+  pending; no legacy source or artifact directories are present
 - Logical closeout commits: `c8f85a3` (documentation and artifact ownership),
   `77634e6` (maintained test migration), and `dc32a9e` (legacy implementation
   removal and artifact relocation), followed by `2626038` (canonical artifact
@@ -69,6 +70,9 @@ the current checkout is a hosted current-head Python 3.10–3.12 matrix run.
   import boundaries and absence of all 15 legacy directories.
 - Package-owned export checks and relocated characterization fixtures under
   `tests/`.
+- Supplementary boundary-summary notebook imports now use
+  `thg_protocol.merge`; it no longer presents the removed `functions` namespace
+  as an available example dependency.
 
 ## Validation Evidence
 
@@ -113,6 +117,14 @@ Later dependency-free checks on the current refactoring line recorded:
 - Current checkout removal policy and package export gates: `19 passed`.
 - The exact default offline command from the CI failure report passes after
   the artifact-tracking fix: `1838 passed, 2 skipped` under Python 3.12.
+- Current audit rerun of the exact default offline gate passes: `1843 passed,
+  2 skipped` under Python 3.12. Ruff, bytecode compilation, the legacy-closure
+  policy tests, and the three installed CLI help checks also pass. The closure
+  policy covers maintained Python/notebook sources, documentation snippets,
+  canonical artifact tracking, and package imports.
+- A fresh isolated `python -m build` completed successfully, and the resulting
+  wheel installed outside the checkout, imported all supported package areas,
+  and passed `thg-gapfill`, `thg-compare`, and `thg-pathway --help` smoke tests.
 - The focused legacy-closure and CI-policy gates pass: `9 passed`; Ruff is
   clean for `src tests`.
 - `git lfs fsck` passes with all seven approved objects, including the

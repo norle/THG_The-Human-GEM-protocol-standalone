@@ -129,11 +129,18 @@ PROXY_CONFIG = None
 
 
 def global_met_annotation_file():
-    global annotation_file
-    annotation_file = os.path.join(
-        project_root, "metabolite_reac_identification", "reports", "met_annotation.tsv"
+    """Return the canonical snapshot path used by the annotation workflow.
+
+    New callers should pass explicit paths to the annotation APIs.  This
+    compatibility helper remains available for source-checkout consumers, but
+    must point at the relocated artifact rather than the removed legacy tree.
+    """
+    return os.path.join(
+        project_root,
+        "supplementary_material",
+        "metabolite_reaction",
+        "met_annotation.tsv",
     )
-    return annotation_file
 
 
 def gather_metabolites(model: cobra.Model) -> List[Tuple[str, str, str, str]]:
