@@ -10,4 +10,5 @@ models/Human[[:space:]]Database.xml filter=lfs diff=lfs merge=lfs -text
 
 # Large generated HTML reports retained through Git LFS and excluded from language statistics.
 supplementary_material/pathway/figures/Glycocalyx_Cytoskeleton_network_plotly.html filter=lfs diff=lfs merge=lfs -text linguist-generated=true
+supplementary_material/pathway/figures/Glycocalyx_Cytoskeleton_network_d3.html linguist-generated=true
 files/MEMOTE_model_THG_endoA_reduced_2506.html filter=lfs diff=lfs merge=lfs -text linguist-generated=true
