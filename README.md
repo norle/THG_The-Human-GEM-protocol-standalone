@@ -1,152 +1,180 @@
-# The Human GEM (THG): A protocol for the automatic construction of highly curated genome-scale models of human metabolism.
+# THG Protocol
+
+[![CI](https://github.com/norle/THG_The-Human-GEM-protocol-standalone/actions/workflows/ci.yml/badge.svg)](https://github.com/norle/THG_The-Human-GEM-protocol-standalone/actions/workflows/ci.yml)
+[![Documentation](https://github.com/norle/THG_The-Human-GEM-protocol-standalone/actions/workflows/docs.yml/badge.svg)](https://github.com/norle/THG_The-Human-GEM-protocol-standalone/actions/workflows/docs.yml)
+[![License: CC BY 4.0](https://img.shields.io/badge/License-CC%20BY%204.0-lightgrey.svg)](LICENSE)
+
+Python tools for reconstructing, curating, annotating, comparing, and
+analyzing human genome-scale metabolic models.
+
+The Human GEM (THG) protocol can build a curated metabolic network from
+normalized records, or curate and expand an existing human GEM. Network-backed
+services and optional solver workflows are explicit opt-ins; the maintained
+package APIs are deterministic by default and accept caller-owned input,
+output, cache, and report paths.
 
 > [!NOTE]
 > This is a standalone repository derived from
 > [MarindeMasLab/THG_The-Human-GEM-protocol](https://github.com/MarindeMasLab/THG_The-Human-GEM-protocol).
 > It was created with rewritten Git history to migrate repository artifacts to
-> Git LFS, because new LFS objects cannot be added to the existing public fork
-> network. It is intentionally **not** part of that repository's GitHub fork
-> network.
->
-> The source repository is itself a fork of
-> [biosustain/THG](https://github.com/biosustain/THG). Please refer to those
-> repositories for the original project lineage and upstream history. For the
-> publishing rationale and procedure, see
-> [the standalone-repository runbook](docs/git-lfs-standalone-repository.md).
+> Git LFS and is intentionally outside that repository's GitHub fork network.
+> The source project is itself based on [biosustain/THG](https://github.com/biosustain/THG).
+> See the [standalone-repository runbook](docs/git-lfs-standalone-repository.md)
+> for the publishing rationale and procedure.
 
-The protocol enables the automatic curation and/or expansion of existing human GEMs or generates a highly curated metabolic network based on the current information retrieved from multiple databases in real time. 
+## Package status
 
-Please cite https://github.com/biosustain/THG if you use THG in your research. 
+This checkout contains the `thg-protocol` package, version `0.1.0`, using a
+`src/` layout and supporting Python 3.10–3.12. The maintained package surface
+includes Python APIs under `thg_protocol`, three installed command-line tools,
+and documentation-backed workflow examples. Historical checkout-only
+implementations and their old import namespaces have been removed; preserved
+reports, figures, inputs, and model files remain available under their
+canonical artifact locations.
 
-## User Guide 
+The [current-state snapshot](CURRENT_STATE.md) records validation evidence and
+remaining release work for the refactoring branch.
 
-Package installation, Python APIs, and tested CLI workflows are documented in
-the [THG Protocol guide](docs/index.md). The original architecture is recorded
-in [`REFACTORING_PLAN.md`](REFACTORING_PLAN.md), and the executable closeout
-plan is [`REFACTORING_PLAN_NEXT.md`](REFACTORING_PLAN_NEXT.md). The concise
-implementation and validation snapshot is in
-[`CURRENT_STATE.md`](CURRENT_STATE.md).
-The subsequent Python-removal plan is
-[`REFACTORING_PLAN_LEGACY_REMOVAL.md`](REFACTORING_PLAN_LEGACY_REMOVAL.md).
-The intended documentation site URL is
-<https://norle.github.io/THG_The-Human-GEM-protocol-standalone/>; it becomes
-live after GitHub Pages is enabled for the repository.
+## Features
+
+- Reconstruct models from normalized metabolite and reaction records.
+- Annotate metabolites, reactions, and GPRs through injectable service clients.
+- Run deterministic gapfill and pathway workflows with explicit file paths.
+- Merge models and perform structural consistency, network, and mass-balance
+  analysis.
+- Compare JSON and SBML models and generate figures and reports.
+- Use optional solver, MEMOTE, database, cell-specific, and figure extras when
+  a workflow requires them.
 
 ## Installation
 
-Install the package and select only the workflow extras you need:
+The package is currently installed from a repository checkout:
 
 ```bash
-python -m pip install thg-protocol
-python -m pip install "thg-protocol[dev]"            # tests and linting
-python -m pip install "thg-protocol[solver]"         # solver workflows
-python -m pip install "thg-protocol[memote]"         # MEMOTE analysis
-python -m pip install "thg-protocol[cell-specific]" # cell-specific models
-python -m pip install "thg-protocol[docs]"           # MkDocs documentation
+git clone https://github.com/norle/THG_The-Human-GEM-protocol-standalone.git
+cd THG_The-Human-GEM-protocol-standalone
+
+python -m venv .venv
+source .venv/bin/activate
+python -m pip install --upgrade pip
+python -m pip install -e .
 ```
 
-The installed commands are `thg-gapfill`, `thg-pathway`, and `thg-compare`.
-See the [installation guide](docs/installation.md) and
-[development guide](docs/development.md) for editable installs and release
-validation.
-
-## Model Overview
-
-One of the most recent reconstruction of human metabolism (Human1)&ast; was used as reference model to apply our protocol and generate THG. 
-
-| Model | Source | Reactions | Metabolites | Genes | GPRs | Comp. |
-| ------------- | ------------- | ------------- |------------- | ------------- |------------- | ------------- |
-| Network Model | Online databases | 2.930 | 3.849| 1.485 | 2.838 | 9 |
-| Human1&ast; | HMR2, Recon3D, iHsa  | 13.069 | 8.369| 3.067 | 8.022 | 9 |
-| THG-beta1.1 | Human1&ast;  | 13.069 | 8.369| 3.067 | 8.022 | 9 |
-| THG-beta1 |  THG-beta1.1 | 13.069 | 8.369| 3.067 | 8.022 | 9 |
-| THG-beta2 | THG-beta1  | 18.136 | 12.919 | 3.174 | 13.188 | 9 |
-| THG | Network Model, THG-beta2   | 20.677 | 13.840 | 3.392 | 15.651 | 9 |
-
-&ast; J. L. Robinson, P. Kocabas, H. Wang, P.-E. Cholley, et al. An atlas of human metabolism. Sci. Signal. 13, eaaz1482 (2020). https://www.science.org/doi/10.1126/scisignal.aaz1482
-
-The historical model checkpoints were generated by source-checkout workflows.
-Those checkout-only implementations have been removed; preserved reports and
-inputs are listed in [`docs/artifact-inventory.md`](docs/artifact-inventory.md).
-New users should use the maintained package APIs documented in
-`docs/workflows/` and the installed commands.
-
-## Model Files
-
-The models are available as ```.xml``` in the respective folders where a brief description can be read. 
-
-## Brief Protocol Description
-
-The maintained steps are available as package modules and can be executed
-independently. Historical outputs remain available under their canonical
-artifact owners, but the former checkout folders are not release interfaces.
-
-
-1. Annotation: `thg_protocol.annotation.metabolites`,
-   `thg_protocol.annotation.reactions`, and
-   `thg_protocol.annotation.metabolite_reactions` enrich a reference model.
-
-2. Database/model construction: `thg_protocol.database` and
-   `thg_protocol.model_build` reconstruct models from explicit records and
-   injected service clients.
-
-3. Model curation and expansion: use `thg_protocol.model_build` with explicit
-   input, output, cache, and error paths.
-
-4. Merge and consistency: use `thg_protocol.merge` and
-   `thg_protocol.analysis.consistency`; structural checks are separate from
-   optional solver/MEMOTE workflows.
-
-5. MEMOTE/task analysis uses the optional `memote` and `solver` extras as
-   documented in `docs/workflows/memote.md`; it is not default release evidence.
-
-6. Comparison: `thg_protocol.analysis.compare` and `thg-compare` compare two
-   GEMs and write caller-selected reports.
-
-7. Figures: `thg_protocol.figures` generates figures from explicit models and
-   reports.
-
-## Using the GPR service boundary
-
-First, install the repository:
+Install the development tools or workflow-specific extras as needed:
 
 ```bash
-pip install .
+python -m pip install -e ".[database]"
+python -m pip install -e ".[dev]"
+python -m pip install -e ".[docs]"
+python -m pip install -e ".[solver]"
+python -m pip install -e ".[memote]"
+python -m pip install -e ".[cell-specific]"
+python -m pip install -e ".[figures]"
 ```
 
-After that, you need to create a BioCyc account. This works if you are in an institution that has BioCyc licenses, usually requiring physical presence.
+| Extra | Provides |
+| --- | --- |
+| `database` | Compatibility support for database checkpoints |
+| `dev` | Tests, linting, and package builds |
+| `docs` | MkDocs documentation and API rendering |
+| `solver` | Solver-backed workflows and tests |
+| `memote` | MEMOTE analysis |
+| `cell-specific` | Cell-specific model workflows |
+| `figures` | Matplotlib and Seaborn figure generation |
 
-Once installed and with a BioCyc account, the following script will fetch different ec numbers in a list:
+See the [installation guide](docs/installation.md) for the supported Python
+range and the complete [dependency compatibility matrix](docs/dependency-compatibility.md).
+
+## Quickstart
+
+The following offline example reconstructs a small COBRA JSON model and runs a
+structural consistency check:
 
 ```python
-from thg_protocol.gpr.lookup import get_gpr
-from thg_protocol.services.biocyc import BioCycClient
+from pathlib import Path
 
-ec_numbers = ["1.1.1.1", "1.1.1.204"]
-# Pass a caller-owned authenticated requests session via session= when needed.
-# StaticBioCycClient is available for offline tests.
-client = BioCycClient()
-gprs = [get_gpr(ec, biocyc_client=client) for ec in ec_numbers]
+from thg_protocol.analysis.consistency import unbalanced_reactions
+from thg_protocol.database import MetaboliteRecord, ReactionRecord, reconstruct_model
+
+output = Path("results/quickstart/model.json")
+model = reconstruct_model(
+    "quickstart",
+    [
+        MetaboliteRecord("a_c", compartment="c", name="A", formula="C1H2"),
+        MetaboliteRecord("b_c", compartment="c", name="B", formula="C1H2"),
+    ],
+    [ReactionRecord("R_A_to_B", {"a_c": -1, "b_c": 1}, name="A to B")],
+    output_path=output,
+)
+
+print(model.id, output, unbalanced_reactions(model))
 ```
 
-### Session from environment variables
+Read the [five-minute quickstart](docs/quickstart.md) for the full example,
+including reusable JSON inputs and the next workflows to try.
 
-Email and password arguments can be specified outside of the script.
+## Command-line tools
+
+The package installs these commands:
 
 ```bash
-# this has to be the email that was used to create the account
-export BIOCYC_EMAIL="YOUR EMAIL"
-export BIOCYC_PASSWORD="YOUR STRONG PASSWORD"
+thg-gapfill --help
+thg-pathway --help
+thg-compare --help
 ```
 
-And then, the script can be run as before:
+For example:
 
-```python
-from thg_protocol.gpr.lookup import get_gpr
-from thg_protocol.services.biocyc import BioCycClient
-
-ec_numbers = ["1.1.1.1", "1.1.1.204"]
-# Pass an authenticated, caller-owned requests session via session= when needed.
-client = BioCycClient()
-gprs = [get_gpr(ec, biocyc_client=client) for ec in ec_numbers]
+```bash
+thg-gapfill --model model.json --output-dir results/gapfill
+thg-pathway --model model.json --config pathway.json \
+  --database metabolite_ids.json --output results/pathway.json
+thg-compare model_a.json model_b.json --output-dir results/compare
 ```
+
+The [usage guide](docs/usage.md) and [CLI API reference](docs/api/cli.md)
+describe the supported arguments and workflow boundaries.
+
+## Documentation
+
+- [Documentation home](docs/index.md)
+- [Hosted documentation](https://norle.github.io/THG_The-Human-GEM-protocol-standalone/)
+- [Quickstart](docs/quickstart.md)
+- [Workflow guides](docs/usage.md)
+- [Python API reference](docs/api/index.md)
+- [Examples and deterministic fixtures](docs/examples/README.md)
+- [Development guide](docs/development.md)
+- [Release validation](docs/release-validation.md)
+- [Data and model files](docs/data-and-model-files.md)
+- [Repository map and artifact inventory](docs/repository-map.md) ·
+  [tracked artifacts](docs/artifact-inventory.md)
+
+The hosted site is deployed by GitHub Actions when GitHub Pages is enabled for
+the repository's default branch. The source documentation under `docs/` is
+always available in the checkout.
+
+## Development
+
+Run the default offline test suite and linter with:
+
+```bash
+ruff check src tests
+pytest -m "not slow and not online and not solver and not gurobi and not memote"
+```
+
+The [release-validation guide](docs/release-validation.md) covers source and
+wheel builds, outside-checkout imports, installed CLI smoke tests, and optional
+solver or online checks.
+
+## Citation and lineage
+
+If you use THG in research, please cite the original
+[biosustain/THG project](https://github.com/biosustain/THG). This repository is
+a standalone packaging and artifact-migration line for that project.
+
+## License
+
+Project materials are distributed under the
+[Creative Commons Attribution 4.0 International license](LICENSE). Please
+review the license and retain attribution when reusing the repository's code,
+models, documentation, or other materials.
