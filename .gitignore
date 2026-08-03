@@ -30,6 +30,17 @@ files/
 files/caches/
 files/*cache*
 files/*checkpoint*
+
+# Maintained deterministic characterization fixtures are tracked despite the
+# historical checkout-wide `files/` ignore rule.
+!tests/fixtures/legacy_characterization/reac_identification/
+!tests/fixtures/legacy_characterization/reac_identification/files/
+tests/fixtures/legacy_characterization/reac_identification/files/*
+!tests/fixtures/legacy_characterization/reac_identification/files/ec-number.tsv
+!tests/fixtures/legacy_characterization/metabolite_identification/
+!tests/fixtures/legacy_characterization/metabolite_identification/files/
+tests/fixtures/legacy_characterization/metabolite_identification/files/*
+!tests/fixtures/legacy_characterization/metabolite_identification/files/kegg.tsv
 *.tmp
 
 .tokensave/
