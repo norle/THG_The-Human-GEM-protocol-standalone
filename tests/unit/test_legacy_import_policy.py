@@ -52,7 +52,11 @@ CANONICAL_ROOTS = (
     "tests/fixtures/memote/data",
     "tests/fixtures/legacy_characterization",
 )
-LFS_CANONICAL_PATHS = {"files/pathway/inputs/endoA_250917_3.json"}
+LFS_CANONICAL_PATHS = {
+    "files/pathway/inputs/endoA_250917_3.json",
+    "files/MEMOTE_model_THG_endoA_reduced_2506.html",
+    "supplementary_material/pathway/figures/Glycocalyx_Cytoskeleton_network_plotly.html",
+}
 
 
 def _imported_modules(path: Path) -> list[tuple[int, str]]:
