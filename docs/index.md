@@ -40,6 +40,8 @@ Format and dependency requirements are documented in each task guide.
   map after choosing a task.
 - Use the [API reference](api/index.md) for Python interfaces and the
   [installation guide](installation.md) for optional dependencies.
+- The current refactoring closeout plan is recorded in
+  `plans/REFACTORING_PLAN_NEXT.md` for repository maintainers.
 
 ## Research use
 
