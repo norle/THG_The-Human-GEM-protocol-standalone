@@ -1,16 +1,29 @@
 # Model reconstruction
 
-Use model reconstruction when normalized records, JSON bundles, or a
-historical pickle checkpoint are the authoritative input.
+## What this workflow is for
 
-The normalized reconstruction core is available without network access:
+Reconstruct a COBRA model when normalized records, a JSON record bundle, or a
+historical pickle checkpoint is the authoritative input.
+
+## When not to use it
+
+Use [model enrichment](model-build.md) for an existing model, or
+[pathway implementation](pathway.md) when the input is a pathway
+configuration rather than records.
+
+## Prerequisites and inputs
+
+The normalized API needs metabolite IDs and reaction stoichiometry that refer
+to known metabolites. JSON bundles contain `model_id`, `metabolites`, and
+`reactions`, with optional `genes` and `pathways`. Pickle support is a
+compatibility adapter and may require the `database` extra for `dill`.
+
+## Python API
+
+The deterministic entry point is [`reconstruct_model`][thg_protocol.database.reconstruct_model]:
 
 ```python
-from thg_protocol.database import (
-    MetaboliteRecord,
-    ReactionRecord,
-    reconstruct_model,
-)
+from thg_protocol.database import MetaboliteRecord, ReactionRecord, reconstruct_model
 
 model = reconstruct_model(
     "toy",
@@ -20,69 +33,29 @@ model = reconstruct_model(
 )
 ```
 
-For service-backed enrichment of normalized records, use
-`reconstruct_model_with_services` and pass static clients in tests. It fetches
-only the KEGG/BioCyc/Ensembl annotations represented by the supplied records,
-then delegates to the same deterministic reconstruction core.
+For file and service boundaries use
+[`reconstruct_model_from_json`][thg_protocol.database.reconstruct_model_from_json],
+[`reconstruct_model_from_pickle`][thg_protocol.database.reconstruct_model_from_pickle],
+and [`reconstruct_model_with_services`][thg_protocol.database.reconstruct_model_with_services].
+Use [`summarize_biocyc_compartments`][thg_protocol.database.summarize_biocyc_compartments]
+for loaded cache mappings and
+[`parse_pathway_links`][thg_protocol.database_parsing.parse_pathway_links] for
+independent KEGG parsing.
 
-The API accepts normalized records and writes only to the caller-provided
-output path. KEGG, BioCyc, and Ensembl record collection remains behind
-injectable service clients.
+## Outputs
 
-BioCyc compartment caches can be summarized without COBRA or file-system side
-effects by passing their loaded mappings to `summarize_biocyc_compartments`:
+The functions return a COBRA model and write JSON or SBML only when an
+explicit output path is supplied. Service enrichment uses injectable clients;
+it does not hide network access. Pickle reconstruction performs no network
+access.
 
-```python
-from thg_protocol.database import summarize_biocyc_compartments
+## Common errors
 
-summary = summarize_biocyc_compartments(location_cache, name_cache)
-print(summary.unique_names)
-```
+Malformed bundles fail before output is written. A reaction referring to an
+unknown metabolite indicates incomplete records. Do not commit generated
+models, caches, or credentials.
 
-KEGG pathway pages can be parsed independently of the orchestrator:
+## Next workflow
 
-```python
-from thg_protocol.database_parsing import parse_pathway_links
-
-compound_links, reaction_links = parse_pathway_links(
-    kgml_text, client=static_kegg_client
-)
-```
-
-For a file-based workflow, use a JSON bundle containing `model_id`,
-`metabolites`, `reactions`, optional `genes`, and optional `pathways`, then:
-
-```python
-from thg_protocol.database import reconstruct_model_from_json
-
-reconstruct_model_from_json("records.json", output_path="results/model.xml")
-```
-
-Historical database checkpoints can be reconstructed without importing a
-credentialed harvesting workflow:
-
-```bash
-python -m pip install "thg-protocol[database]"
-```
-
-```python
-from thg_protocol.database import reconstruct_model_from_pickle
-
-reconstruct_model_from_pickle("pre_sbml_pos_comp.pk", output_path="results/model.xml")
-```
-
-The pickle adapter accepts the historical `mets_cl`, `reactions_cl`, `genes`,
-`pathways`, and `loc` bundle keys. Standard pickle is preferred; the
-`database` extra installs `dill` for historical checkpoints. It performs no
-network access.
-
-Before running the workflow, provide the required reference tables and an
-explicit output location. Do not commit generated database files, caches, or
-credentials.
-
-## Prerequisites, output, and troubleshooting
-
-The normalized API requires record IDs and stoichiometry that reference known
-metabolites. It returns a COBRA model and, when requested, writes JSON or SBML
-to the explicit output path. Malformed bundles raise a validation error before
-output is written.
+Run [network analysis](network-analysis.md) to check connectivity and balance,
+or [model enrichment](model-build.md) to add external annotations.

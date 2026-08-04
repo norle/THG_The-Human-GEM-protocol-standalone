@@ -1,26 +1,47 @@
 # MEMOTE and task analysis
 
-Use MEMOTE and task analysis for a broader quality assessment of a model. These
-optional tools complement structural checks such as connectivity and balance.
+## What this workflow is for
 
-MEMOTE and task-analysis runs require the optional `memote` extra and, for
-some checks, a configured solver:
+Run a broad quality assessment alongside structural connectivity and balance
+checks.
+
+## When not to use it
+
+Use [network analysis](network-analysis.md) for a dependency-light local
+diagnostic, or [model comparison](comparison.md) when the question is what
+changed between two models.
+
+## Prerequisites and inputs
+
+Install the optional tools and configure a solver where required:
 
 ```bash
 python -m pip install 'thg-protocol[memote,solver]'
 ```
 
-Use the report alongside [network analysis](network-analysis.md) and model
-comparison to understand both model quality and content changes.
+The input is a model file and a caller-selected report location.
 
-## Expected output and troubleshooting
-
-Run a local diagnostic after installing the opt-in extras:
+## CLI
 
 ```bash
 memote run --filename results/memote.html model.xml
 ```
 
-Use a pinned constraint set for reproducible solver checks and keep generated
-HTML with your project results. Solver or optimization errors usually indicate
-an environment or solver-configuration issue.
+The `memote` command is the primary CLI reference for this workflow; it is
+recorded in the [workflow API inventory](../api/workflow-api-inventory.json).
+
+## Outputs
+
+MEMOTE writes an HTML diagnostic report. Keep generated reports with project
+results and use pinned solver constraints for reproducibility.
+
+## Common errors
+
+Solver or optimization errors generally indicate an environment or solver
+configuration issue. Validate the solver independently before interpreting
+model findings.
+
+## Next workflow
+
+Return to [usage](../usage.md) to select the next task, or use
+[figures and reports](figures.md) to present selected results.

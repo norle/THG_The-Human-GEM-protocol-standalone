@@ -35,9 +35,9 @@ Format and dependency requirements are documented in each task guide.
 
 - Follow the [five-minute quickstart](quickstart.md) to reconstruct a small
   model.
-- Use the [task guides](usage.md) to select a specific operation.
-- Read the [workflow overview](workflow-overview.md) for the available
-  operations and their inputs and outputs.
+- Use the [task guides](usage.md) as the canonical task chooser.
+- Read the [workflow overview](workflow-overview.md) for the input-to-output
+  map after choosing a task.
 - Use the [API reference](api/index.md) for Python interfaces and the
   [installation guide](installation.md) for optional dependencies.
 
@@ -47,6 +47,5 @@ Please cite [biosustain/THG](https://github.com/biosustain/THG) when using THG
 in research.
 
 Development, release, legacy, and repository-maintenance information is kept
-in the [developer and maintainer section](development.md). The active
-[refactoring closeout plan](plans/REFACTORING_PLAN_NEXT.md) is maintained with
-the other implementation plans.
+in the [developer and maintainer section](development.md). Internal planning
+records are kept in the repository but are not published in the site.

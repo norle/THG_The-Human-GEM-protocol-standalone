@@ -2,6 +2,8 @@ site_name: THG Protocol
 site_description: Tools for constructing and analyzing human genome-scale metabolic models.
 site_url: https://norle.github.io/THG_The-Human-GEM-protocol-standalone/
 docs_dir: docs
+exclude_docs: |
+  plans/**
 theme:
   name: material
   features:
@@ -33,13 +35,13 @@ plugins:
         python:
           options:
             docstring_style: google
-            show_source: true
+            show_source: false
             show_root_heading: true
             show_root_full_path: false
             members_order: source
             show_signature_annotations: true
             separate_signature: true
-            inherited_members: true
+            inherited_members: false
             filters:
               - "!^_"
 nav:
@@ -49,6 +51,7 @@ nav:
       - Five-minute quickstart: quickstart.md
       - Choose a task: usage.md
       - Model operations overview: workflow-overview.md
+      - Data and model files: data-and-model-files.md
   - Guides:
       - Operations and data flow: architecture.md
       - Gapfill: workflows/gapfill.md
@@ -72,6 +75,8 @@ nav:
       - Analysis: api/analysis.md
       - Figures: api/figures.md
       - CLI commands: api/cli.md
+  - Examples:
+      - Example files: examples/README.md
   - Maintainer reference:
       - Development: development.md
       - Documentation contribution: documentation-contributing.md

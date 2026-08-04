@@ -1,10 +1,24 @@
 # Network analysis
 
-Use network analysis to inspect connectivity, identify formula-balance issues,
-and compact redundant reactions. Run it after constructing, merging, or
-curating a model to understand the consequences of your changes.
+## What this workflow is for
 
-Find connected components in a loaded COBRA model:
+Inspect connectivity, identify formula-balance issues, and compact redundant
+reactions after constructing, merging, or curating a model.
+
+## When not to use it
+
+Use [model comparison](comparison.md) for differences between two models and
+[MEMOTE](memote.md) for broader quality diagnostics.
+
+## Prerequisites and inputs
+
+Provide a loaded COBRA model. Solver-backed cleanup and HTML visualization are
+optional; connectivity and formula-balance checks run locally.
+
+## Python API
+
+Find components with [`find_network_components`][thg_protocol.analysis.network.find_network_components]
+and persist them with [`write_component_report`][thg_protocol.analysis.network.write_component_report]:
 
 ```python
 from thg_protocol.analysis import find_network_components, write_component_report
@@ -13,32 +27,24 @@ results = find_network_components(model)
 write_component_report(results, "results/network/components.json")
 ```
 
-Component analysis does not change the model. Solver-backed cleanup and HTML
-visualization are optional operations for larger investigations.
+Use [`full_compaction`][thg_protocol.analysis.compaction.full_compaction] for
+proportional reactions, [`reaction_balance`][thg_protocol.analysis.consistency.reaction_balance]
+for one reaction, and
+[`unbalanced_reactions`][thg_protocol.analysis.consistency.unbalanced_reactions]
+for a model-wide check.
 
-Proportional-reaction compaction is available separately:
+## Outputs
 
-```python
-from thg_protocol.analysis import full_compaction
+Component analysis returns a graph and connectivity summary without mutation.
+Compaction returns a copied model and removed IDs. Reports are written only to
+explicit paths.
 
-compacted, removed = full_compaction(model)
-```
+## Common errors
 
-Blocked-reaction filtering is solver-dependent and only runs when explicitly
-requested.
+Unexpected disconnection usually indicates missing transport reactions or
+compartment-specific IDs; inspect `component_info` before changing bounds.
 
-Formula-based consistency checks are also available without MEMOTE:
+## Next workflow
 
-```python
-from thg_protocol.analysis import reaction_balance, unbalanced_reactions
-
-reaction_balance(model.reactions[0])
-unbalanced_reactions(model)
-```
-
-## Prerequisites, output, and troubleshooting
-
-Provide a loaded COBRA model and an explicit JSON report path when persistence
-is needed. Component analysis returns a graph and connectivity summary without
-mutation. An unexpectedly disconnected model usually indicates missing
-transport reactions or compartment-specific IDs; inspect `component_info`.
+Use [gapfill](gapfill.md) for transport candidates, or
+[figures and reports](figures.md) to present the results.

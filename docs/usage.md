@@ -1,8 +1,7 @@
 # Task guides
 
-Use these guides to choose the THG Protocol operation that matches your next
-piece of work. For the usual order of operations, see [the full workflow
-overview](workflow-overview.md).
+Use these guides as the canonical task chooser. For the usual input-to-output
+order after choosing a task, see [the workflow overview](workflow-overview.md).
 
 | I want to... | Guide | Main result |
 | --- | --- | --- |

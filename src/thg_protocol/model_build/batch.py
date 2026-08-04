@@ -41,7 +41,7 @@ def build_model_batch(
 
     The model, output, cache, and error paths are explicit. Service clients
     are injectable for offline tests and production adapters are instantiated
-    lazily by :func:`thg_protocol.model_build.build_model`. Four legacy cache
+    lazily by [`build_model`][thg_protocol.model_build.build_model]. Four legacy cache
     filenames are retained so existing batch automation can resume safely;
     package-owned JSON caches remain the source of annotation state.
     """

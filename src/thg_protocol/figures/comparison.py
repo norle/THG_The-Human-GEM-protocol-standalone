@@ -40,7 +40,8 @@ class AnnotationGroupSummary:
 
 @dataclass(frozen=True)
 class FigureGenerationResult:
-    """Files produced by :func:`generate_annotation_comparison_figures`."""
+    """Files produced by
+    [`generate_annotation_comparison_figures`][thg_protocol.figures.comparison.generate_annotation_comparison_figures]."""
 
     report_path: Path
     output_paths: tuple[Path, ...]

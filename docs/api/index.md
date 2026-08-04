@@ -28,3 +28,21 @@ See the [workflow guides](../usage.md) for end-to-end context and the
 | Analysis | [Analysis](analysis.md) | consistency, comparison, compaction, network |
 | Figures | [Figures](figures.md) | comparison and model reports |
 | Commands | [CLI commands](cli.md) | `thg-gapfill`, `thg-pathway`, `thg-compare` |
+
+## Recommended entry points
+
+- Construction: [`reconstruct_model`][thg_protocol.database.reconstruct_model],
+  [`reconstruct_model_from_json`][thg_protocol.database.reconstruct_model_from_json],
+  and [`reconstruct_model_with_services`][thg_protocol.database.reconstruct_model_with_services].
+- Annotation: [`analyze_model_annotations`][thg_protocol.annotation.model_annotations.analyze_model_annotations]
+  and [`get_gpr`][thg_protocol.gpr.lookup.get_gpr].
+- Model changes: [`implement_pathway_files`][thg_protocol.pathway.workflow.implement_pathway_files],
+  [`run_pipeline`][thg_protocol.gapfill.core.run_pipeline], and
+  [`merge_models`][thg_protocol.merge.merge_models].
+- Analysis: [`find_network_components`][thg_protocol.analysis.network.find_network_components],
+  [`compare_models_from_files`][thg_protocol.analysis.compare.compare_models_from_files],
+  and [`full_compaction`][thg_protocol.analysis.compaction.full_compaction].
+
+The checked-in [canonical API inventory](api-inventory.json) is the source of
+truth for generated members. Re-exported package facades remain supported
+import paths, but each symbol is rendered once at its defining module.

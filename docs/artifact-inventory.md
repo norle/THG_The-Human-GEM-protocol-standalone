@@ -78,9 +78,8 @@ All files remain available in the current working tree after index removal.
 
 ## Legacy-directory closure
 
-The checkout-only directories listed in
-`docs/plans/REFACTORING_PLAN_LEGACY_REMOVAL.md`
-were closed without retaining an artifact-owned directory. Preserved content
+The checkout-only legacy directories were closed without retaining an
+artifact-owned directory. Preserved content
 was relocated to these canonical owners:
 
 | Former owner | Canonical destination | Disposition |

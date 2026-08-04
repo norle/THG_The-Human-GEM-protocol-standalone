@@ -81,7 +81,8 @@ def summarize_biocyc_compartments(
 
 @dataclass(frozen=True)
 class MetaboliteRecord:
-    """Normalized metabolite data consumed by :func:`reconstruct_model`."""
+    """Normalized metabolite data consumed by
+    [`reconstruct_model`][thg_protocol.database.reconstruct_model]."""
 
     id: str
     compartment: str = "c"
@@ -93,7 +94,8 @@ class MetaboliteRecord:
 
 @dataclass(frozen=True)
 class ReactionRecord:
-    """Normalized reaction data consumed by :func:`reconstruct_model`."""
+    """Normalized reaction data consumed by
+    [`reconstruct_model`][thg_protocol.database.reconstruct_model]."""
 
     id: str
     stoichiometry: Mapping[str, float]
@@ -319,7 +321,8 @@ def reconstruct_model_from_pickle(
     ``Formula1``, and ``charge``. Reaction records use ``ID``, ``Name``,
     ``subs``/``prods`` (or callable ``Substrate``/``Product``), ``GPR``, and
     ``EC``. This adapter performs no network access; service enrichment remains
-    available through :func:`reconstruct_model_with_services`.
+    available through
+    [`reconstruct_model_with_services`][thg_protocol.database.reconstruct_model_with_services].
 
     Standard pickle is attempted first. Pickles created with the historical
     ``dill`` workflow require ``dill`` to be installed and are loaded through
@@ -555,7 +558,7 @@ def reconstruct_model_with_services(
     created lazily only when matching records require them.
 
     The deterministic model construction and output behavior are delegated to
-    :func:`reconstruct_model`.
+    [`reconstruct_model`][thg_protocol.database.reconstruct_model].
     """
     metabolite_records = list(metabolites)
     reaction_records = list(reactions)

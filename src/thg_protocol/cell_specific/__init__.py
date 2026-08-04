@@ -10,7 +10,8 @@ from typing import Any
 
 @dataclass(frozen=True)
 class ActivityReductionReport:
-    """Summary returned by :func:`reduce_model_by_activity`."""
+    """Summary returned by
+    [`reduce_model_by_activity`][thg_protocol.cell_specific.reduce_model_by_activity]."""
 
     total_reactions: int
     retained_reactions: int

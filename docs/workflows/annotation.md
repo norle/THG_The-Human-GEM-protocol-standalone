@@ -1,49 +1,53 @@
 # Metabolite and reaction identification
 
-Use annotation to inventory model identifiers, enrich metabolites or reactions,
-and resolve gene–protein–reaction (GPR) rules. This is useful when you need to
-understand how complete a model is before using it for curation or analysis.
+## What this workflow is for
 
-For a JSON model, start by checking the annotations already present:
+Inventory model identifiers, enrich metabolites or reactions, and resolve
+gene–protein–reaction (GPR) rules before curation or analysis.
+
+## When not to use it
+
+Use [model enrichment](model-build.md) for the complete external-service
+pipeline, or [network analysis](network-analysis.md) for purely structural
+connectivity and balance checks.
+
+## Prerequisites and inputs
+
+Provide a JSON model, annotation targets, and optional report paths. Live
+clients may require credentials, network access, and service-specific rate
+limits; static clients are preferred for tests.
+
+## Python API
+
+Start with [`analyze_model_annotations`][thg_protocol.annotation.model_annotations.analyze_model_annotations]
+and [`extract_metabolite_annotations`][thg_protocol.annotation.model_annotations.extract_metabolite_annotations]:
 
 ```python
-from thg_protocol.annotation import (
-    analyze_model_annotations,
-    extract_metabolite_annotations,
-)
+from thg_protocol.annotation import analyze_model_annotations, extract_metabolite_annotations
 
 counts = analyze_model_annotations("inputs/model.json")
-annotations, missing = extract_metabolite_annotations(
-    "inputs/model.json", ["ATP", "H2O"]
-)
+annotations, missing = extract_metabolite_annotations("inputs/model.json", ["ATP", "H2O"])
 ```
 
-The annotation functions can write an optional JSON report. Provide the model,
-annotation targets, and any output path needed for your project. PubChem and
-other external lookups require an appropriate client and may need network
-access or credentials.
+Resolve GPRs with [`get_gpr`][thg_protocol.gpr.lookup.get_gpr] and locations
+with [`resolve_locations`][thg_protocol.gpr.location.resolve_locations].
+The lower-level model and reaction APIs are available as
+[`annotate_cobra_model`][thg_protocol.annotation.model.annotate_cobra_model],
+[`identify_reaction`][thg_protocol.annotation.reactions.identify_reaction],
+and [`run_metabolite_reaction_identification`][thg_protocol.annotation.metabolite_reactions.run_metabolite_reaction_identification].
 
-Resolve GPR candidates from an EC number with BioCyc and KEGG:
+## Outputs
 
-```python
-from thg_protocol.gpr import get_gpr
+Results are inventories, transformed rules, or optional JSON reports. Missing
+fields are reported as unmatched targets; input models are not silently
+rewritten.
 
-result = get_gpr("1.2.3.4", biocyc_client=static_biocyc, kegg_client=static_kegg)
-```
+## Common errors
 
-For subcellular GPR rules, resolve locations separately:
+No lookup result usually means an identifier namespace or compartment mismatch.
+Check target IDs and metadata before changing service settings.
 
-```python
-from thg_protocol.gpr.location import resolve_locations
+## Next workflow
 
-rules = resolve_locations(
-    gpr, gene_names, gene_ids, location_client=static_location_client
-)
-```
-
-## Prerequisites, output, and troubleshooting
-
-Provide a model, annotation targets, and optional report/output paths. Live
-clients may require credentials, network access, and service-specific rate
-limits. Missing fields are reported as unmatched targets; check identifier
-namespaces and compartment metadata when a lookup returns no result.
+Continue with [network analysis](network-analysis.md), or use
+[model comparison](comparison.md) to review changes between model versions.

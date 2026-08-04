@@ -10,7 +10,7 @@ from typing import Any
 
 @dataclass
 class ModelBuildReport:
-    """Outcome of :func:`build_model`.
+    """Outcome of [`build_model`][thg_protocol.model_build.build_model].
 
     Counts describe annotations applied to the model.  Errors are collected
     per service so a report can be written even when one optional lookup fails.

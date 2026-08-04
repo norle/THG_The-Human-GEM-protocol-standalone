@@ -35,7 +35,8 @@ print(model.id, output, unbalanced_reactions(model))
 
 The output is a COBRA JSON model at `results/quickstart/model.json`; the
 output directory is created as needed. For a reusable input bundle, use
-`reconstruct_model_from_json` as shown in the [database guide](workflows/database.md).
+[`reconstruct_model_from_json`][thg_protocol.database.reconstruct_model_from_json]
+as shown in the [database guide](workflows/database.md).
 
 ## What to try next
 
@@ -44,6 +45,8 @@ output directory is created as needed. For a reusable input bundle, use
 - Compare two JSON or SBML models with [model comparison](workflows/comparison.md).
 - Read the [API reference](api/index.md) for ownership, optional dependencies,
   exceptions, and file-format details.
+- Use the [task guides](usage.md) when you are ready to choose a different
+  workflow.
 
 ## Troubleshooting
 

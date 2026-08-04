@@ -1,20 +1,23 @@
 # Model comparison
 
-Use comparison to see how two models differ in reaction IDs and stoichiometry,
-including differences by compartment. It is useful before a merge and after a
-curation step, when you want a report of what changed.
+## What this workflow is for
 
-Reaction IDs and stoichiometry can be compared per compartment through the
-Python API or `thg-compare`:
+Compare reaction IDs and stoichiometry, including differences by compartment,
+before a merge or after curation.
 
-```bash
-thg-compare model_a.json model_b.json --output-dir results/compare
-```
+## When not to use it
 
-The command writes raw and (by default) blocked-reaction-filtered CSV reports.
-Use `--no-include-blocked` when only the raw comparison is required.
+Use [network analysis](network-analysis.md) for connectivity or balance, and
+[merge](merge.md) when the goal is to combine model content.
 
-The equivalent Python API is:
+## Prerequisites and inputs
+
+Inputs may be JSON or SBML. Blocked-reaction filtering needs a COBRA solver;
+structural comparison does not.
+
+## Python API
+
+Use [`compare_models_from_files`][thg_protocol.analysis.compare.compare_models_from_files]:
 
 ```python
 from thg_protocol.analysis.compare import compare_models_from_files
@@ -24,9 +27,25 @@ reports = compare_models_from_files(
 )
 ```
 
-## Prerequisites, output, and troubleshooting
+## CLI
 
-Inputs may be JSON or SBML. Reports are CSV files under the output directory,
-and the Python function also returns structured data. Blocked-reaction
-filtering requires COBRA's solver path; use `--no-include-blocked` when you
-only need structural comparison.
+```bash
+thg-compare model_a.json model_b.json --output-dir results/compare
+```
+
+Use `--no-include-blocked` when only raw comparison is required.
+
+## Outputs
+
+The command writes raw and filtered CSV reports. The Python function also
+returns structured comparison data.
+
+## Common errors
+
+Solver errors indicate that blocked filtering was requested without a working
+solver. Repeat with `include_blocked=False` or the CLI flag.
+
+## Next workflow
+
+Use [merge and consistency](merge.md) to combine compatible models, or
+[figures and reports](figures.md) to present comparison summaries.

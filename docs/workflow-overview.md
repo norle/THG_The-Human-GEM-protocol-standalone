@@ -1,8 +1,9 @@
 # Model operations
 
-Use this page to choose an operation based on the input you have and the
-result you need. Operations can be run independently. A model or report written
-by one operation can be used as input to another where the format is supported.
+Use this page as a conceptual input-to-output map. Operations can be run
+independently. A model or report written by one operation can be used as input
+to another where the format is supported. Use the [task guides](usage.md) to
+choose a specific operation.
 
 ## Construct or enrich a model
 
@@ -41,5 +42,4 @@ capabilities; see [installation](installation.md) before using them.
 ## First example
 
 The [five-minute quickstart](quickstart.md) reconstructs a small model from
-normalized records and checks its balance. For an individual guide selected by
-your goal rather than input type, use the [task guides](usage.md).
+normalized records and checks its balance.

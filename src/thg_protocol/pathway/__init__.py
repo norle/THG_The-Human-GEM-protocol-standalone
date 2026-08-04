@@ -1,8 +1,9 @@
 """Public pathway helpers.
 
-The implementation lives in :mod:`thg_protocol.pathway.core` so workflow
-specific CLI and orchestration modules can be added without changing the
-stable ``thg_protocol.pathway`` import path.
+The implementation lives in the
+[`thg_protocol.pathway.core`][thg_protocol.pathway.core] module so workflow-specific
+CLI and orchestration modules can be added without changing the stable
+``thg_protocol.pathway`` import path.
 """
 
 from .core import (

@@ -19,3 +19,28 @@ thg-compare --help
 
 The [workflow pages](../usage.md) contain CLI examples and the generated
 reference pages contain the parser and error contracts.
+
+## Recommended entry points
+
+Use the installed commands in the workflow guides. The generated parser
+references below document the exact options for each command.
+
+## Parser APIs
+
+::: thg_protocol.gapfill.cli
+    options:
+      members:
+        - build_parser
+        - main
+
+::: thg_protocol.pathway.cli
+    options:
+      members:
+        - build_parser
+        - main
+
+::: thg_protocol.analysis.compare_cli
+    options:
+      members:
+        - build_parser
+        - main

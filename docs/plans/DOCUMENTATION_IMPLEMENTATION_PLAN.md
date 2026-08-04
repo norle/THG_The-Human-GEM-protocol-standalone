@@ -3,7 +3,7 @@
 ## Document control
 
 - **Status:** Blocked at Phase 7 pending repository publication and Pages activation
-- **Last updated:** 2026-08-03
+- **Last updated:** 2026-08-04
 - **Owner:** Codex / THG maintainers
 - **Tracking rule:** This file is the source of truth for documentation progress.
 
@@ -34,11 +34,11 @@ For every phase, record:
 | Phase | Status | Last updated | Evidence / notes |
 | --- | --- | --- | --- |
 | 1. Documentation foundation | `[x]` | 2026-08-03 | `pyproject.toml`, `mkdocs.yml`, `docs/documentation-contributing.md`; editable docs install and strict build pass locally. |
-| 2. Information architecture | `[x]` | 2026-08-03 | `docs/index.md`, `quickstart.md`, `architecture.md`, `repository-map.md`, and complete navigation. |
-| 3. API and code reference | `[x]` | 2026-08-03 | `docs/api/`; strict build renders all 47 maintained package modules and installed command pages. |
+| 2. Information architecture | `[x]` | 2026-08-04 | `docs/index.md`, `quickstart.md`, `usage.md`, `workflow-overview.md`, complete navigation, and explicit `plans/**` exclusion. |
+| 3. API and code reference | `[x]` | 2026-08-04 | `docs/api/`, `api-inventory.json`, and `workflow-api-inventory.json`; strict build renders curated canonical symbols and installed command pages. |
 | 4. Tutorials and executable examples | `[x]` | 2026-08-03 | `docs/workflows/`, `docs/examples/`, `tests/docs/test_examples.py`; 3-phase offline examples pass. |
 | 5. Repository and artifact reference | `[x]` | 2026-08-03 | Artifact, data/model, service-boundary, legacy, and Git LFS pages are navigable and cross-linked. |
-| 6. Documentation validation and CI | `[x]` | 2026-08-03 | `.github/workflows/docs.yml`; local strict build, docs tests, and full offline suite pass. |
+| 6. Documentation validation and CI | `[x]` | 2026-08-04 | `.github/workflows/docs.yml`, `tests/docs/test_documentation.py`; fresh-site anchor/link checks, local strict build, and offline docs tests pass. |
 | 7. GitHub Pages publishing | `[!]` | 2026-08-03 | Local workflow is ready, but it is not present on the remote default branch; publication, Pages source activation, and deployment require authorized external state changes. |
 
 ### Progress update checklist
@@ -60,6 +60,7 @@ When updating this plan:
 | 2026-08-03 | Audited repository Pages state: default branch is `refactoring-cleanup`; intended URL returns HTTP 404 until Pages Actions source and deployment are enabled. | GitHub repository metadata; read-only Pages URL check. |
 | 2026-08-03 | Added the administrator handoff for enabling the repository Pages source and verifying the deployment before closing Phase 7. | `docs/documentation-contributing.md` |
 | 2026-08-03 | Reconfirmed the blocker: the remote default branch does not yet contain `.github/workflows/docs.yml` (GitHub API 404), so no deployment run can exist. | GitHub repository metadata and default-branch file inspection. |
+| 2026-08-04 | Implemented the documentation UX plan: canonical task chooser, published data/examples references, excluded plans, curated API inventories, Autorefs workflow links, reduced API clutter, consistent workflow templates, and fresh-site validation. | `mkdocs build --strict`; `pytest tests/docs`; `tests/docs/test_documentation.py` |
 
 ## Repository assessment
 
@@ -258,7 +259,8 @@ Create `.github/workflows/docs.yml` that:
 - [x] Executes documentation examples or their dedicated tests.
 - [x] Does not require credentials, solvers, large model files, or live
   external services.
-- [ ] Optionally runs a link checker.
+- [x] Runs documentation link, API-anchor, and unresolved-markup checks in the
+  fresh-site documentation test.
 
 ### Release/maintenance policy
 

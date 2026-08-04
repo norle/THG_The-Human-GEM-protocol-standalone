@@ -4,8 +4,8 @@ Reviewed: 2026-07-31
 Inventory count: 82 Python files outside `src/` and the maintained `tests/`
 tree.
 
-This is the executable inventory required by
-`docs/plans/REFACTORING_PLAN_NEXT.md`.
+This is the executable inventory for the maintained package compatibility
+boundary.
 Status is assigned from contract and evidence, not filename similarity.
 Models, datasets, reports, and research artifacts are outside the deletion
 scope.

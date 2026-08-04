@@ -13,9 +13,9 @@ fixtures, static service clients, and marked optional sections for solvers,
 MEMOTE, plotting, or live services. Every tutorial should state its purpose,
 prerequisites, Python and/or CLI usage, expected outputs, and troubleshooting.
 
-When a documentation change advances a phase, update
-`docs/plans/DOCUMENTATION_IMPLEMENTATION_PLAN.md` in the same change: phase status, date,
-owner or PR, checklist, evidence, and follow-up work. API changes require an API page update; workflow changes
+When a documentation change advances a phase, update the internal
+documentation records in the same change: phase status, date, owner or PR,
+checklist, evidence, and follow-up work. API changes require an API page update; workflow changes
 require a tested example; new artifacts require an ownership and publication
 decision.
 

@@ -10,7 +10,8 @@ from typing import Any
 
 @dataclass(frozen=True)
 class MergeReport:
-    """Counts and output metadata produced by :func:`merge_models`."""
+    """Counts and output metadata produced by
+    [`merge_models`][thg_protocol.merge.merge_models]."""
 
     added_metabolites: int
     added_reactions: int

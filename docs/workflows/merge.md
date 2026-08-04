@@ -1,31 +1,49 @@
 # Merge and network consistency
 
-Use merge when a base model should be enriched with content from a second
-model. The input models remain unchanged, and the merge report shows what was
-added or retained.
+## What this workflow is for
 
-The package-native merge boundary accepts two COBRA models and returns a
-non-mutating merged copy with an explicit report:
+Combine compatible model content while keeping both input models unchanged and
+recording what was added, retained, or removed.
+
+## When not to use it
+
+Use [model comparison](comparison.md) when you only need a diff, or
+[pathway implementation](pathway.md) when one explicit pathway is being
+added.
+
+## Prerequisites and inputs
+
+Inputs are compatible COBRA models or JSON/SBML files. Select an explicit
+output path and decide whether isolated metabolites should be removed.
+
+## Python API
+
+Use [`merge_models`][thg_protocol.merge.merge_models] for loaded models:
 
 ```python
 from thg_protocol.merge import merge_models
 
 merged, report = merge_models(
-    base_model,
-    incoming_model,
-    output_path="results/merged.xml",
+    base_model, incoming_model, output_path="results/merged.xml",
     remove_isolated_metabolites=True,
 )
 ```
 
-For file-based workflows, use `merge_models_from_paths` with SBML or JSON
-inputs. Follow the merge with [network analysis](network-analysis.md) to check
-the connectivity and balance of the result.
+Use [`merge_models_from_paths`][thg_protocol.merge.merge_models_from_paths] for
+file inputs. The result is summarized by
+[`MergeReport`][thg_protocol.merge.MergeReport].
 
-## Prerequisites, output, and troubleshooting
+## Outputs
 
-Inputs must be compatible COBRA models or JSON/SBML files. The result is a
-copied merged model and a `MergeReport`; optional output is written to the
-explicit path. Overlapping IDs retain base stoichiometry and receive non-empty
-incoming metadata. Inspect the report before enabling isolated-metabolite
-removal.
+The result is a copied merged model and a merge report. Overlapping IDs retain
+base stoichiometry and receive non-empty incoming metadata.
+
+## Common errors
+
+Incompatible model formats or IDs should be resolved before merging. Inspect
+the report before enabling isolated-metabolite removal.
+
+## Next workflow
+
+Run [network analysis](network-analysis.md) to check connectivity and balance,
+then use [figures and reports](figures.md) if a summary is needed.

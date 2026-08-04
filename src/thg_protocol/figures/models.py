@@ -46,7 +46,8 @@ class ModelComponentSummary:
 
 @dataclass(frozen=True)
 class ModelFigureGenerationResult:
-    """Paths created by :func:`generate_model_comparison_figures`."""
+    """Paths created by
+    [`generate_model_comparison_figures`][thg_protocol.figures.models.generate_model_comparison_figures]."""
 
     output_paths: tuple[Path, ...]
 

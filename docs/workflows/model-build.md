@@ -1,54 +1,55 @@
 # Model enrichment
 
-Use model enrichment to add information from BioCyc, KEGG, and Ensembl to an
-existing JSON or SBML model. It writes the enriched model, caches collected
-information when requested, and records any problems for review.
+## What this workflow is for
 
-For a single model, use `thg_protocol.model_build.build_model`:
+Add BioCyc, KEGG, and Ensembl information to an existing JSON or SBML model,
+while retaining caches and an explicit error report for review.
+
+## When not to use it
+
+Use [model reconstruction](database.md) for normalized records and
+[annotation](annotation.md) when you need identifier or GPR analysis without
+the complete enrichment pipeline.
+
+## Prerequisites and inputs
+
+Provide a JSON or SBML model, caller-owned output paths, and optional service
+clients. The default package does not require network access for the
+dependency-light helpers; live service lookups need credentials and rate-limit
+planning.
+
+## Python API
+
+Use [`build_model`][thg_protocol.model_build.build_model] for one model:
 
 ```python
 from thg_protocol.model_build import build_model
 
 report = build_model(
-    "input.xml",
-    "results/model.xml",
-    cache_dir="results/cache",
+    "input.xml", "results/model.xml", cache_dir="results/cache",
     errors_path="results/errors.json",
 )
 ```
 
-For a batch-oriented process, use:
+For batch processing use [`build_model_batch`][thg_protocol.model_build.batch.build_model_batch].
+Formula-only helpers are [`formula_atoms`][thg_protocol.model_build.mass_balance.formula_atoms],
+[`atom10`][thg_protocol.model_build.mass_balance.atom10], and
+[`missing_atoms`][thg_protocol.model_build.mass_balance.missing_atoms]. Use
+[`reformulate_glycan_equation`][thg_protocol.model_build.mass_balance.reformulate_glycan_equation]
+with an injected KEGG client for glycan resolution.
 
-```python
-from thg_protocol.model_build import build_model_batch
+## Outputs
 
-report = build_model_batch(
-    "input.xml",
-    "results/model.xml",
-    cache_dir="results/cache",
-    output_errors="results/errors.tsv",
-)
-```
+The pipeline writes an enriched model, JSON service caches, and an optional
+error report under the paths selected by the caller. Formula helpers return
+data and do not mutate models.
 
-You can supply BioCyc, KEGG, and Ensembl clients to control how information is
-looked up. For record-driven construction rather than enrichment of an existing
-model, use [model reconstruction](database.md).
+## Common errors
 
-Formula-only mass-balance helpers are available without COBRA or a solver:
+Inspect the error file and cache contents before retrying a failed service.
+Malformed JSON or SBML should be corrected before enrichment.
 
-```python
-from thg_protocol.model_build import atom10, formula_atoms, missing_atoms
+## Next workflow
 
-formula_atoms("C6H12O6")
-atom10("C6H12O6")
-missing_atoms("H2 + O2 -> H2O")
-```
-
-Use `reformulate_glycan_equation` with an injected KEGG client when glycan
-resolution is needed.
-
-## Prerequisites, output, and troubleshooting
-
-The input must be JSON or SBML. The output is an annotated model, JSON service
-caches, and an optional error report under the paths you select. If a service
-error is reported, inspect the error file and cache contents before retrying.
+Use [annotation](annotation.md) to inspect identifiers or
+[network analysis](network-analysis.md) to assess the enriched model.
