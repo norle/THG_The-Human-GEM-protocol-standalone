@@ -100,7 +100,8 @@ def implement_pathway_files(
     output_path: str | Path,
 ) -> dict[str, Any]:
     """Load JSON inputs, run
-    [`implement_pathway`][thg_protocol.pathway.workflow.implement_pathway], and write the result."""
+    [`implement_pathway`][thg_protocol.pathway.workflow.implement_pathway], and write
+    the result."""
     paths = [Path(model_path), Path(config_path), Path(id_database_path)]
     with paths[0].open() as handle:
         model = json.load(handle)

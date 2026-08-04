@@ -138,7 +138,8 @@ def balance_equation(equation: str) -> tuple[list[float], list[float]]:
     """Return the smallest positive elemental-balance coefficients.
 
     The equation syntax is the same as
-    [`equation_matrix`][thg_protocol.model_build.mass_balance.equation_matrix]; coefficients
+    [`equation_matrix`][thg_protocol.model_build.mass_balance.equation_matrix];
+    coefficients
     already present in the input are treated as part of the formula token and
     are therefore best supplied as ``2 H2`` rather than ``H2`` with a
     separately fixed coefficient.  A positive null-space vector is required:
