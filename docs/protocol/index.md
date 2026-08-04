@@ -97,5 +97,5 @@ historical task workflow is Archived.
 - Human pathway/database records: [construct the Human Database](human-database.md).
 - Two prepared branches: [merge and validate](merge-and-validate.md).
 - Small offline software demonstration: [worked end-to-end example](end-to-end-example.md).
+- Restartable API composition: [resumable engineering runs](../workflows/resumable-run.md).
 - One operation: [individual-operation chooser](../usage.md).
-

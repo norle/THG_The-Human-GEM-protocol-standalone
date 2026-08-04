@@ -59,6 +59,7 @@ figures = [
 thg-gapfill = "thg_protocol.gapfill.cli:main"
 thg-compare = "thg_protocol.analysis.compare_cli:main"
 thg-pathway = "thg_protocol.pathway.cli:main"
+thg-run = "thg_protocol.workflow.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]

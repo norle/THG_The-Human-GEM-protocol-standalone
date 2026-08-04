@@ -1,0 +1,50 @@
+from __future__ import annotations
+
+import json
+
+import pytest
+
+from thg_protocol.workflow.cli import build_parser, main
+
+
+def test_cli_parser_exposes_all_commands_and_help(capsys):
+    parser = build_parser()
+    assert parser.parse_args(["start", "config.json"]).command == "start"
+    assert (
+        parser.parse_args(["resume", "run", "--force-step", "validation"]).force_step
+        == "validation"
+    )
+    assert parser.parse_args(["status", "run", "--json"]).as_json
+    assert parser.parse_args(["unlock", "run", "--force"]).force
+
+    with pytest.raises(SystemExit) as error:
+        main(["--help"])
+    assert error.value.code == 0
+    assert "resumable workflow" in capsys.readouterr().out
+
+
+def test_status_json_is_read_only_and_parseable(tmp_path, capsys):
+    from thg_protocol.workflow.config import (
+        DatabaseSettings,
+        MergeSettings,
+        ReferenceSettings,
+        RunConfig,
+        RunSettings,
+        ValidationSettings,
+    )
+    from thg_protocol.workflow.manifest import new_manifest, write_manifest_atomic
+
+    config = RunConfig(
+        1,
+        RunSettings("status-run", tmp_path),
+        ReferenceSettings("prebuilt", tmp_path / "reference.json"),
+        DatabaseSettings(tmp_path / "records.json"),
+        MergeSettings(),
+        ValidationSettings(),
+    )
+    write_manifest_atomic(tmp_path, new_manifest(config))
+    before = (tmp_path / "manifest.json").read_text(encoding="utf-8")
+    assert main(["status", str(tmp_path), "--json"]) == 0
+    output = json.loads(capsys.readouterr().out)
+    assert output["overall_status"] == "pending"
+    assert (tmp_path / "manifest.json").read_text(encoding="utf-8") == before

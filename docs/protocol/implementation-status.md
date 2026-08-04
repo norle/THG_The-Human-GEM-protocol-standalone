@@ -14,7 +14,7 @@
 | Network and reaction checks | `thg_protocol.analysis` | **Supported** | Consistency and network-analysis tests | Structural checks are not a complete biological acceptance assessment; solver needs vary | Save connectivity, formula-balance, and consistency results |
 | MEMOTE assessment | external `memote` command | **External** | [MEMOTE guide](../workflows/memote.md), `memote` optional dependency | Not a THG package API or default offline test | Install/pin MEMOTE separately and save its HTML report |
 | Essential metabolic-task analysis | Historical MEMOTE task code | **Archived** | [legacy workflow status](../legacy-workflows.md), legacy inventory | No maintained replacement is installed or covered by the default suite | Record as Archived; do not infer task success from MEMOTE or structural checks |
-| Iterative merge/consistency loop | merge + consistency APIs | **Partial** | Merge/consistency tests and API contracts | No maintained convergence orchestrator | Compose the loop manually and retain every checkpoint |
+| Iterative merge/consistency loop | `thg_protocol.workflow`, merge + consistency APIs | **Partial** | Resumable workflow tests and API contracts | Checkpointed engineering composition is available; scientific convergence decisions remain manual | Use `thg-run` for restartable checkpoints and review every result |
 | Reproduce the final published THG artifact | complete staged workflow | **Partial** | This matrix, contracts, legacy inventory, and absence of an end-to-end run/test | Current package does not demonstrate exact publication regeneration | Treat current output as a documented composition, not exact artifact reproduction |
 
 ## How to read the statuses
@@ -29,4 +29,3 @@ The [API contracts](../api-contracts.md) are authoritative for mutation,
 ownership, explicit output paths, injected service clients, and intentional
 migration differences. The [legacy inventory](../legacy-api-inventory.md) is
 authoritative for removed or compatibility-only workflows.
-
