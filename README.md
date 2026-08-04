@@ -2,6 +2,7 @@
 
 [![CI](https://github.com/norle/THG_The-Human-GEM-protocol-standalone/actions/workflows/ci.yml/badge.svg)](https://github.com/norle/THG_The-Human-GEM-protocol-standalone/actions/workflows/ci.yml)
 [![Documentation](https://github.com/norle/THG_The-Human-GEM-protocol-standalone/actions/workflows/docs.yml/badge.svg)](https://github.com/norle/THG_The-Human-GEM-protocol-standalone/actions/workflows/docs.yml)
+[![Hosted documentation](https://img.shields.io/badge/docs-GitHub%20Pages-blue?logo=github)](https://norle.github.io/THG_The-Human-GEM-protocol-standalone/)
 [![License: CC BY 4.0](https://img.shields.io/badge/License-CC%20BY%204.0-lightgrey.svg)](LICENSE)
 
 > [!NOTE]
@@ -93,6 +94,7 @@ thg-compare model_a.json model_b.json --output-dir results/compare
 
 ## Documentation
 
+- [Hosted documentation](https://norle.github.io/THG_The-Human-GEM-protocol-standalone/)
 - [Documentation home](docs/index.md)
 - [Model operations overview](docs/workflow-overview.md)
 - [Task guides](docs/usage.md)
