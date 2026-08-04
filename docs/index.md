@@ -76,7 +76,8 @@ the input model and provenance metadata alongside generated results.
 
 Read the [published-protocol coverage matrix](protocol/implementation-status.md)
 before treating a package operation as a complete reproduction of a published
-stage.
+stage. Maintainers should also consult `REFACTORING_PLAN_NEXT.md` in the
+repository's `docs/plans/` directory for closeout requirements.
 
 ## Terms used in this site
 

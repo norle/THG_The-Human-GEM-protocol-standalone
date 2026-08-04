@@ -1,6 +1,7 @@
 # SHA-256 checksums for tracked canonical artifacts relocated during closeout.
 # The large LFS input is verified by the repository's LFS gate separately.
 docs/assets/component_visualization_template.html | c72ffcec93da6182db399e28922edc5e1d7213ebbc712b1fc2974ed9f796d931
+docs/assets/mermaid-init.js | 31135e93341f66d09c22d59ebced0b93adbfa837b3a593100de8a8f255552e5b
 files/pathway/README.md | 59345022d30ef38f266ed3f94a1affaaccd29a357c6b54a5ba35311116aa27ac
 files/pathway/config/config_glycocalyx_cytoskeleton.json | affecaa197eff5b6a006c23d5ba6dbca3023496de31c7afad3be7beed38b3fe0
 files/pathway/config/config_glycocalyx_cytoskeleton_contractile.json | b8435a8e3605120b6c45aa3c2504d4115f3d146c685fc60f0138ef271e3a5586

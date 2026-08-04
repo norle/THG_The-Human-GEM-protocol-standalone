@@ -75,5 +75,7 @@ and is maintained separately from the historical implementation. Please cite
 [biosustain/THG](https://github.com/biosustain/THG) when using THG in research.
 
 Developer, release, repository, and legacy records are in the [maintainer
-reference](docs/development.md). Project materials are distributed under the
-[Creative Commons Attribution 4.0 International license](LICENSE).
+reference](docs/development.md). The active closeout requirements are recorded
+in the [next refactoring plan](docs/plans/REFACTORING_PLAN_NEXT.md). Project
+materials are distributed under the [Creative Commons Attribution 4.0
+International license](LICENSE).
