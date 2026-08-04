@@ -2,6 +2,7 @@
 
 [![CI](https://github.com/norle/THG_The-Human-GEM-protocol-standalone/actions/workflows/ci.yml/badge.svg)](https://github.com/norle/THG_The-Human-GEM-protocol-standalone/actions/workflows/ci.yml)
 [![Documentation](https://github.com/norle/THG_The-Human-GEM-protocol-standalone/actions/workflows/docs.yml/badge.svg)](https://github.com/norle/THG_The-Human-GEM-protocol-standalone/actions/workflows/docs.yml)
+[![Hosted documentation](https://img.shields.io/badge/docs-GitHub%20Pages-blue?logo=github)](https://norle.github.io/THG_The-Human-GEM-protocol-standalone/)
 
 THG Protocol is a Python package and command-line toolset for constructing,
 curating, expanding, and validating human genome-scale metabolic models. The
