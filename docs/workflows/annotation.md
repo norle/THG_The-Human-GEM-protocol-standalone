@@ -1,53 +1,93 @@
-# Metabolite and reaction identification
+# Annotation and identification
 
-## What this workflow is for
+!!! info "Status: Supported"
+    Maintained annotation, reaction-identification, and GPR/location helpers
+    are covered by current tests; the complete publication curation sequence is
+    composed manually.
 
-Inventory model identifiers, enrich metabolites or reactions, and resolve
-gene–protein–reaction (GPR) rules before curation or analysis.
+## Outcome
+
+Inspect annotation coverage, resolve metabolite/reaction identifiers, and
+derive GPR or cellular-location information for review.
+
+## Place in the THG protocol
+
+Core reference-model curation building block and a standalone inspection tool.
+
+## When to use it
+
+Use it before and after model enrichment or when unresolved identifiers need a
+separate report.
 
 ## When not to use it
 
-Use [model enrichment](model-build.md) for the complete external-service
-pipeline, or [network analysis](network-analysis.md) for purely structural
-connectivity and balance checks.
+Use [model reconstruction](database.md) for normalized records or
+[model enrichment](model-build.md) for a multi-service model-file pipeline.
 
-## Prerequisites and inputs
+## Inputs
 
-Provide a JSON model, annotation targets, and optional report paths. Live
-clients may require credentials, network access, and service-specific rate
-limits; static clients are preferred for tests.
+Inputs are model paths, metabolite/reaction records, target identifiers, and
+optional injected `PubChemClient`, BioCyc, KEGG, Ensembl, or location clients.
+The exact required fields are defined by the linked API references.
 
-## Python API
+## Requirements
 
-Start with [`analyze_model_annotations`][thg_protocol.annotation.model_annotations.analyze_model_annotations]
-and [`extract_metabolite_annotations`][thg_protocol.annotation.model_annotations.extract_metabolite_annotations]:
+Coverage inspection is offline. Live identifier/GPR/location lookup uses the
+selected service and may need network, credentials, pacing, and caches. Static
+clients provide deterministic offline tests. No solver is required.
+
+## Run from the command line
+
+No installed annotation CLI exists. Use the package APIs or the explicit
+model-identification workflow function from Python.
+
+## Run from Python
 
 ```python
-from thg_protocol.annotation import analyze_model_annotations, extract_metabolite_annotations
+from thg_protocol.annotation import analyze_model_annotations
+from thg_protocol.gpr import get_gpr
+from thg_protocol.services.biocyc import StaticBioCycClient
 
-counts = analyze_model_annotations("inputs/model.json")
-annotations, missing = extract_metabolite_annotations("inputs/model.json", ["ATP", "H2O"])
+counts = analyze_model_annotations("docs/examples/quickstart_model.json")
+client = StaticBioCycClient(
+    ec_pages={("HUMAN", "1.1.1.1"): "<b>Gene:</b> GENE1 ENSG0001<br>"}
+)
+gpr = get_gpr("1.1.1.1", biocyc_client=client)
+print(counts, gpr)
 ```
-
-Resolve GPRs with [`get_gpr`][thg_protocol.gpr.lookup.get_gpr] and locations
-with [`resolve_locations`][thg_protocol.gpr.location.resolve_locations].
-The lower-level model and reaction APIs are available as
-[`annotate_cobra_model`][thg_protocol.annotation.model.annotate_cobra_model],
-[`identify_reaction`][thg_protocol.annotation.reactions.identify_reaction],
-and [`run_metabolite_reaction_identification`][thg_protocol.annotation.metabolite_reactions.run_metabolite_reaction_identification].
 
 ## Outputs
 
-Results are inventories, transformed rules, or optional JSON reports. Missing
-fields are reported as unmatched targets; input models are not silently
-rewritten.
+Inspection returns mappings and does not mutate or write the input. The
+metabolite/reaction workflow returns `MetaboliteReactionResult` and writes
+model, normalized-model, annotation, and failure files under explicit output
+locations. Service caches are caller-owned where the API exposes them.
 
-## Common errors
+## Inspect the result
 
-No lookup result usually means an identifier namespace or compartment mismatch.
-Check target IDs and metadata before changing service settings.
+Review annotation counts, unresolved records, generated GPR syntax, location
+sets, and failure reports. Compare before/after model files and then run balance
+and connectivity checks.
 
-## Next workflow
+## Common problems
 
-Continue with [network analysis](network-analysis.md), or use
-[model comparison](comparison.md) to review changes between model versions.
+Empty results can mean the model has no matching annotations, not that a service
+call succeeded. Check client fixtures, identifier prefixes, service responses,
+and failure files. Never put credentials in examples.
+
+## Next step
+
+Continue with [model enrichment](model-build.md) or the
+[reference-model protocol route](../protocol/reference-model.md).
+
+## API references
+
+Use [`analyze_model_annotations`][thg_protocol.annotation.model_annotations.analyze_model_annotations],
+[`extract_metabolite_annotations`][thg_protocol.annotation.model_annotations.extract_metabolite_annotations],
+[`get_gpr`][thg_protocol.gpr.lookup.get_gpr], and
+[`resolve_locations`][thg_protocol.gpr.location.resolve_locations].
+
+## Differences from the historical workflow
+
+Current package boundaries require explicit paths and injected clients; retired
+checkout wrappers and implicit repository outputs are Archived.

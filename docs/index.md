@@ -1,53 +1,94 @@
 # THG Protocol
 
-THG Protocol is a Python package and command-line toolset for constructing,
-curating, analysing, and comparing human genome-scale metabolic models (GEMs).
+THG Protocol supports the construction, curation, expansion, and validation of
+human genome-scale metabolic models (GEMs). The published strategy starts from
+Human1 or another reference GEM, builds a complementary Human Database, and
+converges on a validated THG model; the current package exposes maintained
+building blocks for that strategy.
 
-## What it does
+## Choose your starting point
 
-- Reconstruct a COBRA model from normalized metabolite and reaction records.
-- Annotate model metabolites, reactions, and gene--protein--reaction (GPR)
-  rules.
-- Add configured pathways, identify transport gapfill candidates, and merge
-  model content.
-- Check network connectivity, reaction balance, and redundant reactions.
-- Compare model versions, derive cell-specific models, and produce reports or
-  SVG figures.
+### I have an existing human GEM — recommended
 
-## Inputs and outputs
+Start with the [reference-model route](protocol/reference-model.md) if your
+input is a JSON or SBML model such as Human1. It explains annotation,
+mass-balance, GPR/location, and isoenzyme-expansion checkpoints and maps each
+step to the current package. This is the closest starting point to the
+publication's reference-model branch.
 
-The tools accept normalized records, JSON or SBML models, and, for specific
-operations, pathway configurations or measurement data. They write models,
-CSV reports, caches, and optional SVG figures to paths supplied by the caller.
-Format and dependency requirements are documented in each task guide.
+### I want to construct a network from pathway/database information
 
-## Choose an operation
+Use the [Human Database route](protocol/human-database.md) when your inputs are
+human pathway records or normalized metabolite and reaction records. The
+current deterministic reconstruction API consumes normalized records; live
+harvesting orchestration from online sources is documented as Partial.
 
-| If you need to... | Use |
+### I need only one operation
+
+Use the [individual-operation chooser](usage.md) for annotation, model
+reconstruction, pathway addition, gapfill, merge, comparison, figures, or
+cell-specific reduction without following the complete protocol.
+
+## How the complete protocol fits together
+
+The two branches are conceptual model states from the publication. The current
+package can compose several of the steps, but does not provide one command that
+regenerates the published artifact.
+
+```mermaid
+flowchart TD
+    A{"Starting material"}
+    A -->|Existing human GEM| B["Curate reference model → THGβ1"]
+    B --> C["Curate GPRs and expand locations → THGβ2"]
+    A -->|Pathway and database information| D["Construct Human Database"]
+    C --> E["Merge, assess, and validate → final THG"]
+    D --> E
+```
+
+The left branch begins with an existing human GEM such as Human1. Reference
+annotation and mass-balance curation conceptually produce THGβ1; GPR/location
+curation and isoenzyme-based expansion produce THGβ2. The other branch gathers
+human pathway and online biological information into the Human Database/network.
+Those products converge during merge. Connectivity, formula-balance, and
+stoichiometric-consistency checks can be performed with package analysis APIs;
+MEMOTE is an external assessment. See the [canonical protocol overview](protocol/index.md)
+for the full map and its support boundaries.
+
+## What you will produce
+
+Depending on the route, outputs include a curated or reconstructed model in
+JSON/SBML, annotation and merge reports, deterministic comparison or
+connectivity reports, service caches, and (when separately installed) a MEMOTE
+HTML report. Output paths and cache ownership belong to the caller; preserve
+the input model and provenance metadata alongside generated results.
+
+## Before you begin
+
+| Requirement | Why it matters |
 | --- | --- |
-| Create a model from records | [Model reconstruction](workflows/database.md) |
-| Add or inspect biological annotations | [Annotation](workflows/annotation.md) |
-| Change model content | [Pathway implementation](workflows/pathway.md), [gapfill](workflows/gapfill.md), or [merge](workflows/merge.md) |
-| Inspect or compare models | [Network analysis](workflows/network-analysis.md) or [model comparison](workflows/comparison.md) |
-| Create a reduced model or visual output | [Cell-specific models](workflows/cell-specific.md) or [figures and reports](workflows/figures.md) |
+| Python 3.10–3.12 | Supported package runtime |
+| Network access | Only service-backed lookups and live harvesting; local examples are offline |
+| Credentials | BioCyc or other services only when the selected client requires them |
+| Solver | Solver-backed checks and some downstream analyses; not needed for structural checks |
+| Optional tools | MEMOTE, plotting, or cell-specific extras as selected by the route |
 
-## Start here
+## Implementation status
 
-- Follow the [five-minute quickstart](quickstart.md) to reconstruct a small
-  model.
-- Use the [task guides](usage.md) as the canonical task chooser.
-- Read the [workflow overview](workflow-overview.md) for the input-to-output
-  map after choosing a task.
-- Use the [API reference](api/index.md) for Python interfaces and the
-  [installation guide](installation.md) for optional dependencies.
-- The current refactoring closeout plan is recorded in
-  `plans/REFACTORING_PLAN_NEXT.md` for repository maintainers.
+Read the [published-protocol coverage matrix](protocol/implementation-status.md)
+before treating a package operation as a complete reproduction of a published
+stage.
 
-## Research use
+## Terms used in this site
 
-Please cite [biosustain/THG](https://github.com/biosustain/THG) when using THG
-in research.
+A **GEM** is a genome-scale metabolic model. **THG** is the final Human GEM
+concept from the publication; **THGβ1** and **THGβ2** are intermediate model
+states for reference curation and GPR/location expansion. A **GPR** links genes
+to reactions, while an **S-GPR** also represents stoichiometric protein
+requirements. **Isoenzyme-based expansion** adds reaction instances for
+compartment-specific enzyme activity. **Mass balance** checks elemental totals
+across a reaction; **stoichiometric consistency** checks the model's
+stoichiometric structure. **MEMOTE** is an external metabolic-model quality
+assessment. A **metabolic task** is a defined functional test, and **gapfill**
+adds selected reactions or transport links to address a structural gap.
 
-Development, release, legacy, and repository-maintenance information is kept
-in the [developer and maintainer section](development.md). Internal planning
-records are kept in the repository but are not published in the site.
+For scientific context, see the [published protocol](https://doi.org/10.3390/bioengineering10050576).

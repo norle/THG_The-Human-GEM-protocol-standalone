@@ -1,51 +1,82 @@
 # Figures and reports
 
-## What this workflow is for
+!!! info "Status: Supported"
+    Summary and SVG figure APIs are maintained, with rendering covered when the
+    optional plotting dependencies are installed.
 
-Turn model summaries or report tables into SVG figures suitable for reports
-and publications.
+## Outcome
+
+Summarize model components, annotation groups, comparisons, and selected MEMOTE
+scores as caller-owned report data or SVG figures.
+
+## Place in the THG protocol
+
+Downstream presentation and review operation; figures are not a mandatory
+construction stage.
+
+## When to use it
+
+Use it after saving stable model/report inputs and when a visual summary helps
+review or communicate a result.
 
 ## When not to use it
 
-Use [network analysis](network-analysis.md) or [model comparison](comparison.md)
-to produce the underlying diagnostics before rendering figures.
+Do not use figures as a substitute for inspecting raw merge, balance, or MEMOTE
+reports.
 
-## Prerequisites and inputs
+## Inputs
 
-Summary APIs accept model-like objects. Rendering needs the optional plotting
-extra:
+Summary functions accept model-like objects or report rows. Rendering functions
+require an explicit report/input path and output directory.
 
-```bash
-python -m pip install 'thg-protocol[figures]'
-```
+## Requirements
 
-## Python API
+Summary functions are local. Install `python -m pip install -e '.[figures]'`
+for matplotlib/seaborn rendering. No network or solver is implicit.
 
-Start with [`summarize_model_components`][thg_protocol.figures.models.summarize_model_components]:
+## Run from the command line
+
+No installed figures CLI exists. Use Python.
+
+## Run from Python
 
 ```python
-from thg_protocol.figures.models import summarize_model_components
+from thg_protocol.figures.models import model_component_summary
+from cobra.io import load_json_model
 
-summary = summarize_model_components({"toy": model})
-print(summary["toy"].reactions)
+model = load_json_model("results/model.json")
+summary = model_component_summary(model)
+print(summary.reactions, summary.metabolites)
 ```
-
-Use [`summarize_annotation_rows`][thg_protocol.figures.comparison.summarize_annotation_rows]
-for annotation tables and
-[`generate_model_comparison_figures`][thg_protocol.figures.models.generate_model_comparison_figures]
-for SVG output.
 
 ## Outputs
 
-Summary functions return structured data. Rendering writes SVG files under the
-caller-selected directory.
+Summary functions return structured values. Rendering returns result objects
+and writes deterministic SVGs under the selected directory. Inputs are not
+mutated and no cache is created.
 
-## Common errors
+## Inspect the result
 
-Excel-backed reports must contain the documented sheet and columns. A missing
-column raises `ValueError` before a chart is created.
+Open SVGs and compare their labels/counts with the source report. Record the
+model/report checksum and plotting dependency versions.
 
-## Next workflow
+## Common problems
 
-Use [MEMOTE and task analysis](memote.md) for broader quality diagnostics, or
-return to the relevant task guide in [usage](../usage.md).
+Import-safe summary APIs do not guarantee plotting dependencies are installed.
+Install the figures extra and check that output directories are writable.
+
+## Next step
+
+Return to [usage](../usage.md), [comparison](comparison.md), or
+[MEMOTE](memote.md).
+
+## API references
+
+[`summarize_model_components`][thg_protocol.figures.models.summarize_model_components],
+[`summarize_annotation_rows`][thg_protocol.figures.comparison.summarize_annotation_rows],
+and [`generate_model_comparison_figures`][thg_protocol.figures.models.generate_model_comparison_figures].
+
+## Differences from the historical workflow
+
+Current figure APIs require explicit inputs and output directories and do not
+silently recreate historical repository figures.

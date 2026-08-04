@@ -1,49 +1,82 @@
-# Merge and network consistency
+# Merge
 
-## What this workflow is for
+!!! info "Status: Supported"
+    `merge_models`, `merge_models_from_paths`, and `MergeReport` are maintained,
+    non-mutating APIs covered by current tests.
 
-Combine compatible model content while keeping both input models unchanged and
-recording what was added, retained, or removed.
+## Outcome
+
+Combine two compatible COBRA models into a copied result while reporting added,
+overlapping, and optionally removed isolated objects.
+
+## Place in the THG protocol
+
+Core convergence building block for THGβ2 plus Human Database; it does not
+implement the full historical similarity-aware merge orchestration.
+
+## When to use it
+
+Use it when both branch inputs have compatible IDs, compartments, and formats.
 
 ## When not to use it
 
-Use [model comparison](comparison.md) when you only need a diff, or
-[pathway implementation](pathway.md) when one explicit pathway is being
-added.
+Use [comparison](comparison.md) to ask what differs without combining models.
 
-## Prerequisites and inputs
+## Inputs
 
-Inputs are compatible COBRA models or JSON/SBML files. Select an explicit
-output path and decide whether isolated metabolites should be removed.
+Two loaded COBRA models or JSON/SBML paths, an explicit output path for the
+path-based API, and an explicit isolated-metabolite policy.
 
-## Python API
+## Requirements
 
-Use [`merge_models`][thg_protocol.merge.merge_models] for loaded models:
+Local COBRA I/O only; no network, credentials, or solver.
+
+## Run from the command line
+
+No installed merge CLI exists. Use the Python API or a caller script.
+
+## Run from Python
 
 ```python
-from thg_protocol.merge import merge_models
+from thg_protocol.merge import merge_models_from_paths
 
-merged, report = merge_models(
-    base_model, incoming_model, output_path="results/merged.xml",
-    remove_isolated_metabolites=True,
+merged, report = merge_models_from_paths(
+    "results/reference/model.json",
+    "results/database/model.json",
+    "results/merge/merged.json",
+    remove_isolated_metabolites=False,
 )
+print(report.added_reactions, report.overlapping_reactions)
 ```
-
-Use [`merge_models_from_paths`][thg_protocol.merge.merge_models_from_paths] for
-file inputs. The result is summarized by
-[`MergeReport`][thg_protocol.merge.MergeReport].
 
 ## Outputs
 
-The result is a copied merged model and a merge report. Overlapping IDs retain
-base stoichiometry and receive non-empty incoming metadata.
+Returns a copied model and `MergeReport`; writes only the selected JSON/SBML
+path. Base and incoming inputs are not mutated. Existing base stoichiometry and
+bounds are retained on overlap; non-empty incoming metadata may be added.
 
-## Common errors
+## Inspect the result
 
-Incompatible model formats or IDs should be resolved before merging. Inspect
-the report before enabling isolated-metabolite removal.
+Review every report field, collision IDs, retained stoichiometry, GPRs, and
+isolated-metabolite decision before running [validation](../protocol/merge-and-validate.md).
 
-## Next workflow
+## Common problems
 
-Run [network analysis](network-analysis.md) to check connectivity and balance,
-then use [figures and reports](figures.md) if a summary is needed.
+Unexpected overlap or missing metabolites usually indicates incompatible ID
+namespaces or compartments. Use comparison before changing identifiers.
+
+## Next step
+
+Continue to [network analysis](network-analysis.md) or the
+[merge-and-validate protocol route](../protocol/merge-and-validate.md).
+
+## API references
+
+[`merge_models`][thg_protocol.merge.merge_models],
+[`merge_models_from_paths`][thg_protocol.merge.merge_models_from_paths], and
+[`MergeReport`][thg_protocol.merge.MergeReport].
+
+## Differences from the historical workflow
+
+The current API has intentional retained-base semantics and returns a
+structured report rather than historical positional overlap lists.

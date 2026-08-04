@@ -25,6 +25,18 @@ theme:
       toggle:
         icon: fontawesome/solid/moon
         name: Use light mode
+markdown_extensions:
+  - admonition
+  - attr_list
+  - pymdownx.details
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+extra_javascript:
+  - https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js
+  - assets/mermaid-init.js
 repo_url: https://github.com/norle/THG_The-Human-GEM-protocol-standalone
 repo_name: norle/THG_The-Human-GEM-protocol-standalone
 edit_uri: edit/refactoring-cleanup/docs/
@@ -46,27 +58,35 @@ plugins:
               - "!^_"
 nav:
   - Home: index.md
-  - Get started:
+  - Start here:
       - Installation: installation.md
-      - Five-minute quickstart: quickstart.md
-      - Choose a task: usage.md
-      - Model operations overview: workflow-overview.md
-      - Data and model files: data-and-model-files.md
-  - Guides:
-      - Operations and data flow: architecture.md
-      - Gapfill: workflows/gapfill.md
-      - Pathway implementation: workflows/pathway.md
-      - Model comparison: workflows/comparison.md
-      - Annotation: workflows/annotation.md
+      - Choose your route: workflow-overview.md
+      - Practical quickstart: quickstart.md
+      - API smoke test: api-smoke-test.md
+  - Run the THG protocol:
+      - Complete workflow: protocol/index.md
+      - Curate an existing GEM: protocol/reference-model.md
+      - Construct the Human Database: protocol/human-database.md
+      - Merge and validate: protocol/merge-and-validate.md
+      - Worked end-to-end example: protocol/end-to-end-example.md
+      - Published protocol coverage: protocol/implementation-status.md
+  - Individual operations:
+      - Choose an operation: usage.md
       - Model reconstruction: workflows/database.md
       - Model enrichment: workflows/model-build.md
-      - Merge and consistency: workflows/merge.md
+      - Annotation and identification: workflows/annotation.md
+      - Pathway implementation: workflows/pathway.md
+      - Gapfill: workflows/gapfill.md
+      - Merge: workflows/merge.md
+      - Network analysis: workflows/network-analysis.md
+      - Model comparison: workflows/comparison.md
+      - MEMOTE and task analysis: workflows/memote.md
       - Cell-specific models: workflows/cell-specific.md
       - Figures and reports: workflows/figures.md
-      - Network analysis: workflows/network-analysis.md
-      - MEMOTE and task analysis: workflows/memote.md
-  - Python and command-line reference:
-      - Overview: api/index.md
+  - Reference:
+      - Inputs, outputs, and file formats: data-and-model-files.md
+      - Examples: examples/README.md
+      - Python and CLI overview: api/index.md
       - Core and I/O: api/core.md
       - Database and model construction: api/construction.md
       - Annotation and GPR: api/annotation.md
@@ -75,14 +95,12 @@ nav:
       - Analysis: api/analysis.md
       - Figures: api/figures.md
       - CLI commands: api/cli.md
-  - Examples:
-      - Example files: examples/README.md
-  - Maintainer reference:
+  - Maintainers:
       - Development: development.md
       - Documentation contribution: documentation-contributing.md
       - Release validation: release-validation.md
       - Dependency compatibility: dependency-compatibility.md
-  - Repository records:
+      - Package architecture: architecture.md
       - Repository map: repository-map.md
       - Tracked artifact inventory: artifact-inventory.md
       - Service boundary audit: service-boundary-audit.md

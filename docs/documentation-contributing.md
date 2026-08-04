@@ -13,6 +13,12 @@ fixtures, static service clients, and marked optional sections for solvers,
 MEMOTE, plotting, or live services. Every tutorial should state its purpose,
 prerequisites, Python and/or CLI usage, expected outputs, and troubleshooting.
 
+Mermaid diagrams use `pymdownx.superfences` during the build and a Mermaid
+runtime script loaded from jsDelivr. The build has no network dependency; the
+browser fetches Mermaid when a reader opens the site. Keep diagrams readable
+without hover-only detail and verify the generated Mermaid container after
+changing the configuration.
+
 When a documentation change advances a phase, update the internal
 documentation records in the same change: phase status, date, owner or PR,
 checklist, evidence, and follow-up work. API changes require an API page update; workflow changes

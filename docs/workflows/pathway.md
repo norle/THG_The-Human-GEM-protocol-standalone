@@ -1,55 +1,91 @@
 # Pathway implementation
 
-## What this workflow is for
+!!! info "Status: Supported"
+    `implement_pathway` and `implement_pathway_files`, plus the installed
+    `thg-pathway` CLI, are maintained and covered by current tests.
 
-Add a defined biological pathway to a JSON model from an explicit pathway
-configuration and metabolite-ID lookup table.
+## Outcome
+
+Add a defined pathway's compartments, metabolites, and reactions to a JSON
+model from explicit configuration and identifier data.
+
+## Place in the THG protocol
+
+Supporting model-enrichment operation; it is not mandatory in every THG
+construction and is not a substitute for Human Database harvesting.
+
+## When to use it
+
+Use it when pathway content and the metabolite-ID mapping are already prepared.
 
 ## When not to use it
 
-Use [model reconstruction](database.md) for normalized records, or
-[gapfill](gapfill.md) when the missing content is a transport candidate rather
-than a defined pathway.
+Use [model reconstruction](database.md) for normalized records or [gapfill](gapfill.md)
+for deterministic transport candidates.
 
-## Prerequisites and inputs
+## Inputs
 
-Provide a compatible JSON model, a configuration with compartment and reaction
-definitions, and the ID database selected by that configuration.
+Provide a JSON model, pathway configuration, and metabolite-ID mapping. The
+minimal repository examples are `quickstart_model.json`, `pathway_config.json`,
+and `metabolite_ids.json`.
 
-## Python API
+## Requirements
 
-Apply file inputs with [`implement_pathway_files`][thg_protocol.pathway.workflow.implement_pathway_files]:
+Local JSON inputs only; no network, credentials, or solver. The in-memory API
+mutates its model mapping. The file wrapper writes a separate explicit output.
+
+## Run from the command line
+
+```bash
+thg-pathway --model docs/examples/quickstart_model.json \
+  --config docs/examples/pathway_config.json \
+  --database docs/examples/metabolite_ids.json \
+  --output results/pathway/model.json
+```
+
+## Run from Python
 
 ```python
 from thg_protocol.pathway import implement_pathway_files
 
-implement_pathway_files(
-    "model.json", "pathway.json", "metabolite_ids.json", "results/model.json"
+result = implement_pathway_files(
+    "docs/examples/quickstart_model.json",
+    "docs/examples/pathway_config.json",
+    "docs/examples/metabolite_ids.json",
+    "results/pathway/model.json",
 )
-```
-
-For in-memory data use [`implement_pathway`][thg_protocol.pathway.workflow.implement_pathway].
-For a small KEGG reaction listing use
-[`list_pathway_reactions`][thg_protocol.pathway.kegg_listing.list_pathway_reactions].
-
-## CLI
-
-```bash
-thg-pathway --model model.json --config pathway.json \
-  --database metabolite_ids.json --output results/pathway.json
+print(result["compartments_added"])
 ```
 
 ## Outputs
 
-The workflow writes the modified JSON model and returns counts of added
-content. It does not select hidden repository-relative inputs.
+The wrapper returns counts and writes one JSON model. It does not write caches or
+reports and does not mutate the input file. The in-memory mapping is mutated;
+make a copy when that is not desired.
 
-## Common errors
+## Inspect the result
 
-A missing metabolite usually means its name is absent from the lookup database
-or its compartment abbreviation does not match the model.
+Check added compartment/metabolite/reaction counts and inspect the resulting
+JSON. Run [network analysis](network-analysis.md) and a model comparison.
 
-## Next workflow
+## Common problems
 
-Run [network analysis](network-analysis.md) to inspect the revised model, or
-[model comparison](comparison.md) to review the change.
+Missing IDs usually indicate an incomplete lookup mapping or compartment
+abbreviation mismatch. Invalid equations and duplicate IDs should be corrected
+in the configuration.
+
+## Next step
+
+Use [network analysis](network-analysis.md), [comparison](comparison.md), or
+the [Human Database protocol route](../protocol/human-database.md).
+
+## API references
+
+[`implement_pathway_files`][thg_protocol.pathway.workflow.implement_pathway_files],
+[`implement_pathway`][thg_protocol.pathway.workflow.implement_pathway], and
+[`list_pathway_reactions`][thg_protocol.pathway.kegg_listing.list_pathway_reactions].
+
+## Differences from the historical workflow
+
+The current operation consumes explicit local configuration and does not imply
+that online pathway discovery or the complete publication branch occurred.

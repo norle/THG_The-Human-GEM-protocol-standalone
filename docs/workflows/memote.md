@@ -1,47 +1,76 @@
 # MEMOTE and task analysis
 
-## What this workflow is for
+!!! info "Status: External"
+    MEMOTE quality assessment is performed with the separately installed
+    `memote` command; it is not a maintained THG package API.
 
-Run a broad quality assessment alongside structural connectivity and balance
-checks.
+## Outcome
+
+Produce a broad MEMOTE HTML quality report and keep essential metabolic-task
+status as a separate record.
+
+## Place in the THG protocol
+
+External validation alongside package connectivity, formula-balance, and
+stoichiometric checks. It is not a replacement for those checks.
+
+## When to use it
+
+Use MEMOTE after saving a candidate model and its provenance. Use task analysis
+only when a maintained, separately identified implementation is available.
 
 ## When not to use it
 
-Use [network analysis](network-analysis.md) for a dependency-light local
-diagnostic, or [model comparison](comparison.md) when the question is what
-changed between two models.
+Do not infer that a MEMOTE score proves the publication's essential metabolic
+tasks. Do not present the historical task implementation as a current THG API.
 
-## Prerequisites and inputs
+## Inputs
 
-Install the optional tools and configure a solver where required:
+An SBML or JSON model accepted by the installed MEMOTE version and a caller-
+selected HTML output path. Task files/configuration must be preserved too.
+
+## Requirements
+
+Install and pin MEMOTE separately; solver support may be needed by selected
+checks. The package's `memote` extra provides the dependency but does not add a
+THG command. Network is not inherently required after installation.
+
+## Run from the command line
 
 ```bash
-python -m pip install 'thg-protocol[memote,solver]'
+python -m pip install 'memote'
+memote run --filename results/validation/memote.html results/model.xml
 ```
 
-The input is a model file and a caller-selected report location.
+## Run from Python
 
-## CLI
-
-```bash
-memote run --filename results/memote.html model.xml
-```
-
-The `memote` command is the primary CLI reference for this workflow; it is
-recorded in the [workflow API inventory](../api/workflow-api-inventory.json).
+No maintained THG Python wrapper exists. Invoke the external command from a
+caller-owned workflow and record its version/configuration.
 
 ## Outputs
 
-MEMOTE writes an HTML diagnostic report. Keep generated reports with project
-results and use pinned solver constraints for reproducibility.
+MEMOTE writes the requested HTML report and may write tool-managed intermediate
+files according to its version/configuration. Historical essential-task output
+is **Archived** in this repository unless separately replaced.
 
-## Common errors
+## Inspect the result
 
-Solver or optimization errors generally indicate an environment or solver
-configuration issue. Validate the solver independently before interpreting
-model findings.
+Review category failures, warnings, model loading errors, solver details, and
+the exact command. Compare with package balance/consistency reports and record
+task status independently.
 
-## Next workflow
+## Common problems
 
-Return to [usage](../usage.md) to select the next task, or use
-[figures and reports](figures.md) to present selected results.
+Solver errors are environment/configuration failures until investigated.
+Version drift can change reports, so pin MEMOTE and preserve its configuration.
+
+## Next step
+
+Use [network analysis](network-analysis.md) for local diagnostics or
+[figures](figures.md) only after retaining the raw report.
+
+## Differences from the historical workflow
+
+The publication combined MEMOTE and metabolic-task assessment in its research
+workflow. Current support separates external MEMOTE from the Archived task
+implementation and does not provide one THG orchestration.

@@ -1,45 +1,30 @@
-# Model operations
+# Choose your route
 
-Use this page as a conceptual input-to-output map. Operations can be run
-independently. A model or report written by one operation can be used as input
-to another where the format is supported. Use the [task guides](usage.md) to
-choose a specific operation.
+Choose the route that matches the material you already have. THG operations
+can be called independently. To reproduce the published construction strategy,
+follow the staged protocol shown in the [complete workflow](protocol/index.md).
 
-## Construct or enrich a model
+| Starting point | Recommended route | Main output | Typical external requirements |
+| --- | --- | --- | --- |
+| Existing JSON/SBML human GEM | [Curate and expand a reference GEM](protocol/reference-model.md) | THGβ1-like/THGβ2-like revised model and reports | Biological services; BioCyc credentials for applicable lookups |
+| Human pathway/database records | [Construct the Human Database](protocol/human-database.md) | Human-specific network or reconstructed model | Normalized records or supported service clients |
+| Two prepared model branches | [Merge and validate](protocol/merge-and-validate.md) | Merged model and validation reports | Solver and MEMOTE for selected checks |
+| One local task | [Individual operations](usage.md) | Operation-specific model/report | Depends on the operation |
 
-| Starting input | Operation | Result |
-| --- | --- | --- |
-| Normalized metabolite and reaction records | [Model reconstruction](workflows/database.md) | A JSON or SBML model |
-| JSON or SBML model | [Model enrichment](workflows/model-build.md) | An enriched model, optional caches, and an error report |
-| JSON or SBML model with incomplete identifiers or GPRs | [Annotation](workflows/annotation.md) | Annotation inventory, updated information, or GPR candidates |
+## Pick one
 
-Model reconstruction works from local normalized records. Model enrichment and
-some annotation operations can use external biological databases; those guides
-state when clients, network access, or credentials are required.
+1. **Existing GEM:** preserve the input, inspect identifiers, apply the
+   supported annotation/model-build building blocks, then check balances and
+   GPR/location changes.
+2. **Pathway/database information:** normalize records first, reconstruct a
+   model locally, and use the Human Database page to distinguish that operation
+   from historical live harvesting.
+3. **One operation:** use the operation chooser for a focused task such as
+   pathway implementation, gapfill, comparison, or a downstream cell-specific
+   model.
 
-## Change model content
-
-| Starting input | Operation | Result |
-| --- | --- | --- |
-| JSON model and pathway configuration | [Pathway implementation](workflows/pathway.md) | A model with the configured reactions and compartments |
-| JSON model with compartment-specific dead ends | [Gapfill](workflows/gapfill.md) | Transport candidates, selection reports, and a revised model |
-| Two compatible JSON or SBML models | [Merge](workflows/merge.md) | A merged model and merge report |
-
-## Inspect, compare, or derive output
-
-| Starting input | Operation | Result |
-| --- | --- | --- |
-| Loaded COBRA model | [Network analysis](workflows/network-analysis.md) | Connectivity, balance, and compaction results |
-| Two JSON or SBML models | [Model comparison](workflows/comparison.md) | CSV reports of reaction and stoichiometry differences |
-| Model and activity or expression data | [Cell-specific models](workflows/cell-specific.md) | A reduced model and reduction report |
-| Models or report tables | [Figures and reports](workflows/figures.md) | Summaries and optional SVG figures |
-| Model and optional solver setup | [MEMOTE and task analysis](workflows/memote.md) | MEMOTE and task-analysis reports |
-
-Network analysis runs locally for connectivity and formula-balance checks.
-Solver-backed checks, cell-specific methods, MEMOTE, and rendering are optional
-capabilities; see [installation](installation.md) before using them.
-
-## First example
-
-The [five-minute quickstart](quickstart.md) reconstructs a small model from
-normalized records and checks its balance.
+The [practical quickstart](quickstart.md) demonstrates a small offline journey
+through inspection, deterministic enrichment, checks, and comparison. It is a
+software demonstration, not a research-quality human reconstruction. The
+[API smoke test](api-smoke-test.md) retains the minimal two-metabolite example
+for installation checks.

@@ -1,56 +1,91 @@
 # Cell-specific models
 
-## What this workflow is for
+!!! info "Status: Partial"
+    CSV/MAT activity reduction and transcriptomic helpers are maintained and
+    tested, but a complete publication-style cell-specific workflow is not an
+    automatic THG construction stage.
 
-Derive a model for a cell type from an activity matrix and report which
-reactions were retained. The input model is copied rather than mutated.
+## Outcome
+
+Reduce a model using activity data and retain a caller-owned report of removed
+and retained reactions.
+
+## Place in the THG protocol
+
+Optional downstream analysis after a general model is curated; it is not a
+mandatory stage in every THG construction.
+
+## When to use it
+
+Use a prepared activity matrix when a cell- or tissue-specific model is the
+scientific question.
 
 ## When not to use it
 
-Do not use this workflow for simple model comparison or for changing a
-pathway definition. Use [model comparison](comparison.md) or
-[pathway implementation](pathway.md) instead.
+Do not use reduction to repair a general model or replace pathway curation,
+merge, or validation.
 
-## Prerequisites and inputs
+## Inputs
 
-Activity rows must follow model reaction order. CSV and MAT inputs are
-supported; MAT files use `all_Solutions_matrix5` by default. Install the
-optional extra for solver-backed GIMME/Troppo methods:
+Provide a COBRA model and a matrix-like value, CSV, or MAT activity file. Gene
+annotation/transcript helpers accept explicit model/XML paths as documented by
+the API.
 
-```bash
-python -m pip install 'thg-protocol[cell-specific]'
-```
+## Requirements
 
-## Python API
+Basic reduction accepts CSV/MAT without Troppo. Some methods need the
+`cell-specific` extra and a solver; no network or credentials are implicit.
 
-Reduce a model with [`reduce_model_by_activity`][thg_protocol.cell_specific.reduce_model_by_activity]:
+## Run from the command line
+
+No installed cell-specific CLI exists. Use Python.
+
+## Run from Python
 
 ```python
+from cobra.io import load_json_model
 from thg_protocol.cell_specific import reduce_model_by_activity
 
+model = load_json_model("results/model.json")
 tailored, report = reduce_model_by_activity(
-    model, "results/activity.csv", presence_threshold=0.0,
-    output_path="results/tailored.xml",
+    model,
+    "inputs/activity.csv",
+    output_path="results/cell-specific/model.json",
 )
+print(report.retained_reactions, report.removed_reactions)
 ```
-
-Boundary matching uses [`match_exchange_reactions`][thg_protocol.cell_specific.exchange.match_exchange_reactions].
-Transcriptomics helpers are [`extract_gene_annotation_pairs`][thg_protocol.cell_specific.transcriptomics.extract_gene_annotation_pairs],
-[`extract_sgpr_rules`][thg_protocol.cell_specific.transcriptomics.extract_sgpr_rules],
-and [`replace_gene_symbols`][thg_protocol.cell_specific.transcriptomics.replace_gene_symbols].
 
 ## Outputs
 
-The result is a copied model and an
-[`ActivityReductionReport`][thg_protocol.cell_specific.ActivityReductionReport].
-Transcriptomics helpers return transformed rules and mappings.
+Returns a copied model and `ActivityReductionReport`, and writes only the
+explicit JSON/SBML path. The input model and activity file are not mutated; no
+cache is created.
 
-## Common errors
+## Inspect the result
 
-A row-count error means matrix and model order do not match. A MAT input must
-contain `all_Solutions_matrix5` unless `matrix_key` is changed.
+Review threshold/sample metadata, retained and removed reactions, orphan
+metabolites, and whether boundary reactions were preserved as intended.
 
-## Next workflow
+## Common problems
 
-Run [network analysis](network-analysis.md) on the tailored model, then use
-[figures and reports](figures.md) for presentation output.
+Wrong matrix orientation or missing activity values can remove unexpected
+reactions. Check sample order, gene IDs, and the chosen threshold before
+interpreting the report.
+
+## Next step
+
+Run [network analysis](network-analysis.md) on the tailored model and use
+[figures](figures.md) for presentation.
+
+## API references
+
+[`reduce_model_by_activity`][thg_protocol.cell_specific.reduce_model_by_activity],
+[`match_exchange_reactions`][thg_protocol.cell_specific.exchange.match_exchange_reactions],
+[`extract_gene_annotation_pairs`][thg_protocol.cell_specific.transcriptomics.extract_gene_annotation_pairs],
+[`extract_sgpr_rules`][thg_protocol.cell_specific.transcriptomics.extract_sgpr_rules],
+and [`replace_gene_symbols`][thg_protocol.cell_specific.transcriptomics.replace_gene_symbols].
+
+## Differences from the historical workflow
+
+The current reduction helper is a maintained local building block; historical
+solver-heavy cell-specific orchestration is not implied.

@@ -1,61 +1,96 @@
 # Model reconstruction
 
-## What this workflow is for
+!!! info "Status: Supported"
+    The maintained `thg_protocol.database` API reconstructs models from
+    normalized records and is covered by current database tests.
 
-Reconstruct a COBRA model when normalized records, a JSON record bundle, or a
-historical pickle checkpoint is the authoritative input.
+## Outcome
+
+Create a COBRA model from explicit metabolite, reaction, gene, and pathway
+records. This is the deterministic core of the Human Database branch; it does
+not harvest online services by itself.
+
+## Place in the THG protocol
+
+Core building block for the Human Database branch or a standalone local task.
+It is not proof that the publication's live pathway-harvesting stage has been
+reproduced.
+
+## When to use it
+
+Use normalized records, `docs/examples/records.json`, or a supported JSON
+record bundle when you want reproducible model construction.
 
 ## When not to use it
 
-Use [model enrichment](model-build.md) for an existing model, or
-[pathway implementation](pathway.md) when the input is a pathway
-configuration rather than records.
+Use [model enrichment](model-build.md) for an existing model, or the protocol
+page when your input is only a list of pathways and online sources.
 
-## Prerequisites and inputs
+## Inputs
 
-The normalized API needs metabolite IDs and reaction stoichiometry that refer
-to known metabolites. JSON bundles contain `model_id`, `metabolites`, and
-`reactions`, with optional `genes` and `pathways`. Pickle support is a
-compatibility adapter and may require the `database` extra for `dill`.
+`MetaboliteRecord` requires `id`; `ReactionRecord` requires `id` and a
+stoichiometry mapping whose IDs exist in the metabolite set. Optional records
+carry annotations, bounds, GPRs, genes, and pathways. The JSON schema is
+described in [Inputs and file formats](../data-and-model-files.md).
 
-## Python API
+## Requirements
 
-The deterministic entry point is [`reconstruct_model`][thg_protocol.database.reconstruct_model]:
+Core reconstruction is local and needs no credentials, network, or solver. The
+`database` extra is required only for historical pickle input. Inject service
+clients into `reconstruct_model_with_services` when enrichment is intentional.
+
+## Run from the command line
+
+No installed model-reconstruction CLI exists. Use the Python API or a caller
+script with explicit paths.
+
+## Run from Python
 
 ```python
-from thg_protocol.database import MetaboliteRecord, ReactionRecord, reconstruct_model
+from pathlib import Path
 
-model = reconstruct_model(
-    "toy",
-    [MetaboliteRecord("a_c", compartment="c", formula="C1H2")],
-    [ReactionRecord("R1", {"a_c": -1}, name="example")],
-    output_path="results/toy.json",
+from thg_protocol.database import reconstruct_model_from_json
+
+model = reconstruct_model_from_json(
+    Path("docs/examples/records.json"),
+    output_path=Path("results/reconstruction/model.json"),
 )
+print(model.id, len(model.reactions))
 ```
-
-For file and service boundaries use
-[`reconstruct_model_from_json`][thg_protocol.database.reconstruct_model_from_json],
-[`reconstruct_model_from_pickle`][thg_protocol.database.reconstruct_model_from_pickle],
-and [`reconstruct_model_with_services`][thg_protocol.database.reconstruct_model_with_services].
-Use [`summarize_biocyc_compartments`][thg_protocol.database.summarize_biocyc_compartments]
-for loaded cache mappings and
-[`parse_pathway_links`][thg_protocol.database_parsing.parse_pathway_links] for
-independent KEGG parsing.
 
 ## Outputs
 
-The functions return a COBRA model and write JSON or SBML only when an
-explicit output path is supplied. Service enrichment uses injectable clients;
-it does not hide network access. Pickle reconstruction performs no network
-access.
+The function returns a new COBRA model and writes JSON for a `.json` output
+path; other suffixes are written as SBML. Inputs are not mutated. Pure
+reconstruction creates no cache or report.
 
-## Common errors
+## Inspect the result
 
-Malformed bundles fail before output is written. A reaction referring to an
-unknown metabolite indicates incomplete records. Do not commit generated
-models, caches, or credentials.
+Check model ID/counts, reaction metabolite IDs, pathway groups, formulas, and
+GPRs. Then run [network analysis](network-analysis.md) and
+`unbalanced_reactions` for structural checks.
 
-## Next workflow
+## Common problems
 
-Run [network analysis](network-analysis.md) to check connectivity and balance,
-or [model enrichment](model-build.md) to add external annotations.
+`KeyError` means a reaction references a missing metabolite. Duplicate IDs are
+rejected. A pickle import failure usually means the optional `database` extra
+or the historical payload shape is missing.
+
+## Next step
+
+Continue to the [Human Database protocol route](../protocol/human-database.md)
+or [model enrichment](model-build.md).
+
+## API references
+
+[`reconstruct_model`][thg_protocol.database.reconstruct_model],
+[`reconstruct_model_from_json`][thg_protocol.database.reconstruct_model_from_json],
+[`reconstruct_model_from_pickle`][thg_protocol.database.reconstruct_model_from_pickle],
+[`reconstruct_model_with_services`][thg_protocol.database.reconstruct_model_with_services],
+[`summarize_biocyc_compartments`][thg_protocol.database.summarize_biocyc_compartments],
+and [`parse_pathway_links`][thg_protocol.database_parsing.parse_pathway_links].
+
+## Differences from the historical workflow
+
+The package consumes normalized records at its boundary and does not claim to
+perform the publication's complete online pathway harvest.
