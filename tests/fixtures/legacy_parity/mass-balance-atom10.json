@@ -1,0 +1,21 @@
+{
+  "case_id": "reference.mass-balance.atom10.basic-formulas",
+  "cases": [
+    {
+      "formula": "C6H12O6",
+      "expected": [6, 12, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    },
+    {
+      "formula": "H2O",
+      "expected": [0, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    },
+    {
+      "formula": "Fe2",
+      "expected": [0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0]
+    },
+    {
+      "formula": "X3R",
+      "expected": [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 1]
+    }
+  ]
+}

@@ -1,15 +1,15 @@
 # Contract: mass balance
 
-- **Legacy:** historical equation and mass-balance routines under
-  `build_model/`.
-- **Maintained:** `thg_protocol.model_build.mass_balance.formula_atoms`,
-  `reaction_compare`, and balancing helpers.
-- **Inputs/defaults:** formulas and stoichiometric equations, including missing
-  formulas and glycan branches; no solver or network access.
-- **Result:** parsed atoms, imbalance/missing-atom reports, or a new balanced
-  equation. Inputs are not mutated unless an API explicitly returns a revised
-  object.
-- **Comparison:** compare element totals, coefficient signs, normalization of
-  formulas, exceptions, and the positive/negative balance decision.
-- **Difference policy:** a changed scientific convention must be named in the
-  contract before the differential test is enabled.
+- **Legacy:** `functions/equations_bm_gdb.py:atom10` from the recorded legacy
+  commit.
+- **Maintained:** `thg_protocol.model_build.mass_balance.atom10`.
+- **Inputs/defaults:** the four offline formulas in
+  `tests/fixtures/legacy_parity/mass-balance-atom10.json`; no solver or
+  network access.
+- **Result:** the ordered twelve-element C/H/O/N/P/S/K/Ca/Na/Fe/X/R vector.
+- **Comparison:** both implementations must return the fixture's exact vector
+  for every formula, in isolated subprocesses.
+- **Scope boundary:** this contract deliberately excludes the historical
+  substring ambiguity for formulas such as `Ca`, and does not establish parity
+  for equation balancing, missing-atom insertion, or other mass-balance
+  routines.

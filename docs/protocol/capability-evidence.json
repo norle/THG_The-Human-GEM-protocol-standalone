@@ -87,10 +87,10 @@
       "workflow_coverage": "Operation",
       "legacy_relationship": "Not assessed",
       "published_reproduction": "Not yet verified",
-      "legacy_sources": ["build_model/equations_build_model.py"],
+      "legacy_sources": ["functions/equations_bm_gdb.py"],
       "current_sources": ["src/thg_protocol/model_build/mass_balance.py"],
-      "tests": ["tests/unit/test_mass_balance_api.py"],
-      "known_differences": ["Legacy and maintained implementations have not been run on the same fixture"],
+      "tests": ["tests/unit/test_mass_balance_api.py", "tests/parity/test_mass_balance_atom10.py"],
+      "known_differences": ["One atom10 vector fixture is compared; legacy substring handling for overlapping element symbols and broader equation/mass-balance behavior remain unverified"],
       "evidence_commit": "0c91fdec325df12f25ef13819525e830a4cec1e8"
     },
     {
