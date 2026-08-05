@@ -237,7 +237,7 @@
       "legacy_sources": [],
       "current_sources": ["src/thg_protocol/analysis/model_signature.py"],
       "tests": ["tests/unit/test_model_signature.py"],
-      "known_differences": ["Signature normalization is a maintained comparison contract, not proof of publication parity"],
+      "known_differences": ["Signature normalization is a maintained comparison contract, not proof of parity with the paper"],
       "evidence_commit": "0c91fdec325df12f25ef13819525e830a4cec1e8"
     },
     {
@@ -258,7 +258,7 @@
         "tests/unit/test_workflow_stages.py",
         "tests/unit/test_workflow_lock.py"
       ],
-      "known_differences": ["The DAG composes maintained operations; it does not execute complete publication construction"],
+      "known_differences": ["The DAG composes maintained operations; it does not execute the paper's complete construction"],
       "evidence_commit": "0c91fdec325df12f25ef13819525e830a4cec1e8"
     },
     {
@@ -323,7 +323,7 @@
     },
     {
       "id": "publication.final_artifact",
-      "publication_concept": "Exact published THG reconstruction",
+      "publication_concept": "Exact THG reconstruction from the paper",
       "current_entry_points": [],
       "implementation": "Not implemented",
       "verification": "Not yet verified",
@@ -333,7 +333,7 @@
       "legacy_sources": [],
       "current_sources": [],
       "tests": [],
-      "known_differences": ["No frozen publication-stage input, artifact, or full workflow result is available"],
+      "known_differences": ["No frozen paper-stage input, artifact, or full workflow result is available"],
       "evidence_commit": "0c91fdec325df12f25ef13819525e830a4cec1e8"
     }
   ]
