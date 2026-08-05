@@ -21,7 +21,8 @@ publication's reference-model branch.
 Use the [Human Database route](protocol/human-database.md) when your inputs are
 human pathway records or normalized metabolite and reaction records. The
 current deterministic reconstruction API consumes normalized records; live
-harvesting orchestration from online sources is documented as Partial.
+harvesting orchestration from online sources is recorded as Not implemented;
+see the [capability and evidence matrix](protocol/implementation-status.md).
 
 ### I need only one operation
 

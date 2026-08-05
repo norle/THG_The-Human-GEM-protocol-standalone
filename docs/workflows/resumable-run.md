@@ -1,6 +1,6 @@
 # Resumable engineering runs
 
-!!! warning "Scientific scope: Partial"
+!!! warning "Scientific scope"
     `thg-run` composes maintained package APIs into restartable engineering
     checkpoints. It does not implement live biological harvesting, complete
     THGbeta2 construction, essential metabolic-task analysis, or exact
@@ -71,7 +71,8 @@ recorded explicitly.
 
 `reference` in `prebuilt` mode copies and reads a JSON or SBML model. In
 `build_model` mode it calls `build_model_batch` with run-owned output, cache,
-and error paths. `database` accepts normalized JSON records and calls
+and error paths. The reference stage writes a checksummed cache manifest;
+configured external caches are inventoried but remain caller-owned. `database` accepts normalized JSON records and calls
 `reconstruct_model_from_json`; it does not harvest online services.
 
 ## Resume and recovery
@@ -82,17 +83,27 @@ input reruns `reference`, `merge`, `validation`, and enabled MEMOTE, while the
 independent database stage remains reusable. A changed records bundle reruns
 the other branch and those same descendants. A deleted report reruns only its
 stage and descendants. Previous successful attempt directories are retained.
+The manifest records the latest attempt for each stage; retained directories
+preserve files but are not a structured complete attempt history.
 
 If a process stopped while a stage was `running`, resume records it as
 `interrupted` and creates a new attempt. Failed and interrupted temporary work
 is retained under `failed/` when possible. A lock is removed automatically only
 when its owning command exits; `unlock` requires a demonstrably dead local PID
 unless `--force` is supplied. Do not use `--force` while another process may be
-writing the run.
+writing the run. A SIGTERM that prevents cleanup can leave a stale lock; after
+confirming the recorded process is gone, use `thg-run unlock`.
 
-Checksum-invalid or hand-edited manifests are rejected rather than repaired.
-Inspect the log and use `resume`; use `--force-step` when a deliberate rerun is
-needed. Caller-owned input files are read-only from the workflow's perspective.
+Checksum-invalid or structurally invalid manifests are rejected rather than
+repaired. The manifest is not an authentication mechanism: a well-formed manual
+edit is detected only when its configuration or artifact checks no longer
+match. Inspect the log and use `resume`; use `--force-step` when a deliberate
+rerun is needed. Caller-owned input files are read-only from the workflow's
+perspective.
+
+`start` refuses an existing nonempty output directory unless it already has a
+manifest (which must be resumed). This prevents unrelated files from becoming
+part of a new run.
 
 ## MEMOTE
 
@@ -109,3 +120,10 @@ location, and isoenzyme THGbeta2 branch, historical similarity-aware merging,
 essential metabolic-task analysis, and exact published-artifact regeneration
 remain outside version 1. Outputs should be named and interpreted as neutral
 artifacts such as `reference-model` and `candidate-thg`.
+
+## API reference
+
+The maintained entry points are [`start`][thg_protocol.workflow.runner.start],
+[`resume`][thg_protocol.workflow.runner.resume], and
+[`get_status`][thg_protocol.workflow.runner.get_status]. Their implementation
+and manifest/checksum contracts are rendered in the [workflow API reference](../api/workflows.md).

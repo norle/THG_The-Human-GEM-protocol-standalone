@@ -1,31 +1,56 @@
-# Published protocol coverage
+# Capability and evidence status
 
-!!! info "Status: Partial"
-    This matrix distinguishes maintained package interfaces from the complete
-    historical/published workflow. Status labels follow the repository policy:
-    Supported, Partial, External, and Archived.
+!!! info "Evidence baseline"
+    This matrix is keyed to [`capability-evidence.json`](capability-evidence.json).
+    It reports implementation, evidence strength, callable scope, historical
+    relationship, and published-artifact reproduction independently.
 
-| Publication concept | Current entry point | Status | Evidence | Behavioral difference | Recommended path |
-| --- | --- | --- | --- | --- | --- |
-| Reference annotation and mass balancing → THGβ1 | `thg_protocol.annotation`, `thg_protocol.model_build`, formula and consistency helpers | **Partial** | [API contracts](../api-contracts.md), annotation/model-build tests, [legacy inventory](../legacy-api-inventory.md) | Building blocks do not provide one THGβ1 orchestrator or guarantee publication artifact naming | Compose inspection, injected annotation, explicit output, and balance checks; keep an intermediate model |
-| Construct Human Database from live biological sources | `thg_protocol.database`, service clients, parsing/model-build helpers | **Partial** | Database API/tests and service-boundary audit | `reconstruct_model` consumes normalized records; it does not harvest KEGG/BioCyc/PubChem itself | Normalize records or compose clients manually; record source/cache dates |
-| GPR/location curation and isoenzyme expansion → THGβ2 | `thg_protocol.gpr`, `thg_protocol.model_build`, pathway/model helpers | **Partial** | GPR/location tests, API contracts, legacy inventory | No maintained end-to-end THGβ2 expansion runbook or named artifact | Run only verified helper sequences and label the resulting state by its actual output |
-| Similarity/identity-aware merge | `thg_protocol.merge.merge_models` | **Supported** with intentional differences | Merge tests and [API contracts](../api-contracts.md) | Retained base stoichiometry; merge report replaces historical positional overlap output | Preserve inputs, merge to explicit output, review `MergeReport`, and use comparison separately |
-| Network and reaction checks | `thg_protocol.analysis` | **Supported** | Consistency and network-analysis tests | Structural checks are not a complete biological acceptance assessment; solver needs vary | Save connectivity, formula-balance, and consistency results |
-| MEMOTE assessment | external `memote` command | **External** | [MEMOTE guide](../workflows/memote.md), `memote` optional dependency | Not a THG package API or default offline test | Install/pin MEMOTE separately and save its HTML report |
-| Essential metabolic-task analysis | Historical MEMOTE task code | **Archived** | [legacy workflow status](../legacy-workflows.md), legacy inventory | No maintained replacement is installed or covered by the default suite | Record as Archived; do not infer task success from MEMOTE or structural checks |
-| Iterative merge/consistency loop | `thg_protocol.workflow`, merge + consistency APIs | **Partial** | Resumable workflow tests and API contracts | Checkpointed engineering composition is available; scientific convergence decisions remain manual | Use `thg-run` for restartable checkpoints and review every result |
-| Reproduce the final published THG artifact | complete staged workflow | **Partial** | This matrix, contracts, legacy inventory, and absence of an end-to-end run/test | Current package does not demonstrate exact publication regeneration | Treat current output as a documented composition, not exact artifact reproduction |
+The maintained evidence baseline is commit `0c91fdec325df12f25ef13819525e830a4cec1e8`
+on branch `refactoring-cleanup`. The legacy source commit is recorded in the
+registry but lives in an adjacent dirty checkout, so no parity is claimed until
+isolated cases run. A frozen publication artifact is not present. The registry
+is authoritative for the controlled vocabulary and source/test paths behind
+each row.
 
-## How to read the statuses
+| Registry ID | Publication concept | Implementation | Verification | Workflow coverage | Legacy relationship | Published reproduction | Known difference or evidence boundary |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `reference.annotation.reactions` | Reference reaction identification | Implemented | Unit-tested | Operation | Not assessed | Not yet verified | One basic identify_reaction fixture is compared; Jaccard, duplicate, and full-file cases remain unverified |
+| `reference.annotation.metabolites` | Reference metabolite identification | Implemented | Unit-tested | Operation | Not assessed | Not yet verified | One formula-valid hit fixture is compared; misses, service failures, synonym ties, and batch behavior remain unverified |
+| `reference.model_build.annotation` | Reference model annotation enrichment | Implemented | Integration-tested | Operation | Intentional difference | Not yet verified | Enriches an existing model; does not construct the full beta1/beta2 branch |
+| `reference.mass_balance` | Formula and mass-balance operations | Implemented | Unit-tested | Operation | Not assessed | Not yet verified | Legacy and maintained implementations have not been run on the same fixture |
+| `reference.gpr.lookup` | GPR lookup and rule construction | Implemented | Unit-tested | Operation | Intentional difference | Not yet verified | One deterministic page-parser fixture is compared; full get_gpr source precedence, complexes, transferred ECs, and stoichiometric parity remain unverified |
+| `reference.gpr.location` | GPR location resolution | Implemented | Unit-tested | Operation | Intentional difference | Not yet verified | Complex-rule preservation and unresolved-location semantics are not legacy-verified |
+| `database.reconstruction.json` | Normalized-record model reconstruction | Implemented | Integration-tested | Orchestrated stage | Intentional difference | Not yet verified | Reconstructs normalized records and does not harvest live biological sources |
+| `database.reconstruction.pickle` | Legacy-pickle model reconstruction | Implemented | Not yet verified | Operation | Intentional difference | Not yet verified | No authentic sanitized legacy pickle parity fixture is present |
+| `database.harvesting` | Live Human Database harvesting | Not implemented | Not yet verified | N/A | No replacement | Not yet verified | No maintained pathway-list harvesting orchestrator exists |
+| `merge.identifier` | Identifier-based model merge | Implemented | Integration-tested | Orchestrated stage | Intentional difference | Not yet verified | Matches identifiers and retains the base model's overlapping stoichiometry |
+| `merge.publication_compatible` | Legacy similarity-aware model merge | Not implemented | Not yet verified | N/A | No replacement | Not yet verified | No maintained API ports legacy cross-identifier and chemistry matching |
+| `analysis.consistency` | Structural network and consistency reports | Implemented | Integration-tested | Orchestrated stage | Intentional difference | N/A | Current reports are a smaller structural subset and are not scientific convergence |
+| `analysis.model_signature` | Semantic COBRA model signature and diff | Implemented | Unit-tested | Operation | No legacy target | N/A | Signature normalization is a maintained comparison contract, not proof of publication parity |
+| `workflow.resumable_v1` | Resumable v1 engineering workflow DAG | Implemented | Integration-tested | Workflow-complete for documented v1 scope | No legacy target | N/A | The DAG composes maintained operations; it does not execute complete publication construction |
+| `workflow.memote` | MEMOTE validation stage | External integration | Integration-tested | Orchestrated stage | No legacy target | N/A | The executable and report semantics belong to the separately installed MEMOTE tool |
+| `workflow.essential_tasks` | Essential metabolic tasks | Archived | Not yet verified | N/A | No replacement | Not yet verified | Ordinary MEMOTE and structural checks do not establish essential-task success |
+| `publication.reference_beta1` | Complete THG beta1 construction | Not implemented | Not yet verified | Operation | Not assessed | Not yet verified | No complete maintained reference-branch constructor or frozen target artifact |
+| `publication.reference_beta2` | Complete THG beta2 construction | Not implemented | Not yet verified | Operation | Not assessed | Not yet verified | No complete maintained GPR/location and isoenzyme-expansion workflow |
+| `publication.final_artifact` | Exact published THG reconstruction | Not implemented | Not yet verified | N/A | Not assessed | Not yet verified | No frozen publication-stage input, artifact, or full workflow result is available |
 
-**Supported** means a maintained API or installed CLI exists and current tests
-cover it. **Partial** means maintained building blocks exist but the complete
-published stage is not orchestrated. **External** means a separately installed
-tool performs the step. **Archived** means the historical code or workflow is
-recorded but is not a supported current interface.
+## Controlled vocabulary
 
-The [API contracts](../api-contracts.md) are authoritative for mutation,
-ownership, explicit output paths, injected service clients, and intentional
-migration differences. The [legacy inventory](../legacy-api-inventory.md) is
-authoritative for removed or compatibility-only workflows.
+| Axis | Allowed values |
+| --- | --- |
+| Implementation | `Implemented`, `External integration`, `Archived`, `Not implemented` |
+| Verification | `Unit-tested`, `Integration-tested`, `Parity-tested`, `Artifact-reproduction-tested`, `Not yet verified` |
+| Workflow coverage | `Operation`, `Orchestrated stage`, `Workflow-complete for documented v1 scope`, `Published stage complete`, `N/A` |
+| Legacy relationship | `Verified equivalent`, `Intentional difference`, `No replacement`, `No legacy target`, `Not assessed` |
+| Published reproduction | `Verified`, `Not yet verified`, `N/A` |
+
+`Parity-tested` requires an isolated run of both implementations on the same
+fixture and a written comparison contract. `Artifact-reproduction-tested`
+requires a declared artifact comparison using a semantic model signature and
+documented counts. An ordinary maintained-package test, even when it consumes
+an old fixture, does not satisfy either definition.
+
+The [legacy API inventory](../legacy-api-inventory.md), [API contracts](../api-contracts.md),
+and operation-specific parity contracts will provide the detailed migration
+context as the parity harness is added. Until then, rows marked `Not assessed`
+or `Intentional difference` must not be promoted to historical equivalence.

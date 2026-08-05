@@ -1,0 +1,15 @@
+{
+  "case_id": "reference-metabolite-identification.formula-valid-hit",
+  "name": "glucose",
+  "formula": "C6H12O6",
+  "identifier": "MAM00001c",
+  "threshold": 0.82,
+  "compound": {
+    "cid": 5793,
+    "molecular_formula": "C6H12O6",
+    "synonyms": ["glucose", "C00031", "LABC0001", "CHEBI:17234"],
+    "inchi": "InChI=1S/glucose",
+    "inchikey": "KEY"
+  },
+  "expected": "glucose\t\tC6H12O6\tLABC0001\tC00031\tCHEBI:17234\t5793\t\tKEY\tInChI=1S/glucose\t\tMAM00001c\n"
+}

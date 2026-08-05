@@ -1,8 +1,9 @@
 # Worked end-to-end example
 
-!!! warning "Status: Partial"
+!!! warning "Scope and evidence"
     This is a deterministic worked miniature of the workflow structure. It is
-    not a regeneration of THG from live databases and omits unsupported stages.
+    not a regeneration of THG from live databases and omits stages recorded as
+    Not implemented in the capability matrix.
 
 ## What this miniature represents
 
@@ -111,4 +112,3 @@ also record client configuration, database releases, query/cache dates, and
 credentials-independent service response caches. Follow the [implementation
 status matrix](implementation-status.md) before describing this miniature as a
 scientific reproduction.
-

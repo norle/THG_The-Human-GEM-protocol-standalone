@@ -1,8 +1,9 @@
 # MEMOTE and task analysis
 
-!!! info "Status: External"
-    MEMOTE quality assessment is performed with the separately installed
-    `memote` command; it is not a maintained THG package API.
+!!! info "Scope and evidence"
+    MEMOTE is an External integration. `thg-run` provides an optional
+    subprocess stage, covered by fake-executable stage tests; the MEMOTE tool
+    itself remains separately installed and version-pinned.
 
 ## Outcome
 
@@ -32,8 +33,9 @@ selected HTML output path. Task files/configuration must be preserved too.
 ## Requirements
 
 Install and pin MEMOTE separately; solver support may be needed by selected
-checks. The package's `memote` extra provides the dependency but does not add a
-THG command. Network is not inherently required after installation.
+checks. The package's `memote` extra provides the dependency and `thg-run` can
+invoke the executable as an optional stage. Network is not inherently required
+after installation.
 
 ## Run from the command line
 
@@ -44,8 +46,10 @@ memote run --filename results/validation/memote.html results/model.xml
 
 ## Run from Python
 
-No maintained THG Python wrapper exists. Invoke the external command from a
-caller-owned workflow and record its version/configuration.
+The maintained `MemoteStage` invokes the external command from a caller-owned
+`thg-run` configuration and records its version, HTML output, and stage log.
+Direct callers may still invoke MEMOTE themselves when they do not use the
+resumable workflow.
 
 ## Outputs
 

@@ -1,9 +1,9 @@
 # Run the THG protocol
 
-!!! warning "Status: Partial"
-    Maintained package APIs cover several stages and can be composed manually,
-    but no supported single orchestration reproduces the complete published
-    THG construction and final-artifact run.
+!!! warning "Scope and evidence"
+    Maintained operations and a restartable engineering DAG exist. Complete
+    published THG construction and final-artifact reproduction are Not
+    implemented and Not yet verified.
 
 ## Purpose and intended audience
 
@@ -50,7 +50,7 @@ Human1-like starting point.
 The [Human Database route](human-database.md) explains the publication's
 pathway-driven information gathering and the current package's boundary:
 normalized records can be reconstructed deterministically, while a complete
-live harvesting orchestrator is Partial.
+live harvesting orchestrator is Not implemented.
 
 ## Intermediate model states
 
@@ -85,11 +85,12 @@ recorded as Archived unless a maintained replacement is demonstrated.
 
 ## Current implementation status
 
-Use the [coverage matrix](implementation-status.md) as the authoritative
+Use the [capability and evidence status](capability-status.md) as the authoritative
 user-facing status record. In short, reconstruction, merge, local analysis,
 pathway, gapfill, and several annotation helpers are maintained interfaces;
-the complete published orchestration is Partial, MEMOTE is External, and the
-historical task workflow is Archived.
+the complete published orchestration is Not implemented, MEMOTE is an External
+integration, and the historical task workflow is Archived. See the evidence
+registry for the operation-level records.
 
 ## Where to start
 

@@ -8,7 +8,9 @@
 ## Outcome
 
 Inspect annotation coverage, resolve metabolite/reaction identifiers, and
-derive GPR or cellular-location information for review.
+derive GPR or cellular-location information for review. Location resolution
+preserves Boolean GPR structure and leaves unmatched pages unresolved unless
+the caller explicitly supplies a documented fallback location.
 
 ## Place in the THG protocol
 
@@ -66,8 +68,10 @@ locations. Service caches are caller-owned where the API exposes them.
 ## Inspect the result
 
 Review annotation counts, unresolved records, generated GPR syntax, location
-sets, and failure reports. Compare before/after model files and then run balance
-and connectivity checks.
+sets, and failure reports. For resumable metabolite annotation, the checkpoint
+sidecar is tied to the input fingerprint and is removed only after successful
+finalization. Compare before/after model files and then run balance and
+connectivity checks.
 
 ## Common problems
 

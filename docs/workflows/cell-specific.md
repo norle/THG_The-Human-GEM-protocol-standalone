@@ -1,9 +1,9 @@
 # Cell-specific models
 
-!!! info "Status: Partial"
+!!! info "Scope and evidence"
     CSV/MAT activity reduction and transcriptomic helpers are maintained and
-    tested, but a complete publication-style cell-specific workflow is not an
-    automatic THG construction stage.
+    tested operations. A complete publication-style cell-specific workflow is
+    not an automatic THG construction stage.
 
 ## Outcome
 

@@ -1,9 +1,10 @@
 # Merge and validate
 
-!!! warning "Status: Partial"
-    Structural merge and local consistency APIs are Supported, while the full
-    publication-style convergence loop is Partial; MEMOTE is External and the
-    historical metabolic-task workflow is Archived.
+!!! warning "Scope and evidence"
+    Identifier-based merge and local structural reports are Implemented at
+    their documented boundaries. A publication-compatible convergence loop is
+    Not implemented; MEMOTE is an External integration and essential tasks are
+    Archived.
 
 ## Inputs from both branches
 
@@ -94,4 +95,3 @@ Do not conflate the following activities:
 The resulting file is a validated candidate or final THG model only to the
 extent that the documented scientific review and current implementation-status
 limitations support that claim.
-

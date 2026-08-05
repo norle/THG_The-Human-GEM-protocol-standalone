@@ -1,0 +1,340 @@
+{
+  "schema_version": 1,
+  "normalization_version": "model-signature-v1",
+  "source_commits": {
+    "maintained": {
+      "repository": "https://github.com/norle/THG_The-Human-GEM-protocol-standalone",
+      "branch": "refactoring-cleanup",
+      "commit": "0c91fdec325df12f25ef13819525e830a4cec1e8"
+    },
+    "legacy": {
+      "repository": "https://github.com/MarindeMasLab/THG_The-Human-GEM-protocol",
+      "commit": "b474d80a34ef3bda9754bad3e24a21dc6cf3e57f",
+      "status": "committed comparison snapshot recorded from the adjacent legacy checkout; its working tree is dirty and parity is not claimed"
+    },
+    "publication_artifact": {
+      "repository": "https://github.com/biosustain/THG",
+      "commit": null,
+      "status": "no frozen target artifact is available in the maintained checkout"
+    }
+  },
+  "entries": [
+    {
+      "id": "reference.annotation.reactions",
+      "publication_concept": "Reference reaction identification",
+      "current_entry_points": ["thg_protocol.annotation.reactions"],
+      "implementation": "Implemented",
+      "verification": "Unit-tested",
+      "workflow_coverage": "Operation",
+      "legacy_relationship": "Not assessed",
+      "published_reproduction": "Not yet verified",
+      "legacy_sources": ["functions/function_reac_identification.py"],
+      "current_sources": ["src/thg_protocol/annotation/reactions.py"],
+      "tests": [
+        "tests/unit/test_reaction_annotation_api.py",
+        "tests/characterization/test_reaction_identification_current.py",
+        "tests/parity/test_reference_reaction_identification.py"
+      ],
+      "known_differences": [
+        "One basic identify_reaction fixture is compared; Jaccard, duplicate, and full-file cases remain unverified"
+      ],
+      "evidence_commit": "0c91fdec325df12f25ef13819525e830a4cec1e8"
+    },
+    {
+      "id": "reference.annotation.metabolites",
+      "publication_concept": "Reference metabolite identification",
+      "current_entry_points": ["thg_protocol.annotation.metabolites"],
+      "implementation": "Implemented",
+      "verification": "Unit-tested",
+      "workflow_coverage": "Operation",
+      "legacy_relationship": "Not assessed",
+      "published_reproduction": "Not yet verified",
+      "legacy_sources": ["functions/function_metabolite_identification.py"],
+      "current_sources": ["src/thg_protocol/annotation/metabolites.py"],
+      "tests": [
+        "tests/unit/test_metabolite_annotation_api.py",
+        "tests/parity/test_reference_metabolite_identification.py"
+      ],
+      "known_differences": [
+        "One formula-valid hit fixture is compared; misses, service failures, synonym ties, and batch behavior remain unverified"
+      ],
+      "evidence_commit": "0c91fdec325df12f25ef13819525e830a4cec1e8"
+    },
+    {
+      "id": "reference.model_build.annotation",
+      "publication_concept": "Reference model annotation enrichment",
+      "current_entry_points": ["thg_protocol.model_build.build_model"],
+      "implementation": "Implemented",
+      "verification": "Integration-tested",
+      "workflow_coverage": "Operation",
+      "legacy_relationship": "Intentional difference",
+      "published_reproduction": "Not yet verified",
+      "legacy_sources": ["build_model/build_model.py"],
+      "current_sources": ["src/thg_protocol/model_build/__init__.py"],
+      "tests": [
+        "tests/unit/test_model_build_api.py",
+        "tests/integration/test_build_model_batch_boundary.py"
+      ],
+      "known_differences": ["Enriches an existing model; does not construct the full beta1/beta2 branch"],
+      "evidence_commit": "0c91fdec325df12f25ef13819525e830a4cec1e8"
+    },
+    {
+      "id": "reference.mass_balance",
+      "publication_concept": "Formula and mass-balance operations",
+      "current_entry_points": ["thg_protocol.model_build.mass_balance"],
+      "implementation": "Implemented",
+      "verification": "Unit-tested",
+      "workflow_coverage": "Operation",
+      "legacy_relationship": "Not assessed",
+      "published_reproduction": "Not yet verified",
+      "legacy_sources": ["build_model/equations_build_model.py"],
+      "current_sources": ["src/thg_protocol/model_build/mass_balance.py"],
+      "tests": ["tests/unit/test_mass_balance_api.py"],
+      "known_differences": ["Legacy and maintained implementations have not been run on the same fixture"],
+      "evidence_commit": "0c91fdec325df12f25ef13819525e830a4cec1e8"
+    },
+    {
+      "id": "reference.gpr.lookup",
+      "publication_concept": "GPR lookup and rule construction",
+      "current_entry_points": [
+        "thg_protocol.gpr.lookup.get_gpr",
+        "thg_protocol.gpr.lookup.parse_gene_pairs"
+      ],
+      "implementation": "Implemented",
+      "verification": "Unit-tested",
+      "workflow_coverage": "Operation",
+      "legacy_relationship": "Intentional difference",
+      "published_reproduction": "Not yet verified",
+      "legacy_sources": ["functions/gpr/gpr_def.py"],
+      "current_sources": ["src/thg_protocol/gpr/lookup.py", "src/thg_protocol/gpr/ast_gpr.py"],
+      "tests": [
+        "tests/unit/test_gpr_lookup_api.py",
+        "tests/unit/test_gpr_wrapper.py",
+        "tests/parity/test_gpr_page_parser.py"
+      ],
+      "known_differences": [
+        "One deterministic page-parser fixture is compared; full get_gpr source precedence, complexes, transferred ECs, and stoichiometric parity remain unverified"
+      ],
+      "evidence_commit": "0c91fdec325df12f25ef13819525e830a4cec1e8"
+    },
+    {
+      "id": "reference.gpr.location",
+      "publication_concept": "GPR location resolution",
+      "current_entry_points": ["thg_protocol.gpr.location.resolve_locations"],
+      "implementation": "Implemented",
+      "verification": "Unit-tested",
+      "workflow_coverage": "Operation",
+      "legacy_relationship": "Intentional difference",
+      "published_reproduction": "Not yet verified",
+      "legacy_sources": ["gpr_prediction/location_prediction.py"],
+      "current_sources": ["src/thg_protocol/gpr/location.py"],
+      "tests": ["tests/unit/test_gpr_location_api.py"],
+      "known_differences": ["Complex-rule preservation and unresolved-location semantics are not legacy-verified"],
+      "evidence_commit": "0c91fdec325df12f25ef13819525e830a4cec1e8"
+    },
+    {
+      "id": "database.reconstruction.json",
+      "publication_concept": "Normalized-record model reconstruction",
+      "current_entry_points": ["thg_protocol.database.reconstruct_model_from_json"],
+      "implementation": "Implemented",
+      "verification": "Integration-tested",
+      "workflow_coverage": "Orchestrated stage",
+      "legacy_relationship": "Intentional difference",
+      "published_reproduction": "Not yet verified",
+      "legacy_sources": ["generate_database/generate_db.py"],
+      "current_sources": ["src/thg_protocol/database.py"],
+      "tests": ["tests/unit/test_database_api.py", "tests/docs/test_practical_quickstart.py"],
+      "known_differences": ["Reconstructs normalized records and does not harvest live biological sources"],
+      "evidence_commit": "0c91fdec325df12f25ef13819525e830a4cec1e8"
+    },
+    {
+      "id": "database.reconstruction.pickle",
+      "publication_concept": "Legacy-pickle model reconstruction",
+      "current_entry_points": ["thg_protocol.database.reconstruct_model_from_pickle"],
+      "implementation": "Implemented",
+      "verification": "Not yet verified",
+      "workflow_coverage": "Operation",
+      "legacy_relationship": "Intentional difference",
+      "published_reproduction": "Not yet verified",
+      "legacy_sources": ["generate_database/generate_db.py"],
+      "current_sources": ["src/thg_protocol/database.py"],
+      "tests": ["tests/unit/test_database_api.py"],
+      "known_differences": ["No authentic sanitized legacy pickle parity fixture is present"],
+      "evidence_commit": "0c91fdec325df12f25ef13819525e830a4cec1e8"
+    },
+    {
+      "id": "database.harvesting",
+      "publication_concept": "Live Human Database harvesting",
+      "current_entry_points": [],
+      "implementation": "Not implemented",
+      "verification": "Not yet verified",
+      "workflow_coverage": "N/A",
+      "legacy_relationship": "No replacement",
+      "published_reproduction": "Not yet verified",
+      "legacy_sources": ["generate_database/generate_db.py"],
+      "current_sources": [],
+      "tests": [],
+      "known_differences": ["No maintained pathway-list harvesting orchestrator exists"],
+      "evidence_commit": "0c91fdec325df12f25ef13819525e830a4cec1e8"
+    },
+    {
+      "id": "merge.identifier",
+      "publication_concept": "Identifier-based model merge",
+      "current_entry_points": ["thg_protocol.merge.merge_models"],
+      "implementation": "Implemented",
+      "verification": "Integration-tested",
+      "workflow_coverage": "Orchestrated stage",
+      "legacy_relationship": "Intentional difference",
+      "published_reproduction": "Not yet verified",
+      "legacy_sources": ["functions_merge_metabolic_networks/functions_merge_metabolic_networks.py"],
+      "current_sources": ["src/thg_protocol/merge/__init__.py"],
+      "tests": ["tests/unit/test_merge_api.py"],
+      "known_differences": ["Matches identifiers and retains the base model's overlapping stoichiometry"],
+      "evidence_commit": "0c91fdec325df12f25ef13819525e830a4cec1e8"
+    },
+    {
+      "id": "merge.publication_compatible",
+      "publication_concept": "Legacy similarity-aware model merge",
+      "current_entry_points": [],
+      "implementation": "Not implemented",
+      "verification": "Not yet verified",
+      "workflow_coverage": "N/A",
+      "legacy_relationship": "No replacement",
+      "published_reproduction": "Not yet verified",
+      "legacy_sources": ["functions_merge_metabolic_networks/functions_merge_metabolic_networks.py"],
+      "current_sources": [],
+      "tests": [],
+      "known_differences": ["No maintained API ports legacy cross-identifier and chemistry matching"],
+      "evidence_commit": "0c91fdec325df12f25ef13819525e830a4cec1e8"
+    },
+    {
+      "id": "analysis.consistency",
+      "publication_concept": "Structural network and consistency reports",
+      "current_entry_points": ["thg_protocol.analysis.consistency"],
+      "implementation": "Implemented",
+      "verification": "Integration-tested",
+      "workflow_coverage": "Orchestrated stage",
+      "legacy_relationship": "Intentional difference",
+      "published_reproduction": "N/A",
+      "legacy_sources": ["network_consistency/network_consistency.py"],
+      "current_sources": ["src/thg_protocol/analysis/consistency.py"],
+      "tests": ["tests/unit/test_consistency_api.py"],
+      "known_differences": ["Current reports are a smaller structural subset and are not scientific convergence"],
+      "evidence_commit": "0c91fdec325df12f25ef13819525e830a4cec1e8"
+    },
+    {
+      "id": "analysis.model_signature",
+      "publication_concept": "Semantic COBRA model signature and diff",
+      "current_entry_points": [
+        "thg_protocol.analysis.model_signature.model_signature",
+        "thg_protocol.analysis.model_signature.diff_model_signatures"
+      ],
+      "implementation": "Implemented",
+      "verification": "Unit-tested",
+      "workflow_coverage": "Operation",
+      "legacy_relationship": "No legacy target",
+      "published_reproduction": "N/A",
+      "legacy_sources": [],
+      "current_sources": ["src/thg_protocol/analysis/model_signature.py"],
+      "tests": ["tests/unit/test_model_signature.py"],
+      "known_differences": ["Signature normalization is a maintained comparison contract, not proof of publication parity"],
+      "evidence_commit": "0c91fdec325df12f25ef13819525e830a4cec1e8"
+    },
+    {
+      "id": "workflow.resumable_v1",
+      "publication_concept": "Resumable v1 engineering workflow DAG",
+      "current_entry_points": ["thg_protocol.workflow.runner.start", "thg_protocol.workflow.runner.resume"],
+      "implementation": "Implemented",
+      "verification": "Integration-tested",
+      "workflow_coverage": "Workflow-complete for documented v1 scope",
+      "legacy_relationship": "No legacy target",
+      "published_reproduction": "N/A",
+      "legacy_sources": [],
+      "current_sources": ["src/thg_protocol/workflow/runner.py", "src/thg_protocol/workflow/stages.py"],
+      "tests": [
+        "tests/integration/test_resumable_workflow.py",
+        "tests/unit/test_workflow_manifest.py",
+        "tests/unit/test_workflow_runner.py",
+        "tests/unit/test_workflow_stages.py",
+        "tests/unit/test_workflow_lock.py"
+      ],
+      "known_differences": ["The DAG composes maintained operations; it does not execute complete publication construction"],
+      "evidence_commit": "0c91fdec325df12f25ef13819525e830a4cec1e8"
+    },
+    {
+      "id": "workflow.memote",
+      "publication_concept": "MEMOTE validation stage",
+      "current_entry_points": ["thg_protocol.workflow.stages.MemoteStage"],
+      "implementation": "External integration",
+      "verification": "Integration-tested",
+      "workflow_coverage": "Orchestrated stage",
+      "legacy_relationship": "No legacy target",
+      "published_reproduction": "N/A",
+      "legacy_sources": [],
+      "current_sources": ["src/thg_protocol/workflow/stages.py"],
+      "tests": ["tests/unit/test_workflow_stages.py"],
+      "known_differences": ["The executable and report semantics belong to the separately installed MEMOTE tool"],
+      "evidence_commit": "0c91fdec325df12f25ef13819525e830a4cec1e8"
+    },
+    {
+      "id": "workflow.essential_tasks",
+      "publication_concept": "Essential metabolic tasks",
+      "current_entry_points": [],
+      "implementation": "Archived",
+      "verification": "Not yet verified",
+      "workflow_coverage": "N/A",
+      "legacy_relationship": "No replacement",
+      "published_reproduction": "Not yet verified",
+      "legacy_sources": ["memote_and_task_analysis"],
+      "current_sources": [],
+      "tests": [],
+      "known_differences": ["Ordinary MEMOTE and structural checks do not establish essential-task success"],
+      "evidence_commit": "0c91fdec325df12f25ef13819525e830a4cec1e8"
+    },
+    {
+      "id": "publication.reference_beta1",
+      "publication_concept": "Complete THG beta1 construction",
+      "current_entry_points": [],
+      "implementation": "Not implemented",
+      "verification": "Not yet verified",
+      "workflow_coverage": "Operation",
+      "legacy_relationship": "Not assessed",
+      "published_reproduction": "Not yet verified",
+      "legacy_sources": ["build_model/build_model.py"],
+      "current_sources": [],
+      "tests": [],
+      "known_differences": ["No complete maintained reference-branch constructor or frozen target artifact"],
+      "evidence_commit": "0c91fdec325df12f25ef13819525e830a4cec1e8"
+    },
+    {
+      "id": "publication.reference_beta2",
+      "publication_concept": "Complete THG beta2 construction",
+      "current_entry_points": [],
+      "implementation": "Not implemented",
+      "verification": "Not yet verified",
+      "workflow_coverage": "Operation",
+      "legacy_relationship": "Not assessed",
+      "published_reproduction": "Not yet verified",
+      "legacy_sources": ["gpr_prediction/gpr_prediction.py", "gpr_prediction/location_prediction.py"],
+      "current_sources": [],
+      "tests": [],
+      "known_differences": ["No complete maintained GPR/location and isoenzyme-expansion workflow"],
+      "evidence_commit": "0c91fdec325df12f25ef13819525e830a4cec1e8"
+    },
+    {
+      "id": "publication.final_artifact",
+      "publication_concept": "Exact published THG reconstruction",
+      "current_entry_points": [],
+      "implementation": "Not implemented",
+      "verification": "Not yet verified",
+      "workflow_coverage": "N/A",
+      "legacy_relationship": "Not assessed",
+      "published_reproduction": "Not yet verified",
+      "legacy_sources": [],
+      "current_sources": [],
+      "tests": [],
+      "known_differences": ["No frozen publication-stage input, artifact, or full workflow result is available"],
+      "evidence_commit": "0c91fdec325df12f25ef13819525e830a4cec1e8"
+    }
+  ]
+}

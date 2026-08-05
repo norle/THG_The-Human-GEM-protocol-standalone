@@ -82,7 +82,8 @@ optional dependency versions for reproducibility.
 ## Implementation status
 
 The complete published orchestration and exact final-artifact reproduction are
-currently **Partial**; see the [implementation-status matrix](docs/protocol/implementation-status.md).
+**Not implemented** and **Not yet verified**; see the
+[capability and evidence matrix](docs/protocol/implementation-status.md).
 
 ## Lineage and citation
 

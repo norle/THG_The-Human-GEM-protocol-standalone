@@ -1,9 +1,9 @@
 # Construct the Human Database
 
-!!! warning "Status: Partial"
-    Deterministic reconstruction from normalized records and injected service
-    clients is Supported, but the publication's complete live pathway-harvesting
-    orchestration is not a maintained end-to-end interface.
+!!! warning "Scope and evidence"
+    Deterministic reconstruction from normalized records is Implemented and
+    tested at its package boundary. The publication's complete live
+    pathway-harvesting orchestration is Not implemented and has No replacement.
 
 ## What “Human Database” means in the publication
 
@@ -91,4 +91,3 @@ Retain the normalized input bundle, reconstructed JSON/SBML model, pathway
 membership, service caches, and a report of unresolved records. Run
 [network analysis](../workflows/network-analysis.md), formula-balance checks,
 and comparison before moving to [merge and validate](merge-and-validate.md).
-

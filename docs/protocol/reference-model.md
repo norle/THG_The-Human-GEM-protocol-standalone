@@ -1,9 +1,9 @@
 # Curate an existing GEM
 
-!!! warning "Status: Partial"
-    `thg_protocol.annotation`, `thg_protocol.model_build`, and GPR/location
-    helpers are maintained and tested building blocks, but no supported command
-    performs the complete reference-model branch through THGβ2.
+!!! warning "Scope and evidence"
+    Annotation, model-build, and GPR/location helpers are maintained
+    operations. Complete reference-model construction through THGβ2 is Not
+    implemented and Not yet verified.
 
 ## Scientific outcome
 
@@ -80,4 +80,3 @@ error reports, caches, and a provenance file. Review the checkpoint before
 combining the reference branch with the [Human Database](human-database.md).
 Detailed operation instructions remain in [annotation](../workflows/annotation.md),
 [model enrichment](../workflows/model-build.md), and [model reconstruction](../workflows/database.md).
-

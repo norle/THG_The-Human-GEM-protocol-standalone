@@ -28,8 +28,9 @@ Evidence keys:
 - `C4`: annotation and metabolite-reaction tests.
 - `C5`: database/model-build tests and the batch boundary integration test.
 - `C6`: comparison, figures, compaction, and cell-specific tests.
-- `C7`: gapfill/pathway CLI, legacy CLI contract, and installed-style CLI
-  tests.
+- `C7`: gapfill/pathway/comparison/workflow CLI, legacy CLI contract, and
+  installed-style CLI tests. The maintained installed command set is
+  `thg-gapfill`, `thg-pathway`, `thg-compare`, and `thg-run`.
 - `C8`: `tests/integration/test_legacy_algorithm_apis.py`; selected fixture
   characterization through package APIs, not release evidence for old code.
 - `C9`: static service-client/GPR tests and the opt-in online fixture.
@@ -118,6 +119,10 @@ retirement decision; the source files were removed in the final manifest.
 The grouped tables above expand to the following exact 82 checkout paths.
 This list is intentionally plain text so an inventory test or review can
 compare it directly with repository search results.
+
+This historical inventory is not a parity result. Same-fixture differential
+evidence is tracked separately in the [capability registry](protocol/capability-evidence.json)
+and [parity contracts](parity/contracts/index.md).
 
 ```text
 build_model/build_model.py

@@ -16,13 +16,17 @@ manifest is authoritative for the closeout.
   `thg_protocol.analysis`.
 - Annotation uses `thg_protocol.annotation` and injected service clients.
 - Pathway, gapfill, and comparison workflows use `thg-pathway`, `thg-gapfill`,
-  `thg-compare`, or their corresponding package APIs.
+  `thg-compare`, and the resumable engineering DAG uses `thg-run`; each also
+  has a corresponding package API where applicable.
 - Historical algorithm characterization fixtures used by maintained tests live
   under `tests/fixtures/legacy_characterization/`.
 
 The package contracts in [`api-contracts.md`](api-contracts.md) document the
 intentional migration differences, including explicit output paths, copied
 model ownership, normalized result objects, and injected external clients.
+The [capability and evidence registry](protocol/capability-evidence.json)
+separates those engineering contracts from unverified legacy parity and
+published-artifact claims.
 
 ## Release boundary
 

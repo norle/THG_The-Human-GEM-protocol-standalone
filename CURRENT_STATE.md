@@ -1,6 +1,6 @@
 # THG Protocol Refactoring: Current State
 
-Last reviewed: 2026-08-03
+Last reviewed: 2026-08-05
 
 This document is the concise operational snapshot for the refactoring described
 in `docs/plans/REFACTORING_PLAN.md`, with closeout requirements in
@@ -17,10 +17,17 @@ tests use package APIs, and preserved artifacts have canonical destinations.
 Local release validation is complete; the only release gate not evidenced from
 the current checkout is a hosted current-head Python 3.10–3.12 matrix run.
 
+The legacy-parity remediation baseline is maintained separately from the
+refactoring closeout. The capability registry records implementation,
+verification, workflow coverage, legacy relationship, and publication
+reproduction independently. No legacy source commit or frozen publication
+artifact is available in this checkout, so parity and exact reproduction
+remain unverified.
+
 ## Repository Snapshot
 
 - Branch: `refactoring-cleanup`
-- Reviewed commit: `b9cd6e9` (`fix: close out canonical pathway artifacts`)
+- Reviewed commit: `0c91fdec` (`fix: chagned contirbuting md`)
 - Working tree at review: one intentional supplementary-notebook migration is
   pending; no legacy source or artifact directories are present
 - Logical closeout commits: `c8f85a3` (documentation and artifact ownership),
@@ -28,7 +35,7 @@ the current checkout is a hosted current-head Python 3.10–3.12 matrix run.
   removal and artifact relocation), followed by `2626038` (canonical artifact
   tracking and closeout documentation)
 - Package layout: `src/thg_protocol`
-- Installed commands: `thg-gapfill`, `thg-pathway`, and `thg-compare`
+- Installed commands: `thg-gapfill`, `thg-pathway`, `thg-compare`, and `thg-run`
 - Supported Python range currently declared: `>=3.10,<3.13`
 - Canonical large artifacts: seven targeted Git LFS paths
 - Legacy checkout namespaces: removed; not shipped in wheels
@@ -73,6 +80,14 @@ the current checkout is a hosted current-head Python 3.10–3.12 matrix run.
 - Supplementary boundary-summary notebook imports now use
   `thg_protocol.merge`; it no longer presents the removed `functions` namespace
   as an available example dependency.
+- Capability evidence is recorded in
+  [`docs/protocol/capability-evidence.json`](docs/protocol/capability-evidence.json)
+  and rendered in the [capability and evidence status matrix](docs/protocol/implementation-status.md).
+  Complete beta1/beta2 construction, live harvesting, publication-compatible
+  merge, and exact final-artifact reproduction remain Not implemented or Not
+  yet verified.
+- The resumable v1 DAG is represented in the API inventories and wheel/CI smoke
+  checks, including the installed `thg-run` command.
 
 ## Validation Evidence
 
@@ -81,7 +96,7 @@ The strongest recorded model-backed checkpoint ran from committed tree
 
 - `1827 passed, 1 skipped`
 - The skip was the credential-gated online GPR fixture.
-- Package imports and all three installed CLI `--help` checks passed from
+- Package imports and all four installed CLI `--help` checks passed from
   outside the checkout.
 
 Later dependency-free checks on the current refactoring line recorded:
@@ -100,12 +115,12 @@ Later dependency-free checks on the current refactoring line recorded:
   `src tests`.
 - The pre-removal package checkout passed the complete default suite under the
   available Python 3.10.12 environment: `1880 passed, 2 skipped`.
-- The three installed-command compatibility checks pass for the legacy CLI
+- The installed-command compatibility checks pass for the legacy CLI
   option/help contract under Python 3.10 and 3.12.
 - The focused inventory, compatibility-export, deterministic-adapter, CLI, and
   CI-policy gates pass: `22 passed` under both Python 3.10.12 and Python 3.12.9.
 - No-isolation `python -m build` completed successfully on the current
-  checkout; the rebuilt wheel passed outside-checkout imports and all three
+  checkout; the rebuilt wheel passed outside-checkout imports and all four
   installed CLI help checks.
 - Unit/integration gates passed: `127 passed, 1 skipped` for the unit and
   characterization paths, and `1848 passed, 2 skipped` for unit plus
@@ -119,20 +134,21 @@ Later dependency-free checks on the current refactoring line recorded:
   the artifact-tracking fix: `1838 passed, 2 skipped` under Python 3.12.
 - Current audit rerun of the exact default offline gate passes: `1843 passed,
   2 skipped` under Python 3.12. Ruff, bytecode compilation, the legacy-closure
-  policy tests, and the three installed CLI help checks also pass. The closure
+  policy tests, and the four installed CLI help checks also pass. The closure
   policy covers maintained Python/notebook sources, documentation snippets,
   canonical artifact tracking, and package imports.
 - A fresh isolated `python -m build` completed successfully, and the resulting
   wheel installed outside the checkout, imported all supported package areas,
-  and passed `thg-gapfill`, `thg-compare`, and `thg-pathway --help` smoke tests.
+  and passed `thg-gapfill`, `thg-compare`, `thg-pathway`, and `thg-run --help`
+  smoke tests.
 - The focused legacy-closure and CI-policy gates pass: `9 passed`; Ruff is
   clean for `src tests`.
 - `git lfs fsck` passes with all seven approved objects, including the
   relocated `files/pathway/inputs/endoA_250917_3.json` path. The rebuilt wheel
-  installs outside the checkout and all three installed CLI `--help` checks
+  installs outside the checkout and all four installed CLI `--help` checks
   pass.
 - A no-dependency wheel installed outside the checkout imported all package
-  areas and passed all three installed CLI `--help` smoke tests.
+  areas and passed all four installed CLI `--help` smoke tests.
 - Python 3.10 dependency installation completed in `/tmp/thg-py310-venv` using
   the project constraints; `thg_protocol` and `cobra` import successfully.
 - Python 3.10 exact editable install (`pip install -c
@@ -140,7 +156,7 @@ Later dependency-free checks on the current refactoring line recorded:
   Ruff and the complete default offline suite: `1858 passed, 2 skipped`.
 - Python 3.10 source distribution and wheel builds passed on 2026-07-31.
   The no-dependency wheel installed outside the checkout and passed package,
-  workflow, database/model-build, merge, cell-specific, and all three CLI help
+  workflow, database/model-build, merge, cell-specific, and all four CLI help
   smoke checks; the rebuilt wheel also exposes the explicit annotation-path
   signatures.
 - Git LFS verification passed: all seven approved LFS files are present,
