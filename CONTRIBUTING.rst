@@ -1,96 +1,120 @@
-.. highlight:: shell
-
 ============
 Contributing
 ============
 
-Contributions are welcome, and they are greatly appreciated! Every
-little bit helps, and credit will always be given.
+Contributions are welcome and appreciated. You can help by reporting a
+problem, fixing a bug, implementing a feature, improving the documentation,
+or sharing feedback.
 
-You can contribute in many ways:
+Reporting Problems
+------------------
 
-Types of Contributions
-----------------------
+Please report problems in the `GitHub issue tracker
+<https://github.com/norle/THG_The-Human-GEM-protocol-standalone/issues>`_.
 
-Report Problems
-~~~~~~~~~~~~~~~
+Include, where applicable:
 
-Report problems with the metabolic model at https://github.com/igormdem/THG/issues.
+* Your operating system and version.
+* Your Python version and THG Protocol version.
+* Relevant package, solver, or service versions.
+* Detailed steps to reproduce the problem, including a small input or fixture
+  when possible.
+* The complete error message or traceback.
 
-If you are reporting a problem, please include:
+Before opening an issue, search the existing issues and documentation. For
+security-sensitive problems, do not disclose details in a public issue.
 
-* Your operating system name and version.
-* Any details about your local setup that might be helpful in troubleshooting, such as cobrapy version, memote version.
-* Detailed steps to reproduce the problem.
+Proposing Changes
+-----------------
 
-Fix Problems
-~~~~~~~~~~~~
+Bug fixes, focused features, tests, and documentation improvements are all
+welcome. For a substantial change, open an issue first so that the scope and
+design can be discussed before implementation.
 
-Look through the GitHub issues for bugs. Anything tagged with "bug"
-is open to whoever wants to implement it.
+When proposing a feature:
 
-Implement Features
-~~~~~~~~~~~~~~~~~~
+* Explain the problem it solves and how the proposed behavior would work.
+* Keep the scope as narrow as possible.
+* Add or update tests for behavior that can be checked automatically.
+* Update the relevant documentation and command/API examples.
+* Preserve reproducibility: record input, output, package, service, and solver
+  versions when they affect the result.
 
-Look through the GitHub issues for features. Anything tagged with "feature"
-is open to whoever wants to implement it.
+Getting Started
+---------------
 
-Write Documentation
-~~~~~~~~~~~~~~~~~~~
+THG Protocol supports Python 3.10 through 3.12. Create a virtual environment
+and install the package with its development dependencies:
 
-THG could always use more documentation, whether as part of the
-official THG docs, in docstrings, or even on the web in blog posts,
-articles, and such.
+.. code-block:: console
 
-Submit Feedback
-~~~~~~~~~~~~~~~
+   $ git clone https://github.com/norle/THG_The-Human-GEM-protocol-standalone.git
+   $ cd THG_The-Human-GEM-protocol-standalone
+   $ python -m venv .venv
+   $ source .venv/bin/activate
+   $ python -m pip install --upgrade pip
+   $ python -m pip install -e ".[dev]"
 
-The best way to send feedback is to file an issue at https://github.com/igormdem/THG/issues.
+On Windows, activate the environment with
+``.venv\\Scripts\\activate`` instead of ``source .venv/bin/activate``.
 
-If you are proposing a feature:
+Create a branch for your change:
 
-* Explain in detail how it would work.
-* Keep the scope as narrow as possible, to make it easier to implement.
-* Remember that this is a volunteer-driven project, and that contributions
-  are welcome :)
+.. code-block:: console
 
-Get Started!
-------------
+   $ git switch -c name-of-your-change
 
-Ready to contribute? Here's how to set up `THG` for local development.
+Run the Local Checks
+--------------------
 
-1. Fork the `THG` repo on GitHub.
-2. Clone your fork locally::
+Run the default offline test suite and linter from the repository root:
 
-    $ git clone git@github.com:your_name_here/THG.git
+.. code-block:: console
 
-3. Install your local copy into a virtualenv. Assuming you have virtualenvwrapper installed, this is how you set up your fork for local development::
+   $ pytest -m "not slow and not online and not solver and not gurobi and not memote"
+   $ ruff check src tests
 
-    $ mkvirtualenv THG
-    $ cd THG/
-    $ pip install -e .
+If you change documentation, install the documentation extra and build it in
+strict mode:
 
-4. Create a branch for local development::
+.. code-block:: console
 
-    $ git checkout -b name-of-your-bugfix-or-feature
+   $ python -m pip install -e ".[docs,dev]"
+   $ mkdocs build --strict
+   $ pytest tests/docs
 
-   Now you can make your changes locally.
+Some tests are marked ``slow``, ``online``, ``solver``, ``gurobi``, or
+``memote``. Run those only when their required services or dependencies are
+available. Solver reproducibility uses the constraints file documented in
+``docs/development.md``.
 
-5. When you're done making changes, check that your changes pass the memote test suite::
+For changes involving model quality or validation, install MEMOTE with
+``python -m pip install -e ".[memote]"`` and follow the
+`MEMOTE and task analysis guide
+<docs/workflows/memote.md>`_.
 
-    $ memote THG
+Submitting a Pull Request
+-------------------------
 
-6. Commit your changes and push your branch to GitHub::
+Before submitting a pull request:
 
-    $ git add .
-    $ git commit -m "Your detailed description of your changes."
-    $ git push origin name-of-your-bugfix-or-feature
+* Make sure the relevant local checks pass.
+* Keep commits focused and describe the reason for the change.
+* Do not commit generated build output, local virtual environments, caches, or
+  secrets.
+* Check that model and other large artifacts follow the repository's Git LFS
+  conventions.
+* Summarize the change, tests run, and any known limitations in the pull
+  request description.
 
-7. Submit a pull request through the GitHub website.
+Push your branch to your fork and open a pull request against the repository's
+``refactoring-cleanup`` branch, unless the maintainers specify another target:
 
-Pull Request Guidelines
------------------------
+.. code-block:: console
 
-Before you submit a pull request, check that it meets these guidelines:
+   $ git add path/to/changed-file
+   $ git commit -m "Describe the change"
+   $ git push origin name-of-your-change
 
-1. The pull request should pass the memote test suite.
+Please respond to review feedback and keep the pull request up to date with
+the target branch.
