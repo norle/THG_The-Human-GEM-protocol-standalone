@@ -12,7 +12,7 @@ snapshot is `b474d80a34ef3bda9754bad3e24a21dc6cf3e57f`; it is available in an
 adjacent checkout but is not vendored into this repository. That adjacent
 working tree is dirty, so parity harnesses must extract files from the recorded
 commit rather than import its working tree. A frozen published artifact is not
-available. Four deterministic operation cases are available through the
+available. Five deterministic operation cases are available through the
 separate pinned `legacy-parity` CI job; the ordinary package test command still
 skips them when no legacy checkout is supplied. No capability is marked
 `Parity-tested`.

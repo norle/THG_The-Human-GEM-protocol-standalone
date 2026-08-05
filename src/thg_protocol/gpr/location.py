@@ -83,6 +83,16 @@ def _render_gpr(
             for child in node.values
         ]
         return f"({f' {operator} '.join(children)})"
+    if isinstance(node, ast.BinOp) and isinstance(node.op, ast.Mult):
+        if isinstance(node.right, ast.Constant) and isinstance(
+            node.right.value, (int, float)
+        ):
+            base = _render_gpr(
+                node.left, replacements, stoich=False, resolved=resolved
+            ).strip("()")
+            if stoich:
+                return f"({base}*{node.right.value:g})"
+            return f"({base})"
     if isinstance(node, ast.Constant):
         return str(node.value)
     return ast.unparse(node)

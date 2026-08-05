@@ -1,0 +1,15 @@
+{
+  "case_id": "reference.gpr.location.basic-mitochondria",
+  "gpr": "GENE1*1",
+  "gene_names": ["GENE1"],
+  "gene_ids": ["G1"],
+  "location_page": "SUBCELLULAR LOCATION: Mitochondria.",
+  "legacy_uniprot_page": "GO:0001 C:Mitochondria;",
+  "ensembl_id": "ENSG000001",
+  "expected": {
+    "locations": ["Mitochondria"],
+    "stoich_rule": "GENE1*1",
+    "plain_rule": "GENE1",
+    "ensembl_rule": "ENSG000001"
+  }
+}

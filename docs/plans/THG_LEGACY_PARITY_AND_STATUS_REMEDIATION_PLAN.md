@@ -19,21 +19,23 @@ uncommitted. It has established the evidence registry and orthogonal status
 matrix, added the parity-contract/result skeleton, added the semantic COBRA
 model signature, and hardened the resumable v1 runner and MEMOTE stage at their
 documented boundaries. The focused evidence, signature, workflow-stage, lock,
-and resumable-run tests pass (`17 passed`); the complete offline suite passes
-(`1885 passed, 6 skipped`, including the four default-skipped opt-in parity
+and resumable-run tests pass (`19 passed`); the complete offline suite passes
+(`1887 passed, 7 skipped`, including the five default-skipped opt-in parity
 cases), Ruff is clean, and a source/wheel build succeeds
 from a writable temporary checkout.
 
-Four approved differential contracts and fixtures now exist for reaction
-identification, metabolite identification, deterministic GPR page parsing, and
-the dependency-light mass-balance `atom10` primitive. With
-`THG_LEGACY_CHECKOUT` pointed at the adjacent legacy checkout, all four
-isolated parity cases pass (`4 passed`); without that explicit environment they
+Five approved differential contracts and fixtures now exist for reaction
+identification, metabolite identification, deterministic GPR page parsing,
+the dependency-light mass-balance `atom10` primitive, and one offline GPR
+location branch. With
+`THG_LEGACY_CHECKOUT` pointed at the adjacent legacy checkout, all five
+isolated parity cases pass (`5 passed`); without that explicit environment they
 are skipped by default. Reaction comparison normalizes only set-derived
 compartment fields and preserves species/stoichiometry order; metabolite
 comparison uses a synthetic normalized PubChem response in both subprocesses;
-GPR comparison is limited to sorted gene/identifier page pairs; mass-balance
-comparison is limited to four formulas whose legacy token scan is unambiguous.
+GPR page comparison is limited to sorted gene/identifier pairs, mass-balance
+comparison is limited to four formulas whose legacy token scan is unambiguous,
+and location comparison is limited to one static Mitochondria branch.
 
 The status-matrix test now compares every Markdown known-difference cell
 exactly with the registry, preventing evidence wording from drifting after a
@@ -52,12 +54,23 @@ legacy-pickle comparison, live Human Database harvesting,
 publication-compatible merge, and full beta1/beta2 construction therefore
 remain explicitly unverified or not implemented.
 
-Next evidence-preserving slice: add the next operation contract only after
-freezing its exact legacy path and fixture schema, then run both implementations
-in isolated processes before changing any parity status. The current four
+The adjacent legacy checkout contains ignored local `pre_sbml_raw.pk` and
+`pre_sbml_pos_comp.pk` files, but neither is present in the recorded legacy
+commit and neither is suitable as a reproducible parity fixture. A local
+Python 3.10 diagnostic can load the positive-compartment file and the
+maintained adapter now reaches a 1,279-metabolite/1,041-reaction/1,318-gene/
+86-group model by preferring serialized compound fields over generation-time
+methods and resolving callable legacy `ID2` values. This is diagnostic evidence
+only; authentic pickle parity remains pending a sanitized committed snapshot.
+
+Next evidence-preserving slice: obtain or authorize a sanitized committed
+legacy-pickle snapshot, freeze its schema, and run both reconstruction paths in
+isolated processes before changing any parity status. The current five
 cases do not establish broad legacy equivalence for their surrounding
 workflows. In particular, legacy substring handling for overlapping element
-symbols and the remaining mass-balance equation operations remain unverified.
+symbols, complex/multi-location semantics, and the remaining mass-balance
+equation operations remain unverified; authentic database reconstruction parity
+also remains pending.
 
 ## Audit conclusion to treat as the starting baseline
 

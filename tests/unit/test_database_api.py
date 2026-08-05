@@ -18,6 +18,31 @@ from thg_protocol.services.ensembl import EnsemblAnnotation, StaticEnsemblClient
 from thg_protocol.services.kegg import StaticKeggClient
 
 
+class _LegacyReactionWithSerializedFields:
+    ID = "R1_c"
+    Name = "A to B"
+    GPR = ["", ""]
+    EC = []
+    subs = [[1, "A", "A"]]
+    prods = [[1, "B", "B"]]
+
+    def Substrate(self):
+        raise NameError("generation-time global is unavailable")
+
+    def Product(self):
+        raise NameError("generation-time global is unavailable")
+
+
+class _LegacyCompoundWithCallableId:
+    Subcel = "c"
+
+    def __init__(self, identifier):
+        self.identifier = identifier
+
+    def ID2(self):
+        return self.identifier
+
+
 def test_reconstruct_model_builds_annotated_toy_model_and_writes_json(tmp_path):
     output = tmp_path / "nested" / "model.json"
     model = reconstruct_model(
@@ -129,6 +154,25 @@ def test_reconstruct_model_from_legacy_pickle_bundle(tmp_path):
     assert model.metabolites.missing_c.compartment == "c"
     assert model.groups.get_by_id("toy pathway").members == [model.reactions.R1_c]
     assert output.exists()
+
+
+def test_reconstruct_model_from_pickle_prefers_serialized_compounds(tmp_path):
+    records = {
+        "id": "serialized-fields.xml",
+        "mets_cl": {
+            "A": _LegacyCompoundWithCallableId("A"),
+            "B": _LegacyCompoundWithCallableId("B"),
+        },
+        "reactions_cl": {"R1_c": _LegacyReactionWithSerializedFields()},
+    }
+    records_path = tmp_path / "serialized-fields.pkl"
+    with records_path.open("wb") as handle:
+        pickle.dump(records, handle)
+
+    model = reconstruct_model_from_pickle(records_path)
+
+    assert model.reactions.R1_c.metabolites[model.metabolites.A_c] == -1
+    assert model.reactions.R1_c.metabolites[model.metabolites.B_c] == 1
 
 
 def test_reconstruct_model_with_services_enriches_records_offline(tmp_path):

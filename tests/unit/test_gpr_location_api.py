@@ -50,6 +50,25 @@ def test_location_resolution_preserves_complex_rules_and_ensembl_mapping():
     assert ensembl == {"Mitochondria": "((ENSG000001) and (ENSG000002))"}
 
 
+def test_location_resolution_renders_explicit_stoichiometric_gpr():
+    client = StaticLocationClient(
+        pages={
+            "https://www.uniprot.org/uniprotkb/G1_HUMAN.txt": "Mitochondria"
+        }
+    )
+
+    stoich, plain, _, _ = resolve_locations(
+        "GENE1*1",
+        ["GENE1"],
+        ["G1"],
+        allowed_locations={"Cytosol", "Mitochondria"},
+        location_client=client,
+    )
+
+    assert stoich == {"Mitochondria": "(GENE1*1)"}
+    assert plain == {"Mitochondria": "(GENE1)"}
+
+
 def test_location_resolution_does_not_treat_er_substrings_as_er():
     client = StaticLocationClient(
         pages={

@@ -380,7 +380,7 @@ def reconstruct_model_from_pickle(
         "mets", {}
     )
     for source_key, record in _pickle_items(source_mets):
-        base_id = _record_value(record, "ID2") or _record_value(record, "id")
+        base_id = _record_call(record, "ID2") or _record_value(record, "id")
         base_id = base_id or source_key
         source_compartment = _record_value(record, "Subcel", "c")
         metabolite_id = with_compartment(base_id, source_compartment)
@@ -415,9 +415,13 @@ def reconstruct_model_from_pickle(
     known_metabolite_ids = {record.id for record in metabolite_records}
 
     def compounds(record: Any, method: str, fallback: str) -> list[Any]:
-        values = _record_call(record, method)
+        # Historical pickles serialize ``subs``/``prods`` alongside methods
+        # whose closures may refer to generation-time globals. Prefer the
+        # serialized fields when present so reconstruction remains independent
+        # of that vanished generation context.
+        values = _record_value(record, fallback)
         if values is None:
-            values = _record_value(record, fallback, [])
+            values = _record_call(record, method)
         return list(values or [])
 
     reaction_records: list[ReactionRecord] = []

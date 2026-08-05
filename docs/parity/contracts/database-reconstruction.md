@@ -1,7 +1,7 @@
 # Contract: database reconstruction
 
-- **Legacy:** historical prepared-record/pickle reconstruction under
-  `generate_database/`.
+- **Legacy:** prepared-record/pickle generation and reconstruction under
+  `generate_data-base/generate_db.py`.
 - **Maintained:** `reconstruct_model_from_json` and
   `reconstruct_model_from_pickle`.
 - **Inputs/defaults:** normalized JSON records or an authentic sanitized legacy
@@ -12,4 +12,6 @@
   groups, compartments, GPRs, and objective; separately compare unresolved
   references and serialized checksums.
 - **Pass/fail:** hand-built dictionaries do not establish authentic pickle
-  parity; missing legacy fixtures leave this case pending.
+  parity. The recorded legacy commit contains no pickle fixture; ignored local
+  files are not used by the parity gate, so this case remains pending until a
+  sanitized committed snapshot is authorized and available.

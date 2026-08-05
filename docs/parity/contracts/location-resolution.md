@@ -1,14 +1,20 @@
 # Contract: location resolution
 
-- **Legacy:** historical `gpr_prediction/location_prediction.py` operation.
+- **Legacy:** `functions/gpr/get_location_def.py:getLocationnew` from the
+  recorded legacy commit.
 - **Maintained:** `thg_protocol.gpr.location.resolve_locations` with injected
   location and Ensembl clients.
-- **Inputs/defaults:** a GPR, gene identifiers, recorded location pages, and
-  an explicit unresolved-location policy.
-- **Result:** deterministic location assignments preserving Boolean complex
-  relationships, plus unresolved identifiers and lookup errors.
-- **Comparison:** multiple locations, missing pages, Ensembl mapping,
-  identifier-type mismatch, ER false positives, and deterministic fallback.
-- **Difference policy:** Cytosol fallback is not silently accepted unless the
-  contract explicitly requests it through `fallback_location`. Any discarded
-  client or GPR input fails the maintained contract.
+- **Inputs/defaults:** one offline GPR, gene-name/identifier pair, recorded
+  location pages, and an Ensembl mapping injected into both isolated runs.
+- **Result:** deterministic location assignments and normalized stoichiometric,
+  plain, and Ensembl rules. The compatibility tuple's fourth mapping is not
+  part of this case because its key is intentionally different: maintained
+  output preserves the supplied identifier while legacy output rewrites it to
+  the resolved Ensembl identifier.
+- **Comparison:** the basic Mitochondria branch must match after removing only
+  legacy square brackets/current grouping parentheses and normalizing location
+  capitalization.
+- **Scope boundary:** this case does not establish parity for multiple
+  locations, complexes spanning compartments, missing pages, identifier
+  mismatches, ER false positives, or explicit fallback policy. Cytosol fallback
+  is not silently accepted by the maintained API.
