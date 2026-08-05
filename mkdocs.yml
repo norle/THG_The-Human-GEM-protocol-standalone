@@ -70,6 +70,7 @@ nav:
       - Merge and validate: protocol/merge-and-validate.md
       - Worked end-to-end example: protocol/end-to-end-example.md
       - Published protocol coverage: protocol/implementation-status.md
+      - Capability and evidence status: protocol/capability-status.md
   - Individual operations:
       - Choose an operation: usage.md
       - Model reconstruction: workflows/database.md
@@ -106,6 +107,8 @@ nav:
       - Tracked artifact inventory: artifact-inventory.md
       - Service boundary audit: service-boundary-audit.md
       - Git LFS standalone repository: git-lfs-standalone-repository.md
+      - Legacy parity evidence: parity/README.md
+      - Parity contracts: parity/contracts/index.md
       - Python API contracts: api-contracts.md
       - Legacy workflow status: legacy-workflows.md
       - Legacy API inventory: legacy-api-inventory.md

@@ -73,6 +73,9 @@ markers = [
   "solver: requires an optimization solver",
   "gurobi: requires Gurobi",
   "memote: requires memote",
+  "legacy_parity: executes isolated legacy and maintained implementations",
+  "artifact_reproduction: compares a frozen full-stage or final artifact",
+  "recorded_service: uses checksum-pinned recorded service responses",
 ]
 
 [tool.black]

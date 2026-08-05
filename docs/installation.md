@@ -11,11 +11,13 @@ python -m pip install --upgrade pip
 python -m pip install -e .
 ```
 
-This installs the core workflows and the `thg-gapfill`, `thg-pathway`, and
-`thg-compare` commands. Confirm that a command is available with:
+This installs the core workflows and the `thg-gapfill`, `thg-pathway`,
+`thg-compare`, and `thg-run` commands. Confirm that the command surface is
+available with:
 
 ```bash
 thg-gapfill --help
+thg-run --help
 ```
 
 ## Optional capabilities

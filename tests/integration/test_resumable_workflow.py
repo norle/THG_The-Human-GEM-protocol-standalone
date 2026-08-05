@@ -3,6 +3,9 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+import pytest
+
+from thg_protocol.workflow.config import ConfigError
 from thg_protocol.workflow.manifest import load_manifest, write_manifest_atomic
 from thg_protocol.workflow.runner import resume, start
 
@@ -64,3 +67,13 @@ def test_offline_run_resumes_by_checksums_and_marks_crashed_stage_interrupted(tm
         final["steps"]["validation"]["attempt"]
         == third["steps"]["validation"]["attempt"] + 1
     )
+
+
+def test_start_refuses_an_unrelated_nonempty_output_directory(tmp_path):
+    config_path = _configuration(tmp_path)
+    run_dir = tmp_path / "run"
+    run_dir.mkdir()
+    (run_dir / "unrelated.txt").write_text("keep me", encoding="utf-8")
+
+    with pytest.raises(ConfigError, match="nonempty without a manifest"):
+        start(config_path)

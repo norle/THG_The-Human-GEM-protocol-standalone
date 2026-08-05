@@ -15,7 +15,7 @@ workflow.
 | Combine two models | [Merge](workflows/merge.md) | Two COBRA JSON/SBML models | Model and `MergeReport` | Supported with differences | Local |
 | Compare versions | [Model comparison](workflows/comparison.md) | Two JSON/SBML models | Mapping and optional CSVs | Supported | Local; blocked filtering may use solver |
 | Check connectivity/balance | [Network analysis](workflows/network-analysis.md) | Loaded COBRA model | Component and consistency reports | Supported | Local; solver only for selected checks |
-| Derive a cell-specific model | [Cell-specific models](workflows/cell-specific.md) | Model and CSV/MAT activity | Copied model and reduction report | Partial | `cell-specific` extra; method-dependent solver |
+| Derive a cell-specific model | [Cell-specific models](workflows/cell-specific.md) | Model and CSV/MAT activity | Copied model and reduction report | Implemented operation | `cell-specific` extra; method-dependent solver |
 | Create figures/reports | [Figures and reports](workflows/figures.md) | Models or report tables | Summaries and SVGs | Supported building blocks | `figures` extra for rendering |
 | Assess model quality/tasks | [MEMOTE and task analysis](workflows/memote.md) | Model file | MEMOTE HTML/task record | External / Archived | External MEMOTE; historical tasks Archived |
 

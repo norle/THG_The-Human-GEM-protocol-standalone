@@ -8,6 +8,8 @@
 from __future__ import annotations
 
 import difflib
+import hashlib
+import json
 import logging
 import os
 import pickle
@@ -282,62 +284,160 @@ def generate_met_annotation(
     anotated: list[tuple[str, str, str, str]]
         list of anotated metabolites
     """
-    out = os.fspath(out)
-    unnanotated, annotated = [], []
-    api_failures = []  # Track API/temporary failures separately
-    total = len(met_list)
-    
-    # Failure tracking file
-    failure_file = out.replace('.tsv', '_failures.tsv')
-    
+    output_path = Path(out)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    checkpoint_path = output_path.with_name(
+        f"{output_path.stem}.checkpoint.json"
+    )
+    failure_path = output_path.with_name(
+        f"{output_path.stem}_failures{output_path.suffix}"
+    )
+    if delay_between_requests < 0:
+        raise ValueError("delay_between_requests must be non-negative")
+    if checkpoint_interval < 1:
+        raise ValueError("checkpoint_interval must be at least 1")
+
+    records = [list(record) for record in met_list]
+    total = len(records)
+    fingerprint = hashlib.sha256(
+        json.dumps(
+            records, ensure_ascii=False, sort_keys=True, separators=(",", ":")
+        ).encode("utf-8")
+    ).hexdigest()
+
+    def initial_state() -> dict:
+        return {
+            "next_index": 0,
+            "annotated": [],
+            "unannotated": [],
+            "failure_reasons": [],
+            "api_failures": [],
+            "annotation_lines": [],
+        }
+
+    def write_checkpoint(state: dict) -> None:
+        payload = {
+            "format_version": 1,
+            "input_sha256": fingerprint,
+            **state,
+        }
+        temporary = checkpoint_path.with_name(checkpoint_path.name + ".tmp")
+        temporary.write_text(
+            json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True)
+            + "\n",
+            encoding="utf-8",
+        )
+        os.replace(temporary, checkpoint_path)
+
+    def read_checkpoint() -> dict:
+        try:
+            checkpoint = json.loads(checkpoint_path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError) as error:
+            raise ValueError(
+                f"annotation checkpoint is unreadable: {checkpoint_path}"
+            ) from error
+        if checkpoint.get("format_version") != 1:
+            raise ValueError("unsupported annotation checkpoint format")
+        if checkpoint.get("input_sha256") != fingerprint:
+            raise ValueError(
+                "annotation checkpoint input does not match met_list; "
+                "use resume=False to start a new run"
+            )
+        next_index = checkpoint.get("next_index")
+        if not isinstance(next_index, int) or not 0 <= next_index <= total:
+            raise ValueError("annotation checkpoint has an invalid next_index")
+        required = (
+            "annotated",
+            "unannotated",
+            "failure_reasons",
+            "api_failures",
+            "annotation_lines",
+        )
+        if any(key not in checkpoint for key in required):
+            raise ValueError("annotation checkpoint is missing progress fields")
+        return {key: checkpoint[key] for key in ("next_index", *required)}
+
+    def write_final(path: Path, content: str) -> None:
+        temporary = path.with_name(path.name + ".tmp")
+        temporary.write_text(content, encoding="utf-8")
+        os.replace(temporary, path)
+
+    if resume and checkpoint_path.exists():
+        state = read_checkpoint()
+    else:
+        if not resume and checkpoint_path.exists():
+            checkpoint_path.unlink()
+        state = initial_state()
+
     print(f"\n{'='*70}")
     print(f"Starting metabolite annotation for {total} metabolites")
     print(f"{'='*70}\n")
 
-    with open(out, "w") as f, open(failure_file, "w") as fail_f:
-        # Write header for failure file
-        fail_f.write("name\tformula\tidentifier\tfailure_reason\n")
-        
-        for idx, (name, formula, annotation, iden) in enumerate(met_list, 1):
-            if idx % 100 == 0:
-                print(f"[{idx}/{total}] {(idx/total)*100:.1f}% | Success: {len(annotated)}, Failed: {len(unnanotated)}, API errors: {len(api_failures)}")
-            
-            try:
-                # Track if this is an API failure
-                api_error = False
-                failure_reason = "unknown"
-                
-                result = identify_metabolite(name, formula, iden, client=client)
-                met = [name, formula, annotation, iden]
-                
-                if result is None:
-                    # Try to determine failure reason from recent logs
-                    # Since we can't easily capture it, we'll mark for retry
-                    unnanotated.append(met)
-                    failure_reason = "not_found_or_api_error"
-                    fail_f.write(f"{name}\t{formula}\t{iden}\t{failure_reason}\n")
-                else:
-                    f.write(result)
-                    f.flush()  # Ensure data is written immediately
-                    annotated.append(met)
-                    
-            except Exception as e:
-                error_str = str(e)
-                met = [name, formula, annotation, iden]
-                unnanotated.append(met)
-                
-                # Categorize error
-                if "503" in error_str or "ServerBusy" in error_str or "HTTP Error" in error_str:
-                    failure_reason = "api_error"
-                    api_failures.append(met)
-                elif "timeout" in error_str.lower():
-                    failure_reason = "timeout"
-                    api_failures.append(met)
-                else:
-                    failure_reason = f"exception: {error_str[:50]}"
-                
-                fail_f.write(f"{name}\t{formula}\t{iden}\t{failure_reason}\n")
-                continue
+    for index in range(state["next_index"], total):
+        name, formula, annotation, identifier = records[index]
+        if (index + 1) % 100 == 0:
+            print(
+                f"[{index + 1}/{total}] "
+                f"{((index + 1) / total) * 100:.1f}% | "
+                f"Success: {len(state['annotated'])}, "
+                f"Failed: {len(state['unannotated'])}, "
+                f"API errors: {len(state['api_failures'])}"
+            )
+
+        try:
+            result = identify_metabolite(
+                name, formula, identifier, client=client
+            )
+            record = [name, formula, annotation, identifier]
+            if result is None:
+                state["unannotated"].append(record)
+                state["failure_reasons"].append("not_found_or_api_error")
+            else:
+                state["annotation_lines"].append(str(result))
+                state["annotated"].append(record)
+        except Exception as error:
+            error_str = str(error)
+            record = [name, formula, annotation, identifier]
+            state["unannotated"].append(record)
+            if (
+                "503" in error_str
+                or "ServerBusy" in error_str
+                or "HTTP Error" in error_str
+            ):
+                failure_reason = "api_error"
+                state["api_failures"].append(record)
+            elif "timeout" in error_str.lower():
+                failure_reason = "timeout"
+                state["api_failures"].append(record)
+            else:
+                failure_reason = f"exception: {error_str[:50]}"
+            state["failure_reasons"].append(failure_reason)
+
+        state["next_index"] = index + 1
+        if (
+            state["next_index"] % checkpoint_interval == 0
+            or state["next_index"] == total
+        ):
+            write_checkpoint(state)
+        if delay_between_requests and index + 1 < total:
+            time.sleep(delay_between_requests)
+
+    write_final(output_path, "".join(state["annotation_lines"]))
+    failure_lines = [
+        "name\tformula\tidentifier\tfailure_reason\n",
+        *(
+            f"{record[0]}\t{record[1]}\t{record[3]}\t{reason}\n"
+            for record, reason in zip(
+                state["unannotated"], state["failure_reasons"], strict=True
+            )
+        ),
+    ]
+    write_final(failure_path, "".join(failure_lines))
+    checkpoint_path.unlink(missing_ok=True)
+
+    annotated = state["annotated"]
+    unnanotated = state["unannotated"]
+    api_failures = state["api_failures"]
     
     print(f"\n{'='*70}")
     print(f"ANNOTATION COMPLETE")
@@ -348,8 +448,8 @@ def generate_met_annotation(
     print(f"Successfully annotated:     {len(annotated)} ({percentage(len(annotated)):.1f}%)")
     print(f"Failed (likely not in DB):  {len(unnanotated)-len(api_failures)} ({percentage(len(unnanotated)-len(api_failures)):.1f}%)")
     print(f"Failed (API/temp errors):   {len(api_failures)} ({percentage(len(api_failures)):.1f}%)")
-    print(f"\nResults saved to:      {out}")
-    print(f"Failures saved to:     {failure_file}")
+    print(f"\nResults saved to:      {output_path}")
+    print(f"Failures saved to:     {failure_path}")
     print(f"{'='*70}\n")
     
     return annotated, unnanotated

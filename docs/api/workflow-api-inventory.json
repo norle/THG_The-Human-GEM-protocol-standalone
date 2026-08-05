@@ -12,6 +12,7 @@
     {"page": "workflows/merge.md", "symbols": ["thg_protocol.merge.merge_models", "thg_protocol.merge.merge_models_from_paths", "thg_protocol.merge.MergeReport"], "cli": null},
     {"page": "workflows/model-build.md", "symbols": ["thg_protocol.model_build.build_model", "thg_protocol.model_build.batch.build_model_batch", "thg_protocol.model_build.mass_balance.formula_atoms", "thg_protocol.model_build.mass_balance.atom10", "thg_protocol.model_build.mass_balance.missing_atoms", "thg_protocol.model_build.mass_balance.reformulate_glycan_equation"], "cli": null},
     {"page": "workflows/network-analysis.md", "symbols": ["thg_protocol.analysis.network.find_network_components", "thg_protocol.analysis.network.write_component_report", "thg_protocol.analysis.compaction.full_compaction", "thg_protocol.analysis.consistency.reaction_balance", "thg_protocol.analysis.consistency.unbalanced_reactions"], "cli": null},
-    {"page": "workflows/pathway.md", "symbols": ["thg_protocol.pathway.workflow.implement_pathway_files", "thg_protocol.pathway.workflow.implement_pathway", "thg_protocol.pathway.kegg_listing.list_pathway_reactions"], "cli": "thg-pathway"}
+    {"page": "workflows/pathway.md", "symbols": ["thg_protocol.pathway.workflow.implement_pathway_files", "thg_protocol.pathway.workflow.implement_pathway", "thg_protocol.pathway.kegg_listing.list_pathway_reactions"], "cli": "thg-pathway"},
+    {"page": "workflows/resumable-run.md", "symbols": ["thg_protocol.workflow.runner.start", "thg_protocol.workflow.runner.resume", "thg_protocol.workflow.runner.get_status"], "cli": "thg-run"}
   ]
 }

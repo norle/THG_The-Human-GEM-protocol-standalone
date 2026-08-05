@@ -15,6 +15,7 @@ python -m build
 thg-gapfill --help
 thg-pathway --help
 thg-compare --help
+thg-run --help
 ```
 
 The built wheel must also be installed without dependencies into a temporary
@@ -36,6 +37,7 @@ cd /tmp
 /tmp/thg-wheel-check/venv/bin/thg-gapfill --help
 /tmp/thg-wheel-check/venv/bin/thg-pathway --help
 /tmp/thg-wheel-check/venv/bin/thg-compare --help
+/tmp/thg-wheel-check/venv/bin/thg-run --help
 ```
 
 The CI package job runs the same gate on Python 3.10, 3.11, and 3.12. Solver,

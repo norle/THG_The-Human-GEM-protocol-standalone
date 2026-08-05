@@ -10,7 +10,73 @@ Use [`run_pipeline`][thg_protocol.gapfill.core.run_pipeline],
 [`implement_pathway_files`][thg_protocol.pathway.workflow.implement_pathway_files],
 [`merge_models`][thg_protocol.merge.merge_models], or
 [`reduce_model_by_activity`][thg_protocol.cell_specific.reduce_model_by_activity]
-for complete user-facing workflows.
+for complete user-facing operations. Use [`start`][thg_protocol.workflow.runner.start]
+and [`resume`][thg_protocol.workflow.runner.resume] for the documented
+restartable engineering DAG.
+
+## Resumable workflow
+
+::: thg_protocol.workflow.config
+    options:
+      members:
+        - ConfigError
+        - RunSettings
+        - ReferenceSettings
+        - DatabaseSettings
+        - MergeSettings
+        - ValidationSettings
+        - RunConfig
+        - load_start_config
+        - config_to_dict
+        - write_snapshot
+        - load_snapshot
+
+::: thg_protocol.workflow.hashing
+    options:
+      members:
+        - sha256_file
+        - sha256_json
+        - artifact_record
+        - verify_artifact
+
+::: thg_protocol.workflow.manifest
+    options:
+      members:
+        - ManifestError
+        - utc_now
+        - new_manifest
+        - validate_manifest
+        - load_manifest
+        - write_manifest_atomic
+
+::: thg_protocol.workflow.runner
+    options:
+      members:
+        - WorkflowError
+        - StageFailedError
+        - start
+        - resume
+        - get_status
+
+::: thg_protocol.workflow.stages
+    options:
+      members:
+        - StageContext
+        - StageResult
+        - Stage
+        - ReferenceStage
+        - DatabaseStage
+        - MergeStage
+        - ValidationStage
+        - MemoteStage
+        - validate_stage_order
+
+::: thg_protocol.workflow.lock
+    options:
+      members:
+        - RunLockedError
+        - acquire_run_lock
+        - unlock_run
 
 ## Gapfill
 

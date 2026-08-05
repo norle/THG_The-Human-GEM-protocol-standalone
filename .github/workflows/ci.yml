@@ -58,7 +58,36 @@ jobs:
             "$smoke_dir/venv/bin/thg-gapfill" --help
             "$smoke_dir/venv/bin/thg-compare" --help
             "$smoke_dir/venv/bin/thg-pathway" --help
+            "$smoke_dir/venv/bin/thg-run" --help
           )
+
+  legacy-parity:
+    name: Legacy parity contracts
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check out the pinned legacy comparison snapshot
+        uses: actions/checkout@v4
+        with:
+          repository: MarindeMasLab/THG_The-Human-GEM-protocol
+          ref: b474d80a34ef3bda9754bad3e24a21dc6cf3e57f
+          path: legacy-source
+          fetch-depth: 1
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install development dependencies
+        run: >-
+          python -m pip install --upgrade pip &&
+          python -m pip install -c constraints/py312-glpk.txt -e ".[dev]"
+
+      - name: Run pinned offline parity contracts
+        env:
+          THG_LEGACY_CHECKOUT: ${{ github.workspace }}/legacy-source
+        run: pytest tests/parity -m "legacy_parity and not online"
 
   solver:
     if: github.event_name == 'workflow_dispatch' || github.event_name == 'schedule'

@@ -281,9 +281,16 @@ def _execute(
 def start(config_path: str | Path) -> Path:
     config = load_start_config(config_path)
     run_dir = config.run.output_dir
+    if run_dir.exists() and not run_dir.is_dir():
+        raise ConfigError(f"run output path is not a directory: {run_dir}")
     if (run_dir / "manifest.json").exists():
         raise ConfigError(
             f"run directory already contains a manifest; use resume: {run_dir}"
+        )
+    if run_dir.exists() and any(run_dir.iterdir()):
+        raise ConfigError(
+            "run directory is nonempty without a manifest; choose a new output "
+            "directory or remove unrelated files explicitly"
         )
     run_dir.mkdir(parents=True, exist_ok=True)
     with acquire_run_lock(run_dir):

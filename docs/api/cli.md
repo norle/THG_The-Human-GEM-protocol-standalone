@@ -1,6 +1,6 @@
 # Installed commands
 
-The package installs three commands. All have import-safe `--help` output and
+The package installs four commands. All have import-safe `--help` output and
 require explicit input and output paths for actual work.
 
 | Command | Python entry point | Purpose |
@@ -8,6 +8,7 @@ require explicit input and output paths for actual work.
 | `thg-gapfill` | `thg_protocol.gapfill.cli:main` | Deterministic three-phase JSON gapfill |
 | `thg-pathway` | `thg_protocol.pathway.cli:main` | Apply a pathway configuration to a JSON model |
 | `thg-compare` | `thg_protocol.analysis.compare_cli:main` | Compare model reactions and write CSV reports |
+| `thg-run` | `thg_protocol.workflow.cli:main` | Start and resume a checksum-verified workflow DAG |
 
 Run these commands from any directory after installation:
 
@@ -15,6 +16,7 @@ Run these commands from any directory after installation:
 thg-gapfill --help
 thg-pathway --help
 thg-compare --help
+thg-run --help
 ```
 
 The [workflow pages](../usage.md) contain CLI examples and the generated
@@ -40,6 +42,12 @@ references below document the exact options for each command.
         - main
 
 ::: thg_protocol.analysis.compare_cli
+    options:
+      members:
+        - build_parser
+        - main
+
+::: thg_protocol.workflow.cli
     options:
       members:
         - build_parser

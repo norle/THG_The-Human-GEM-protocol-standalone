@@ -24,10 +24,10 @@ See the [workflow guides](../usage.md) for end-to-end context and the
 | Construction | [Construction](construction.md) | `database`, `database_parsing`, `model_build` |
 | Annotation and GPR | [Annotation](annotation.md) | `annotation`, `gpr` |
 | Services | [Services](services.md) | BioCyc, KEGG, Ensembl, PubChem, Location |
-| Workflows | [Workflows](workflows.md) | gapfill, pathway, merge, cell-specific |
+| Workflows | [Workflows](workflows.md) | gapfill, pathway, merge, cell-specific, resumable run |
 | Analysis | [Analysis](analysis.md) | consistency, comparison, compaction, network |
 | Figures | [Figures](figures.md) | comparison and model reports |
-| Commands | [CLI commands](cli.md) | `thg-gapfill`, `thg-pathway`, `thg-compare` |
+| Commands | [CLI commands](cli.md) | `thg-gapfill`, `thg-pathway`, `thg-compare`, `thg-run` |
 
 ## Recommended entry points
 

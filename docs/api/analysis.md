@@ -11,6 +11,18 @@ for connectivity, [`compare_models_from_files`][thg_protocol.analysis.compare.co
 for file comparisons, and [`full_compaction`][thg_protocol.analysis.compaction.full_compaction]
 for duplicate-reaction cleanup.
 
+Use [`model_signature`][thg_protocol.analysis.model_signature.model_signature]
+and [`diff_model_signatures`][thg_protocol.analysis.model_signature.diff_model_signatures]
+for semantic model parity and artifact comparisons.
+
+## Semantic model signatures
+
+::: thg_protocol.analysis.model_signature
+    options:
+      members:
+        - model_signature
+        - diff_model_signatures
+
 ## Consistency
 
 ::: thg_protocol.analysis.consistency

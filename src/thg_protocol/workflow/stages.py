@@ -117,6 +117,50 @@ def _report_path(path: str | Path, work_dir: Path) -> str:
         return str(candidate)
 
 
+def _write_cache_manifest(cache_dir: Path, work_dir: Path) -> Path:
+    """Record checksums for a stage cache without claiming external ownership."""
+    cache_root = cache_dir.resolve()
+    run_root = work_dir.resolve()
+    try:
+        cache_root.relative_to(run_root)
+    except ValueError:
+        ownership = "external"
+    else:
+        ownership = "run-owned"
+
+    files: list[dict[str, object]] = []
+    if cache_root.is_dir():
+        for path in sorted(item for item in cache_root.rglob("*") if item.is_file()):
+            display_path = (
+                path.relative_to(run_root).as_posix()
+                if ownership == "run-owned"
+                else str(path)
+            )
+            files.append(
+                {
+                    "path": display_path,
+                    "sha256": sha256_file(path),
+                    "size": path.stat().st_size,
+                }
+            )
+
+    manifest_path = work_dir / "cache-manifest.json"
+    manifest_path.write_text(
+        json.dumps(
+            {
+                "cache_dir": _report_path(cache_root, work_dir),
+                "ownership": ownership,
+                "files": files,
+            },
+            indent=2,
+            sort_keys=True,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    return manifest_path
+
+
 class ReferenceStage:
     id = "reference"
     dependencies: tuple[str, ...] = ()
@@ -183,9 +227,15 @@ class ReferenceStage:
             + "\n",
             encoding="utf-8",
         )
+        cache_manifest = _write_cache_manifest(cache, work_dir)
         _load_cobra_model(destination)
         return StageResult(
-            (("model", destination), ("errors", errors), ("report", report_path)),
+            (
+                ("model", destination),
+                ("errors", errors),
+                ("report", report_path),
+                ("cache_manifest", cache_manifest),
+            ),
             {"mode": "build_model", "errors": len(report.errors)},
         )
 
