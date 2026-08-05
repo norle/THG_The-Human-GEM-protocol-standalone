@@ -58,9 +58,9 @@ plugins:
               - "!^_"
 nav:
   - Home: index.md
-  - Start here:
+  - Getting started:
       - Installation: installation.md
-      - Choose your route: workflow-overview.md
+      - Workflow overview: workflow-overview.md
       - Practical quickstart: quickstart.md
       - API smoke test: api-smoke-test.md
   - Run the THG protocol:
@@ -72,7 +72,7 @@ nav:
       - Published protocol coverage: protocol/implementation-status.md
       - Capability and evidence status: protocol/capability-status.md
   - Individual operations:
-      - Choose an operation: usage.md
+      - Operation reference: usage.md
       - Model reconstruction: workflows/database.md
       - Model enrichment: workflows/model-build.md
       - Annotation and identification: workflows/annotation.md

@@ -1,9 +1,8 @@
-# Choose an individual operation
+# Operation reference
 
-Use this page when you have one local task rather than following the staged
-[THG protocol](protocol/index.md). Operations can be called independently; the
-status column describes the current interface, not the publication's complete
-workflow.
+This page describes individual local operations that can be used independently
+of the staged [THG protocol](protocol/index.md). The status column describes
+the current interface, not the publication's complete workflow.
 
 | Goal | Operation | Input | Output | Status | Network/solver needs |
 | --- | --- | --- | --- | --- | --- |
@@ -19,6 +18,6 @@ workflow.
 | Create figures/reports | [Figures and reports](workflows/figures.md) | Models or report tables | Summaries and SVGs | Supported building blocks | `figures` extra for rendering |
 | Assess model quality/tasks | [MEMOTE and task analysis](workflows/memote.md) | Model file | MEMOTE HTML/task record | External / Archived | External MEMOTE; historical tasks Archived |
 
-Use the [practical quickstart](quickstart.md) for a small offline combination of
-these operations. Use the [route chooser](workflow-overview.md) when your goal
-is a complete construction branch.
+The [practical quickstart](quickstart.md) combines a subset of these operations
+offline. The [workflow overview](workflow-overview.md) maps input classes to
+complete construction branches.

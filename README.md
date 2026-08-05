@@ -26,6 +26,12 @@ the branches and validate the result.
 
 This repository provides maintained building blocks for that strategy.
 
+Inputs are caller-owned JSON/SBML models or normalized pathway and database
+records. Operations produce revised models, structured reports, comparison
+artifacts, and optional service caches; output paths and provenance remain
+under caller control. The complete published orchestration and exact
+final-artifact reproduction are not implemented.
+
 ## Installation
 
 THG Protocol supports Python 3.10–3.12:
@@ -38,13 +44,13 @@ python -m pip install -e .
 
 Optional extras are documented in the [installation guide](docs/installation.md).
 
-## Choose a route
+## Documentation entry points
 
 - [Practical quickstart](docs/quickstart.md): a small deterministic offline
-  journey through reconstruction, enrichment, checks, and comparison.
+  workflow through reconstruction, enrichment, checks, and comparison.
 - [Complete THG workflow](docs/protocol/index.md): the scientific sequence,
   intermediate states, and current support boundaries.
-- [Individual-operation chooser](docs/usage.md): annotation, reconstruction,
+- [Operation reference](docs/usage.md): annotation, reconstruction,
   pathway, gapfill, merge, comparison, figures, and downstream tools.
 - [API reference](docs/api/index.md): Python and installed CLI contracts.
 

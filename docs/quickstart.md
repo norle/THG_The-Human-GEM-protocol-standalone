@@ -1,6 +1,6 @@
 # Practical quickstart
 
-This offline example follows a small but realistic user journey: load a
+This offline example demonstrates a small but realistic workflow: load a
 normalized record bundle, inspect annotations, apply a deterministic pathway
 configuration, check connectivity and formula balance, and compare the result.
 It uses the stable files in [`docs/examples/`](examples/README.md). The model is

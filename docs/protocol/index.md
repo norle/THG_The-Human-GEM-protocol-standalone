@@ -1,4 +1,4 @@
-# Run the THG protocol
+# THG protocol overview
 
 !!! warning "Scope and evidence"
     Maintained operations and a restartable engineering DAG exist. Complete
@@ -17,7 +17,7 @@ GEM concept.
 
 ```mermaid
 flowchart TD
-    A{"What are you starting with?"}
+    A{"Input class"}
     A -->|Existing human GEM| B["Curate and annotate: reference model → THGβ1"]
     B --> C["Curate GPRs and expand locations: THGβ1 → THGβ2"]
     A -->|Pathway and database information| D["Construct Human Database: human-specific network"]
@@ -42,8 +42,8 @@ current package emits all named files automatically.
 
 The [reference-model route](reference-model.md) preserves a caller-owned
 existing model, inspects and enriches identifiers, treats mass-balance issues,
-and then composes GPR/location helpers. It is the recommended route for a
-Human1-like starting point.
+and then composes GPR/location helpers. It corresponds to the Human1-like
+starting point described in the publication.
 
 ### Human Database branch
 
@@ -92,11 +92,11 @@ the complete published orchestration is Not implemented, MEMOTE is an External
 integration, and the historical task workflow is Archived. See the evidence
 registry for the operation-level records.
 
-## Where to start
+## Workflow entry points
 
-- Existing human GEM: [curate the reference model](reference-model.md).
-- Human pathway/database records: [construct the Human Database](human-database.md).
-- Two prepared branches: [merge and validate](merge-and-validate.md).
+- Existing human GEM: [reference-model branch](reference-model.md).
+- Human pathway/database records: [Human Database branch](human-database.md).
+- Two prepared branches: [merge and validation](merge-and-validate.md).
 - Small offline software demonstration: [worked end-to-end example](end-to-end-example.md).
 - Restartable API composition: [resumable engineering runs](../workflows/resumable-run.md).
-- One operation: [individual-operation chooser](../usage.md).
+- One operation: [operation reference](../usage.md).

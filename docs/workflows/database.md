@@ -18,13 +18,14 @@ reproduced.
 
 ## When to use it
 
-Use normalized records, `docs/examples/records.json`, or a supported JSON
-record bundle when you want reproducible model construction.
+Normalized records, `docs/examples/records.json`, or a supported JSON record
+bundle provide the reproducible model-construction input.
 
 ## When not to use it
 
-Use [model enrichment](model-build.md) for an existing model, or the protocol
-page when your input is only a list of pathways and online sources.
+Use [model enrichment](model-build.md) for an existing model. A pathway list
+and online sources alone require the [Human Database protocol page](../protocol/human-database.md)
+because complete live harvesting is outside the maintained reconstruction API.
 
 ## Inputs
 
@@ -78,7 +79,7 @@ or the historical payload shape is missing.
 
 ## Next step
 
-Continue to the [Human Database protocol route](../protocol/human-database.md)
+Continue to the [Human Database protocol branch](../protocol/human-database.md)
 or [model enrichment](model-build.md).
 
 ## API references

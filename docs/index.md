@@ -6,29 +6,29 @@ Human1 or another reference GEM, builds a complementary Human Database, and
 converges on a validated THG model; the current package exposes maintained
 building blocks for that strategy.
 
-## Choose your starting point
+## Workflow entry points
 
-### I have an existing human GEM — recommended
+### Existing human GEM
 
-Start with the [reference-model route](protocol/reference-model.md) if your
+The [reference-model route](protocol/reference-model.md) applies when the
 input is a JSON or SBML model such as Human1. It explains annotation,
 mass-balance, GPR/location, and isoenzyme-expansion checkpoints and maps each
-step to the current package. This is the closest starting point to the
+step to the current package. This is the closest package mapping to the
 publication's reference-model branch.
 
-### I want to construct a network from pathway/database information
+### Pathway/database records
 
-Use the [Human Database route](protocol/human-database.md) when your inputs are
-human pathway records or normalized metabolite and reaction records. The
-current deterministic reconstruction API consumes normalized records; live
-harvesting orchestration from online sources is recorded as Not implemented;
-see the [capability and evidence matrix](protocol/implementation-status.md).
+The [Human Database route](protocol/human-database.md) applies to human
+pathway records or normalized metabolite and reaction records. The current
+deterministic reconstruction API consumes normalized records; live harvesting
+orchestration from online sources is recorded as Not implemented; see the
+[capability and evidence matrix](protocol/implementation-status.md).
 
-### I need only one operation
+### Individual operation
 
-Use the [individual-operation chooser](usage.md) for annotation, model
-reconstruction, pathway addition, gapfill, merge, comparison, figures, or
-cell-specific reduction without following the complete protocol.
+The [operation reference](usage.md) covers annotation, model reconstruction,
+pathway addition, gapfill, merge, comparison, figures, and cell-specific
+reduction without requiring the complete protocol.
 
 ## How the complete protocol fits together
 
@@ -55,15 +55,15 @@ stoichiometric-consistency checks can be performed with package analysis APIs;
 MEMOTE is an external assessment. See the [canonical protocol overview](protocol/index.md)
 for the full map and its support boundaries.
 
-## What you will produce
+## Outputs
 
-Depending on the route, outputs include a curated or reconstructed model in
-JSON/SBML, annotation and merge reports, deterministic comparison or
+Depending on the workflow branch, outputs include a curated or reconstructed
+model in JSON/SBML, annotation and merge reports, deterministic comparison or
 connectivity reports, service caches, and (when separately installed) a MEMOTE
 HTML report. Output paths and cache ownership belong to the caller; preserve
 the input model and provenance metadata alongside generated results.
 
-## Before you begin
+## Requirements
 
 | Requirement | Why it matters |
 | --- | --- |
