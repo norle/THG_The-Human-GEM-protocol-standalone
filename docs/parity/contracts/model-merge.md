@@ -9,5 +9,5 @@
   chemistry, different IDs with equal chemistry, reversals, GPR rewrites,
   isolated-object cleanup, and report mappings.
 - **Difference policy:** the current identifier-based API must not be called
-  similarity-aware. A publication-compatible implementation requires a separate
+  similarity-aware. An implementation matching the 2023 protocol paper requires a separate
   API and differential contract; it is not present today.

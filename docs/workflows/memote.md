@@ -22,8 +22,9 @@ only when a maintained, separately identified implementation is available.
 
 ## When not to use it
 
-Do not infer that a MEMOTE score proves the publication's essential metabolic
-tasks. Do not present the historical task implementation as a current THG API.
+Do not infer that a MEMOTE score proves the 2023 protocol paper's essential
+metabolic tasks. Do not present the historical task implementation as a current
+THG API.
 
 ## Inputs
 
@@ -75,6 +76,6 @@ Use [network analysis](network-analysis.md) for local diagnostics or
 
 ## Differences from the historical workflow
 
-The publication combined MEMOTE and metabolic-task assessment in its research
-workflow. Current support separates external MEMOTE from the Archived task
-implementation and does not provide one THG orchestration.
+The 2023 protocol paper combined MEMOTE and metabolic-task assessment in its
+research workflow. Current support separates external MEMOTE from the Archived
+task implementation and does not provide one THG orchestration.

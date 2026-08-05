@@ -2,7 +2,8 @@
 
 This page describes individual local operations that can be used independently
 of the staged [THG protocol](protocol/index.md). The status column describes
-the current interface, not the publication's complete workflow.
+the current package interface, not the complete workflow from the 2023 protocol
+paper.
 
 | Goal | Operation | Input | Output | Status | Network/solver needs |
 | --- | --- | --- | --- | --- | --- |

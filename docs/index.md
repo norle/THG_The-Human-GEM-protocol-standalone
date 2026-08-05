@@ -1,10 +1,14 @@
 # THG Protocol
 
 THG Protocol supports the construction, curation, expansion, and validation of
-human genome-scale metabolic models (GEMs). The published strategy starts from
-Human1 or another reference GEM, builds a complementary Human Database, and
-converges on a validated THG model; the current package exposes maintained
-building blocks for that strategy.
+human genome-scale metabolic models (GEMs). The scientific basis is Marin de
+Mas et al., [*A Protocol for the Automatic Construction of Highly Curated
+Genome-Scale Models of Human Metabolism* (2023)](https://doi.org/10.3390/bioengineering10050576).
+That paper starts from Human1 or another reference GEM, builds a complementary
+Human Database, and converges on a validated THG model. The current package is
+a refactored continuation of the historical THG software and exposes
+maintained building blocks for parts of that workflow. Read the [project
+history and lineage](project-history.md) for the distinction.
 
 ## Workflow entry points
 
@@ -14,7 +18,7 @@ The [reference-model route](protocol/reference-model.md) applies when the
 input is a JSON or SBML model such as Human1. It explains annotation,
 mass-balance, GPR/location, and isoenzyme-expansion checkpoints and maps each
 step to the current package. This is the closest package mapping to the
-publication's reference-model branch.
+reference-model branch described in the 2023 protocol paper.
 
 ### Pathway/database records
 
@@ -32,9 +36,10 @@ reduction without requiring the complete protocol.
 
 ## How the complete protocol fits together
 
-The two branches are conceptual model states from the publication. The current
-package can compose several of the steps, but does not provide one command that
-regenerates the published artifact.
+The two branches below are model states and data products defined by the 2023
+protocol paper. In this repository they are a conceptual map of the paper's
+workflow and the package's available building blocks: several steps can be
+composed, but no single command regenerates the paper's final THG artifact.
 
 ```mermaid
 flowchart TD
@@ -83,7 +88,7 @@ repository's `docs/plans/` directory for closeout requirements.
 ## Terms used in this site
 
 A **GEM** is a genome-scale metabolic model. **THG** is the final Human GEM
-concept from the publication; **THGβ1** and **THGβ2** are intermediate model
+concept from the 2023 protocol paper; **THGβ1** and **THGβ2** are intermediate model
 states for reference curation and GPR/location expansion. A **GPR** links genes
 to reactions, while an **S-GPR** also represents stoichiometric protein
 requirements. **Isoenzyme-based expansion** adds reaction instances for
@@ -93,4 +98,4 @@ stoichiometric structure. **MEMOTE** is an external metabolic-model quality
 assessment. A **metabolic task** is a defined functional test, and **gapfill**
 adds selected reactions or transport links to address a structural gap.
 
-For scientific context, see the [published protocol](https://doi.org/10.3390/bioengineering10050576).
+For scientific context, see the [2023 protocol paper](https://doi.org/10.3390/bioengineering10050576).

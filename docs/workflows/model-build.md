@@ -92,5 +92,5 @@ run local balance and connectivity checks.
 ## Differences from the historical workflow
 
 The refactored API uses injected clients and explicit caller-owned paths; it
-does not silently write repository-relative outputs or establish publication
-THG stage names.
+does not silently write repository-relative outputs or establish the 2023
+protocol paper's THG stage names.

@@ -20,11 +20,17 @@
 
 THG Protocol is a Python package and command-line toolset for constructing,
 curating, expanding, and validating human genome-scale metabolic models. The
-published strategy has two branches: curate an existing reference GEM such as
-Human1, or construct a Human Database from pathway/database information; merge
-the branches and validate the result.
+scientific workflow comes from Marin de Mas et al., *A Protocol for the
+Automatic Construction of Highly Curated Genome-Scale Models of Human
+Metabolism* (2023). It has two branches: curate an existing reference GEM such
+as Human1, or construct a Human Database from pathway/database information;
+merge the branches and validate the result.
 
-This repository provides maintained building blocks for that strategy.
+This standalone repository is a refactored continuation of the historical THG
+software lineage. See the [project history and lineage](docs/project-history.md)
+for the relationship between the paper, the earlier repositories, and this
+package. It provides maintained building blocks for the scientific workflow;
+it is not itself a verified reproduction of the paper's final artifact.
 
 Inputs are caller-owned JSON/SBML models or normalized pathway and database
 records. Operations produce revised models, structured reports, comparison
@@ -93,7 +99,7 @@ The complete published orchestration and exact final-artifact reproduction are
 
 ## Lineage and citation
 
-The scientific workflow is described in [the published protocol](https://doi.org/10.3390/bioengineering10050576).
+The scientific workflow is described in [the 2023 protocol paper](https://doi.org/10.3390/bioengineering10050576).
 This standalone repository is derived from
 [MarindeMasLab/THG_The-Human-GEM-protocol](https://github.com/MarindeMasLab/THG_The-Human-GEM-protocol)
 and is maintained separately from the historical implementation. Please cite

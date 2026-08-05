@@ -8,10 +8,14 @@
 ## Purpose and intended audience
 
 This is the canonical route for researchers who want to understand or compose
-the published construction strategy. It separates the scientific sequence from
-the package's modular operations. A GEM is a genome-scale metabolic model;
-Human1 is the reference GEM used by the publication; THG is the resulting Human
-GEM concept.
+the construction strategy described in Marin de Mas et al., [*A Protocol for
+the Automatic Construction of Highly Curated Genome-Scale Models of Human
+Metabolism* (2023)](https://doi.org/10.3390/bioengineering10050576). It separates
+that scientific sequence from this package's modular operations. A GEM is a
+genome-scale metabolic model; Human1 is the reference GEM used by the paper;
+THG is the resulting Human GEM concept. For the relationship between the paper,
+the historical code, and this standalone package, see the [project history and
+lineage](../project-history.md).
 
 ## The complete workflow
 
@@ -33,8 +37,8 @@ Human Database/network containing metabolites, reactions, genes, GPRs, and
 compartments. The branches converge during merge. MEMOTE/task assessment and
 package stoichiometric-consistency checks are separate validation activities.
 
-The diagram is the publication's conceptual workflow, not a claim that the
-current package emits all named files automatically.
+The diagram is the 2023 protocol paper's conceptual workflow, not a claim that
+the current package emits all named files automatically.
 
 ## The two construction branches
 
@@ -43,18 +47,18 @@ current package emits all named files automatically.
 The [reference-model route](reference-model.md) preserves a caller-owned
 existing model, inspects and enriches identifiers, treats mass-balance issues,
 and then composes GPR/location helpers. It corresponds to the Human1-like
-starting point described in the publication.
+starting point described in the 2023 protocol paper.
 
 ### Human Database branch
 
-The [Human Database route](human-database.md) explains the publication's
+The [Human Database route](human-database.md) explains the paper's
 pathway-driven information gathering and the current package's boundary:
 normalized records can be reconstructed deterministically, while a complete
 live harvesting orchestrator is Not implemented.
 
 ## Intermediate model states
 
-| Stage | Starting material | Main transformation | Result in the publication |
+| Stage | Starting material | Main transformation | Result in the 2023 protocol paper |
 | --- | --- | --- | --- |
 | Reference curation | Existing human GEM, such as Human1 | Improve identifiers/annotation and correct mass-balance issues | THGβ1 |
 | GPR/location expansion | Curated reference model | Curate GPRs and add compartment-specific isoenzyme reactions | THGβ2 |
@@ -62,7 +66,7 @@ live harvesting orchestrator is Not implemented.
 | Merge | THGβ2 and Human Database | Identify overlap and combine compatible content | Merged candidate THG |
 | Assessment and consistency | Merged candidate | MEMOTE, essential tasks, and stoichiometric consistency checks | Final THG |
 
-The publication uses these names as intermediate model states. The refactored
+The paper uses these names as intermediate model states. The refactored
 package does not formally name every output THGβ1/THGβ2, so those names are used
 here for conceptual mapping only.
 
@@ -71,8 +75,9 @@ here for conceptual mapping only.
 Merge the two preserved inputs, review the structured merge report, and run
 connectivity, formula-balance, and stoichiometric-consistency checks. MEMOTE is
 an [external operation](../workflows/memote.md), not an installed THG API.
-Essential metabolic-task analysis from the historical publication workflow is
-recorded as Archived unless a maintained replacement is demonstrated.
+Essential metabolic-task analysis from the historical implementation of the
+paper's workflow is recorded as Archived unless a maintained replacement is
+demonstrated.
 
 ## Requirements by stage
 

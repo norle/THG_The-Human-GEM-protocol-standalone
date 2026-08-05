@@ -2,9 +2,9 @@
 
 !!! warning "Scope and evidence"
     Identifier-based merge and local structural reports are Implemented at
-    their documented boundaries. A publication-compatible convergence loop is
-    Not implemented; MEMOTE is an External integration and essential tasks are
-    Archived.
+    their documented boundaries. A convergence loop matching the 2023 protocol
+    paper is Not implemented; MEMOTE is an External integration and essential
+    tasks are Archived.
 
 ## Inputs from both branches
 

@@ -10,5 +10,5 @@
 - **Comparison:** annotation writes, mass-balance changes, generated reactions,
   groups, compartments, duplicates, cache behavior, warnings, and exceptions.
 - **Scope:** this contract distinguishes annotation enrichment from complete
-  THG beta1/beta2 construction; an enriched model cannot pass as a publication
-  artifact without the separate phase contracts.
+  THG beta1/beta2 construction; an enriched model cannot pass as an artifact
+  from the 2023 protocol paper without the separate phase contracts.

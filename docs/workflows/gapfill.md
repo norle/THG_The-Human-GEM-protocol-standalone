@@ -86,4 +86,4 @@ gapfilled models.
 ## Differences from the historical workflow
 
 This is a deterministic package pipeline for JSON transport candidates, not the
-publication's complete curation or merge loop.
+complete curation or merge loop from the 2023 protocol paper.

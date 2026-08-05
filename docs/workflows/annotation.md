@@ -2,8 +2,8 @@
 
 !!! info "Status: Supported"
     Maintained annotation, reaction-identification, and GPR/location helpers
-    are covered by current tests; the complete publication curation sequence is
-    composed manually.
+    are covered by current tests; the complete curation sequence from the 2023
+    protocol paper is composed manually.
 
 ## Outcome
 

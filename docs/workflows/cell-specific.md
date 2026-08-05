@@ -2,8 +2,8 @@
 
 !!! info "Scope and evidence"
     CSV/MAT activity reduction and transcriptomic helpers are maintained and
-    tested operations. A complete publication-style cell-specific workflow is
-    not an automatic THG construction stage.
+    tested operations. A complete cell-specific workflow in the style of the
+    2023 protocol paper is not an automatic THG construction stage.
 
 ## Outcome
 

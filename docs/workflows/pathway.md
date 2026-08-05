@@ -88,4 +88,5 @@ the [Human Database protocol route](../protocol/human-database.md).
 ## Differences from the historical workflow
 
 The current operation consumes explicit local configuration and does not imply
-that online pathway discovery or the complete publication branch occurred.
+that online pathway discovery or the complete branch from the 2023 protocol
+paper occurred.

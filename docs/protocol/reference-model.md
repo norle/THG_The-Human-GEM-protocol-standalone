@@ -9,8 +9,9 @@
 
 This branch improves a reference human GEM's identifiers, annotation,
 mass-balance treatment, GPRs, and cellular locations before isoenzyme-based
-expansion. In publication terminology it moves the reference model toward
-THGβ1 and then THGβ2. The caller should keep each intermediate model and report
+expansion. In the terminology of the 2023 protocol paper, it moves the
+reference model toward THGβ1 and then THGβ2. The caller should keep each
+intermediate model and report
 so every change remains reviewable.
 
 ## Acceptable starting formats
@@ -49,8 +50,8 @@ are demonstrations, not human reference models.
 6. **Expand by isoenzyme and compartment.** Apply only the expansion logic
    supported by the model/pathway inputs in hand and save the resulting model.
    The current inventory does not establish a single THGβ2 orchestration, so
-   do not label an arbitrary enriched model as publication THGβ2 without a
-   documented mapping.
+   do not label an arbitrary enriched model as THGβ2 from the 2023 protocol
+   paper without a documented mapping.
 7. **Validate the checkpoint.** Re-run annotation inventory, formula-balance,
    connectivity, and comparison checks. Preserve the report, caches, service
    dates, and configuration before moving to [merge](merge-and-validate.md).

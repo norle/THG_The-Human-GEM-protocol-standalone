@@ -7,5 +7,6 @@ remediation plan; the machine-readable source is
 [`capability-evidence.json`](capability-evidence.json).
 
 Use the matrix to distinguish an implemented operation from legacy equivalence,
-workflow completeness, and reproduction of a published artifact. No
-publication claim should be inferred from an operation-level test alone.
+workflow completeness, and reproduction of the 2023 protocol paper's artifact.
+No claim that the paper's workflow has been reproduced should be inferred from
+an operation-level test alone.

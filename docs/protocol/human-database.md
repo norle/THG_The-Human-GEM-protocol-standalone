@@ -2,20 +2,20 @@
 
 !!! warning "Scope and evidence"
     Deterministic reconstruction from normalized records is Implemented and
-    tested at its package boundary. The publication's complete live
+    tested at its package boundary. The 2023 protocol paper's complete live
     pathway-harvesting orchestration is Not implemented and has No replacement.
 
-## What “Human Database” means in the publication
+## What “Human Database” means in the 2023 protocol paper
 
-The publication's Human Database is the complementary human metabolic network
+The paper's Human Database is the complementary human metabolic network
 assembled from a list of human metabolic pathways and information gathered from
 online biological sources. It contains metabolites, reactions, genes, GPRs, and
 compartments and is later combined with THGβ2. It is more than a generic local
 database file.
 
-## Published inputs and information gathered
+## Inputs and information gathered in the paper
 
-The published branch starts with human pathway records. For each pathway, the
+The paper's branch starts with human pathway records. For each pathway, the
 construction gathers or normalizes metabolite identifiers and formulas,
 reaction stoichiometry and identifiers, gene/protein relationships, GPRs, and
 cellular compartments. Current package service clients cover selected KEGG,
@@ -79,7 +79,7 @@ KEGG, BioCyc, PubChem, or another service by itself.
 ## Current limitation
 
 There is no supported current command that accepts only a pathway list and
-recreates the publication's entire live information-gathering branch. Compose
+recreates the paper's entire live information-gathering branch. Compose
 the maintained record, parsing, service, and reconstruction APIs manually, or
 use a separately maintained harvesting workflow and document its version and
 inputs. Historical pickle adapters are compatibility input support, not proof of

@@ -13,8 +13,8 @@ not harvest online services by itself.
 ## Place in the THG protocol
 
 Core building block for the Human Database branch or a standalone local task.
-It is not proof that the publication's live pathway-harvesting stage has been
-reproduced.
+It is not proof that the 2023 protocol paper's live pathway-harvesting stage
+has been reproduced.
 
 ## When to use it
 
@@ -94,4 +94,4 @@ and [`parse_pathway_links`][thg_protocol.database_parsing.parse_pathway_links].
 ## Differences from the historical workflow
 
 The package consumes normalized records at its boundary and does not claim to
-perform the publication's complete online pathway harvest.
+perform the paper's complete online pathway harvest.

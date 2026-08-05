@@ -59,6 +59,7 @@ plugins:
 nav:
   - Home: index.md
   - Getting started:
+      - Project history and lineage: project-history.md
       - Installation: installation.md
       - Workflow overview: workflow-overview.md
       - Practical quickstart: quickstart.md
