@@ -20,11 +20,9 @@ def reaction_balance(reaction: Any) -> dict[str, float]:
 
 def unbalanced_reactions(model: Any) -> list[str]:
     """Return IDs of reactions whose available formulas do not balance."""
-    return [
-        reaction.id
-        for reaction in model.reactions
-        if reaction_balance(reaction)
-    ]
+    return sorted(
+        reaction.id for reaction in model.reactions if reaction_balance(reaction)
+    )
 
 
 def orphan_metabolites(model: Any) -> list[str]:
@@ -63,7 +61,7 @@ def charge_balance(reaction: Any) -> dict[str, float]:
 
 def unbalanced_reactions_by_charge(model: Any) -> list[str]:
     """Return internal reactions with a non-zero or undefined net charge."""
-    return [
+    return sorted(
         reaction.id
         for reaction in model.reactions
         if not reaction.boundary
@@ -71,7 +69,7 @@ def unbalanced_reactions_by_charge(model: Any) -> list[str]:
             abs(charge_balance(reaction)["charge"]) > 1e-9
             or "missing" in charge_balance(reaction)
         )
-    ]
+    )
 
 
 def blocked_reactions(model: Any) -> list[str]:
