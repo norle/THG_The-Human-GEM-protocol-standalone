@@ -19,8 +19,8 @@ uncommitted. It has established the evidence registry and orthogonal status
 matrix, added the parity-contract/result skeleton, added the semantic COBRA
 model signature, and hardened the resumable v1 runner and MEMOTE stage at their
 documented boundaries. The focused evidence, signature, workflow-stage, lock,
-and resumable-run tests pass (`19 passed`); the complete offline suite passes
-(`1887 passed, 7 skipped`, including the five default-skipped opt-in parity
+and resumable-run tests pass (`20 passed`); the complete offline suite passes
+(`1888 passed, 7 skipped`, including the five default-skipped opt-in parity
 cases), Ruff is clean, and a source/wheel build succeeds
 from a writable temporary checkout.
 
@@ -62,6 +62,11 @@ maintained adapter now reaches a 1,279-metabolite/1,041-reaction/1,318-gene/
 86-group model by preferring serialized compound fields over generation-time
 methods and resolving callable legacy `ID2` values. This is diagnostic evidence
 only; authentic pickle parity remains pending a sanitized committed snapshot.
+
+The current consistency contract now pins sorted structural reports, boundary
+exclusion for charge checks, and directional produced/consumed semantics. This
+is maintained-only evidence and does not establish parity with the archived
+solver-backed consistency/task suite.
 
 Next evidence-preserving slice: obtain or authorize a sanitized committed
 legacy-pickle snapshot, freeze its schema, and run both reconstruction paths in
