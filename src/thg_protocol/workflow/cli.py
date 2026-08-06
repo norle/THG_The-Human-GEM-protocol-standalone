@@ -9,6 +9,7 @@ from pathlib import Path
 from .config import ConfigError
 from .lock import RunLockedError, unlock_run
 from .manifest import ManifestError
+from .registered_runner import RegisteredWorkflowError
 from .runner import StageFailedError, WorkflowError, get_status, resume, start
 
 
@@ -32,6 +33,16 @@ def build_parser() -> argparse.ArgumentParser:
     )
     unlock_parser.add_argument("run_dir", type=Path)
     unlock_parser.add_argument("--force", action="store_true")
+
+    # Public names make the maintained workflow entry points discoverable
+    # while retaining ``start`` for generic and legacy configurations.
+    for workflow_id in ("beta1", "beta2", "validate", "compare"):
+        workflow_parser = commands.add_parser(
+            workflow_id, help=f"start a {workflow_id} registered workflow"
+        )
+        workflow_parser.add_argument(
+            "config", type=Path, help="format-2 workflow configuration"
+        )
     return parser
 
 
@@ -50,6 +61,16 @@ def main(argv: list[str] | None = None) -> int:
     try:
         if args.command == "start":
             print(f"run started: {start(args.config)}")
+        elif args.command in {"beta1", "beta2", "validate", "compare"}:
+            from .config import load_workflow_config
+
+            config = load_workflow_config(args.config)
+            if config.workflow != args.command:
+                raise ConfigError(
+                    f"configuration selects workflow '{config.workflow}', "
+                    f"not '{args.command}'"
+                )
+            print(f"run started: {start(args.config)}")
         elif args.command == "resume":
             print(f"run resumed: {resume(args.run_dir, force_step=args.force_step)}")
         elif args.command == "status":
@@ -62,7 +83,13 @@ def main(argv: list[str] | None = None) -> int:
             unlock_run(args.run_dir, force=args.force)
             print(f"lock removed: {Path(args.run_dir).resolve()}")
         return 0
-    except (ConfigError, ManifestError, RunLockedError, WorkflowError) as error:
+    except (
+        ConfigError,
+        ManifestError,
+        RunLockedError,
+        WorkflowError,
+        RegisteredWorkflowError,
+    ) as error:
         print(f"error: {error}", file=__import__("sys").stderr)
         if isinstance(error, RunLockedError):
             return 3

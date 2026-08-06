@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+from collections.abc import Mapping
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -51,6 +52,22 @@ class RunConfig:
     database: DatabaseSettings
     merge: MergeSettings
     validation: ValidationSettings
+
+
+@dataclass(frozen=True)
+class WorkflowConfig:
+    """Version 2 configuration shared by registered workflow DAGs.
+
+    ``sections`` contains only the section(s) allowed by the selected
+    workflow.  Values remain JSON-shaped so configuration snapshots are
+    portable and auditable.
+    """
+
+    format_version: int
+    workflow: str
+    run: RunSettings
+    sections: Mapping[str, object]
+    source_path: Path | None = None
 
 
 def _object(value: Any, name: str) -> dict[str, Any]:
@@ -106,6 +123,84 @@ def load_start_config(path: str | Path) -> RunConfig:
     if not isinstance(payload, dict):
         raise ConfigError("configuration must be a JSON object")
     return _parse(payload, source.parent, output_base=Path.cwd().resolve())
+
+
+def load_workflow_config(path: str | Path) -> WorkflowConfig:
+    """Load a format-2 config and validate sections against its workflow DAG."""
+    source = Path(path).resolve()
+    try:
+        payload = json.loads(source.read_text(encoding="utf-8"))
+    except OSError as error:
+        raise ConfigError(f"could not read configuration: {source}") from error
+    except json.JSONDecodeError as error:
+        raise ConfigError(f"configuration is not valid JSON: {error.msg}") from error
+    if not isinstance(payload, dict):
+        raise ConfigError("configuration must be a JSON object")
+    return _parse_workflow(
+        payload, source.parent, output_base=Path.cwd().resolve(), source=source
+    )
+
+
+def _parse_workflow(
+    payload: dict[str, Any],
+    input_base: Path,
+    *,
+    output_base: Path,
+    source: Path | None = None,
+) -> WorkflowConfig:
+    from .registry import WorkflowRegistryError, get_workflow
+
+    allowed_base = {"format_version", "workflow", "run"}
+    if payload.get("format_version") != 2:
+        raise ConfigError("'format_version' must be 2 for a registered workflow")
+    workflow = _required_string(payload, "workflow", "configuration")
+    try:
+        definition = get_workflow(workflow)
+    except WorkflowRegistryError as error:
+        raise ConfigError(str(error)) from error
+    unknown = sorted(set(payload) - allowed_base - set(definition.allowed_sections))
+    if unknown:
+        raise ConfigError(
+            f"configuration key(s) do not apply to workflow '{workflow}': "
+            f"{', '.join(unknown)}"
+        )
+    run = _object(payload.get("run"), "run")
+    _keys(run, {"name", "output_dir"}, "run")
+    name = _required_string(run, "name", "run")
+    output_value = _required_string(run, "output_dir", "run")
+    sections: dict[str, object] = {}
+    for section in sorted(definition.allowed_sections):
+        if section in payload:
+            value = payload[section]
+            if not isinstance(value, dict):
+                raise ConfigError(f"'{section}' must be an object")
+            sections[section] = _resolve_workflow_paths(value, input_base)
+    return WorkflowConfig(
+        format_version=2,
+        workflow=workflow,
+        run=RunSettings(
+            name=name, output_dir=_directory_path(output_value, output_base)
+        ),
+        sections=sections,
+        source_path=source,
+    )
+
+
+def _resolve_workflow_paths(value: object, base: Path, *, key: str = "") -> object:
+    """Resolve explicitly named external paths while preserving JSON shape."""
+    if isinstance(value, dict):
+        return {
+            name: _resolve_workflow_paths(item, base, key=name)
+            for name, item in value.items()
+        }
+    if isinstance(value, list):
+        return [_resolve_workflow_paths(item, base, key=key) for item in value]
+    if isinstance(value, str) and (
+        key.endswith(("_file", "_path", "_dir")) or key in {"run_dir", "cache_dir"}
+    ):
+        path = Path(value)
+        return str(path if path.is_absolute() else (base / path).resolve())
+    return value
 
 
 def _parse(
@@ -199,10 +294,29 @@ def config_to_dict(config: RunConfig) -> dict[str, object]:
     }
 
 
+def workflow_config_to_dict(config: WorkflowConfig) -> dict[str, object]:
+    """Return a normalized, JSON-safe format-2 snapshot."""
+    return {
+        "format_version": 2,
+        "workflow": config.workflow,
+        "run": {"name": config.run.name, "output_dir": str(config.run.output_dir)},
+        **{key: value for key, value in sorted(config.sections.items())},
+    }
+
+
 def write_snapshot(config: RunConfig, run_dir: Path) -> Path:
     path = run_dir / "config.snapshot.json"
     path.write_text(
         json.dumps(config_to_dict(config), indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+    return path
+
+
+def write_workflow_snapshot(config: WorkflowConfig, run_dir: Path) -> Path:
+    path = run_dir / "config.snapshot.json"
+    path.write_text(
+        json.dumps(workflow_config_to_dict(config), indent=2, sort_keys=True) + "\n",
         encoding="utf-8",
     )
     return path
@@ -223,6 +337,13 @@ def load_snapshot(run_dir: str | Path) -> RunConfig:
         ) from error
     if not isinstance(payload, dict):
         raise ConfigError("configuration snapshot must be a JSON object")
+    if payload.get("format_version") == 2:
+        return _parse_workflow(
+            payload,
+            Path("/"),
+            output_base=Path("/"),
+            source=path,
+        )  # type: ignore[return-value]
     # Snapshot paths are already absolute.  The snapshot is deliberately
     # parsed using its own values, never by consulting the original config.
     config = _parse(payload, Path("/"), output_base=Path("/"))
@@ -231,3 +352,8 @@ def load_snapshot(run_dir: str | Path) -> RunConfig:
             "configuration snapshot output_dir does not match run directory"
         )
     return config
+
+
+def load_any_snapshot(run_dir: str | Path) -> RunConfig | WorkflowConfig:
+    """Load either the maintained v1 snapshot or a registered v2 snapshot."""
+    return load_snapshot(run_dir)

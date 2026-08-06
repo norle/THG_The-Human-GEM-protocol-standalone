@@ -279,6 +279,10 @@ def _execute(
 
 
 def start(config_path: str | Path) -> Path:
+    from .registered_runner import is_registered_config, start_registered
+
+    if is_registered_config(config_path):
+        return start_registered(config_path)
     config = load_start_config(config_path)
     run_dir = config.run.output_dir
     if run_dir.exists() and not run_dir.is_dir():
@@ -301,6 +305,11 @@ def start(config_path: str | Path) -> Path:
 
 
 def resume(run_dir: str | Path, *, force_step: str | None = None) -> Path:
+    from .registered_runner import is_registered_config, resume_registered
+
+    snapshot = Path(run_dir).resolve() / "config.snapshot.json"
+    if is_registered_config(snapshot):
+        return resume_registered(run_dir, force_step=force_step)
     directory = Path(run_dir).resolve()
     with acquire_run_lock(directory):
         config = load_snapshot(directory)
@@ -311,4 +320,15 @@ def resume(run_dir: str | Path, *, force_step: str | None = None) -> Path:
 
 
 def get_status(run_dir: str | Path) -> Mapping[str, object]:
+    from .manifest import load_workflow_manifest
+
+    manifest_path = Path(run_dir).resolve() / "manifest.json"
+    try:
+        import json
+
+        payload = json.loads(manifest_path.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        payload = None
+    if isinstance(payload, dict) and payload.get("format_version") == 2:
+        return load_workflow_manifest(run_dir)
     return load_manifest(Path(run_dir).resolve())

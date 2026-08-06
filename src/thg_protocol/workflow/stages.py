@@ -11,6 +11,7 @@ from pathlib import Path
 from typing import Any, Protocol
 
 from .config import RunConfig
+from .contracts import contract_for_stage
 from .hashing import sha256_file
 
 
@@ -163,6 +164,9 @@ def _write_cache_manifest(cache_dir: Path, work_dir: Path) -> Path:
 
 class ReferenceStage:
     id = "reference"
+    contract = contract_for_stage(
+        id, "legacy-v1", purpose="Load or build the reference model."
+    )
     dependencies: tuple[str, ...] = ()
     implementation_version = 1
 
@@ -246,6 +250,9 @@ class ReferenceStage:
 
 class DatabaseStage:
     id = "database"
+    contract = contract_for_stage(
+        id, "legacy-v1", purpose="Reconstruct the database branch."
+    )
     dependencies: tuple[str, ...] = ()
     implementation_version = 1
 
@@ -286,6 +293,9 @@ class DatabaseStage:
 
 class MergeStage:
     id = "merge"
+    contract = contract_for_stage(
+        id, "legacy-v1", purpose="Merge independent model branches."
+    )
     dependencies = ("reference", "database")
     implementation_version = 1
 
@@ -349,6 +359,9 @@ class MergeStage:
 
 class ValidationStage:
     id = "validation"
+    contract = contract_for_stage(
+        id, "legacy-v1", purpose="Run structural consistency checks."
+    )
     dependencies = ("merge",)
     implementation_version = 1
 
@@ -404,9 +417,9 @@ class ValidationStage:
             (("components", components_path), ("consistency", consistency_path)),
             {
                 "component_count": len(components["components"]),
-                "consistency": consistency["results"]
-                if "results" in consistency
-                else consistency,
+                "consistency": (
+                    consistency["results"] if "results" in consistency else consistency
+                ),
             },
         )
 
@@ -419,6 +432,9 @@ class ValidationStage:
 
 class MemoteStage:
     id = "memote"
+    contract = contract_for_stage(
+        id, "legacy-v1", purpose="Run the optional MEMOTE external check."
+    )
     dependencies = ("merge",)
     implementation_version = 1
 
