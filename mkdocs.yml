@@ -77,6 +77,7 @@ nav:
       - Model reconstruction: workflows/database.md
       - Model enrichment: workflows/model-build.md
       - Annotation and identification: workflows/annotation.md
+      - β1 reference-model curation: workflows/beta1.md
       - Pathway implementation: workflows/pathway.md
       - Gapfill: workflows/gapfill.md
       - Merge: workflows/merge.md

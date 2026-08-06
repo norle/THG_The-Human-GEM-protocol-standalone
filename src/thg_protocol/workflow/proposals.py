@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import json
 from collections.abc import Callable, Iterable, Mapping
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
@@ -33,6 +33,7 @@ class Proposal:
     stage: str
     status: str = "proposed"
     reason: str = ""
+    metadata: Mapping[str, object] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
         if not self.proposal_id.strip():
@@ -83,6 +84,9 @@ class Proposal:
             isinstance(x, str) for x in evidence
         ):
             raise ProposalError("proposal evidence must be a list of IDs")
+        metadata = value.get("metadata", {})
+        if not isinstance(metadata, Mapping):
+            raise ProposalError("proposal metadata must be an object")
         return cls(
             proposal_id=value["proposal_id"],
             operation=value["operation"],
@@ -96,6 +100,7 @@ class Proposal:
             stage=value["stage"],
             status=value["status"],
             reason=value["reason"],
+            metadata=dict(metadata),
         )
 
     def to_dict(self) -> dict[str, object]:
@@ -112,6 +117,7 @@ class Proposal:
             "stage": self.stage,
             "status": self.status,
             "reason": self.reason,
+            "metadata": dict(self.metadata),
         }
 
 
@@ -277,8 +283,9 @@ def apply_proposals(
             if apply is not None:
                 apply(item, replacement)
             applied.append(item)
-            status, reason = "applied", (
-                decision.reason if decision else "valid proposal"
+            status, reason = (
+                "applied",
+                (decision.reason if decision else "valid proposal"),
             )
         ledger.append(
             {
@@ -292,6 +299,7 @@ def apply_proposals(
                 "stage": item.stage,
                 "status": status,
                 "reason": reason,
+                "metadata": dict(item.metadata),
             }
         )
     return tuple(applied), tuple(ledger)

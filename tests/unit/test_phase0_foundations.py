@@ -42,6 +42,23 @@ def test_workflow_config_rejects_sections_for_another_workflow(tmp_path):
         load_workflow_config(path)
 
 
+def test_beta1_config_rejects_unknown_section_keys(tmp_path):
+    path = tmp_path / "config.json"
+    path.write_text(
+        json.dumps(
+            {
+                "format_version": 2,
+                "workflow": "beta1",
+                "run": {"name": "run", "output_dir": str(tmp_path / "run")},
+                "beta1": {"not_a_beta1_option": True},
+            }
+        ),
+        encoding="utf-8",
+    )
+    with pytest.raises(ConfigError, match="unknown key"):
+        load_workflow_config(path)
+
+
 def test_builtin_workflows_have_independently_validated_dags_and_contracts():
     assert {"beta1", "beta2", "validate", "compare"}.issubset(list_workflows())
     REGISTRY.validate_all()

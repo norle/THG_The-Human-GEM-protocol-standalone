@@ -1,9 +1,10 @@
 # Curate an existing GEM
 
 !!! warning "Scope and evidence"
-    Annotation, model-build, and GPR/location helpers are maintained
-    operations. Complete reference-model construction through THGβ2 is Not
-    implemented and Not yet verified.
+    Annotation, model-build, GPR/location helpers, and the offline β1
+    candidate-curation workflow are maintained operations. The β1 release gate
+    is pinned to the checked-in sanctioned fixture; β2 expansion is not yet
+    verified.
 
 ## Scientific outcome
 

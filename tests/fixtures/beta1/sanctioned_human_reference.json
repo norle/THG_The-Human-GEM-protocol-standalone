@@ -1,0 +1,21 @@
+{
+  "id": "sanctioned-human-reference",
+  "name": "Sanctioned human reference fixture",
+  "genes": [
+    {"id": "ENSG000001", "name": "human enzyme alpha"},
+    {"id": "ENSG000002", "name": "human enzyme beta"}
+  ],
+  "compartments": {"c": "cytosol", "e": "extracellular"},
+  "metabolites": [
+    {"id": "glc__D_c", "name": "D-Glucose", "compartment": "c", "formula": "C6H12O6", "charge": 0, "annotation": {"chebi": ["17234"]}},
+    {"id": "glc__D_e", "name": "D-Glucose", "compartment": "e", "formula": "C6H12O6", "charge": 0, "annotation": {"chebi": ["17234"]}},
+    {"id": "h2o_c", "name": "Water", "compartment": "c", "formula": "H2O", "charge": 0, "annotation": {"chebi": ["15377"]}},
+    {"id": "h_c", "name": "Proton", "compartment": "c", "formula": "H", "charge": 1, "annotation": {"chebi": ["15378"]}}
+  ],
+  "reactions": [
+    {"id": "EX_glc__D_e", "name": "D-Glucose exchange", "metabolites": {"glc__D_e": -1}, "lower_bound": -10, "upper_bound": 1000},
+    {"id": "GLC_TRANSPORT", "name": "Glucose transport", "metabolites": {"glc__D_e": -1, "glc__D_c": 1}, "gene_reaction_rule": "ENSG000001 or ENSG000002", "lower_bound": 0, "upper_bound": 1000},
+    {"id": "DM_glc__D_c", "name": "Glucose demand", "metabolites": {"glc__D_c": -1}, "lower_bound": 0, "upper_bound": 1000, "objective_coefficient": 1.0}
+  ],
+  "objective": "DM_glc__D_c"
+}

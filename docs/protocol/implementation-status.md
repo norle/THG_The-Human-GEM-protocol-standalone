@@ -31,7 +31,7 @@ source/test paths behind each row.
 | `workflow.resumable_v1` | Resumable v1 engineering workflow DAG | Implemented | Integration-tested | Workflow-complete for documented v1 scope | No legacy target | N/A | The DAG composes maintained operations; it does not execute the paper's complete construction |
 | `workflow.memote` | MEMOTE validation stage | External integration | Integration-tested | Orchestrated stage | No legacy target | N/A | The executable and report semantics belong to the separately installed MEMOTE tool |
 | `workflow.essential_tasks` | Essential metabolic tasks | Archived | Not yet verified | N/A | No replacement | Not yet verified | Ordinary MEMOTE and structural checks do not establish essential-task success |
-| `publication.reference_beta1` | Complete THG beta1 construction | Not implemented | Not yet verified | Operation | Not assessed | Not yet verified | No complete maintained reference-branch constructor or frozen target artifact |
+| `publication.reference_beta1` | Complete THG beta1 construction | Implemented | Integration-tested | Workflow-complete for documented v1 scope | Not assessed | Not yet verified | The maintained release is fixture-sanctioned and policy-scoped; it is not a claim of reproducing the 2023 publication artifact |
 | `publication.reference_beta2` | Complete THG beta2 construction | Not implemented | Not yet verified | Operation | Not assessed | Not yet verified | No complete maintained GPR/location and isoenzyme-expansion workflow |
 | `publication.final_artifact` | Exact THG reconstruction from the paper | Not implemented | Not yet verified | N/A | Not assessed | Not yet verified | No frozen paper-stage input, artifact, or full workflow result is available |
 

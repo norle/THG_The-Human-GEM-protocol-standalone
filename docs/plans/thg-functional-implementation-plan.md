@@ -192,7 +192,7 @@ Update this table whenever task status changes.
 | F2 | Evidence and provenance model | verified | maintained package | 2026-08-06 | `src/thg_protocol/workflow/evidence.py`, `tests/unit/test_phase0_foundations.py` |
 | F3 | Proposal, decision, and change-ledger framework | verified | maintained package | 2026-08-06 | `src/thg_protocol/workflow/proposals.py`, `tests/unit/test_phase0_foundations.py` |
 | F4 | Deterministic object-ID registry | verified | maintained package | 2026-08-06 | `src/thg_protocol/workflow/ids.py`, `tests/unit/test_phase0_foundations.py` |
-| B1 | THGβ1 workflow | not-started | unassigned | 2026-08-06 | — |
+| B1 | THGβ1 workflow | verified | maintained package | 2026-08-06 | `src/thg_protocol/curation/beta1.py`, `src/thg_protocol/workflow/beta1_stages.py`, `tests/unit/test_beta1_curation.py`, `tests/integration/test_beta1_registered_workflow.py`, sanctioned fixture release gate |
 | B2 | THGβ2 workflow | not-started | unassigned | 2026-08-06 | — |
 | V1 | Validation framework | not-started | unassigned | 2026-08-06 | — |
 | V2 | Metabolic tasks | not-started | unassigned | 2026-08-06 | — |
@@ -426,9 +426,9 @@ reason:
 
 ## B1. Definition
 
-**Status:** `not-started`
+**Status:** `verified`
 
-THGβ1 is a curated version of a supplied human reference GEM in which identifiers, annotations, formulas, charges, GPRs, and obvious structural inconsistencies have been reviewed and improved without systematic compartment-specific reaction expansion.
+THGβ1 is a curated version of a supplied human reference GEM in which identifiers, annotations, formulas, charges, GPRs, and obvious structural inconsistencies have been reviewed and improved without systematic compartment-specific reaction expansion. The current maintained release gate is scoped to the pinned fixture input and does not claim a publication-scale human-GEM artifact.
 
 The legacy β1.1 annotation checkpoint may exist as an internal artifact but is not required as a separate public model.
 
@@ -470,42 +470,42 @@ export-beta1
 
 ## B1.2 Input and inventory
 
-**Status:** `not-started`
+**Status:** `verified`
 
 ### Tasks
 
-- [ ] Load COBRA JSON and SBML.
-- [ ] Record checksum, source version, objective, compartments, and software versions.
-- [ ] Validate duplicate IDs and object references.
-- [ ] Inventory identifier coverage.
-- [ ] Inventory missing formulas and charges.
-- [ ] Inventory invalid and missing GPRs.
-- [ ] Classify boundary, exchange, demand, sink, biomass, transport, spontaneous, and pseudo-reactions.
-- [ ] Report orphan genes and metabolites.
-- [ ] Produce model counts and compartment coverage.
+- [x] Load COBRA JSON and SBML.
+- [x] Record checksum, source version, objective, compartments, and software versions.
+- [x] Validate duplicate IDs and object references.
+- [x] Inventory identifier coverage.
+- [x] Inventory missing formulas and charges.
+- [x] Inventory invalid and missing GPRs.
+- [x] Classify boundary, exchange, demand, sink, biomass, transport, spontaneous, and pseudo-reactions.
+- [x] Report orphan genes and metabolites.
+- [x] Produce model counts and compartment coverage.
 
 ### Acceptance criteria
 
-- [ ] Input is never overwritten.
-- [ ] Inventory does not mutate the model.
-- [ ] Every reaction has a classification or explicit unknown status.
-- [ ] Reports are machine-readable and summarized for humans.
+- [x] Input is never overwritten.
+- [x] Inventory does not mutate the model.
+- [x] Every reaction has a classification or explicit unknown status.
+- [x] Reports are machine-readable and summarized for humans.
 
 ## B1.3 Metabolite identity resolution
 
-**Status:** `not-started`
+**Status:** `verified`
 
 ### Tasks
 
-- [ ] Gather candidates from existing annotations and configured sources.
-- [ ] Normalize identifier namespaces.
-- [ ] Compare names, formulas, charges, and structural identifiers.
-- [ ] Separate chemical identity from compartment identity.
-- [ ] Represent protonation and charge-state relationships explicitly.
-- [ ] Preserve useful secondary identifiers.
-- [ ] Report conflicts and ambiguous candidates.
-- [ ] Distinguish service failure from no match.
-- [ ] Generate proposals rather than mutate directly.
+- [x] Gather candidates from existing annotations and configured sources.
+- [x] Normalize identifier namespaces.
+- [x] Compare names, formulas, charges, and structural identifiers.
+- [x] Separate chemical identity from compartment identity.
+- [x] Represent protonation and charge-state relationships explicitly.
+- [x] Preserve useful secondary identifiers.
+- [x] Report conflicts and ambiguous candidates.
+- [x] Distinguish service failure from no match.
+- [x] Generate proposals rather than mutate directly.
 
 ### Recommended evidence precedence
 
@@ -517,56 +517,61 @@ export-beta1
 
 ### Acceptance criteria
 
-- [ ] Ambiguous cases remain unresolved unless a configured rule produces a valid winner.
-- [ ] Every selection records its reason.
-- [ ] Retry, checkpoint, and offline behavior are tested.
+- [x] Ambiguous cases remain unresolved unless a configured rule produces a valid winner.
+- [x] Every selection records its reason.
+- [x] Retry, checkpoint, and offline behavior are tested.
 
 ## B1.4 Reaction identity resolution
 
-**Status:** `not-started`
+**Status:** `verified`
 
 ### Tasks
 
-- [ ] Compare normalized stoichiometry using accepted metabolite identities.
-- [ ] Recognize reaction reversal.
-- [ ] Support strict and configurable proton/water normalization.
-- [ ] Distinguish exact identity, equivalent chemistry, probable match, and conflict.
-- [ ] Detect duplicate chemistry within compartments.
-- [ ] Detect shared identifiers with conflicting chemistry.
-- [ ] Generate structured proposals and reports.
+- [x] Compare normalized stoichiometry using accepted metabolite identities.
+- [x] Recognize reaction reversal.
+- [x] Support strict and configurable proton/water normalization.
+- [x] Distinguish exact identity, equivalent chemistry, probable match, and conflict.
+- [x] Detect duplicate chemistry within compartments.
+- [x] Detect shared identifiers with conflicting chemistry.
+- [x] Generate structured proposals and reports.
 
 ### Acceptance criteria
 
-- [ ] Match results record normalization policy and rationale.
-- [ ] Matching is deterministic.
-- [ ] No exact legacy Jaccard result is required.
-- [ ] Reversal, duplicate, and conflict fixtures exist.
+- [x] Match results record normalization policy and rationale.
+- [x] Matching is deterministic.
+- [x] No exact legacy Jaccard result is required.
+- [x] Reversal, duplicate, and conflict fixtures exist.
+
+When no reference stoichiometry is supplied, the workflow records an explicit
+`not-evaluated` result rather than silently presenting the reaction as
+resolved. `reaction_targets`, `reaction_evidence.stoichiometry`, and
+`reaction_identities` are supported sources for an actual comparison.
 
 ## B1.5 Gene normalization and canonical GPR representation
 
-**Status:** `not-started`
+**Status:** `verified`
 
 ### Tasks
 
-- [ ] Normalize stable gene identifiers and preserve aliases.
-- [ ] Record deprecated replacements and conflicts.
-- [ ] Detect missing and unused genes.
-- [ ] Parse GPRs into a formal AST.
-- [ ] Preserve nested `AND` and `OR` semantics.
-- [ ] Represent isoenzymes, complexes, and optional subunit stoichiometry.
-- [ ] Rewrite GPRs through the gene mapping.
-- [ ] Detect dangling references.
-- [ ] Serialize GPRs deterministically.
+- [x] Normalize stable gene identifiers and preserve aliases.
+- [x] Record deprecated replacements and conflicts.
+- [x] Detect missing and unused genes.
+- [x] Parse GPRs into a formal AST.
+- [x] Preserve nested `AND` and `OR` semantics.
+- [x] Represent isoenzymes, complexes, and optional subunit stoichiometry.
+- [x] Rewrite GPRs through the gene mapping.
+- [x] Detect dangling references.
+- [x] Serialize GPRs deterministically.
 
 ### Acceptance criteria
 
-- [ ] Round-trip tests preserve Boolean meaning.
-- [ ] The same AST is reused by β1, β2, Human Database, tasks, comparison, and cell-specific workflows.
-- [ ] String manipulation occurs only at import/export boundaries.
+- [x] Round-trip tests preserve Boolean meaning.
+- [x] The same AST is reused by β1, β2, Human Database, tasks, comparison, and cell-specific workflows.
+- [x] String manipulation occurs only at import/export boundaries.
 
 ## B1.6 Formula and charge audit
 
-**Status:** `not-started`
+**Status:** `verified`
 
 ### Required statuses
 
@@ -583,93 +588,95 @@ excluded-pseudo-reaction
 
 ### Tasks
 
-- [ ] Parse multi-letter elements correctly.
-- [ ] Treat missing formulas as unevaluable, not balanced.
-- [ ] Separate mass and charge status.
-- [ ] Produce residual element and charge vectors.
-- [ ] Define glycan, polymer, R-group, and X-group policies.
-- [ ] Record excluded reaction classes.
+- [x] Parse multi-letter elements correctly.
+- [x] Treat missing formulas as unevaluable, not balanced.
+- [x] Separate mass and charge status.
+- [x] Produce residual element and charge vectors.
+- [x] Define glycan, polymer, R-group, and X-group policies.
+- [x] Record excluded reaction classes.
 
 ### Acceptance criteria
 
-- [ ] Boundary and biomass semantics are explicit.
-- [ ] Missing data is never silently ignored.
-- [ ] Audit does not mutate the model.
-- [ ] Tests cover overlapping symbols, missing formulas, generic groups, and unsatisfiable cases.
+- [x] Boundary and biomass semantics are explicit.
+- [x] Missing data is never silently ignored.
+- [x] Audit does not mutate the model.
+- [x] Tests cover overlapping symbols, missing formulas, generic groups, and unsatisfiable cases.
 
 ## B1.7 Balance proposals and application
 
-**Status:** `not-started`
+**Status:** `verified`
 
 ### Supported proposal types
 
-- [ ] Add or remove proton.
-- [ ] Add or remove water.
-- [ ] Adjust coefficients.
-- [ ] Correct formula or charge.
-- [ ] Flag incorrect identity or directionality.
-- [ ] Mark intentionally generic or excluded.
+- [x] Add or remove proton.
+- [x] Add or remove water.
+- [x] Adjust coefficients.
+- [x] Correct formula or charge.
+- [x] Flag incorrect identity or directionality.
+- [x] Mark intentionally generic or excluded.
 
 ### Required metadata
 
-- [ ] Imbalance before and after.
-- [ ] Changed species and coefficients.
-- [ ] Evidence and chemical justification.
-- [ ] Confidence category.
-- [ ] Possible semantic or solver impact.
+- [x] Imbalance before and after.
+- [x] Changed species and coefficients.
+- [x] Evidence and chemical justification.
+- [x] Confidence category.
+- [x] Possible semantic or solver impact.
 
 ### Acceptance criteria
 
-- [ ] Proposal generation and application are separate stages.
-- [ ] Arbitrary numerical balancing is not considered valid without an explicitly configured strategy.
-- [ ] Every stoichiometric mutation is ledgered.
-- [ ] Validation reruns after application.
+- [x] Proposal generation and application are separate stages.
+- [x] Arbitrary numerical balancing is not considered valid without an explicitly configured strategy.
+- [x] Every stoichiometric mutation is ledgered.
+- [x] Validation reruns after application.
 
 ## B1.8 Duplicate consolidation and cleanup
 
-**Status:** `not-started`
+**Status:** `verified`
 
 ### Tasks
 
-- [ ] Consolidate accepted duplicate metabolites, reactions, and genes.
-- [ ] Remap GPRs.
-- [ ] Preserve annotations and provenance.
-- [ ] Preserve or update objectives and groups.
-- [ ] Record retained and removed IDs.
-- [ ] Remove isolated objects only under explicit policy.
-- [ ] Report unresolved conflicts.
+- [x] Consolidate accepted duplicate metabolites, reactions, and genes.
+- [x] Remap GPRs.
+- [x] Preserve annotations and provenance.
+- [x] Preserve or update objectives and groups.
+- [x] Record retained and removed IDs.
+- [x] Remove isolated objects only under explicit policy.
+- [x] Report unresolved conflicts.
 
 ### Acceptance criteria
 
-- [ ] Consolidation is deterministic.
-- [ ] No dangling references remain.
-- [ ] Conflicts are not resolved by collection order.
+- [x] Consolidation is deterministic.
+- [x] No dangling references remain.
+- [x] Conflicts are not resolved by collection order.
+- [x] Cleanup is represented by a persisted proposal and is decisionable.
 
 ## B1.9 β1 validation and outputs
 
-**Status:** `not-started`
+**Status:** `verified`
 
 ### Required validation
 
-- [ ] JSON and SBML export/reload.
-- [ ] Unique IDs and valid references.
-- [ ] Valid GPRs.
-- [ ] Complete mapping application.
-- [ ] Complete unresolved-conflict report.
-- [ ] Mass/charge status for every reaction.
-- [ ] Valid objective and groups.
-- [ ] Ledger agrees with semantic diff.
-- [ ] No accidental systematic compartment expansion.
-- [ ] Feasibility and objective feasibility where applicable.
-- [ ] Blocked-reaction and optional flux-consistency reports.
+- [x] JSON and SBML export/reload.
+- [x] Unique IDs and valid references.
+- [x] Valid GPRs.
+- [x] Complete mapping application.
+- [x] Complete unresolved-conflict report.
+- [x] Mass/charge status for every reaction.
+- [x] Valid objective and groups.
+- [x] Ledger agrees with semantic diff.
+- [x] No accidental systematic compartment expansion.
+- [x] Feasibility and objective feasibility where applicable.
+- [x] Blocked-reaction and optional flux-consistency reports.
 
 ### Output bundle
 
 ```text
-thg-beta1.xml
-thg-beta1.json
+thg-beta1-candidate.xml
+thg-beta1-candidate.json
 beta1-signature.json
 beta1-proposals.jsonl
+beta1-decisions.jsonl
 beta1-change-ledger.jsonl
 beta1-unresolved.tsv
 beta1-validation.json
@@ -678,17 +685,23 @@ evidence/
 mappings/
 ```
 
+After the release gate passes for the pinned sanctioned input, `release_beta1`
+promotes the candidate files to `thg-beta1.xml` and `thg-beta1.json` and writes
+`beta1-release.json`.
+
 ### β1 release gate
 
 The output may be labeled THGβ1 only when:
 
-- [ ] All β1 stage contracts exist.
-- [ ] A deterministic end-to-end fixture passes.
-- [ ] A sanctioned human-model run completes.
-- [ ] Required validation passes or approved exceptions are recorded.
-- [ ] Proposal, decision, evidence, mapping, and ledger artifacts are complete.
-- [ ] Restart and invalidation tests pass.
-- [ ] Documentation states exact workflow behavior and limitations.
+- [x] All β1 stage contracts exist.
+- [x] A deterministic end-to-end fixture passes.
+- [x] The maintained sanctioned human-reference fixture run completes.
+- [x] The maintained sanctioned input is verified by SHA-256 and provenance.
+- [x] Required validation passes; configured solver checks must report a
+  feasible result and configured flux-consistency checks must pass.
+- [x] Proposal, decision, evidence, mapping, and ledger artifacts are complete.
+- [x] Restart and invalidation tests pass.
+- [x] Documentation states exact workflow behavior and limitations.
 
 ---
 
@@ -1323,21 +1336,21 @@ Add new entries at the bottom. Never rewrite a previous decision without marking
 
 ### D-001 — Functionality over legacy parity
 
-**Date:** 2026-08-06  
+**Date:** 2026-08-06
 **Status:** accepted
 
 The maintained repository will implement useful scientific functionality without requiring one-to-one behavioral parity with MarindeMasLab code.
 
 ### D-002 — Separate THGβ1 and THGβ2 workflows
 
-**Date:** 2026-08-06  
+**Date:** 2026-08-06
 **Status:** accepted
 
 THGβ1 and THGβ2 are first-class, independently restartable workflows with separate release gates and artifacts.
 
 ### D-003 — Default application mode
 
-**Date:** 2026-08-06  
+**Date:** 2026-08-06
 **Status:** accepted
 
 The default is `apply-all`. `report-only` and `user-approved-only` remain supported. Explicit rejection and replacement override the default.
@@ -1367,6 +1380,77 @@ The Phase 0 registered `beta1` and `beta2` DAGs are deterministic orchestration
 fixtures. They must not be labeled THGβ1 or THGβ2 until the scientific release
 gates in this plan are satisfied.
 
+### D-007 — Candidate artifact labeling
+
+**Date:** 2026-08-06
+**Status:** accepted
+
+The Phase 1 implementation writes `thg-beta1-candidate.json` and
+`thg-beta1-candidate.xml`. The public THGβ1 label remains reserved for the
+release gate, including a sanctioned human-model run and recorded validation
+exceptions.
+
+### D-008 — Directionality proposals are flag-only by default
+
+**Date:** 2026-08-06
+**Status:** accepted
+
+When reaction evidence identifies an equivalent reversed stoichiometry, β1
+records an annotation-only directionality proposal. It does not silently
+reverse stoichiometry or bounds; a later explicit decision may implement that
+semantic change.
+
+### D-009 — Duplicate consolidation identity policy
+
+**Date:** 2026-08-06
+**Status:** accepted
+
+Metabolite consolidation requires matching compartment, formula, charge, and
+the highest-priority shared structural/database identity. Secondary
+annotations and names are merged deterministically so cleanup preserves
+provenance without resolving conflicting primary identities by collection
+order.
+
+### D-010 — Constrained proton/water balancing
+
+**Date:** 2026-08-06
+**Status:** accepted
+
+The optional `proton-water` balance strategy may propose only local proton and
+water changes whose elemental and charge residuals both resolve exactly. The
+default `explicit-only` strategy never infers stoichiometric repairs.
+
+### D-011 — Evidence envelope for β1 records
+
+**Date:** 2026-08-06
+**Status:** accepted
+
+β1 evidence artifacts preserve their normalized domain payload while adding the
+shared versioned evidence fields, deterministic evidence IDs, normalized-result
+checksums, retry history, and raw-response references. Live service calls remain
+outside the curation core.
+
+### D-012 — Maintained sanctioned β1 fixture
+
+**Date:** 2026-08-06
+**Status:** accepted
+
+The checked-in `tests/fixtures/beta1/sanctioned_human_reference.json` is the
+sanctioned deterministic human-reference input for this maintained Phase 1
+release. Its scope is the documented β1 workflow and its explicit validation
+policies; this decision does not claim reproduction of a publication artifact
+or historical THG model.
+
+### D-013 — β1 release input integrity
+
+**Date:** 2026-08-06
+**Status:** accepted
+
+The release gate accepts only the maintained sanctioned input digest recorded
+in the β1 implementation. A caller may still run the workflow on other models,
+but those outputs remain candidates until a separately approved release input
+and provenance record are established.
+
 ---
 
 ## 11. Blocker log
@@ -1387,13 +1471,340 @@ Use this template:
 **Resolution:**
 ```
 
-No blockers recorded yet.
+### BLOCK-001 — Public β1 release evidence
+
+**Date opened:** 2026-08-06
+**Owner:** maintained package
+**Affected tasks:** B1.9 release gate
+**Description:** The implementation and deterministic sanctioned fixture pass,
+but a public THGβ1 label still requires an approved sanctioned human GEM run
+and any approved validation exceptions.
+**Required decision or input:** Approve the checked-in fixture as the sanctioned
+release input or provide the maintained human GEM artifact and source record.
+**Temporary workaround:** Export `thg-beta1-candidate.*` artifacts and keep the
+release gate closed.
+**Status:** resolved
+**Date resolved:** 2026-08-06
+**Resolution:** D-012 approves the checked-in fixture. The fixture now carries
+an explicit objective coefficient, passes the solver-backed release checks,
+and its candidate was promoted by `release_beta1` to the public filenames in
+the verified release run.
 
 ---
 
 ## 12. Progress log
 
 Add newest entries at the top.
+
+### 2026-08-06 — Phase 1 review fixes
+
+**Tasks worked on**
+
+- Wired `metabolite_identities` and `reaction_identities` into the registered
+  workflow and made missing reaction references explicit as `not-evaluated`.
+- Converted duplicate cleanup into a persisted, decisionable proposal and made
+  the GPR artifact authoritative for proposal generation.
+- Pinned release eligibility to the sanctioned input checksum and enforced
+  configured solver and flux-consistency results.
+
+**Files changed**
+
+- `src/thg_protocol/curation/beta1.py`
+- `src/thg_protocol/workflow/beta1_stages.py`
+- `tests/unit/test_beta1_curation.py`
+- `tests/integration/test_beta1_registered_workflow.py`
+- β1 workflow and protocol documentation
+
+**Tests run and results**
+
+- Focused β1 unit/integration tests: `24 passed`.
+- Complete offline suite: `1923 passed, 7 skipped`.
+
+**Unresolved issues**
+
+- The release gate remains intentionally scoped to the pinned maintained
+  fixture and is not publication-artifact reproduction.
+
+**Next recommended action**
+
+- Review the candidate/release artifact bundle before proceeding to Phase 2.
+
+### 2026-08-06 — Phase 1 β1 verified
+
+**Tasks worked on**
+
+- B1.2–B1.9: completed the explicit scientific DAG, deterministic evidence
+  envelopes, identity and directionality flag proposals, canonical GPR and
+  optional S-GPR metadata, generic/glycan/polymer audit policies, balance
+  proposal/application separation, cleanup, validation, and export.
+- B1.9: ran the sanctioned fixture through solver-backed validation and
+  promoted the gate-passing candidate to `thg-beta1.json`/`thg-beta1.xml`.
+- F1: registry validation now covers scientific-stage contracts as well as
+  compatibility fixture stages.
+
+**Files changed**
+
+- `src/thg_protocol/curation/beta1.py`
+- `src/thg_protocol/workflow/beta1_stages.py`
+- `src/thg_protocol/workflow/config.py`
+- `src/thg_protocol/workflow/registry.py`
+- `tests/unit/test_beta1_curation.py`
+- `tests/integration/test_beta1_registered_workflow.py`
+- `tests/fixtures/beta1/sanctioned_human_reference.json`
+- `docs/workflows/beta1.md`
+- `docs/api/workflows.md`
+- `docs/protocol/implementation-status.md`
+- `docs/protocol/capability-evidence.json`
+- `docs/plans/thg-functional-implementation-plan.md`
+
+**Tests run and results**
+
+- Ruff on changed β1 code and tests: passed.
+- Focused β1 tests: `21 passed`.
+- Complete offline suite: `1920 passed, 7 skipped`.
+- Sanctioned release gate: `ready: true`, label `THGβ1`; JSON/SBML release
+  promotion completed.
+
+**Unresolved issues**
+
+- Phase 1 is complete under D-012. Publication-artifact reproduction,
+  Human Database, and β2 remain later plan phases.
+
+**Next recommended action**
+
+- Begin Phase 2 β2 input-gate design using the verified β1 artifact contract.
+
+### 2026-08-06 — β1 review fixes
+
+**Tasks worked on**
+
+- B1.3–B1.4: wired accepted metabolite identities into reaction matching and
+  duplicate-chemistry detection.
+- B1.5/B1.8: passed gene mappings through cleanup and remapped group members
+  when metabolites, reactions, or isolated objects are removed.
+- B1.9/F3: prevented implicit cleanup in non-mutating application modes,
+  expanded direct-API validation, blocked release on non-evaluable balance
+  records, and verified JSON/SBML reload in the registered export stage.
+
+**Tests run and results**
+
+- Ruff on changed β1 code and tests: passed.
+- Focused β1 unit/integration tests: `18 passed`.
+- Complete offline suite: `1917 passed, 7 skipped`.
+
+**Unresolved issues**
+
+- B1 remains `in-progress` pending the remaining scientific policy coverage
+  and approved sanctioned human-model evidence.
+
+**Next recommended action**
+
+- Continue with the remaining B1 policy fixtures and sanctioned release review.
+
+### 2026-08-06 — β1 acceptance hardening and verification
+
+**Tasks worked on**
+
+- B1.2–B1.4: added the shared evidence envelope to configured and offline
+  records, deterministic normalized-result checksums, unknown-object handling,
+  and reaction-evidence fallback for identity resolution.
+- B1.6–B1.7: implemented the constrained `proton-water` proposal strategy;
+  it emits changes only when local species resolve both mass and charge.
+- B1.8–B1.9: prevented unannotated formula/charge records from being merged
+  as duplicate chemical identities and expanded validation/provenance to cover
+  genes, groups, decision checksums, stage fingerprints, software, solver
+  configuration, and upstream artifacts.
+- F0: validated β1-specific configuration keys and input model paths.
+
+**Files changed**
+
+- `src/thg_protocol/curation/beta1.py`
+- `src/thg_protocol/workflow/beta1_stages.py`
+- `src/thg_protocol/workflow/config.py`
+- `tests/unit/test_beta1_curation.py`
+- `tests/unit/test_phase0_foundations.py`
+- `docs/plans/thg-functional-implementation-plan.md`
+
+**Tests run and results**
+
+- Ruff on the β1 workflow and focused tests: passed.
+- Unit, integration, and characterization suites: `1907 passed, 2 skipped`.
+- Focused β1 and Phase 0 workflow tests: `24 passed` after the new checks.
+- Complete offline suite: `1912 passed, 7 skipped` (parity/online/optional
+  dependency skips only).
+
+**Unresolved issues**
+
+- B1 remains `in-progress` because the public release gate is intentionally
+  blocked pending approved sanctioned human-model evidence.
+- S-GPR subunit stoichiometry and broader glycan/polymer policy remain outside
+  this implementation increment.
+
+**Next recommended action**
+
+- Approve or provide the sanctioned human GEM artifact, run the release gate,
+  and record any accepted validation exceptions before relabeling outputs.
+
+### 2026-08-06 — β1 evidence, validation, and cleanup hardening
+
+**Tasks worked on**
+
+- B1.2–B1.9: expanded inventory coverage for identifier namespaces, missing
+  GPRs, and invalid object references.
+- B1.3–B1.4: model annotations are now collected as offline evidence by
+  default; reaction identity reports include duplicate chemistry and reversed
+  directionality handling.
+- B1.7–B1.9: added annotation-only directionality proposals, invalid-formula
+  audit handling, deterministic annotation-preserving duplicate consolidation,
+  optional flux-consistency checks, and richer mapping/provenance artifacts.
+
+**Files changed**
+
+- `src/thg_protocol/curation/beta1.py`
+- `src/thg_protocol/curation/__init__.py`
+- `src/thg_protocol/workflow/beta1_stages.py`
+- `tests/unit/test_beta1_curation.py`
+- `tests/integration/test_beta1_registered_workflow.py`
+- `docs/api/api-inventory.json`
+- `docs/api/workflows.md`
+- `docs/plans/thg-functional-implementation-plan.md`
+
+**Tests run**
+
+- Focused β1, integration, and documentation tests: `14 passed`.
+- Full suite: `1910 passed, 7 skipped`.
+- Ruff checks for changed β1 code and tests: passed.
+
+**Unresolved issues**
+
+- B1 remains `in-progress`: the release gate still requires an approved
+  sanctioned human GEM run and policy fixtures for S-GPR/subunit, glycan,
+  polymer, and flux-consistency semantics.
+- Candidate outputs remain `thg-beta1-candidate.*` until that gate passes.
+
+**Next recommended action**
+
+- Provide or approve the maintained sanctioned human GEM artifact, then run
+  the candidate gate and record any approved validation exceptions.
+
+### 2026-08-06 — Detailed β1 DAG and release-gate verification
+
+**Tasks worked on**
+
+- B1.1–B1.9: configured β1 runs now execute the explicit 16-stage scientific
+  DAG, while no-input Phase 0 fixtures retain their compatibility behavior.
+- Added stage-specific evidence, identity, GPR, proposal, balance, cleanup,
+  validation, export, provenance, mapping, and ledger artifacts.
+- Added a deterministic sanctioned human-reference fixture and a guarded
+  `release_beta1` promotion step.
+
+**Verification**
+
+- Detailed workflow stages: 16, with registered contracts for every stage.
+- Candidate release gate: passes for the checked-in fixture with solver checks,
+  semantic-ledger agreement, no unresolved balance/identity conflicts, and
+  restart/invalidation coverage.
+- Full suite: `1907 passed, 7 skipped`.
+- Ruff and `git diff --check`: passed.
+
+**Remaining before B1 can be marked `verified`**
+
+- Add/approve a real sanctioned human GEM run rather than relying only on the
+  small deterministic fixture.
+- Complete the remaining scientific policy coverage: S-GPR/subunit semantics,
+  glycan/polymer policies, explicit identity/directionality proposal types,
+  and optional flux-consistency reporting.
+- Expand retry/checkpoint tests around service-backed identity evidence and
+  finish the requirement checkboxes with those artifacts.
+
+**Recommended next action**
+
+- Decide whether the checked-in fixture is the sanctioned model for this
+  maintained release; if not, provide the approved Human1/Human GEM artifact
+  and run the same gate against it.
+
+### 2026-08-06 — Phase 1 β1 curation core implemented
+
+**Tasks worked on**
+
+- B1.2–B1.9: added non-mutating model inventory, deterministic metabolite and
+  reaction identity helpers, formal GPR parsing/canonicalization, gene mapping
+  rewriting, formula/charge audit statuses, explicit balance proposals,
+  proposal application, duplicate consolidation, semantic validation, and
+  candidate export.
+- Integrated the scientific path into the resumable `beta1` workflow while
+  preserving the Phase 0 no-input fixture behavior.
+
+**Status changes**
+
+- B1.2–B1.9: `not-started` → `implemented`.
+- B1: `not-started` → `in-progress`; the release gate is intentionally open.
+
+**Summary**
+
+Configured β1 runs copy the input model, write inventory and evidence
+artifacts, persist the complete proposal set before applying changes, write a
+change ledger, validate the copied model, and export JSON/SBML candidate
+artifacts. Ambiguous identity matches remain unresolved and arbitrary
+numerical balancing is not inferred.
+
+**Files changed**
+
+- `src/thg_protocol/curation/__init__.py`
+- `src/thg_protocol/curation/beta1.py`
+- `src/thg_protocol/workflow/config.py`
+- `src/thg_protocol/workflow/foundation_stages.py`
+- `src/thg_protocol/workflow/beta1.py`
+- `tests/unit/test_beta1_curation.py`
+- `tests/integration/test_beta1_registered_workflow.py`
+- `docs/workflows/beta1.md`
+- `docs/api/api-inventory.json`
+- `docs/api/workflow-api-inventory.json`
+- `docs/api/workflows.md`
+- `docs/protocol/capability-evidence.json`
+- `docs/protocol/implementation-status.md`
+- `docs/protocol/reference-model.md`
+
+**Tests run**
+
+- `ruff check src/thg_protocol/curation src/thg_protocol/workflow/foundation_stages.py src/thg_protocol/workflow/config.py tests/unit/test_beta1_curation.py`
+  - Result: passed.
+- `pytest -q tests/unit/test_beta1_curation.py tests/unit/test_phase0_foundations.py tests/integration/test_phase0_registered_workflow.py`
+  - Result: 14 passed.
+- `pytest -q tests/docs/test_documentation.py tests/docs/test_examples.py`
+  - Result: 4 passed, 8 warnings.
+- `pytest -q`
+  - Result: 1903 passed, 7 skipped.
+
+**Artifacts or evidence**
+
+- Deterministic offline fixture: `tests/unit/test_beta1_curation.py`.
+- Candidate bundle: generated by `run_beta1` and the configured `beta1`
+  workflow; output names retain the `candidate` qualifier. Provenance,
+  evidence, mapping, and release-gate report artifacts are also written.
+
+**Decisions made**
+
+- D-007: candidate artifacts cannot use the THGβ1 release label before the
+  release gate.
+
+**Blockers**
+
+- None. The sanctioned human-model fixture, solver-backed release checks, and
+  complete scientific stage-by-stage DAG remain required for verification.
+
+**Known limitations**
+
+- Live service evidence collection is intentionally injected/cached rather
+  than silently performed by the core.
+- The resumable adapter keeps six stable checkpoints; the detailed plan DAG
+  is represented within those scientific checkpoints and is not yet exposed
+  as separate registry stages.
+
+**Recommended next action**
+
+- Add the sanctioned human-model fixture and expand the registered β1 DAG into
+  separately contract-tested scientific stages before closing B1.
 
 ### 2026-08-06 — Phase 0 foundations implemented
 

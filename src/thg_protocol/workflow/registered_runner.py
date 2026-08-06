@@ -253,6 +253,12 @@ def start_registered(config_path: str | Path) -> Path:
     except WorkflowRegistryError as error:
         raise ConfigError(str(error)) from error
     run_dir = config.run.output_dir
+    scientific = (
+        config.workflow == "beta1"
+        and isinstance(config.sections.get("beta1"), Mapping)
+        and isinstance(config.sections["beta1"].get("input_model"), str)
+    )
+    stages = definition.stages_for(scientific=scientific)
     if run_dir.exists() and not run_dir.is_dir():
         raise ConfigError(f"run output path is not a directory: {run_dir}")
     if run_dir.exists() and any(run_dir.iterdir()):
@@ -260,9 +266,9 @@ def start_registered(config_path: str | Path) -> Path:
     run_dir.mkdir(parents=True, exist_ok=True)
     with acquire_run_lock(run_dir):
         write_workflow_snapshot(config, run_dir)
-        manifest = new_workflow_manifest(config, definition.stages)
+        manifest = new_workflow_manifest(config, stages)
         _write(run_dir, manifest)
-        return _execute(config, run_dir, manifest, definition.stages)
+        return _execute(config, run_dir, manifest, stages)
 
 
 def resume_registered(run_dir: str | Path, *, force_step: str | None = None) -> Path:
@@ -288,9 +294,19 @@ def resume_registered(run_dir: str | Path, *, force_step: str | None = None) -> 
             raise RegisteredWorkflowError(
                 "manifest workflow does not match config snapshot"
             )
-        return _execute(
-            config, directory, manifest, definition.stages, force_step=force_step
-        )
+        steps = manifest.get("steps")
+        if not isinstance(steps, Mapping):
+            raise RegisteredWorkflowError("manifest has no workflow steps")
+        stage_ids = {str(stage_id) for stage_id in steps}
+        if stage_ids == set(definition.scientific_stage_ids):
+            stages = definition.scientific_stages
+        elif stage_ids == set(definition.stage_ids):
+            stages = definition.stages
+        else:
+            raise RegisteredWorkflowError(
+                f"manifest stages do not match workflow '{config.workflow}'"
+            )
+        return _execute(config, directory, manifest, stages, force_step=force_step)
 
 
 def is_registered_config(path: str | Path) -> bool:

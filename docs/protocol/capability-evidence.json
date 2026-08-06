@@ -294,16 +294,16 @@
     {
       "id": "publication.reference_beta1",
       "publication_concept": "Complete THG beta1 construction",
-      "current_entry_points": [],
-      "implementation": "Not implemented",
-      "verification": "Not yet verified",
-      "workflow_coverage": "Operation",
+      "current_entry_points": ["thg_protocol.curation.beta1.run_beta1"],
+      "implementation": "Implemented",
+      "verification": "Integration-tested",
+      "workflow_coverage": "Workflow-complete for documented v1 scope",
       "legacy_relationship": "Not assessed",
       "published_reproduction": "Not yet verified",
       "legacy_sources": ["build_model/build_model.py"],
-      "current_sources": [],
-      "tests": [],
-      "known_differences": ["No complete maintained reference-branch constructor or frozen target artifact"],
+      "current_sources": ["src/thg_protocol/curation/beta1.py", "src/thg_protocol/workflow/foundation_stages.py"],
+      "tests": ["tests/unit/test_beta1_curation.py", "tests/integration/test_beta1_registered_workflow.py"],
+      "known_differences": ["The maintained release is fixture-sanctioned and policy-scoped; it is not a claim of reproducing the 2023 publication artifact"],
       "evidence_commit": "0c91fdec325df12f25ef13819525e830a4cec1e8"
     },
     {

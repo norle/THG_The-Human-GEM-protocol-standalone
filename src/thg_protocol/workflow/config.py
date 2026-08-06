@@ -15,6 +15,43 @@ class ConfigError(ValueError):
 
 MODEL_SUFFIXES = {".json", ".xml", ".sbml"}
 
+WORKFLOW_SECTION_KEYS = {
+    "beta1": {
+        "input_model",
+        "mode",
+        "balance_strategy",
+        "corrections",
+        "formula_corrections",
+        "charge_corrections",
+        "formula_policy",
+        "remove_isolated",
+        "remove_isolated_metabolites",
+        "sanctioned_model",
+        "metabolite_evidence",
+        "metabolite_identities",
+        "reaction_evidence",
+        "reaction_targets",
+        "reaction_identities",
+        "proton_water_policy",
+        "normalization_species",
+        "gene_mapping",
+        "subunit_stoichiometry",
+        "decisions_file",
+        "run_solver_checks",
+        "run_blocked_reactions",
+        "run_flux_consistency",
+        "solver",
+        "source_releases",
+        "parser_version",
+        "normalization_version",
+        "license",
+        "upstream",
+    },
+    "beta2": {"upstream", "input_model", "decisions_file"},
+    "validation": {"input_model", "upstream", "run_memote"},
+    "compare": {"left", "right", "upstream"},
+}
+
 
 @dataclass(frozen=True)
 class RunSettings:
@@ -174,6 +211,19 @@ def _parse_workflow(
             value = payload[section]
             if not isinstance(value, dict):
                 raise ConfigError(f"'{section}' must be an object")
+            allowed_keys = WORKFLOW_SECTION_KEYS.get(section)
+            if allowed_keys is not None:
+                _keys(value, allowed_keys, section)
+            if section == "beta1" and "input_model" in value:
+                value = dict(value)
+                value["input_model"] = str(
+                    _input_path(
+                        _required_string(value, "input_model", "beta1"),
+                        input_base,
+                        "beta1.input_model",
+                        MODEL_SUFFIXES,
+                    )
+                )
             sections[section] = _resolve_workflow_paths(value, input_base)
     return WorkflowConfig(
         format_version=2,
@@ -196,7 +246,8 @@ def _resolve_workflow_paths(value: object, base: Path, *, key: str = "") -> obje
     if isinstance(value, list):
         return [_resolve_workflow_paths(item, base, key=key) for item in value]
     if isinstance(value, str) and (
-        key.endswith(("_file", "_path", "_dir")) or key in {"run_dir", "cache_dir"}
+        key.endswith(("_file", "_path", "_dir"))
+        or key in {"run_dir", "cache_dir", "input_model"}
     ):
         path = Path(value)
         return str(path if path.is_absolute() else (base / path).resolve())

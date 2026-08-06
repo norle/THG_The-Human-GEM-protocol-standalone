@@ -14,6 +14,44 @@ for complete user-facing operations. Use [`start`][thg_protocol.workflow.runner.
 and [`resume`][thg_protocol.workflow.runner.resume] for the documented
 restartable engineering DAG.
 
+## β1 curation
+
+::: thg_protocol.curation.beta1
+    options:
+      members:
+        - BalanceAudit
+        - GPRExpression
+        - InventoryReport
+        - MetaboliteCandidate
+        - ReactionIdentity
+        - apply_model_proposals
+        - audit_model
+        - audit_reaction
+        - beta1_release_gate
+        - canonicalize_gpr
+        - classify_reaction
+        - compare_reaction_identity
+        - consolidate_model
+        - duplicate_reaction_groups
+        - formula_class
+        - generate_balance_proposals
+        - generate_curation_proposals
+        - inventory_model
+        - normalize_gene_mapping
+        - normalize_namespace
+        - normalized_stoichiometry
+        - parse_gpr
+        - release_beta1
+        - resolve_metabolite_identity
+        - rewrite_gpr
+        - reaction_identity_key
+        - score_metabolite_candidate
+        - serialize_s_gpr
+        - protonation_relation
+        - run_beta1
+        - serialize_gpr
+        - with_subunit_stoichiometry
+
 ## Resumable workflow
 
 ::: thg_protocol.workflow.config
