@@ -16,9 +16,7 @@ def test_metabolite_annotation_api_exposes_characterized_helper_names():
     assert "formula_similarity" in metabolites.__all__
     assert "process_annotation" in metabolites.__all__
     assert (
-        inspect.signature(metabolites.generate_met_annotation)
-        .parameters["out"]
-        .default
+        inspect.signature(metabolites.generate_met_annotation).parameters["out"].default
         is inspect.Parameter.empty
     )
     assert (

@@ -14,9 +14,7 @@ from thg_protocol.analysis.model_signature import (
 def _model(rule: str = "g2 and (g1 or g3)") -> Model:
     model = Model("toy")
     model.name = "Toy model"
-    first = Metabolite(
-        "a_c", name="A", formula="C2H4", charge=-1, compartment="c"
-    )
+    first = Metabolite("a_c", name="A", formula="C2H4", charge=-1, compartment="c")
     first.annotation = {"ids": ["two", "one"]}
     second = Metabolite("b_c", name="B", compartment="c")
     reaction = Reaction("R1", name="reaction")

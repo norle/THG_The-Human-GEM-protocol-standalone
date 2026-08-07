@@ -61,9 +61,7 @@ def get_gpr(
     if not symbols:
         kegg_client = kegg_client or KeggClient()
         try:
-            page = kegg_client.get_page(
-                f"https://rest.kegg.jp/link/hsa/ec:{ec_number}"
-            )
+            page = kegg_client.get_page(f"https://rest.kegg.jp/link/hsa/ec:{ec_number}")
             if not page:
                 page = kegg_client.get_ec_html(ec_number)
             symbols = _kegg_genes(page)

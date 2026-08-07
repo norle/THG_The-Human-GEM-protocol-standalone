@@ -135,8 +135,7 @@ def test_balance_audit_distinguishes_missing_and_generic_formula_cases():
     model.add_reactions([reaction, generic_reaction])
     assert audit_reaction(reaction).mass_status == "not-evaluable-missing-formula"
     assert (
-        audit_reaction(generic_reaction).mass_status
-        == "not-evaluable-generic-formula"
+        audit_reaction(generic_reaction).mass_status == "not-evaluable-generic-formula"
     )
 
 
@@ -209,9 +208,7 @@ def test_identity_conflicts_and_s_gpr_metadata_are_explicit_proposals():
     }
     curated, _ = apply_model_proposals(model, proposals)
     assert curated.reactions.R_A.annotation["thg_identity"]["status"] == "conflict"
-    assert curated.reactions.R_A.annotation["thg_s_gpr"]["gpr"] == (
-        "G2 and (G1 or G3)"
-    )
+    assert curated.reactions.R_A.annotation["thg_s_gpr"]["gpr"] == ("G2 and (G1 or G3)")
     assert with_subunit_stoichiometry("G2 and G1", {"G2": 2}).to_dict() == {
         "and": [
             {"gene": "G1"},

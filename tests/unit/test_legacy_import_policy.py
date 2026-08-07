@@ -112,8 +112,7 @@ def test_package_code_does_not_import_legacy_namespaces():
 def test_maintained_sources_do_not_import_legacy_namespaces():
     violations = []
     roots = [
-        ROOT / name
-        for name in ("src", "tests", "examples", "supplementary_material")
+        ROOT / name for name in ("src", "tests", "examples", "supplementary_material")
     ]
     for root in roots:
         if not root.exists():
@@ -141,15 +140,15 @@ def test_documentation_snippets_do_not_import_legacy_namespaces():
             for line, text in enumerate(
                 path.read_text(encoding="utf-8").splitlines(), 1
             ):
-                fragments = [fragment.strip(' \"\'') for fragment in text.split(";")]
+                fragments = [fragment.strip(" \"'") for fragment in text.split(";")]
                 if any(
                     pattern.search(fragment)
                     for fragment in fragments
                     for pattern in patterns
                 ):
                     violations.append(f"{path.relative_to(ROOT)}:{line}")
-    assert not violations, (
-        "documentation imports legacy code:\n" + "\n".join(violations)
+    assert not violations, "documentation imports legacy code:\n" + "\n".join(
+        violations
     )
 
 

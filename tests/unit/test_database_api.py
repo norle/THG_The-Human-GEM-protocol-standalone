@@ -94,9 +94,7 @@ def test_reconstruct_model_from_json_uses_explicit_output_path(tmp_path):
             {
                 "model_id": "json-toy",
                 "metabolites": [{"id": "a_c", "formula": "C1"}],
-                "reactions": [
-                    {"id": "R1", "stoichiometry": {"a_c": -1}}
-                ],
+                "reactions": [{"id": "R1", "stoichiometry": {"a_c": -1}}],
             }
         )
     )
@@ -190,9 +188,7 @@ def test_reconstruct_model_with_services_enriches_records_offline(tmp_path):
         [GeneRecord("GENE1")],
         output_path=output,
         kegg_client=StaticKeggClient(reaction_entries={"R00001": "ENTRY R00001"}),
-        biocyc_client=StaticBioCycClient(
-            ec_pages={("META", "1.1.1.1"): "EC page"}
-        ),
+        biocyc_client=StaticBioCycClient(ec_pages={("META", "1.1.1.1"): "EC page"}),
         ensembl_client=StaticEnsemblClient(
             annotations={"GENE1": EnsemblAnnotation("ENSG0001")}
         ),

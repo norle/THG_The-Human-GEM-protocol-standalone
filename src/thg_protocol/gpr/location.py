@@ -196,12 +196,9 @@ def resolve_locations(
             rule_plain[location] = _render_gpr(tree, replacements)
             rule_stoich[location] = _render_gpr(tree, replacements, stoich=True)
             resolved = {
-                token: resolved_ensembl.get(token, token)
-                for token in tokens_in_rule
+                token: resolved_ensembl.get(token, token) for token in tokens_in_rule
             }
-            rule_ensembl[location] = _render_gpr(
-                tree, replacements, resolved=resolved
-            )
+            rule_ensembl[location] = _render_gpr(tree, replacements, resolved=resolved)
     else:
         for index, gene in enumerate(names):
             identifier = identifiers[index] if index < len(identifiers) else gene

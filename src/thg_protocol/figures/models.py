@@ -66,8 +66,7 @@ def model_component_summary(model: Any) -> ModelComponentSummary:
     return ModelComponentSummary(
         genes=len(model.genes),
         gene_associated_reactions=sum(
-            bool(getattr(reaction, "gene_reaction_rule", ""))
-            for reaction in reactions
+            bool(getattr(reaction, "gene_reaction_rule", "")) for reaction in reactions
         ),
         metabolites=len(model.metabolites),
         reactions=len(reactions),
@@ -79,8 +78,7 @@ def summarize_model_components(
 ) -> dict[str, ModelComponentSummary]:
     """Return component counts keyed by the supplied model labels."""
     return {
-        item.name: model_component_summary(item.model)
-        for item in _named_models(models)
+        item.name: model_component_summary(item.model) for item in _named_models(models)
     }
 
 

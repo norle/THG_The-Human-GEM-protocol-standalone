@@ -30,9 +30,7 @@ def test_legacy_merge_variants_delegate_to_non_mutating_package_merge():
 
     base = _model("base")
     incoming = _model("incoming")
-    incoming.add_metabolites(
-        [cobra.Metabolite("C_c", compartment="c", formula="C")]
-    )
+    incoming.add_metabolites([cobra.Metabolite("C_c", compartment="c", formula="C")])
 
     merged, report = merge_models(base, incoming)
     assert merged.metabolites.has_id("C_c")

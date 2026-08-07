@@ -66,9 +66,7 @@ def _maintained_commit() -> str:
     ).stdout.strip()
 
 
-def _write_result(
-    result: dict[str, object], *, result_dir: Path, case_id: str
-) -> Path:
+def _write_result(result: dict[str, object], *, result_dir: Path, case_id: str) -> Path:
     result_dir.mkdir(parents=True, exist_ok=True)
     result_path = result_dir / f"{case_id}.json"
     result_path.write_text(

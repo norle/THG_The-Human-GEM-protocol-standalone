@@ -7,11 +7,7 @@ from thg_protocol.pathway.cli import build_parser as package_pathway_parser
 
 
 def _option_strings(parser):
-    return {
-        option
-        for action in parser._actions
-        for option in action.option_strings
-    }
+    return {option for action in parser._actions for option in action.option_strings}
 
 
 def test_pathway_parser_exposes_explicit_inputs_and_output():

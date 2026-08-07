@@ -62,7 +62,8 @@ def _evidence_record(
             "evidence_id": str(
                 value.get(
                     "evidence_id",
-                    "ev-" + sha256_json(
+                    "ev-"
+                    + sha256_json(
                         {
                             "source": source,
                             "query": query,
@@ -78,9 +79,7 @@ def _evidence_record(
             "raw_response_path": value.get("raw_response_path"),
             "raw_response_sha256": value.get("raw_response_sha256"),
             "parser_version": str(value.get("parser_version", "beta1-1")),
-            "normalization_version": str(
-                value.get("normalization_version", "beta1-1")
-            ),
+            "normalization_version": str(value.get("normalization_version", "beta1-1")),
             "confidence": str(value.get("confidence", "recorded")),
             "affected_objects": list(
                 value.get("affected_objects", [f"{object_type}:{object_id}"])
@@ -573,9 +572,9 @@ class DetailedBeta1Stage:
             if not isinstance(subunit_mapping, Mapping):
                 subunit_mapping = {}
             records = []
-            known_genes = {
-                str(gene.id) for gene in model.genes
-            } | {str(value) for value in mapping.values()}
+            known_genes = {str(gene.id) for gene in model.genes} | {
+                str(value) for value in mapping.values()
+            }
             dangling_references: list[dict[str, object]] = []
             for reaction in sorted(model.reactions, key=lambda item: str(item.id)):
                 before = str(reaction.gene_reaction_rule or "")
@@ -866,6 +865,7 @@ class DetailedBeta1Stage:
                 ),
             )
             from thg_protocol.curation.beta1 import is_unresolved_balance
+
             valid_gprs = []
             invalid_gprs = []
             from thg_protocol.curation.beta1 import parse_gpr
@@ -901,9 +901,7 @@ class DetailedBeta1Stage:
                 "invalid_gprs": invalid_gprs,
                 "audits": [item.to_dict() for item in audits],
                 "unresolved": [
-                    item.to_dict()
-                    for item in audits
-                    if is_unresolved_balance(item)
+                    item.to_dict() for item in audits if is_unresolved_balance(item)
                 ],
                 "balance_status_counts": {
                     "mass": _status_counts(item.mass_status for item in audits),
@@ -944,12 +942,11 @@ class DetailedBeta1Stage:
                 )
                 for group in getattr(model, "groups", ())
             )
-            validation["objective_valid"] = (
-                getattr(model, "objective", None) is not None
-                and all(
-                    str(item["reaction"]) in {str(r.id) for r in model.reactions}
-                    for item in model_signature(model).get("objective", [])
-                )
+            validation["objective_valid"] = getattr(
+                model, "objective", None
+            ) is not None and all(
+                str(item["reaction"]) in {str(r.id) for r in model.reactions}
+                for item in model_signature(model).get("objective", [])
             )
             validation["no_systematic_compartment_expansion"] = set(
                 getattr(model, "compartments", {})

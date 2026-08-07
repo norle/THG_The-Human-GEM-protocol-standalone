@@ -137,9 +137,7 @@ def retry_metabolite_annotations(
     with failure_path.open("w", encoding="utf-8") as failure_file:
         failure_file.write("name\tformula\tidentifier\tfailure_reason\n")
         for name, formula, _annotation, identifier in remaining:
-            failure_file.write(
-                f"{name}\t{formula}\t{identifier}\tretry_exhausted\n"
-            )
+            failure_file.write(f"{name}\t{formula}\t{identifier}\tretry_exhausted\n")
 
     return MetaboliteRetryResult(
         annotated=tuple(retried_annotations),
@@ -218,9 +216,7 @@ def run_metabolite_reaction_identification(
         str(database_path), "([A-Z][0-9]+_?[a-z]+[0-9]*)", "C00080", "C00001"
     )
     matches = execute_jaccard(database_reactions, reactions)
-    reaction_annotation = process_jaccard(
-        database_reactions, reactions, matches
-    )
+    reaction_annotation = process_jaccard(database_reactions, reactions, matches)
     annotate_cobra_model(
         cobra_model,
         met_annotation,

@@ -21,6 +21,7 @@ from typing import TYPE_CHECKING, Dict, List, Optional, Tuple
 
 import numpy as np
 import pandas as pd
+
 if TYPE_CHECKING:
     import cobra
 
@@ -207,7 +208,10 @@ def identify_metabolite(
     except Exception as error:  # network failures are an unresolved match
         LOGGER.warning("PubChem lookup failed for %s: %s", name, error)
         return None
-    if compound is None or formula_similarity(formula, compound.molecular_formula) < threshold:
+    if (
+        compound is None
+        or formula_similarity(formula, compound.molecular_formula) < threshold
+    ):
         return None
 
     synonyms = compound.synonyms or (name,)
@@ -222,33 +226,32 @@ def identify_metabolite(
         "",
     )
     lipidmaps = next(
-        (
-            synonym
-            for synonym in synonyms
-            if re.fullmatch(r"L[A-Z]{3}[0-9]+", synonym)
-        ),
+        (synonym for synonym in synonyms if re.fullmatch(r"L[A-Z]{3}[0-9]+", synonym)),
         "",
     )
     chebi = next(
         (synonym for synonym in synonyms if re.fullmatch(r"CHEBI:[0-9]+", synonym)),
         "",
     )
-    return "\t".join(
-        [
-            metabolite,
-            "",
-            compound.molecular_formula,
-            lipidmaps,
-            kegg,
-            chebi,
-            str(compound.cid),
-            "",
-            compound.inchikey,
-            compound.inchi,
-            "",
-            iden,
-        ]
-    ) + "\n"
+    return (
+        "\t".join(
+            [
+                metabolite,
+                "",
+                compound.molecular_formula,
+                lipidmaps,
+                kegg,
+                chebi,
+                str(compound.cid),
+                "",
+                compound.inchikey,
+                compound.inchi,
+                "",
+                iden,
+            ]
+        )
+        + "\n"
+    )
 
 
 def generate_met_annotation(
@@ -286,9 +289,7 @@ def generate_met_annotation(
     """
     output_path = Path(out)
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    checkpoint_path = output_path.with_name(
-        f"{output_path.stem}.checkpoint.json"
-    )
+    checkpoint_path = output_path.with_name(f"{output_path.stem}.checkpoint.json")
     failure_path = output_path.with_name(
         f"{output_path.stem}_failures{output_path.suffix}"
     )
@@ -323,8 +324,7 @@ def generate_met_annotation(
         }
         temporary = checkpoint_path.with_name(checkpoint_path.name + ".tmp")
         temporary.write_text(
-            json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True)
-            + "\n",
+            json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
             encoding="utf-8",
         )
         os.replace(temporary, checkpoint_path)
@@ -369,9 +369,9 @@ def generate_met_annotation(
             checkpoint_path.unlink()
         state = initial_state()
 
-    print(f"\n{'='*70}")
+    print(f"\n{'=' * 70}")
     print(f"Starting metabolite annotation for {total} metabolites")
-    print(f"{'='*70}\n")
+    print(f"{'=' * 70}\n")
 
     for index in range(state["next_index"], total):
         name, formula, annotation, identifier = records[index]
@@ -385,9 +385,7 @@ def generate_met_annotation(
             )
 
         try:
-            result = identify_metabolite(
-                name, formula, identifier, client=client
-            )
+            result = identify_metabolite(name, formula, identifier, client=client)
             record = [name, formula, annotation, identifier]
             if result is None:
                 state["unannotated"].append(record)
@@ -438,20 +436,28 @@ def generate_met_annotation(
     annotated = state["annotated"]
     unnanotated = state["unannotated"]
     api_failures = state["api_failures"]
-    
-    print(f"\n{'='*70}")
+
+    print(f"\n{'=' * 70}")
     print(f"ANNOTATION COMPLETE")
-    print(f"{'='*70}")
+    print(f"{'=' * 70}")
     print(f"Total metabolites:          {total}")
+
     def percentage(count: int) -> float:
         return (count / total) * 100 if total else 0.0
-    print(f"Successfully annotated:     {len(annotated)} ({percentage(len(annotated)):.1f}%)")
-    print(f"Failed (likely not in DB):  {len(unnanotated)-len(api_failures)} ({percentage(len(unnanotated)-len(api_failures)):.1f}%)")
-    print(f"Failed (API/temp errors):   {len(api_failures)} ({percentage(len(api_failures)):.1f}%)")
+
+    print(
+        f"Successfully annotated:     {len(annotated)} ({percentage(len(annotated)):.1f}%)"
+    )
+    print(
+        f"Failed (likely not in DB):  {len(unnanotated) - len(api_failures)} ({percentage(len(unnanotated) - len(api_failures)):.1f}%)"
+    )
+    print(
+        f"Failed (API/temp errors):   {len(api_failures)} ({percentage(len(api_failures)):.1f}%)"
+    )
     print(f"\nResults saved to:      {output_path}")
     print(f"Failures saved to:     {failure_path}")
-    print(f"{'='*70}\n")
-    
+    print(f"{'=' * 70}\n")
+
     return annotated, unnanotated
 
 

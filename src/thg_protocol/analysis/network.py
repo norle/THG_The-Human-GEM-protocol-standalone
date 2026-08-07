@@ -21,9 +21,7 @@ def find_network_components(model: Any) -> dict[str, Any]:
     separate legacy operations.
     """
     if nx is None:
-        raise RuntimeError(
-            "Network analysis requires the 'networkx' dependency"
-        )
+        raise RuntimeError("Network analysis requires the 'networkx' dependency")
 
     model_copy = model.copy()
     graph = nx.DiGraph()
@@ -42,9 +40,7 @@ def find_network_components(model: Any) -> dict[str, Any]:
             elif coefficient > 0:
                 graph.add_edge(reaction_node, metabolite_node)
 
-    components = sorted(
-        nx.weakly_connected_components(graph), key=len, reverse=True
-    )
+    components = sorted(nx.weakly_connected_components(graph), key=len, reverse=True)
     component_info = []
     compartments = {
         ("metabolite", metabolite.id): getattr(metabolite, "compartment", None)

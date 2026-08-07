@@ -96,9 +96,7 @@ def _merge_annotations(first: object, second: object) -> dict[str, object]:
             else ([existing] if existing is not None else [])
         )
         right = (
-            list(value)
-            if isinstance(value, (list, tuple, set, frozenset))
-            else [value]
+            list(value) if isinstance(value, (list, tuple, set, frozenset)) else [value]
         )
         unique = {
             json.dumps(_json(item), sort_keys=True): _json(item)
@@ -255,9 +253,7 @@ def inventory_model(
         model_id=str(getattr(model, "id", "")),
         input_sha256=sha256_file(input_path) if input_path is not None else None,
         source_version=(
-            str(model.version)
-            if getattr(model, "version", None) is not None
-            else None
+            str(model.version) if getattr(model, "version", None) is not None else None
         ),
         counts={
             "metabolites": len(metabolites),
@@ -628,8 +624,7 @@ def with_subunit_stoichiometry(
     return GPRExpression(
         node.kind,
         children=tuple(
-            with_subunit_stoichiometry(child, stoichiometry)
-            for child in node.children
+            with_subunit_stoichiometry(child, stoichiometry) for child in node.children
         ),
     )
 
@@ -861,9 +856,7 @@ def generate_curation_proposals(
             "reason": str(
                 identity.get("reason", "reaction identity remains unresolved")
             ),
-            "normalization_policy": str(
-                identity.get("normalization_policy", "strict")
-            ),
+            "normalization_policy": str(identity.get("normalization_policy", "strict")),
         }
         if after == before:
             continue
@@ -1074,10 +1067,10 @@ def is_unresolved_balance(audit: BalanceAudit) -> bool:
         "excluded-pseudo-reaction",
         "excluded-generic-formula",
     }
-    return (
-        audit.mass_status not in {"balanced", *excluded}
-        or audit.charge_status not in {"balanced", *excluded}
-    )
+    return audit.mass_status not in {
+        "balanced",
+        *excluded,
+    } or audit.charge_status not in {"balanced", *excluded}
 
 
 def formula_class(metabolite: Any) -> str | None:
@@ -1173,8 +1166,7 @@ def audit_reaction(
         )
     )
     selected_policy = {
-        str(key): str(value)
-        for key, value in (formula_policy or {}).items()
+        str(key): str(value) for key, value in (formula_policy or {}).items()
     }
     invalid_policies = set(selected_policy.values()) - GENERIC_FORMULA_POLICIES
     if invalid_policies:
@@ -1437,12 +1429,15 @@ def generate_balance_proposals(
 
 def _proton_water_correction(
     model: Any, reaction: Any
-) -> tuple[
-    dict[str, float],
-    dict[str, float],
-    Any,
-    list[str],
-] | None:
+) -> (
+    tuple[
+        dict[str, float],
+        dict[str, float],
+        Any,
+        list[str],
+    ]
+    | None
+):
     """Return a conservative H/H2O repair when the residual is solvable.
 
     This strategy is deliberately narrower than a general-purpose balancer:
@@ -1481,8 +1476,7 @@ def _proton_water_correction(
         (
             metabolite
             for metabolite in sorted(local, key=lambda item: str(item.id))
-            if formula_atoms(str(getattr(metabolite, "formula", "") or ""))
-            == {"H": 1}
+            if formula_atoms(str(getattr(metabolite, "formula", "") or "")) == {"H": 1}
             and getattr(metabolite, "charge", None) in {-1, 1}
         ),
         None,
@@ -1490,9 +1484,7 @@ def _proton_water_correction(
     if water is None or proton is None:
         return None
     water_coefficient = -float(audit.mass_residual.get("O", 0.0))
-    proton_coefficient = -float(audit.charge_residual or 0.0) / float(
-        proton.charge
-    )
+    proton_coefficient = -float(audit.charge_residual or 0.0) / float(proton.charge)
     expected_proton = -float(audit.mass_residual.get("H", 0.0)) - 2.0 * (
         water_coefficient
     )
@@ -1755,8 +1747,12 @@ def consolidate_model(
             # separate non-zero objective coefficients.
             try:
                 coefficients = copied.objective.get_linear_coefficients(
-                    [keep.forward_variable, keep.reverse_variable,
-                     duplicate.forward_variable, duplicate.reverse_variable]
+                    [
+                        keep.forward_variable,
+                        keep.reverse_variable,
+                        duplicate.forward_variable,
+                        duplicate.reverse_variable,
+                    ]
                 )
                 keep_coefficient = float(
                     coefficients.get(keep.forward_variable, 0.0)
@@ -2036,9 +2032,7 @@ def run_beta1(
         try:
             parse_gpr(reaction.gene_reaction_rule)
         except ValueError as error:
-            invalid_gprs.append(
-                {"reaction_id": str(reaction.id), "error": str(error)}
-            )
+            invalid_gprs.append({"reaction_id": str(reaction.id), "error": str(error)})
         else:
             valid_gprs.append(str(reaction.id))
     validation = {
@@ -2061,9 +2055,7 @@ def run_beta1(
         "invalid_gprs": invalid_gprs,
         "audits": [item.to_dict() for item in audits],
         "unresolved": [
-            item.to_dict()
-            for item in audits
-            if is_unresolved_balance(item)
+            item.to_dict() for item in audits if is_unresolved_balance(item)
         ],
         "ledger_entries": len(ledger),
         "proposal_count": len(proposals),
@@ -2197,8 +2189,7 @@ def run_beta1(
                 },
                 "genes": dict(
                     sorted(
-                        (str(key), str(value))
-                        for key, value in gene_mapping.items()
+                        (str(key), str(value)) for key, value in gene_mapping.items()
                     )
                 ),
                 "unresolved": [
@@ -2212,8 +2203,7 @@ def run_beta1(
                 + [
                     {"object_id": object_id, "status": resolution.get("status")}
                     for object_id, resolution in reaction_identities.items()
-                    if resolution.get("status")
-                    not in {"exact", "equivalent-reversed"}
+                    if resolution.get("status") not in {"exact", "equivalent-reversed"}
                 ],
             },
             indent=2,
@@ -2440,9 +2430,7 @@ def beta1_release_gate(
     elif isinstance(provenance_input, Mapping):
         sanctioned_sha256 = provenance_input.get("sha256")
         if sanctioned_sha256 != SANCTIONED_BETA1_INPUT_SHA256:
-            reasons.append(
-                "input checksum is not the maintained sanctioned β1 fixture"
-            )
+            reasons.append("input checksum is not the maintained sanctioned β1 fixture")
     for directory, required in (
         (root / "evidence", "evidence"),
         (root / "mappings", "mappings"),

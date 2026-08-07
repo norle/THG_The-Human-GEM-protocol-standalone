@@ -42,9 +42,7 @@ def resolve_glycan_atoms(
         return "", "", []
     compound_id = compound_match.group(1)
     compound_page = client.get_page("https://www.genome.jp/entry/" + compound_id)
-    formula_match = re.search(
-        r"\b(C(?:\d+)?(?:[A-Z][a-z]?\d*)+)\b", str(compound_page)
-    )
+    formula_match = re.search(r"\b(C(?:\d+)?(?:[A-Z][a-z]?\d*)+)\b", str(compound_page))
     if formula_match is None:
         return compound_id, "", []
     formula = formula_match.group(1)

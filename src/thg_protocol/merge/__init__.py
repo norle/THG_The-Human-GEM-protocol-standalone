@@ -105,9 +105,7 @@ def merge_models(
     removed_isolated = 0
     if remove_isolated_metabolites:
         isolated = [
-            metabolite
-            for metabolite in result.metabolites
-            if not metabolite.reactions
+            metabolite for metabolite in result.metabolites if not metabolite.reactions
         ]
         result.remove_metabolites(isolated, destructive=False)
         removed_isolated = len(isolated)

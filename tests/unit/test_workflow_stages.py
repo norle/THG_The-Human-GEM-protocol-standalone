@@ -91,11 +91,7 @@ def _memote_context(config: RunConfig, run_dir: Path) -> StageContext:
     merge_model.parent.mkdir(parents=True, exist_ok=True)
     merge_model.write_text("{}", encoding="utf-8")
     manifest = {
-        "steps": {
-            "merge": {
-                "outputs": [{"role": "model", "path": merge_model.name}]
-            }
-        }
+        "steps": {"merge": {"outputs": [{"role": "model", "path": merge_model.name}]}}
     }
     return StageContext(config, run_dir, manifest, run_dir / "memote.log")
 

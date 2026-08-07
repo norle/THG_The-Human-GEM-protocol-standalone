@@ -156,9 +156,7 @@ def reconstruct_model(
         if not record.id:
             raise ValueError("gene id must not be empty")
         gene = (
-            model.genes.get_by_id(record.id)
-            if model.genes.has_id(record.id)
-            else None
+            model.genes.get_by_id(record.id) if model.genes.has_id(record.id) else None
         )
         if gene is None:
             from cobra.core import Gene
@@ -337,8 +335,7 @@ def reconstruct_model_from_pickle(
             import dill
         except ImportError:  # pragma: no cover - optional dependency
             raise ValueError(
-                "could not load pickle; install dill for historical database "
-                "pickles"
+                "could not load pickle; install dill for historical database pickles"
             ) from pickle_error
         try:
             with path.open("rb") as handle:
@@ -376,8 +373,8 @@ def reconstruct_model_from_pickle(
 
     metabolite_records: list[MetaboliteRecord] = []
     metabolite_ids: dict[str, str] = {}
-    source_mets = payload.get("mets_cl") or payload.get("metabolites") or payload.get(
-        "mets", {}
+    source_mets = (
+        payload.get("mets_cl") or payload.get("metabolites") or payload.get("mets", {})
     )
     for source_key, record in _pickle_items(source_mets):
         base_id = _record_call(record, "ID2") or _record_value(record, "id")
@@ -483,9 +480,7 @@ def reconstruct_model_from_pickle(
                 stoichiometry,
                 name=str(_record_call(record, "Name", "") or ""),
                 lower_bound=(
-                    0.0
-                    if bool(_record_call(record, "Termodyn", False))
-                    else -1000.0
+                    0.0 if bool(_record_call(record, "Termodyn", False)) else -1000.0
                 ),
                 gene_reaction_rule=gene_rule,
                 annotation=annotation,
@@ -598,9 +593,7 @@ def reconstruct_model_with_services(
                 if identifier in entries
             }
             if found:
-                annotation["kegg.reaction.entry"] = json.dumps(
-                    found, sort_keys=True
-                )
+                annotation["kegg.reaction.entry"] = json.dumps(found, sort_keys=True)
             enriched_reactions.append(replace(record, annotation=annotation))
         reaction_records = enriched_reactions
 
@@ -642,9 +635,7 @@ def reconstruct_model_with_services(
                     **(
                         {
                             key: value
-                            for key, value in annotations[record.id]
-                            .as_dict()
-                            .items()
+                            for key, value in annotations[record.id].as_dict().items()
                             if value is not None
                         }
                         if record.id in annotations

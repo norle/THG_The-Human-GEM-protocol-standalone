@@ -111,8 +111,6 @@ def test_documented_analysis_annotation_and_transformation_examples(tmp_path):
     assert replace_index_tokens(merged, ["ENSG0001"]) == ["GENE1"]
 
     client = StaticBioCycClient(
-        ec_pages={
-            ("HUMAN", "1.1.1.1"): "<b>Gene:</b> GENE1 ENSG0001<br>"
-        }
+        ec_pages={("HUMAN", "1.1.1.1"): "<b>Gene:</b> GENE1 ENSG0001<br>"}
     )
     assert get_gpr("1.1.1.1", biocyc_client=client)[-1] == "(GENE1)"

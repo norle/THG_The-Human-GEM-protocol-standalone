@@ -67,6 +67,7 @@ def missing_atoms(equation: str) -> list[list[Any]]:
 
 def reaction_compare(first: str, second: str) -> tuple[list[str], list[int]]:
     """Return species newly present in ``first`` relative to ``second``."""
+
     def sides(equation: str) -> tuple[list[str], list[str]]:
         left, right = equation.replace(" ", "").split("->", 1)
         return left.split("+") if left else [], right.split("+") if right else []
@@ -126,8 +127,10 @@ def equation_matrix(equation: str) -> np.ndarray:
     numpy = _numpy()
     return numpy.array(
         [
-            [coefficient * atoms.get(element, 0)
-             for (coefficient, _), atoms in zip(terms, parsed, strict=True)]
+            [
+                coefficient * atoms.get(element, 0)
+                for (coefficient, _), atoms in zip(terms, parsed, strict=True)
+            ]
             for element in elements
         ],
         dtype=float,
@@ -154,9 +157,7 @@ def balance_equation(equation: str) -> tuple[list[float], list[float]]:
     vector = vh[-1]
     if numpy.all(vector < 0):
         vector = -vector
-    if numpy.any(vector <= 1e-10) or not numpy.allclose(
-        matrix @ vector, 0, atol=1e-8
-    ):
+    if numpy.any(vector <= 1e-10) or not numpy.allclose(matrix @ vector, 0, atol=1e-8):
         return [], []
 
     fractions = [Fraction(float(value)).limit_denominator(10000) for value in vector]
@@ -227,9 +228,7 @@ def nullity(matrix: Any) -> tuple[np.ndarray, np.ndarray]:
     independent: list[np.ndarray] = []
     current_rank = 0
     for row in values:
-        candidate = (
-            numpy.vstack(independent + [row]) if independent else row[None, :]
-        )
+        candidate = numpy.vstack(independent + [row]) if independent else row[None, :]
         new_rank = numpy.linalg.matrix_rank(candidate)
         if new_rank > current_rank:
             independent.append(row)
@@ -317,14 +316,9 @@ def reformulate_glycan_equation(
             identifiers.append(token)
             formulas[token] = atoms
     elements = dict.fromkeys(
-        group[0][0]
-        for identifier in identifiers
-        for group in formulas[identifier]
+        group[0][0] for identifier in identifiers for group in formulas[identifier]
     )
-    letters = {
-        element: chr(ord("A") + index)
-        for index, element in enumerate(elements)
-    }
+    letters = {element: chr(ord("A") + index) for index, element in enumerate(elements)}
 
     def render(side: str) -> str:
         values = []
@@ -332,8 +326,7 @@ def reformulate_glycan_equation(
             token = token.strip()
             values.append(
                 "".join(
-                    f"{letters[group[0][0]]}{group[0][1]}"
-                    for group in formulas[token]
+                    f"{letters[group[0][0]]}{group[0][1]}" for group in formulas[token]
                 )
             )
         return " + ".join(values)

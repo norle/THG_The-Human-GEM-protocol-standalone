@@ -77,9 +77,7 @@ def test_find_metabolite_robust_can_copy_formula_match_to_target_compartment():
 
 
 def test_parse_reaction_equation_preserves_names_with_plus_signs():
-    parsed = pathway.parse_reaction_equation(
-        "2 ATP[c] + H+[m] <=> ADP[c] + H2O[m]"
-    )
+    parsed = pathway.parse_reaction_equation("2 ATP[c] + H+[m] <=> ADP[c] + H2O[m]")
 
     assert parsed == {
         "reversible": True,
@@ -102,9 +100,7 @@ def test_parse_universal_reaction_resolves_model_metabolites():
         "reactions": [],
     }
 
-    reaction = pathway.parse_universal_reaction(
-        "2 ATP[c] --> ADP[c]", model, {}
-    )
+    reaction = pathway.parse_universal_reaction("2 ATP[c] --> ADP[c]", model, {})
 
     assert reaction == {
         "metabolites": {"MAM00001c": -2.0, "MAM00002c": 1.0},
@@ -128,9 +124,10 @@ def test_pathway_configuration_helpers_select_and_translate_without_mutation():
 
     assert selected == {"Example": {"compartment": "gl", "formula": "C2"}}
     assert config["metabolites"]["specific"]["Example"]["compartment"] == "gl"
-    assert pathway.substitute_compartment_abbreviations(
-        "A[gl] --> B[c]", {"gl": "gc"}
-    ) == "A[gc] --> B[c]"
+    assert (
+        pathway.substitute_compartment_abbreviations("A[gl] --> B[c]", {"gl": "gc"})
+        == "A[gc] --> B[c]"
+    )
 
 
 def test_build_reaction_from_config_maps_optional_fields():
@@ -209,9 +206,7 @@ def test_create_compartment_reactions_uses_package_builder():
         "reactions": [],
     }
     config = {
-        "reactions": [
-            {"id": "MAR00001", "equation": "A[c] --> B[c]", "name": "A to B"}
-        ]
+        "reactions": [{"id": "MAR00001", "equation": "A[c] --> B[c]", "name": "A to B"}]
     }
 
     assert pathway.create_compartment_reactions(model, {}, "c", config) == 1

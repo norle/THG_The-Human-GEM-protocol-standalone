@@ -42,10 +42,7 @@ def test_installed_commands_match_packaging_and_api_inventory():
     for module in inventory["modules"]:
         for name, target in scripts.items():
             target_module, target_symbol = target.split(":", 1)
-            if (
-                target_module == module["module"]
-                and target_symbol in module["symbols"]
-            ):
+            if target_module == module["module"] and target_symbol in module["symbols"]:
                 inventory_scripts[name] = target
 
     assert inventory_scripts == scripts

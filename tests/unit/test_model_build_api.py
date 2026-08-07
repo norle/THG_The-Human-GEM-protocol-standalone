@@ -28,12 +28,8 @@ def test_model_build_uses_static_services_and_explicit_outputs(tmp_path):
         output,
         cache_dir=cache,
         errors_path=errors,
-        kegg_client=StaticKeggClient(
-            reaction_entries={"R00001": "ENTRY R00001"}
-        ),
-        biocyc_client=StaticBioCycClient(
-            ec_pages={("META", "1.1.1.1"): "EC page"}
-        ),
+        kegg_client=StaticKeggClient(reaction_entries={"R00001": "ENTRY R00001"}),
+        biocyc_client=StaticBioCycClient(ec_pages={("META", "1.1.1.1"): "EC page"}),
         ensembl_client=StaticEnsemblClient(
             annotations={"GENE1": EnsemblAnnotation("ENSG0001")}
         ),
@@ -45,9 +41,7 @@ def test_model_build_uses_static_services_and_explicit_outputs(tmp_path):
     assert report.errors == []
     assert output.exists()
     assert errors.exists()
-    assert {
-        path.name for path in cache.iterdir()
-    } == {
+    assert {path.name for path in cache.iterdir()} == {
         "kegg_reaction_entries.json",
         "biocyc_ec_pages.json",
         "ensembl_annotations.json",

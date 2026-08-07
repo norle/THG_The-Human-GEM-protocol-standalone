@@ -73,9 +73,7 @@ def _maintained_commit() -> str:
     ).stdout.strip()
 
 
-def _write_result(
-    result: dict[str, object], *, result_dir: Path, case_id: str
-) -> Path:
+def _write_result(result: dict[str, object], *, result_dir: Path, case_id: str) -> Path:
     result_dir.mkdir(parents=True, exist_ok=True)
     result_path = result_dir / f"{case_id}.json"
     result_path.write_text(
@@ -93,9 +91,7 @@ def test_atom10_matches_recorded_legacy_snapshot(tmp_path):
     fixture = json.loads(CASE_PATH.read_text(encoding="utf-8"))
     with tempfile.TemporaryDirectory(prefix="thg-legacy-mass-balance-") as temp_dir:
         source_path = _extract_legacy_module(legacy_root, Path(temp_dir))
-        maintained = [
-            _run_atom10(None, case["formula"]) for case in fixture["cases"]
-        ]
+        maintained = [_run_atom10(None, case["formula"]) for case in fixture["cases"]]
         legacy = [
             _run_atom10(source_path, case["formula"]) for case in fixture["cases"]
         ]

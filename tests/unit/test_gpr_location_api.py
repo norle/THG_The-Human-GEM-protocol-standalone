@@ -7,9 +7,7 @@ from thg_protocol.services.location import StaticLocationClient
 
 def test_location_resolution_uses_static_page_and_compatibility_shape() -> None:
     client = StaticLocationClient(
-        pages={
-            "https://www.uniprot.org/uniprotkb/G1_HUMAN.txt": "mitochondria"
-        }
+        pages={"https://www.uniprot.org/uniprotkb/G1_HUMAN.txt": "mitochondria"}
     )
     result = resolve_locations(
         "GENE1",
@@ -52,9 +50,7 @@ def test_location_resolution_preserves_complex_rules_and_ensembl_mapping():
 
 def test_location_resolution_renders_explicit_stoichiometric_gpr():
     client = StaticLocationClient(
-        pages={
-            "https://www.uniprot.org/uniprotkb/G1_HUMAN.txt": "Mitochondria"
-        }
+        pages={"https://www.uniprot.org/uniprotkb/G1_HUMAN.txt": "Mitochondria"}
     )
 
     stoich, plain, _, _ = resolve_locations(
@@ -72,8 +68,9 @@ def test_location_resolution_renders_explicit_stoichiometric_gpr():
 def test_location_resolution_does_not_treat_er_substrings_as_er():
     client = StaticLocationClient(
         pages={
-            "https://www.uniprot.org/uniprotkb/G1_HUMAN.txt":
-            "This protein has a perER-associated motif."
+            "https://www.uniprot.org/uniprotkb/G1_HUMAN.txt": (
+                "This protein has a perER-associated motif."
+            )
         }
     )
 

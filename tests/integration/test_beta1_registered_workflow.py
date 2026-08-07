@@ -202,9 +202,7 @@ def test_recorded_service_failure_is_preserved_as_evidence_and_resumes_offline(
     )
     start(config)
     status = get_status(run_dir)
-    evidence_path = status["steps"]["collect-metabolite-evidence"]["outputs"][0][
-        "path"
-    ]
+    evidence_path = status["steps"]["collect-metabolite-evidence"]["outputs"][0]["path"]
     evidence = json.loads((run_dir / evidence_path).read_text(encoding="utf-8"))[
         "records"
     ]["a_c"]

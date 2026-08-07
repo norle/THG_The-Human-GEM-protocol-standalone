@@ -28,9 +28,7 @@ def unbalanced_reactions(model: Any) -> list[str]:
 def orphan_metabolites(model: Any) -> list[str]:
     """Return metabolite IDs that participate in no reactions."""
     return [
-        metabolite.id
-        for metabolite in model.metabolites
-        if not metabolite.reactions
+        metabolite.id for metabolite in model.metabolites if not metabolite.reactions
     ]
 
 
@@ -94,8 +92,7 @@ def stoichiometrically_balanced_cycles(model: Any) -> list[str]:
     return [
         reaction_id
         for reaction_id, row in fva.iterrows()
-        if abs(float(row["minimum"])) > 1e-9
-        or abs(float(row["maximum"])) > 1e-9
+        if abs(float(row["minimum"])) > 1e-9 or abs(float(row["maximum"])) > 1e-9
     ]
 
 
@@ -127,8 +124,7 @@ def unbounded_reactions(model: Any) -> tuple[list[str], float, Any]:
     ids = [
         reaction_id
         for reaction_id, row in result.iterrows()
-        if abs(float(row["minimum"])) >= 999.0
-        or abs(float(row["maximum"])) >= 999.0
+        if abs(float(row["minimum"])) >= 999.0 or abs(float(row["maximum"])) >= 999.0
     ]
     denominator = max(len(result), 1)
     return ids, len(ids) / denominator, result

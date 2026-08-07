@@ -20,10 +20,7 @@ def test_static_biocyc_client_returns_configured_ec_and_page_responses():
 
 def test_package_gpr_lookup_uses_injected_biocyc_pages():
     client = StaticBioCycClient(
-        ec_pages={
-            ("HUMAN", "1.2.3.4"):
-            "<b>Gene:</b> GENE1 ENSG000001<br>"
-        }
+        ec_pages={("HUMAN", "1.2.3.4"): "<b>Gene:</b> GENE1 ENSG000001<br>"}
     )
 
     result = get_gpr("1.2.3.4", biocyc_client=client)
@@ -123,9 +120,9 @@ def test_kegg_reaction_batches_never_exceed_ten_identifiers():
     client = KeggClient(session=session, retries=0)
     identifiers = [f"R{identifier:05d}" for identifier in range(1, 12)]
 
-    assert sorted(
-        client.get_reaction_entries(identifiers, batch_size=50)
-    ) == identifiers
+    assert (
+        sorted(client.get_reaction_entries(identifiers, batch_size=50)) == identifiers
+    )
     assert len(session.calls) == 2
     assert all(call[0].count("rn:") <= 10 for call in session.calls)
 
@@ -157,8 +154,9 @@ def test_kegg_database_batch_uses_database_prefix():
 def test_static_location_client_and_package_location_resolution():
     client = StaticLocationClient(
         pages={
-            "https://www.uniprot.org/uniprotkb/P12345_HUMAN.txt":
-            "SUBCELLULAR LOCATION: Mitochondria."
+            "https://www.uniprot.org/uniprotkb/P12345_HUMAN.txt": (
+                "SUBCELLULAR LOCATION: Mitochondria."
+            )
         }
     )
 
@@ -174,11 +172,9 @@ def test_static_location_client_and_package_location_resolution():
 
 
 def test_static_ensembl_client_is_used_by_package_model_builders():
-    client = StaticEnsemblClient(
-        annotations={"GENE1": EnsemblAnnotation("ENSG000001")}
-    )
+    client = StaticEnsemblClient(annotations={"GENE1": EnsemblAnnotation("ENSG000001")})
 
-    assert client.annotate(["GENE1"]) ["GENE1"].ensembl == "ENSG000001"
+    assert client.annotate(["GENE1"])["GENE1"].ensembl == "ENSG000001"
 
 
 def test_package_glycan_reformulation_uses_static_kegg_client():
@@ -189,9 +185,10 @@ def test_package_glycan_reformulation_uses_static_kegg_client():
         }
     )
 
-    assert reformulate_glycan_equation(
-        "G00001 -> G00001", client=client
-    ) == "A1B2C1 -> A1B2C1"
+    assert (
+        reformulate_glycan_equation("G00001 -> G00001", client=client)
+        == "A1B2C1 -> A1B2C1"
+    )
 
 
 def test_package_gpr_lookup_accepts_offline_service_clients():

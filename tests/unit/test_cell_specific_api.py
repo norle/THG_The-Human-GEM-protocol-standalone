@@ -112,6 +112,4 @@ def test_transcriptomics_helpers_transform_model_annotations(tmp_path):
         "</rdf:RDF>",
         encoding="utf-8",
     )
-    assert extract_gene_annotation_pairs(xml) == {
-        "HGNC1": ["ENSG000099", "ENSG000100"]
-    }
+    assert extract_gene_annotation_pairs(xml) == {"HGNC1": ["ENSG000099", "ENSG000100"]}

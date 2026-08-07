@@ -160,9 +160,9 @@ def parse_universal_reaction(
         if metabolite is None:
             continue
         metabolite_id = metabolite["id"]
-        metabolites[metabolite_id] = metabolites.get(metabolite_id, 0.0) + term[
-            "stoich"
-        ]
+        metabolites[metabolite_id] = (
+            metabolites.get(metabolite_id, 0.0) + term["stoich"]
+        )
 
     if not metabolites:
         return None
@@ -230,9 +230,18 @@ def create_compartment_metabolites(
                 continue
             annotation = copy.deepcopy(data.get("annotation", {}))
             for key in (
-                "bigg.metabolite", "chebi", "hmdb", "inchi", "inchikey",
-                "kegg.compound", "metanetx.chemical", "pubchem.compound",
-                "uniprot", "vmhmetabolite", "hgnc", "ensembl",
+                "bigg.metabolite",
+                "chebi",
+                "hmdb",
+                "inchi",
+                "inchikey",
+                "kegg.compound",
+                "metanetx.chemical",
+                "pubchem.compound",
+                "uniprot",
+                "vmhmetabolite",
+                "hgnc",
+                "ensembl",
             ):
                 if data.get(key):
                     annotation[key] = data[key]

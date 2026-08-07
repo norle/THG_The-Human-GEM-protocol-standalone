@@ -46,8 +46,8 @@ def implement_pathway(
     for abbreviation, name in resolved:
         add_compartment(model, abbreviation, name)
 
-    pathway_name = str(config.get("pathway_name", "")).replace(" ", "_").replace(
-        "-", "_"
+    pathway_name = (
+        str(config.get("pathway_name", "")).replace(" ", "_").replace("-", "_")
     )
     candidate_keys = [
         f"{pathway_name}_specific" if pathway_name else "",

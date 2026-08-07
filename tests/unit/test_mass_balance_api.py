@@ -40,9 +40,10 @@ def test_reformulate_glycan_equation_assigns_symbols_by_element() -> None:
             "https://www.genome.jp/entry/C00001": "C00001H2O",
         }
     )
-    assert reformulate_glycan_equation(
-        "G00001 -> G00001", client=client
-    ) == "A1B2C1 -> A1B2C1"
+    assert (
+        reformulate_glycan_equation("G00001 -> G00001", client=client)
+        == "A1B2C1 -> A1B2C1"
+    )
 
 
 def test_legacy_numeric_mass_balance_helpers_are_package_owned() -> None:
@@ -52,9 +53,7 @@ def test_legacy_numeric_mass_balance_helpers_are_package_owned() -> None:
     matrix = equation_matrix("2 H2 + O2 -> 2 H2O")
     assert matrix.shape == (2, 3)
     assert matrix.tolist() == [[4.0, 0.0, -4.0], [0.0, 2.0, -2.0]]
-    assert np.array_equal(
-        eq2mat("H2 + O2 -> H2O"), equation_matrix("H2 + O2 -> H2O")
-    )
+    assert np.array_equal(eq2mat("H2 + O2 -> H2O"), equation_matrix("H2 + O2 -> H2O"))
 
 
 def test_nullity_preserves_independent_rows() -> None:

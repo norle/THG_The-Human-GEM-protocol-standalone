@@ -90,9 +90,7 @@ def parse_kegg_compound_entry(
     if same_as and client is not None:
         primary_identifier = same_as.group(1)
         try:
-            primary = client.get_page(
-                f"https://rest.kegg.jp/get/{primary_identifier}"
-            )
+            primary = client.get_page(f"https://rest.kegg.jp/get/{primary_identifier}")
             primary_fields = parse_kegg_compound_entry_fields(primary)
             name = primary_fields.get("NAME", name).split(";", 1)[0].strip()
             formula = primary_fields.get("FORMULA", formula).strip()

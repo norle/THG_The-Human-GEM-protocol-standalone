@@ -82,8 +82,6 @@ def test_public_status_matrix_contains_exactly_the_registry_entries():
 def test_maintained_docs_do_not_reintroduce_partial_status_admonitions():
     prohibited = re.compile(r"\bPartial\b")
     documents = [
-        path
-        for path in (ROOT / "docs").rglob("*.md")
-        if "plans" not in path.parts
+        path for path in (ROOT / "docs").rglob("*.md") if "plans" not in path.parts
     ]
     assert not [path for path in documents if prohibited.search(path.read_text())]

@@ -9,9 +9,7 @@ from thg_protocol.services.pubchem import PubChemCompound, StaticPubChemClient
 
 
 def test_metabolite_reaction_workflow_import_is_safe_without_cobra():
-    workflow = importlib.import_module(
-        "thg_protocol.annotation.metabolite_reactions"
-    )
+    workflow = importlib.import_module("thg_protocol.annotation.metabolite_reactions")
 
     assert callable(workflow.run_metabolite_reaction_identification)
 
