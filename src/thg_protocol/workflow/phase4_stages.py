@@ -36,6 +36,11 @@ class HumanDatabaseStage:
         section = context.config.sections.get("human_database", {})
         if not isinstance(section, Mapping):
             raise ValueError("human_database section is required")
+        if str(section.get("mode", "offline")) == "live":
+            raise ValueError(
+                "registered Human Database live mode requires an injected source "
+                "adapter; use harvest_snapshot() with the adapter"
+            )
         records = Path(str(section["records"]))
         if self.id == "human-database-source":
             copied = work_dir / "normalized-records.json"
@@ -153,18 +158,55 @@ class FinalTHGStage:
         if not isinstance(section, Mapping):
             raise ValueError("final_thg section is required")
         if self.id == "final-thg-load":
-            paths = [
-                Path(str(section[key])) for key in ("beta2_model", "database_model")
-            ]
-            for path in paths:
-                if not path.is_file():
-                    raise FileNotFoundError(path)
+            from .artifacts import resolve_artifact
+
+            input_specs = []
+            for name, path_key, upstream_key in (
+                ("beta2", "beta2_model", "beta2_upstream"),
+                ("database", "database_model", "database_upstream"),
+            ):
+                upstream = section.get(upstream_key)
+                if isinstance(upstream, Mapping):
+                    resolved = resolve_artifact(
+                        upstream,
+                        base_dir=(
+                            context.config.source_path.parent
+                            if context.config.source_path
+                            else None
+                        ),
+                    )
+                    if resolved.reference.role not in {"model", "sbml"}:
+                        raise ValueError(
+                            f"{upstream_key} must reference a model artifact"
+                        )
+                    input_specs.append(
+                        (name, resolved.path, resolved.reference.to_dict())
+                    )
+                else:
+                    path = Path(str(section[path_key]))
+                    if not path.is_file():
+                        raise FileNotFoundError(path)
+                    input_specs.append((name, path, None))
             copied = []
-            for name, path in (("beta2", paths[0]), ("database", paths[1])):
+            input_records = []
+            for name, path, upstream in input_specs:
                 destination = work_dir / f"{name}{path.suffix.lower()}"
                 shutil.copy2(path, destination)
                 copied.append((name, destination))
-            return StageResult(tuple(copied), {"inputs": [str(path) for path in paths]})
+                record = {"name": name, "path": str(path), "sha256": sha256_file(path)}
+                if upstream is not None:
+                    record["upstream"] = upstream
+                input_records.append(record)
+            provenance = work_dir / "input-provenance.json"
+            provenance.write_text(
+                json.dumps({"inputs": input_records}, indent=2, sort_keys=True)
+                + "\n",
+                encoding="utf-8",
+            )
+            return StageResult(
+                (*copied, ("provenance", provenance)),
+                {"inputs": input_records},
+            )
         from thg_protocol.merge import MergePolicy, generate_merge_plan
 
         policy = MergePolicy(
@@ -242,6 +284,21 @@ class FinalTHGStage:
     def validate(self, result: StageResult) -> None:
         if not result.outputs or any(not path.is_file() for _, path in result.outputs):
             raise ValueError(f"stage '{self.id}' did not produce complete artifacts")
+        if self.id == "final-thg-apply":
+            validation = result.summary.get("validation")
+            if not isinstance(validation, Mapping):
+                raise ValueError("final THG validation report is missing")
+            validation_report = validation.get("validation")
+            tasks_report = validation.get("tasks")
+            if isinstance(validation_report, Mapping) and validation_report.get(
+                "passed"
+            ) is False:
+                raise ValueError("final THG model validation failed")
+            if (
+                isinstance(tasks_report, Mapping)
+                and tasks_report.get("passed") is False
+            ):
+                raise ValueError("final THG metabolic task suite failed")
 
 
 def human_database_stages() -> tuple[HumanDatabaseStage, ...]:

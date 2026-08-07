@@ -34,11 +34,17 @@ class MetabolicTask:
                 if isinstance(item, (list, tuple)) and len(item) == 2
             }
 
+        temporary = payload.get("temporary_reactions", [])
+        if not isinstance(temporary, list):
+            raise ValueError("temporary_reactions must be a list")
         return cls(
             id=str(payload["id"]),
             version=str(payload.get("version", "1")),
             uptake=bounds(payload.get("uptake")),
             secretion=bounds(payload.get("secretion")),
+            temporary_reactions=tuple(
+                dict(item) for item in temporary if isinstance(item, Mapping)
+            ),
             bounds=bounds(payload.get("bounds")),
             objective=payload.get("objective")
             if isinstance(payload.get("objective"), str)
@@ -54,11 +60,33 @@ class MetabolicTask:
         )
 
     def to_dict(self) -> dict[str, object]:
+        temporary = []
+        for reaction in self.temporary_reactions:
+            if isinstance(reaction, Mapping):
+                temporary.append(dict(reaction))
+                continue
+            metabolites = getattr(reaction, "metabolites", {})
+            temporary.append(
+                {
+                    "id": str(reaction.id),
+                    "name": str(getattr(reaction, "name", "") or ""),
+                    "lower_bound": float(reaction.lower_bound),
+                    "upper_bound": float(reaction.upper_bound),
+                    "stoichiometry": {
+                        str(metabolite.id): float(coefficient)
+                        for metabolite, coefficient in metabolites.items()
+                    },
+                    "gene_reaction_rule": str(
+                        getattr(reaction, "gene_reaction_rule", "") or ""
+                    ),
+                }
+            )
         return {
             "id": self.id,
             "version": self.version,
             "uptake": dict(self.uptake),
             "secretion": dict(self.secretion),
+            "temporary_reactions": temporary,
             "bounds": dict(self.bounds),
             "objective": self.objective,
             "expected": self.expected,
@@ -115,7 +143,34 @@ def run_task(model: Any, task: MetabolicTask) -> dict[str, object]:
         }.items():
             working.reactions.get_by_id(reaction_id).bounds = tuple(bounds)
         for reaction in task.temporary_reactions:
-            working.add_reactions([reaction.copy()])
+            if isinstance(reaction, Mapping):
+                from cobra import Reaction
+
+                temporary = Reaction(
+                    str(reaction["id"]),
+                    name=str(reaction.get("name", "")),
+                    lower_bound=float(reaction.get("lower_bound", -1000.0)),
+                    upper_bound=float(reaction.get("upper_bound", 1000.0)),
+                )
+                stoichiometry = reaction.get("stoichiometry", {})
+                if not isinstance(stoichiometry, Mapping):
+                    raise ValueError(
+                        "temporary reaction stoichiometry must be an object"
+                    )
+                temporary.add_metabolites(
+                    {
+                        working.metabolites.get_by_id(str(metabolite_id)): float(
+                            coefficient
+                        )
+                        for metabolite_id, coefficient in stoichiometry.items()
+                    }
+                )
+                temporary.gene_reaction_rule = str(
+                    reaction.get("gene_reaction_rule", "")
+                )
+                working.add_reactions([temporary])
+            else:
+                working.add_reactions([reaction.copy()])
         if task.objective:
             working.objective = task.objective
         solution = working.optimize()

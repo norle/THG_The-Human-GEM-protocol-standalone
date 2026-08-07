@@ -59,3 +59,24 @@ def test_expansion_is_proposal_first_and_deterministic():
         )
         == plans
     )
+
+
+def test_expansion_rejects_decisions_for_unknown_proposals():
+    model = Model("beta2")
+    a = Metabolite("a_c", formula="C", charge=0, compartment="c")
+    b = Metabolite("b_c", formula="C", charge=0, compartment="c")
+    reaction = Reaction("R1")
+    reaction.add_metabolites({a: -1, b: 1})
+    reaction.gene_reaction_rule = "G1"
+    model.add_reactions([reaction])
+    plans = generate_expansion_plan(
+        model,
+        {"R1": {"Mitochondria": "G1"}},
+        compartments={"c": "Cytosol", "m": "Mitochondria"},
+    )
+    try:
+        apply_expansion_plan(model, plans, decisions={"unknown": "approve"})
+    except ValueError as error:
+        assert "unknown proposals" in str(error)
+    else:
+        raise AssertionError("unknown β2 decisions must be rejected")

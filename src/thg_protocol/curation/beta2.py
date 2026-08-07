@@ -352,6 +352,13 @@ def apply_expansion_plan(
     result = model.copy()
     approved = approved or set()
     decisions = decisions or {}
+    plan_ids = {str(item.get("proposal_id")) for item in plans}
+    unknown_decisions = sorted(set(decisions) - plan_ids)
+    if unknown_decisions:
+        raise ValueError(
+            "β2 decisions reference unknown proposals: "
+            + ", ".join(unknown_decisions)
+        )
     ledger: list[dict[str, object]] = []
     for original_plan in plans:
         plan = dict(original_plan)

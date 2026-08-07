@@ -294,7 +294,10 @@ def validate_model(
         _check(
             "dead-end-topology",
             "topology",
-            lambda: {"metabolites": consistency.dead_end_metabolites(model)},
+            lambda: {
+                "metabolites": consistency.dead_end_metabolites(model),
+                "passed": not consistency.dead_end_metabolites(model),
+            },
             blocking=False,
         ),
         _check(
@@ -303,6 +306,10 @@ def validate_model(
             lambda: {
                 "not-produced": consistency.metabolites_not_produced(model),
                 "not-consumed": consistency.metabolites_not_consumed(model),
+                "passed": not (
+                    consistency.metabolites_not_produced(model)
+                    or consistency.metabolites_not_consumed(model)
+                ),
             },
             blocking=False,
         ),
@@ -342,7 +349,10 @@ def validate_model(
                     lambda: {
                         "reactions": consistency.stoichiometrically_balanced_cycles(
                             model
-                        )
+                        ),
+                        "passed": not consistency.stoichiometrically_balanced_cycles(
+                            model
+                        ),
                     },
                     blocking=False,
                 ),

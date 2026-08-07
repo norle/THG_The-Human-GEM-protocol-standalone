@@ -477,13 +477,25 @@ class DetailedBeta2Stage:
             if isinstance(section.get("decisions_file"), str):
                 from .proposals import read_decisions
 
-                decisions["proposal_decisions"] = {
+                proposal_decisions = {
                     item.proposal_id: {
                         "action": item.action,
                         "replacement": item.replacement,
                     }
                     for item in read_decisions(str(section["decisions_file"]))
                 }
+                plan_ids = {
+                    json.loads(line).get("proposal_id")
+                    for line in plan.read_text(encoding="utf-8").splitlines()
+                    if line.strip()
+                }
+                unknown = sorted(set(proposal_decisions) - plan_ids)
+                if unknown:
+                    raise ValueError(
+                        "β2 decisions reference unknown proposals: "
+                        + ", ".join(unknown)
+                    )
+                decisions["proposal_decisions"] = proposal_decisions
             else:
                 decisions["proposal_decisions"] = {}
             return StageResult(

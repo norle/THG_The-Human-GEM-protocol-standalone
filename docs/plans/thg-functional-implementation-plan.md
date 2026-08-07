@@ -1632,6 +1632,51 @@ the verified release run.
 
 Add newest entries at the top.
 
+### 2026-08-07 — Correctness fixes from implementation review
+
+**Tasks worked on**
+
+- Made topology and energy-cycle validation checks report failures when they
+  contain findings instead of defaulting to passed.
+- Made final-THG application fail when model validation or the configured task
+  suite fails.
+- Added SHA-256 input provenance and optional verified upstream artifact
+  references to final-THG loading.
+- Rejected unknown β2 decision references before expansion application.
+- Preserved temporary metabolic reactions through task-suite JSON
+  serialization and execution.
+- Made registered Human Database `live` mode fail explicitly unless callers use
+  the injected adapter API.
+
+**Files changed**
+
+- `src/thg_protocol/validation.py`
+- `src/thg_protocol/tasks.py`
+- `src/thg_protocol/curation/beta2.py`
+- `src/thg_protocol/workflow/beta2_stages.py`
+- `src/thg_protocol/workflow/config.py`
+- `src/thg_protocol/workflow/phase4_stages.py`
+- `tests/unit/test_phase3_validation.py`
+- `tests/unit/test_beta2_curation.py`
+- this plan
+
+**Tests run and results**
+
+- Focused regression tests: `16 passed`.
+- Full suite: `1949 passed, 7 skipped`.
+- Ruff checks and `git diff --check`: passed.
+
+**Unresolved issues**
+
+- The historical dashboard still contains unchecked task/acceptance boxes
+  under workstreams marked `verified`; those tracking entries need a separate
+  reconciliation pass.
+
+**Next recommended action**
+
+- Reconcile the dashboard checkboxes and add registered workflow tests for
+  explicit final-THG upstream references and live-adapter integration.
+
 ### 2026-08-07 — Phase 6 comparison, restart, and release verification
 
 **Tasks worked on**

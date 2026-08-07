@@ -28,6 +28,8 @@ WORKFLOW_SECTION_KEYS = {
     "final_thg": {
         "beta2_model",
         "database_model",
+        "beta2_upstream",
+        "database_upstream",
         "source_precedence",
         "remove_isolated_metabolites",
         "direction",
