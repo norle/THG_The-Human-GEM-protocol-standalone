@@ -26,17 +26,27 @@ Metabolism* (2023). It has two branches: curate an existing reference GEM such
 as Human1, or construct a Human Database from pathway/database information;
 merge the branches and validate the result.
 
-This standalone repository is a refactored continuation of the historical THG
-software lineage. See the [project history and lineage](docs/project-history.md)
-for the relationship between the paper, the earlier repositories, and this
-package. It provides maintained building blocks for the scientific workflow;
-it is not itself a verified reproduction of the paper's final artifact.
+This standalone repository is an independent maintained implementation of the
+THG workflow. It improves the historical software's architecture, provenance,
+resumability, service boundaries, and model-ownership semantics. Historical
+repositories and the 2023 paper provide scientific context and useful legacy
+references; they are not compatibility targets or the behavioral specification
+for this package. See the [project history and lineage](docs/project-history.md)
+for background.
 
 Inputs are caller-owned JSON/SBML models or normalized pathway and database
-records. Operations produce revised models, structured reports, comparison
-artifacts, and optional service caches; output paths and provenance remain
-under caller control. The complete published orchestration and exact
-final-artifact reproduction are not implemented.
+records. Maintained workflows produce revised models, structured validation and
+comparison reports, reproducible run artifacts, and optional service caches;
+output paths and provenance remain under caller control.
+
+The Human Database workflow separates source collection from model
+reconstruction. Offline runs consume normalized records directly. For a live or
+credentialed source, callers provide a small source adapter with a `fetch(key)`
+method to `harvest_snapshot`; THG supplies bounded retries, deterministic
+caching, an error ledger, and normalized-record reconstruction. This explicit
+adapter boundary is intentional: network access, credentials, source-specific
+queries, and rate limits remain visible and caller-owned rather than being
+hidden inside the core workflow.
 
 ## Installation
 
@@ -91,11 +101,13 @@ Commands and Python APIs use caller-selected paths. Keep input models unchanged,
 save reports/caches with their models, and record package, service, solver, and
 optional dependency versions for reproducibility.
 
-## Implementation status
+## Project status
 
-The complete published orchestration and exact final-artifact reproduction are
-**Not implemented** and **Not yet verified**; see the
-[capability and evidence matrix](docs/protocol/implementation-status.md).
+The supported package workflows are implemented and tested. The standalone
+package defines its own maintained behavior and contracts; historical behavior
+is preserved only where it remains useful or has been deliberately retained.
+External services and credentialed source collection are opt-in and must be
+provided through explicit clients or source adapters.
 
 ## Lineage and citation
 
