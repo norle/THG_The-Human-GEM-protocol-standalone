@@ -5,6 +5,8 @@ import numpy as np
 from scipy.io import savemat
 
 from thg_protocol.cell_specific import (
+    build_cell_specific_model,
+    evaluate_gpr_activity,
     extract_ensembl_ids,
     extract_gene_annotation_pairs,
     extract_sgpr_rules,
@@ -113,3 +115,15 @@ def test_transcriptomics_helpers_transform_model_annotations(tmp_path):
         encoding="utf-8",
     )
     assert extract_gene_annotation_pairs(xml) == {"HGNC1": ["ENSG000099", "ENSG000100"]}
+
+
+def test_gpr_context_specific_builder_reports_unknown_genes():
+    model = cobra.Model("context")
+    model.add_reactions([cobra.Reaction("R1"), cobra.Reaction("R2")])
+    model.reactions.R1.gene_reaction_rule = "G1 and G2"
+    model.reactions.R2.gene_reaction_rule = "G3"
+    active, unknown = evaluate_gpr_activity("G1 and G2", {"G1": 1, "G2": 0})
+    assert not active and unknown == ()
+    tailored, report = build_cell_specific_model(model, {"G1": 1, "G2": 0})
+    assert not tailored.reactions.has_id("R1")
+    assert report.unknown_genes == ("G3",)

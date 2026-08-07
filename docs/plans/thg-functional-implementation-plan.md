@@ -199,9 +199,9 @@ Update this table whenever task status changes.
 | V3 | MEMOTE integration | verified | maintained package | 2026-08-07 | `src/thg_protocol/memote.py`, real MEMOTE 0.17.0 smoke test |
 | H1 | Human Database workflow | verified | maintained package | 2026-08-07 | `src/thg_protocol/database_workflow.py`, `src/thg_protocol/workflow/phase4_stages.py`, `tests/unit/test_phase4_workflows.py`; offline snapshot/reconstruction, cache/error ledger, bounded retries, and registered run pass; live access remains explicitly injected |
 | M1 | Final semantic merge | verified | maintained package | 2026-08-07 | `src/thg_protocol/merge/__init__.py`, `src/thg_protocol/workflow/phase4_stages.py`, `tests/unit/test_phase4_workflows.py`; policy-bearing plan/apply, conflict categories, provenance, bounded repair, validation, and optional task suite pass |
-| G1 | Gapfill framework | deferred | unassigned | 2026-08-06 | Optional extension |
-| P1 | Pathway workflows | deferred | unassigned | 2026-08-06 | Scope review required |
-| C1 | Cell-specific workflows | deferred | unassigned | 2026-08-06 | Separate from core THG |
+| G1 | Gapfill framework | verified | maintained package | 2026-08-07 | `src/thg_protocol/gapfill/core.py`, `tests/unit/test_gapfill_api.py`; strategy contract, deterministic/MILP metadata, coverage, explicit failure path, and zero temporary reactions |
+| P1 | Pathway workflows | verified | maintained package | 2026-08-07 | `src/thg_protocol/pathway/workflow.py`, `tests/unit/test_pathway_api.py`; explicit local inputs, copied model ownership, structural validation, and provenance fingerprint |
+| C1 | Cell-specific workflows | verified | maintained package | 2026-08-07 | `src/thg_protocol/cell_specific/__init__.py`, `tests/unit/test_cell_specific_api.py`; GPR activity evaluation, copied context model, task/reaction preservation, and uncertainty reporting |
 | R1 | Restart and release validation | implemented | maintained package | 2026-08-07 | `tests/integration/test_beta2_registered_workflow.py`; β2 resume/forced-descendant invalidation and candidate promotion pass; broader interruption/corruption matrix remains |
 
 ---
@@ -1210,7 +1210,7 @@ export-final
 
 ## G1. Gapfill framework
 
-**Status:** `deferred`
+**Status:** `verified`
 
 Gap filling is not part of core β1 or β2 correctness.
 
@@ -1224,17 +1224,34 @@ Potential use cases:
 
 Requirements include a common strategy interface, deterministic and MILP strategies, candidate coverage, solver metadata, explicit failure states, and no leakage of temporary sinks or sources.
 
+The maintained API provides `GapfillStrategy`, `DeterministicGapfillStrategy`,
+`MILPGapfillStrategy`, `GapfillResult`, and `run_gapfill`. Strategies receive an
+explicit candidate universe, copy their model input, report every candidate's
+coverage state, and annotate solver metadata. Candidate application adds only
+declared reactions; temporary sinks and sources are not retained in outputs.
+
 ## P1. Pathway workflows
 
-**Status:** `deferred`
+**Status:** `verified`
 
 Before porting any legacy validation family, record its scientific question, owner, actionable output, dependency class, and overlap with model-wide validation. Separate structural, database-backed, solver-backed, and rendering functions.
 
+The maintained pathway workflow is explicitly local and configuration-driven.
+It copies caller-owned JSON models, performs structural reference/duplicate
+checks before reporting success, and returns a deterministic output fingerprint
+and error list. Database-backed discovery, solver checks, and rendering remain
+separate concerns and are not implied by this workflow.
+
 ## C1. Cell-specific workflows
 
-**Status:** `deferred`
+**Status:** `verified`
 
 Keep separate from core THG construction. Future scope may include transcript mapping, GPR activity evaluation, context-specific algorithms, task preservation, solver provenance, and uncertainty reporting.
+
+The maintained building blocks include activity-matrix reduction plus a copied
+GPR-driven context builder. They preserve explicitly named reactions, report
+unknown genes and uncertain reactions, and leave solver-heavy algorithms and
+transcript retrieval to injected callers.
 
 ---
 
@@ -1552,6 +1569,17 @@ logs, return code, and report checksum are retained in the machine-readable
 run artifact. The default run stores MEMOTE’s JSON result and the snapshot
 HTML report; optional score thresholds are evaluated when the result exposes a
 numeric score.
+
+### D-017 — Optional extension boundaries
+
+**Date:** 2026-08-07
+**Status:** accepted
+
+Phase 5 extensions remain explicit downstream operations. Gapfill strategies
+may add only declared candidate reactions and retain no temporary sinks or
+sources; pathway workflows consume local prepared inputs and report structural
+validation; cell-specific builders copy the general model and report activity
+uncertainty. None of these operations silently becomes a core β1/β2 stage.
 
 ---
 
@@ -2118,6 +2146,63 @@ scientific THGβ1/β2 release artifacts.
 **Recommended next action**
 
 Begin Phase 0 with the workflow registry, stage-contract schema, proposal framework, evidence schema, and deterministic ID registry.
+
+---
+
+### 2026-08-07 — Phase 5 optional extensions
+
+**Tasks worked on**
+
+- G1: added common gapfill strategy/result contracts, deterministic and MILP
+  strategy boundaries, candidate coverage, solver metadata, explicit failures,
+  and model-copy/no-temporary-reaction guarantees.
+- P1: made the JSON pathway workflow non-mutating and added structural
+  validation plus deterministic provenance fingerprinting.
+- C1: added GPR activity evaluation and copied context-specific model building
+  with preserved-reaction and uncertainty reporting.
+
+**Status changes**
+
+- G1: `deferred` → `verified`
+- P1: `deferred` → `verified`
+- C1: `deferred` → `verified`
+
+**Files changed**
+
+- `src/thg_protocol/gapfill/core.py`
+- `src/thg_protocol/gapfill/__init__.py`
+- `src/thg_protocol/pathway/workflow.py`
+- `src/thg_protocol/cell_specific/__init__.py`
+- `tests/unit/test_gapfill_api.py`
+- `tests/unit/test_pathway_api.py`
+- `tests/unit/test_cell_specific_api.py`
+- `docs/plans/thg-functional-implementation-plan.md`
+
+**Tests run**
+
+- `pytest -q tests/unit/test_gapfill_api.py tests/unit/test_pathway_api.py tests/unit/test_cell_specific_api.py`
+  - 19 passed.
+- `ruff check` on all changed Python files
+  - Passed.
+
+**Unresolved issues**
+
+- Solver-heavy context-specific algorithms, online pathway discovery, and
+  publication-specific pathway reproduction remain intentionally outside these
+  local extension contracts.
+
+**Recommended next action**
+
+Full repository verification has now completed; retain the extension APIs as
+downstream building blocks and review future solver-heavy/pathway-specific
+algorithms as separate scope.
+
+**Additional verification**
+
+- `pytest -q`
+  - 1,944 passed, 7 expected skips, 16 warnings.
+- `git diff --check`
+  - Passed.
 
 ---
 

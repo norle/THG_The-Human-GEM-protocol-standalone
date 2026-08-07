@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 from collections.abc import Sequence
 from dataclasses import dataclass
 from pathlib import Path
@@ -19,6 +20,86 @@ class ActivityReductionReport:
     orphan_metabolites_removed: int
     orphan_genes_removed: int
     output_path: Path | None = None
+
+
+@dataclass(frozen=True)
+class CellSpecificReport:
+    """Audit information for GPR-driven context-specific reduction."""
+
+    total_reactions: int
+    retained_reactions: int
+    removed_reactions: int
+    unknown_genes: tuple[str, ...]
+    preserved_reactions: tuple[str, ...]
+    uncertainty: tuple[str, ...] = ()
+
+
+def evaluate_gpr_activity(
+    rule: str, activity: dict[str, float], *, threshold: float = 0.0
+) -> tuple[bool, tuple[str, ...]]:
+    """Evaluate a boolean GPR and report genes absent from the activity map."""
+    if not rule.strip():
+        return True, ()
+    unknown = tuple(
+        sorted(
+            {
+                token
+                for token in re.findall(r"[A-Za-z_][A-Za-z0-9_.-]*", rule)
+                if token.lower() not in {"and", "or", "not"} and token not in activity
+            }
+        )
+    )
+    expression = rule
+    for token in sorted(
+        set(re.findall(r"[A-Za-z_][A-Za-z0-9_.-]*", rule)), key=len, reverse=True
+    ):
+        if token.lower() in {"and", "or", "not"}:
+            continue
+        expression = re.sub(
+            rf"(?<![\w.-]){re.escape(token)}(?![\w.-])",
+            str(float(activity.get(token, 0.0)) > threshold),
+            expression,
+        )
+    expression = re.sub(r"\band\b", " and ", expression, flags=re.I)
+    expression = re.sub(r"\bor\b", " or ", expression, flags=re.I)
+    expression = re.sub(r"\bnot\b", " not ", expression, flags=re.I)
+    try:
+        return bool(eval(expression, {"__builtins__": {}}, {})), unknown  # noqa: S307 - tokens are replaced with booleans
+    except (SyntaxError, ValueError, TypeError):
+        return False, unknown
+
+
+def build_cell_specific_model(
+    model: Any,
+    activity: dict[str, float],
+    *,
+    threshold: float = 0.0,
+    preserve_reactions: Sequence[str] = (),
+) -> tuple[Any, CellSpecificReport]:
+    """Build a copied COBRA model from gene activity with uncertainty reporting."""
+    tailored = model.copy()
+    preserve = set(preserve_reactions)
+    remove = []
+    unknown: set[str] = set()
+    uncertainty: list[str] = []
+    for reaction in tailored.reactions:
+        active, missing = evaluate_gpr_activity(
+            reaction.gene_reaction_rule, activity, threshold=threshold
+        )
+        unknown.update(missing)
+        if missing:
+            uncertainty.append(reaction.id)
+        if not active and reaction.id not in preserve:
+            remove.append(reaction)
+    tailored.remove_reactions(remove)
+    return tailored, CellSpecificReport(
+        len(model.reactions),
+        len(tailored.reactions),
+        len(remove),
+        tuple(sorted(unknown)),
+        tuple(sorted(preserve)),
+        tuple(sorted(uncertainty)),
+    )
 
 
 def _activity_matrix(activity: Any, *, matrix_key: str) -> Any:
@@ -124,6 +205,9 @@ from .transcriptomics import (  # noqa: E402
 __all__ = [
     "ActivityReductionReport",
     "reduce_model_by_activity",
+    "CellSpecificReport",
+    "evaluate_gpr_activity",
+    "build_cell_specific_model",
     "match_exchange_reactions",
     "extract_ensembl_ids",
     "extract_gene_annotation_pairs",

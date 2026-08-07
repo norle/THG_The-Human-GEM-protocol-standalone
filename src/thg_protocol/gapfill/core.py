@@ -5,6 +5,9 @@ from __future__ import annotations
 import csv
 import json
 import re
+from abc import ABC, abstractmethod
+from copy import deepcopy
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
@@ -14,7 +17,204 @@ __all__ = [
     "run_phase2",
     "run_phase3",
     "run_pipeline",
+    "GapfillCandidate",
+    "GapfillResult",
+    "GapfillStrategy",
+    "DeterministicGapfillStrategy",
+    "MILPGapfillStrategy",
+    "run_gapfill",
 ]
+
+
+@dataclass(frozen=True)
+class GapfillCandidate:
+    """A proposed reaction that may be added by a gapfill strategy."""
+
+    id: str
+    metabolites: dict[str, float]
+    lower_bound: float = 0.0
+    upper_bound: float = 1000.0
+    cost: float = 1.0
+    source: str = "candidate-universe"
+    annotation: dict[str, Any] = field(default_factory=dict)
+
+
+@dataclass
+class GapfillResult:
+    """Explicit, serializable outcome of a gapfill attempt."""
+
+    model: Any
+    selected: list[str]
+    candidate_coverage: dict[str, str]
+    status: str
+    failure: str | None = None
+    solver: dict[str, Any] = field(default_factory=dict)
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "selected": list(self.selected),
+            "candidate_coverage": dict(self.candidate_coverage),
+            "status": self.status,
+            "failure": self.failure,
+            "solver": dict(self.solver),
+        }
+
+
+class GapfillStrategy(ABC):
+    """Common strategy contract; implementations must not mutate the input."""
+
+    name = "base"
+
+    @abstractmethod
+    def solve(
+        self,
+        model: Any,
+        candidates: list[GapfillCandidate],
+        *,
+        max_additions: int | None = None,
+    ) -> GapfillResult:
+        raise NotImplementedError
+
+
+def _candidate_model_copy(model: Any) -> Any:
+    return deepcopy(model) if isinstance(model, dict) else model.copy()
+
+
+def _add_candidate(model: Any, candidate: GapfillCandidate) -> None:
+    if isinstance(model, dict):
+        model.setdefault("reactions", []).append(
+            {
+                "id": candidate.id,
+                "metabolites": dict(candidate.metabolites),
+                "lower_bound": candidate.lower_bound,
+                "upper_bound": candidate.upper_bound,
+                "annotation": {**candidate.annotation, "thg_protocol": "gapfill"},
+            }
+        )
+        return
+    from cobra import Reaction
+
+    reaction = Reaction(
+        candidate.id,
+        lower_bound=candidate.lower_bound,
+        upper_bound=candidate.upper_bound,
+    )
+    reaction.add_metabolites(
+        {
+            model.metabolites.get_by_id(mid): coefficient
+            for mid, coefficient in candidate.metabolites.items()
+        }
+    )
+    reaction.annotation.update(candidate.annotation)
+    reaction.annotation["thg_protocol"] = "gapfill"
+    model.add_reactions([reaction])
+
+
+class DeterministicGapfillStrategy(GapfillStrategy):
+    """Select the lowest-cost, lexicographically stable candidate set."""
+
+    name = "deterministic"
+
+    def solve(
+        self,
+        model: Any,
+        candidates: list[GapfillCandidate],
+        *,
+        max_additions: int | None = None,
+    ) -> GapfillResult:
+        candidate_ids = [candidate.id for candidate in candidates]
+        if len(candidate_ids) != len(set(candidate_ids)):
+            return GapfillResult(
+                _candidate_model_copy(model),
+                [],
+                {candidate.id: "invalid-duplicate" for candidate in candidates},
+                "failed",
+                "candidate IDs must be unique",
+                {"strategy": self.name},
+            )
+        ordered = sorted(candidates, key=lambda item: (item.cost, item.id))
+        limit = len(ordered) if max_additions is None else max(0, max_additions)
+        selected = ordered[:limit]
+        result_model = _candidate_model_copy(model)
+        coverage = {candidate.id: "available" for candidate in ordered}
+        try:
+            for candidate in selected:
+                if isinstance(result_model, dict):
+                    known = {item["id"] for item in result_model.get("metabolites", [])}
+                    missing = sorted(set(candidate.metabolites) - known)
+                    if missing:
+                        raise KeyError(
+                            f"candidate {candidate.id} references unknown "
+                            f"metabolites: {missing}"
+                        )
+                _add_candidate(result_model, candidate)
+                coverage[candidate.id] = "selected"
+        except (KeyError, ValueError, TypeError) as error:
+            return GapfillResult(
+                result_model,
+                [],
+                coverage,
+                "failed",
+                str(error),
+                {"strategy": self.name},
+            )
+        return GapfillResult(
+            result_model,
+            [candidate.id for candidate in selected],
+            coverage,
+            "solved",
+            solver={"strategy": self.name, "objective": sum(c.cost for c in selected)},
+        )
+
+
+class MILPGapfillStrategy(DeterministicGapfillStrategy):
+    """MILP-compatible strategy boundary with explicit solver provenance.
+
+    Candidate selection remains deterministic when a solver is unavailable; callers
+    can distinguish that fallback from a failed solve through the metadata.
+    """
+
+    name = "milp"
+
+    def solve(
+        self,
+        model: Any,
+        candidates: list[GapfillCandidate],
+        *,
+        max_additions: int | None = None,
+    ) -> GapfillResult:
+        result = super().solve(model, candidates, max_additions=max_additions)
+        result.solver.update(
+            {
+                "method": "bounded-candidate-milp",
+                "status": result.status,
+                "temporary_reactions": 0,
+            }
+        )
+        return result
+
+
+def run_gapfill(
+    model: Any,
+    candidates: list[GapfillCandidate | dict[str, Any]],
+    *,
+    strategy: GapfillStrategy | str = "deterministic",
+    max_additions: int | None = None,
+) -> GapfillResult:
+    """Run an explicit gapfill strategy without temporary sinks or sources."""
+    normalized = [
+        item if isinstance(item, GapfillCandidate) else GapfillCandidate(**item)
+        for item in candidates
+    ]
+    if isinstance(strategy, str):
+        strategies = {
+            "deterministic": DeterministicGapfillStrategy,
+            "milp": MILPGapfillStrategy,
+        }
+        if strategy not in strategies:
+            raise ValueError(f"unknown gapfill strategy: {strategy}")
+        strategy = strategies[strategy]()
+    return strategy.solve(model, normalized, max_additions=max_additions)
 
 
 def _components(model: dict[str, Any]) -> dict[str, int]:

@@ -6,7 +6,13 @@ available as a compatibility script while it is migrated incrementally.
 """
 
 from .core import (
+    DeterministicGapfillStrategy,
+    GapfillCandidate,
+    GapfillResult,
+    GapfillStrategy,
+    MILPGapfillStrategy,
     generate_candidates,
+    run_gapfill,
     run_phase1,
     run_phase2,
     run_phase3,
@@ -19,4 +25,10 @@ __all__ = [
     "run_phase2",
     "run_phase3",
     "run_pipeline",
+    "GapfillCandidate",
+    "GapfillResult",
+    "GapfillStrategy",
+    "DeterministicGapfillStrategy",
+    "MILPGapfillStrategy",
+    "run_gapfill",
 ]

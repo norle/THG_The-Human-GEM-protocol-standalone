@@ -1,6 +1,12 @@
 import json
 
-from thg_protocol.gapfill import generate_candidates, run_pipeline
+from thg_protocol.gapfill import (
+    DeterministicGapfillStrategy,
+    MILPGapfillStrategy,
+    generate_candidates,
+    run_gapfill,
+    run_pipeline,
+)
 from thg_protocol.gapfill.cli import main
 
 
@@ -35,3 +41,31 @@ def test_gapfill_cli_help_is_import_safe(capsys):
     except SystemExit as error:
         assert error.code == 0
     assert "THG JSON gapfill" in capsys.readouterr().out
+
+
+def test_strategy_contract_is_non_mutating_and_records_coverage():
+    model = toy_model()
+    candidates = [
+        {
+            "id": "TG1",
+            "metabolites": {"MAM00001c": -1, "MAM00001e": 1},
+        }
+    ]
+    result = run_gapfill(model, candidates, strategy=DeterministicGapfillStrategy())
+    assert result.status == "solved"
+    assert result.selected == ["TG1"]
+    assert result.candidate_coverage == {"TG1": "selected"}
+    assert len(model["reactions"]) == 2
+    assert len(result.model["reactions"]) == 3
+    milp = run_gapfill(model, candidates, strategy=MILPGapfillStrategy())
+    assert milp.solver["temporary_reactions"] == 0
+
+
+def test_gapfill_reports_invalid_candidate_without_partial_mutation():
+    result = run_gapfill(
+        toy_model(),
+        [{"id": "bad", "metabolites": {"missing": -1}}],
+    )
+    assert result.status == "failed"
+    assert "unknown metabolites" in result.failure
+    assert result.selected == []

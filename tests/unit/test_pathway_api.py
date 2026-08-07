@@ -1,4 +1,5 @@
 import thg_protocol.pathway as pathway
+from thg_protocol.pathway.workflow import implement_pathway
 
 
 def test_pathway_api_exposes_legacy_public_helper_names():
@@ -211,3 +212,19 @@ def test_create_compartment_reactions_uses_package_builder():
 
     assert pathway.create_compartment_reactions(model, {}, "c", config) == 1
     assert model["reactions"][0]["id"] == "MAR00001"
+
+
+def test_pathway_workflow_copies_input_and_returns_validation_provenance():
+    model = {
+        "compartments": {"c": "cytosol"},
+        "metabolites": [{"id": "MAM00001c", "name": "A", "compartment": "c"}],
+        "reactions": [],
+    }
+    result = implement_pathway(
+        model,
+        {"compartments": [{"abbreviation": "c", "name": "cytosol"}]},
+        {},
+    )
+    assert result["status"] == "validated"
+    assert result["provenance"]["model_sha256"]
+    assert result["model"] is not model

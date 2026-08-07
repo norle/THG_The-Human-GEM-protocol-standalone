@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import copy
+import hashlib
 import json
 from pathlib import Path
 from typing import Any
@@ -18,13 +20,25 @@ def implement_pathway(
     config: dict[str, Any],
     id_database: dict[str, dict[str, Any]],
 ) -> dict[str, Any]:
-    """Implement configured pathway components in a JSON model mapping.
+    """Implement configured pathway components in a copied JSON model mapping.
 
-    The input ``model`` is mutated in place and returned in the result. The
-    result contains the model and counts of newly added metabolites,
-    reactions, and compartments. No files, network services, or global state
-    are accessed.
+    The caller-owned input is never mutated. The result contains the model,
+    counts, structural validation, and a provenance fingerprint. No files,
+    network services, or global state are accessed.
     """
+    model = copy.deepcopy(model)
+    errors: list[str] = []
+    if not isinstance(config.get("compartments", []), list):
+        errors.append("compartments must be a list")
+    if errors:
+        return {
+            "model": model,
+            "compartments_added": 0,
+            "metabolites_added": 0,
+            "reactions_added": 0,
+            "status": "failed",
+            "errors": errors,
+        }
     compartments = config.get("compartments", [])
     abbreviation_map: dict[str, str] = {}
     resolved: list[tuple[str, str]] = []
@@ -83,6 +97,29 @@ def implement_pathway(
             model, id_database, abbreviation, config, abbreviation_map
         )
 
+    metabolite_ids = [item.get("id") for item in model.get("metabolites", [])]
+    reaction_ids = [item.get("id") for item in model.get("reactions", [])]
+    errors.extend(
+        ["duplicate metabolite IDs"]
+        if len(metabolite_ids) != len(set(metabolite_ids))
+        else []
+    )
+    errors.extend(
+        ["duplicate reaction IDs"]
+        if len(reaction_ids) != len(set(reaction_ids))
+        else []
+    )
+    known = set(metabolite_ids)
+    errors.extend(
+        f"reaction {reaction.get('id')} references unknown metabolite {metabolite_id}"
+        for reaction in model.get("reactions", [])
+        for metabolite_id in reaction.get("metabolites", {})
+        if metabolite_id not in known
+    )
+    status = "failed" if errors else "validated"
+    fingerprint = hashlib.sha256(
+        json.dumps(model, sort_keys=True, separators=(",", ":")).encode()
+    ).hexdigest()
     return {
         "model": model,
         "compartments_added": (
@@ -90,6 +127,9 @@ def implement_pathway(
         ),
         "metabolites_added": metabolites_added,
         "reactions_added": reactions_added,
+        "status": status,
+        "errors": errors,
+        "provenance": {"config_keys": sorted(config), "model_sha256": fingerprint},
     }
 
 
