@@ -1,6 +1,14 @@
 """Model analysis APIs."""
 
-from .compare import compare_models, compare_models_from_files, compare_reactions
+from .compare import (
+    compare_model_files_semantically,
+    compare_models,
+    compare_models_from_files,
+    compare_reactions,
+    compare_semantic_models,
+    compare_workflow_runs,
+    save_semantic_comparison,
+)
 from .model_signature import diff_model_signatures, model_signature
 from .network import find_network_components, write_component_report
 
@@ -8,6 +16,10 @@ __all__ = [
     "compare_models",
     "compare_models_from_files",
     "compare_reactions",
+    "compare_semantic_models",
+    "compare_model_files_semantically",
+    "compare_workflow_runs",
+    "save_semantic_comparison",
     "find_network_components",
     "write_component_report",
     "model_signature",

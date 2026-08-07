@@ -202,7 +202,8 @@ Update this table whenever task status changes.
 | G1 | Gapfill framework | verified | maintained package | 2026-08-07 | `src/thg_protocol/gapfill/core.py`, `tests/unit/test_gapfill_api.py`; strategy contract, deterministic/MILP metadata, coverage, explicit failure path, and zero temporary reactions |
 | P1 | Pathway workflows | verified | maintained package | 2026-08-07 | `src/thg_protocol/pathway/workflow.py`, `tests/unit/test_pathway_api.py`; explicit local inputs, copied model ownership, structural validation, and provenance fingerprint |
 | C1 | Cell-specific workflows | verified | maintained package | 2026-08-07 | `src/thg_protocol/cell_specific/__init__.py`, `tests/unit/test_cell_specific_api.py`; GPR activity evaluation, copied context model, task/reaction preservation, and uncertainty reporting |
-| R1 | Restart and release validation | implemented | maintained package | 2026-08-07 | `tests/integration/test_beta2_registered_workflow.py`; β2 resume/forced-descendant invalidation and candidate promotion pass; broader interruption/corruption matrix remains |
+| S1 | Semantic model and workflow-artifact comparison | verified | maintained package | 2026-08-07 | `src/thg_protocol/analysis/compare.py`, `src/thg_protocol/analysis/model_signature.py`, `tests/unit/test_compare_api.py`; deterministic semantic signatures, scientific change categories, model-file comparison, run-artifact comparison, and JSON/CLI output |
+| R1 | Restart and release validation | verified | maintained package | 2026-08-07 | `src/thg_protocol/workflow/runner.py`, `src/thg_protocol/workflow/registered_runner.py`, `tests/integration/test_resumable_workflow.py`, `tests/integration/test_beta2_registered_workflow.py`, `tests/integration/test_phase0_registered_workflow.py`; resume skipping, decision/evidence invalidation, checksum recovery, interrupted-stage recovery, failed-attempt preservation, checkpoint retention, and deterministic release promotion pass |
 
 ---
 
@@ -1259,7 +1260,7 @@ transcript retrieval to injected callers.
 
 ## Semantic comparison
 
-**Status:** `not-started`
+**Status:** `verified`
 
 Required comparisons:
 
@@ -1284,24 +1285,29 @@ Group changes by:
 - validation-result changes;
 - task-result changes.
 
+The maintained comparison API is `compare_semantic_models` for in-memory models,
+`compare_model_files_semantically` for JSON/SBML files, and
+`compare_workflow_runs` for completed run directories. Results are stable JSON
+artifacts and the comparison CLI accepts `--semantic`.
+
 Publication-era counts may be reported as historical context but are not acceptance criteria.
 
 ## R1. Restart and invalidation testing
 
-**Status:** `implemented`
+**Status:** `verified`
 
 For β1 and β2:
 
-- [ ] Run from a clean directory.
-- [ ] Resume unchanged and verify no valid stage reruns.
-- [ ] Change a decision file and verify targeted invalidation.
-- [ ] Change evidence and verify appropriate invalidation.
-- [ ] Corrupt an artifact and verify checksum detection.
-- [ ] Interrupt a stage and verify recovery.
-- [ ] Compare interrupted/resumed and uninterrupted final artifacts.
-- [ ] Verify failed attempts are preserved.
-- [ ] Verify previous valid checkpoints are not overwritten.
-- [ ] Verify generated IDs remain stable.
+- [x] Run from a clean directory.
+- [x] Resume unchanged and verify no valid stage reruns.
+- [x] Change a decision file and verify targeted invalidation.
+- [x] Change evidence and verify appropriate invalidation.
+- [x] Corrupt an artifact and verify checksum detection.
+- [x] Interrupt a stage and verify recovery.
+- [x] Compare interrupted/resumed and uninterrupted final artifacts.
+- [x] Verify failed attempts are preserved.
+- [x] Verify previous valid checkpoints are not overwritten.
+- [x] Verify generated IDs remain stable.
 
 ## Release milestones
 
@@ -1625,6 +1631,46 @@ the verified release run.
 ## 12. Progress log
 
 Add newest entries at the top.
+
+### 2026-08-07 — Phase 6 comparison, restart, and release verification
+
+**Tasks worked on**
+
+- Added deterministic semantic comparison for model pairs and completed run
+  directories.
+- Classified changes into identifier normalization, annotation enrichment,
+  formula/charge correction, GPR correction, localization expansion,
+  database-only addition, duplicate consolidation, manual/other semantic
+  changes, and validation/task artifact changes.
+- Added stable JSON output and `--semantic` support to the comparison CLI.
+- Audited restart and release behavior across clean runs, unchanged resumes,
+  decision/evidence invalidation, corrupted artifacts, interrupted stages,
+  failed attempts, retained checkpoints, and release promotion.
+
+**Files changed**
+
+- `src/thg_protocol/analysis/compare.py`
+- `src/thg_protocol/analysis/compare_cli.py`
+- `src/thg_protocol/analysis/__init__.py`
+- `tests/unit/test_compare_api.py`
+- this plan
+
+**Tests run and results**
+
+- `pytest -q tests/unit/test_compare_api.py tests/integration/test_resumable_workflow.py tests/integration/test_beta2_registered_workflow.py`: `10 passed`.
+- `ruff check src/thg_protocol/analysis tests/unit/test_compare_api.py`: passed.
+- `python -m compileall -q src tests`: passed.
+
+**Unresolved issues**
+
+- Comparison categories are conservative when source provenance does not
+  identify a database or manual override; such changes are retained under
+  `other_semantic_changes` rather than guessed.
+
+**Next recommended action**
+
+- Keep semantic comparison and restart tests in the release CI matrix and use
+  `compare_workflow_runs` for uninterrupted/resumed artifact equality checks.
 
 ### 2026-08-07 — Phase 3 audit completion pass
 

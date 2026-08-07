@@ -19,6 +19,11 @@ def build_parser() -> argparse.ArgumentParser:
         default=True,
         help="Also compare copies with universally blocked reactions removed.",
     )
+    parser.add_argument(
+        "--semantic",
+        action="store_true",
+        help="Write a deterministic semantic JSON comparison instead of CSV reports.",
+    )
     return parser
 
 
@@ -26,6 +31,16 @@ def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     from .compare import compare_models_from_files
 
+    if args.semantic:
+        from .compare import compare_model_files_semantically, save_semantic_comparison
+
+        comparison = compare_model_files_semantically(args.model_a, args.model_b)
+        if args.output_dir is not None:
+            save_semantic_comparison(
+                comparison, args.output_dir / "semantic-comparison.json"
+            )
+        print(f"semantic: equal={comparison['equal']}")
+        return 0
     reports = compare_models_from_files(
         args.model_a,
         args.model_b,
