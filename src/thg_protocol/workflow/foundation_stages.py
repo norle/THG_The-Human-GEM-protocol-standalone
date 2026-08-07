@@ -475,7 +475,11 @@ def register_builtin_workflows(registry: Any) -> None:
             ).detailed_beta1_stages(),
         ),
         WorkflowDefinition(
-            "beta2", _stages("beta2"), frozenset({"beta2"}), "THGβ2 foundation fixture"
+            "beta2", _stages("beta2"), frozenset({"beta2"}), "THGβ2 foundation fixture",
+            scientific_stages=__import__(
+                "thg_protocol.workflow.beta2_stages",
+                fromlist=["detailed_beta2_stages"],
+            ).detailed_beta2_stages(),
         ),
         WorkflowDefinition(
             "validate",

@@ -47,7 +47,12 @@ WORKFLOW_SECTION_KEYS = {
         "license",
         "upstream",
     },
-    "beta2": {"upstream", "input_model", "decisions_file"},
+    "beta2": {
+        "upstream", "input_model", "decisions_file", "mode", "gene_locations",
+        "compartments", "catalysis_evidence", "external_beta1_equivalent",
+        "compartment_ontology_version", "fallback_location", "uncertainty_policy",
+        "subunit_stoichiometry", "run_solver_checks", "solver",
+    },
     "validation": {"input_model", "upstream", "run_memote"},
     "compare": {"left", "right", "upstream"},
 }
@@ -221,6 +226,16 @@ def _parse_workflow(
                         _required_string(value, "input_model", "beta1"),
                         input_base,
                         "beta1.input_model",
+                        MODEL_SUFFIXES,
+                    )
+                )
+            if section == "beta2" and "input_model" in value:
+                value = dict(value)
+                value["input_model"] = str(
+                    _input_path(
+                        _required_string(value, "input_model", "beta2"),
+                        input_base,
+                        "beta2.input_model",
                         MODEL_SUFFIXES,
                     )
                 )

@@ -31,6 +31,18 @@ from .beta1 import (
     serialize_s_gpr,
     with_subunit_stoichiometry,
 )
+from .beta2 import (
+    LocationResolution,
+    apply_expansion_plan,
+    beta2_release_gate,
+    generate_expansion_plan,
+    normalize_compartment_registry,
+    normalize_location,
+    reaction_policy,
+    release_beta2,
+    resolve_gpr_locations,
+    validate_beta2,
+)
 
 __all__ = [
     "BalanceAudit",
@@ -62,4 +74,14 @@ __all__ = [
     "serialize_gpr",
     "serialize_s_gpr",
     "with_subunit_stoichiometry",
+    "LocationResolution",
+    "apply_expansion_plan",
+    "beta2_release_gate",
+    "generate_expansion_plan",
+    "normalize_compartment_registry",
+    "normalize_location",
+    "reaction_policy",
+    "release_beta2",
+    "resolve_gpr_locations",
+    "validate_beta2",
 ]

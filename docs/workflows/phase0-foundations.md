@@ -6,10 +6,10 @@ resumable runner. Format 1 remains the compatibility path for the historical
 selected explicitly with a top-level `workflow` key and uses the registered
 DAG for its manifest, dependency checks, and resume behavior.
 
-The maintained fixture workflows are `beta1`, `beta2`, `validate`, and
-`compare`. They exercise orchestration contracts only; they do not claim to be
-scientific THGβ1 or THGβ2 releases. A release label requires the gates in the
-functional implementation plan.
+The registered workflows are `beta1`, `beta2`, `validate`, and `compare`.
+`beta1` and `beta2` have separate scientific DAGs when model inputs are
+configured; the shorter DAGs remain available as orchestration fixtures. A
+release label still requires the gates in the functional implementation plan.
 
 ## Format-2 configuration
 

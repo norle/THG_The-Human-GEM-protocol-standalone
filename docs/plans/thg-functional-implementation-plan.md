@@ -193,7 +193,7 @@ Update this table whenever task status changes.
 | F3 | Proposal, decision, and change-ledger framework | verified | maintained package | 2026-08-06 | `src/thg_protocol/workflow/proposals.py`, `tests/unit/test_phase0_foundations.py` |
 | F4 | Deterministic object-ID registry | verified | maintained package | 2026-08-06 | `src/thg_protocol/workflow/ids.py`, `tests/unit/test_phase0_foundations.py` |
 | B1 | THGβ1 workflow | verified | maintained package | 2026-08-06 | `src/thg_protocol/curation/beta1.py`, `src/thg_protocol/workflow/beta1_stages.py`, `tests/unit/test_beta1_curation.py`, `tests/integration/test_beta1_registered_workflow.py`, sanctioned fixture release gate |
-| B2 | THGβ2 workflow | not-started | unassigned | 2026-08-06 | — |
+| B2 | THGβ2 workflow | verified | maintained package | 2026-08-07 | `src/thg_protocol/curation/beta2.py`, `src/thg_protocol/workflow/beta2_stages.py`, `tests/unit/test_beta2_curation.py`, `tests/integration/test_beta2_registered_workflow.py`; sanctioned chained release gate passes |
 | V1 | Validation framework | not-started | unassigned | 2026-08-06 | — |
 | V2 | Metabolic tasks | not-started | unassigned | 2026-08-06 | — |
 | V3 | MEMOTE integration | not-started | unassigned | 2026-08-06 | — |
@@ -202,7 +202,7 @@ Update this table whenever task status changes.
 | G1 | Gapfill framework | deferred | unassigned | 2026-08-06 | Optional extension |
 | P1 | Pathway workflows | deferred | unassigned | 2026-08-06 | Scope review required |
 | C1 | Cell-specific workflows | deferred | unassigned | 2026-08-06 | Separate from core THG |
-| R1 | Restart and release validation | not-started | unassigned | 2026-08-06 | — |
+| R1 | Restart and release validation | implemented | maintained package | 2026-08-07 | `tests/integration/test_beta2_registered_workflow.py`; β2 resume/forced-descendant invalidation and candidate promotion pass; broader interruption/corruption matrix remains |
 
 ---
 
@@ -709,7 +709,7 @@ The output may be labeled THGβ1 only when:
 
 ## B2. Definition
 
-**Status:** `not-started`
+**Status:** `verified`
 
 THGβ2 is a compartment-expanded derivative of a validated β1 model in which enzyme isoforms and protein complexes are assigned to supported locations and new reaction/metabolite copies are generated only where GPR and localization evidence supports them.
 
@@ -743,7 +743,7 @@ export-beta2
 
 ## B2.2 β1 input gate
 
-**Status:** `not-started`
+**Status:** `verified`
 
 ### Tasks
 
@@ -760,7 +760,7 @@ export-beta2
 
 ## B2.3 Catalysis and localization evidence
 
-**Status:** `not-started`
+**Status:** `verified`
 
 ### Tasks
 
@@ -783,7 +783,7 @@ export-beta2
 
 ## B2.4 Complex and isoenzyme location semantics
 
-**Status:** `not-started`
+**Status:** `verified`
 
 ### Required rules
 
@@ -808,7 +808,7 @@ export-beta2
 
 ## B2.5 Expansion planner
 
-**Status:** `not-started`
+**Status:** `verified`
 
 For each eligible reaction, determine:
 
@@ -833,7 +833,7 @@ For each eligible reaction, determine:
 
 ## B2.6 Reaction-type policies
 
-**Status:** `not-started`
+**Status:** `verified`
 
 | Reaction class | Initial default |
 |---|---|
@@ -857,7 +857,7 @@ For each eligible reaction, determine:
 
 ## B2.7 Transport scope
 
-**Status:** `not-started`
+**Status:** `verified`
 
 Initial recommendation: do not implement generic transport expansion in the first β2 release.
 
@@ -871,7 +871,7 @@ Initial recommendation: do not implement generic transport expansion in the firs
 
 ## B2.8 Expansion application and consolidation
 
-**Status:** `not-started`
+**Status:** `verified`
 
 ### Tasks
 
@@ -896,7 +896,7 @@ Initial recommendation: do not implement generic transport expansion in the firs
 
 ## B2.9 β2 validation and outputs
 
-**Status:** `not-started`
+**Status:** `verified`
 
 ### Required validation
 
@@ -927,6 +927,10 @@ beta2-validation.json
 beta1-to-beta2-diff.json
 beta2-summary.md
 ```
+
+The export stage writes candidate model filenames; `beta2_release_gate` and
+`release_beta2` are required before the public `thg-beta2.json` and
+`thg-beta2.xml` filenames are promoted.
 
 ### β2 release gate
 
@@ -1202,7 +1206,7 @@ Publication-era counts may be reported as historical context but are not accepta
 
 ## R1. Restart and invalidation testing
 
-**Status:** `not-started`
+**Status:** `implemented`
 
 For β1 and β2:
 
@@ -1393,6 +1397,7 @@ exceptions.
 ### D-008 — Directionality proposals are flag-only by default
 
 **Date:** 2026-08-06
+
 **Status:** accepted
 
 When reaction evidence identifies an equivalent reversed stoichiometry, β1
@@ -1450,6 +1455,15 @@ The release gate accepts only the maintained sanctioned input digest recorded
 in the β1 implementation. A caller may still run the workflow on other models,
 but those outputs remain candidates until a separately approved release input
 and provenance record are established.
+
+### D-014 — Explicit β1-equivalent gate for direct β2 inputs
+
+**Date:** 2026-08-07
+**Status:** accepted
+
+Direct `beta2.input_model` inputs require `external_beta1_equivalent: true`.
+Otherwise β2 accepts only a checksum-verified completed β1 artifact reference.
+This prevents an arbitrary enriched model from being silently labeled as β1.
 
 ---
 
@@ -1870,6 +1884,48 @@ scientific THGβ1/β2 release artifacts.
 
 - Begin the scientific β1 input/inventory contract and offline model fixture
   while retaining the Phase 0 proposal-before-mutation boundary.
+
+### 2026-08-07 — Phase 2 β2 release-gate completion
+
+**Status changes**
+
+- B2 and its detailed β2 sub-workstreams moved from `implemented` to `verified`.
+- R1 moved to `implemented`; the β2 resume and forced-descendant invalidation slice is verified, while the broader interruption/corruption matrix remains.
+
+**Summary**
+
+- Added explicit β2 release-gate and candidate-promotion APIs.
+- Added verified β1 artifact checksum/gate checks, canonical GPR serialization, fallback/conflict policies, complete proposal records, decision replacement handling, deterministic ID registry export, provenance, model reload checks, charge/mass status, feasibility/objective summaries, and consolidation ledgering.
+- Added sanctioned chained β1→β2 integration coverage and public β2 documentation/API inventory entries.
+
+**Files changed**
+
+- `src/thg_protocol/curation/beta2.py`
+- `src/thg_protocol/curation/__init__.py`
+- `src/thg_protocol/workflow/beta2_stages.py`
+- `src/thg_protocol/workflow/config.py`
+- `src/thg_protocol/workflow/foundation_stages.py`
+- `src/thg_protocol/workflow/registered_runner.py`
+- `tests/unit/test_beta2_curation.py`
+- `tests/integration/test_beta2_registered_workflow.py`
+- `docs/workflows/beta2.md`
+- `docs/api/workflows.md`
+- `docs/api/api-inventory.json`
+
+**Tests run**
+
+- `pytest -q tests/unit tests/integration tests/docs` — 1919 passed, 2 optional skips.
+- `mkdocs build --strict --site-dir /tmp/thg-phase2-site` — passed.
+- Sanctioned chained β1→β2 run — β2 gate passed and `release_beta2` promoted candidate JSON/SBML.
+
+**Known limitations**
+
+- R1 still lacks a β2-specific interrupted-process and artifact-corruption test matrix.
+- MEMOTE and historical metabolic-task workflows remain Phase 3 scope.
+
+**Recommended next action**
+
+- Begin Phase 3 validation/task/MEMOTE work, or complete the remaining broader R1 matrix before release packaging.
 
 ### 2026-08-06 — Plan created
 

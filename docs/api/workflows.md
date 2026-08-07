@@ -52,6 +52,22 @@ restartable engineering DAG.
         - serialize_gpr
         - with_subunit_stoichiometry
 
+## β2 compartment expansion
+
+::: thg_protocol.curation.beta2
+    options:
+      members:
+        - LocationResolution
+        - apply_expansion_plan
+        - beta2_release_gate
+        - generate_expansion_plan
+        - normalize_compartment_registry
+        - normalize_location
+        - reaction_policy
+        - release_beta2
+        - resolve_gpr_locations
+        - validate_beta2
+
 ## Resumable workflow
 
 ::: thg_protocol.workflow.config
