@@ -7,6 +7,12 @@ on:
       - "**"
   workflow_dispatch:
 
+# Pages permits only one deployment at a time. Keep deploy jobs serialized so
+# overlapping pushes do not leave a deployment waiting until deploy-pages times out.
+concurrency:
+  group: github-pages
+  cancel-in-progress: false
+
 permissions:
   contents: read
 
@@ -63,3 +69,6 @@ jobs:
           path: site
       - id: deployment
         uses: actions/deploy-pages@v4
+        with:
+          # Pages can remain queued temporarily during service-side rollout.
+          timeout: 1800000
