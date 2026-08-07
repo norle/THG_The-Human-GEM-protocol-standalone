@@ -253,12 +253,13 @@ def start_registered(config_path: str | Path) -> Path:
     except WorkflowRegistryError as error:
         raise ConfigError(str(error)) from error
     run_dir = config.run.output_dir
+    section_key = "validation" if config.workflow == "validate" else config.workflow
     scientific = (
-        config.workflow in {"beta1", "beta2"}
-        and isinstance(config.sections.get(config.workflow), Mapping)
+        config.workflow in {"beta1", "beta2", "validate"}
+        and isinstance(config.sections.get(section_key), Mapping)
         and (
-            isinstance(config.sections[config.workflow].get("input_model"), str)
-            or isinstance(config.sections[config.workflow].get("upstream"), Mapping)
+            isinstance(config.sections[section_key].get("input_model"), str)
+            or isinstance(config.sections[section_key].get("upstream"), Mapping)
         )
     )
     stages = definition.stages_for(scientific=scientific)

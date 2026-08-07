@@ -194,9 +194,9 @@ Update this table whenever task status changes.
 | F4 | Deterministic object-ID registry | verified | maintained package | 2026-08-06 | `src/thg_protocol/workflow/ids.py`, `tests/unit/test_phase0_foundations.py` |
 | B1 | THGβ1 workflow | verified | maintained package | 2026-08-06 | `src/thg_protocol/curation/beta1.py`, `src/thg_protocol/workflow/beta1_stages.py`, `tests/unit/test_beta1_curation.py`, `tests/integration/test_beta1_registered_workflow.py`, sanctioned fixture release gate |
 | B2 | THGβ2 workflow | verified | maintained package | 2026-08-07 | `src/thg_protocol/curation/beta2.py`, `src/thg_protocol/workflow/beta2_stages.py`, `tests/unit/test_beta2_curation.py`, `tests/integration/test_beta2_registered_workflow.py`; sanctioned chained release gate passes |
-| V1 | Validation framework | not-started | unassigned | 2026-08-06 | — |
-| V2 | Metabolic tasks | not-started | unassigned | 2026-08-06 | — |
-| V3 | MEMOTE integration | not-started | unassigned | 2026-08-06 | — |
+| V1 | Validation framework | verified | maintained package | 2026-08-07 | `src/thg_protocol/validation.py`, Phase 3 workflow and unit tests |
+| V2 | Metabolic tasks | verified | maintained package | 2026-08-07 | `src/thg_protocol/tasks.py`, suite serialization and isolation tests |
+| V3 | MEMOTE integration | verified | maintained package | 2026-08-07 | `src/thg_protocol/memote.py`, real MEMOTE 0.17.0 smoke test |
 | H1 | Human Database workflow | deferred | unassigned | 2026-08-06 | After β1/β2 foundations |
 | M1 | Final semantic merge | deferred | unassigned | 2026-08-06 | After H1 and B2 |
 | G1 | Gapfill framework | deferred | unassigned | 2026-08-06 | Optional extension |
@@ -953,7 +953,7 @@ The output may be labeled THGβ2 only when:
 
 ## V1. Validation framework
 
-**Status:** `not-started`
+**Status:** `verified`
 
 ### Profiles
 
@@ -967,82 +967,82 @@ release-full
 
 ### Check families
 
-- [ ] Model load and reference integrity.
-- [ ] Identifier uniqueness.
-- [ ] GPR parsing and references.
-- [ ] Formula and charge balance.
-- [ ] Stoichiometric consistency.
-- [ ] Flux consistency.
-- [ ] Blocked reactions.
-- [ ] Dead-end topology.
-- [ ] Unconserved metabolites.
-- [ ] Minimal inconsistent sets where practical.
-- [ ] Energy-generating cycles.
-- [ ] Objective feasibility.
-- [ ] Workflow-specific invariants.
-- [ ] Ledger-to-diff consistency.
+- [x] Model load and reference integrity.
+- [x] Identifier uniqueness.
+- [x] GPR parsing and references.
+- [x] Formula and charge balance.
+- [x] Stoichiometric consistency.
+- [x] Flux consistency.
+- [x] Blocked reactions.
+- [x] Dead-end topology.
+- [x] Unconserved metabolites.
+- [x] Minimal inconsistent sets where practical.
+- [x] Energy-generating cycles.
+- [x] Objective feasibility.
+- [x] Workflow-specific invariants.
+- [x] Ledger-to-diff consistency.
 
 ### Solver metadata
 
-- [ ] Solver and version.
-- [ ] Configuration.
-- [ ] Feasibility and optimality tolerances.
-- [ ] Objective.
-- [ ] Status.
-- [ ] Deterministic ordering or tie-breaking policy where relevant.
+- [x] Solver and version.
+- [x] Configuration.
+- [x] Feasibility and optimality tolerances.
+- [x] Objective.
+- [x] Status.
+- [x] Deterministic ordering or tie-breaking policy where relevant.
 
 ### Acceptance criteria
 
-- [ ] Checks are independently callable.
-- [ ] Structural and solver-backed checks are separated.
-- [ ] Boundary and biomass semantics are explicit.
-- [ ] Profiles define severity and release-blocking behavior.
+- [x] Checks are independently callable.
+- [x] Structural and solver-backed checks are separated.
+- [x] Boundary and biomass semantics are explicit.
+- [x] Profiles define severity and release-blocking behavior.
 
 ## V2. Metabolic tasks
 
-**Status:** `not-started`
+**Status:** `verified`
 
 ### Required schema
 
-- [ ] Stable task ID and version.
-- [ ] Uptake and secretion constraints.
-- [ ] Temporary reactions.
-- [ ] Changed bounds.
-- [ ] Objective.
-- [ ] Expected pass/fail.
-- [ ] Task group.
-- [ ] Stable identity references.
-- [ ] Solver requirements.
-- [ ] Diagnostics.
+- [x] Stable task ID and version.
+- [x] Uptake and secretion constraints.
+- [x] Temporary reactions.
+- [x] Changed bounds.
+- [x] Objective.
+- [x] Expected pass/fail.
+- [x] Task group.
+- [x] Stable identity references.
+- [x] Solver requirements.
+- [x] Diagnostics.
 
 ### Acceptance criteria
 
-- [ ] Tasks do not permanently mutate input models.
-- [ ] Temporary objects do not leak.
-- [ ] Per-task solver status is recorded.
-- [ ] Infrastructure failure is distinct from biological task failure.
-- [ ] Core and full suites are versioned.
+- [x] Tasks do not permanently mutate input models.
+- [x] Temporary objects do not leak.
+- [x] Per-task solver status is recorded.
+- [x] Infrastructure failure is distinct from biological task failure.
+- [x] Core and full suites are versioned.
 
 ## V3. MEMOTE
 
-**Status:** `not-started`
+**Status:** `verified`
 
 ### Tasks
 
-- [ ] Pin or record MEMOTE version.
-- [ ] Record solver.
-- [ ] Capture logs and machine-readable results.
-- [ ] Retain rendered report when configured.
-- [ ] Support thresholds.
-- [ ] Distinguish command failure from failed model tests.
-- [ ] Add a real small-model CI smoke test.
-- [ ] Keep full-model execution optional or scheduled.
+- [x] Pin or record MEMOTE version.
+- [x] Record solver.
+- [x] Capture logs and machine-readable results.
+- [x] Retain rendered report when configured.
+- [x] Support thresholds.
+- [x] Distinguish command failure from failed model tests.
+- [x] Add a real small-model CI smoke test.
+- [x] Keep full-model execution optional or scheduled.
 
 ### Acceptance criteria
 
-- [ ] Verification uses a real MEMOTE invocation, not only a fake executable.
-- [ ] Report artifacts are checksum-recorded.
-- [ ] MEMOTE remains separate from pure package checks.
+- [x] Verification uses a real MEMOTE invocation, not only a fake executable.
+- [x] Report artifacts are checksum-recorded.
+- [x] MEMOTE remains separate from pure package checks.
 
 ---
 
@@ -1465,6 +1465,29 @@ Direct `beta2.input_model` inputs require `external_beta1_equivalent: true`.
 Otherwise β2 accepts only a checksum-verified completed β1 artifact reference.
 This prevents an arbitrary enriched model from being silently labeled as β1.
 
+### D-015 — Validation profiles and task isolation
+
+**Date:** 2026-08-07
+**Status:** accepted
+
+Phase 3 exposes named validation profiles with structural and solver-backed
+checks as separate results. Metabolic tasks always execute on a copied model;
+temporary reactions and bound changes are never applied to the caller-owned
+model. MEMOTE is an optional external report with command-failure status kept
+separate from model-test results.
+
+### D-016 — MEMOTE command compatibility
+
+**Date:** 2026-08-07
+**Status:** accepted
+
+The maintained MEMOTE adapter uses the documented `memote run --filename
+<report> <model>` invocation by default. The complete command, version output,
+logs, return code, and report checksum are retained in the machine-readable
+run artifact. The default run stores MEMOTE’s JSON result and the snapshot
+HTML report; optional score thresholds are evaluated when the result exposes a
+numeric score.
+
 ---
 
 ## 11. Blocker log
@@ -1509,6 +1532,82 @@ the verified release run.
 ## 12. Progress log
 
 Add newest entries at the top.
+
+### 2026-08-07 — Phase 3 audit completion pass
+
+**Tasks worked on**
+
+- Added practical singleton minimal-inconsistent-set reporting and positive
+  stoichiometric-consistency checks.
+- Added versioned task-suite loading/serialization and suite execution records.
+- Corrected `validate` scientific DAG selection for the `validation` config
+  section and added registered-workflow coverage.
+- Aligned the default MEMOTE invocation with the documented CLI and recorded
+  MEMOTE version/command metadata.
+
+**Files changed**
+
+- `src/thg_protocol/validation.py`
+- `src/thg_protocol/tasks.py`
+- `src/thg_protocol/memote.py`
+- `src/thg_protocol/workflow/registered_runner.py`
+- `tests/unit/test_phase3_validation.py`
+- this plan
+
+**Tests run and results**
+
+- Phase 3 unit/workflow tests: `6 passed` with MEMOTE 0.17.0 installed.
+- Ruff checks for new Phase 3 code: passed.
+- Real MEMOTE smoke test: passed; JSON results and snapshot HTML were emitted
+  and checksummed.
+
+**Unresolved issues**
+
+- Full-model MEMOTE execution remains optional or scheduled because it is more
+  expensive than the small-model smoke test.
+
+**Next recommended action**
+
+- Keep the real small-model invocation in the MEMOTE-enabled CI matrix and
+  schedule full-model runs separately.
+
+### 2026-08-07 — Phase 3 validation, tasks, and MEMOTE
+
+**Tasks worked on**
+
+- Added reusable validation profiles with structural, chemical, topology, and
+  optional solver-backed checks.
+- Added versioned non-mutating metabolic task execution and diagnostics.
+- Added a real MEMOTE subprocess adapter with JSON/HTML artifact checksums and
+  optional threshold evaluation.
+- Added the scientific `validate` workflow DAG and strict configuration fields.
+
+**Files changed**
+
+- `src/thg_protocol/validation.py`
+- `src/thg_protocol/tasks.py`
+- `src/thg_protocol/memote.py`
+- `src/thg_protocol/workflow/config.py`
+- `src/thg_protocol/workflow/foundation_stages.py`
+- `src/thg_protocol/workflow/registered_runner.py`
+- this plan
+
+**Tests run and results**
+
+- Focused Phase 3/Phase 0/config/integration tests: `17 passed, 1 skipped`.
+- Complete offline suite: `1932 passed, 8 skipped`.
+- Python compilation: passed.
+- Real MEMOTE smoke test: not run because the optional `memote` executable is
+  not installed in this environment.
+
+**Unresolved issues**
+
+- Full MEMOTE execution requires installing the declared optional dependency.
+
+**Next recommended action**
+
+- Run the validation workflow and MEMOTE smoke test in CI with the optional
+  dependency enabled.
 
 ### 2026-08-06 — Phase 1 review fixes
 

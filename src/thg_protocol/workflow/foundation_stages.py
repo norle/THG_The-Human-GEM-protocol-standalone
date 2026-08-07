@@ -419,6 +419,78 @@ class FoundationStage:
             raise ValueError(f"stage '{self.id}' did not produce one artifact")
 
 
+class ValidationScientificStage:
+    """Three checkpoint validation DAG with optional real MEMOTE execution."""
+
+    implementation_version = 1
+
+    def __init__(self, stage_id: str, dependencies: tuple[str, ...] = ()) -> None:
+        self.id, self.dependencies = stage_id, dependencies
+        self.output_role = "model" if stage_id == "validate-input" else "validation"
+        self.kind = "collection" if stage_id == "validate-input" else "validation"
+
+    def enabled(self, config: WorkflowConfig) -> bool:
+        del config
+        return True
+
+    def fingerprint_data(self, context: StageContext) -> Mapping[str, object]:
+        section = context.config.sections.get("validation", {})
+        return {
+            "stage": self.id,
+            "version": self.implementation_version,
+            "configuration": dict(section) if isinstance(section, Mapping) else {},
+        }
+
+    def run(self, context: StageContext, work_dir: Path) -> StageResult:
+        from .stages import _load_cobra_model
+
+        section = context.config.sections.get("validation", {})
+        if not isinstance(section, Mapping):
+            section = {}
+        if self.id == "validate-input":
+            source = Path(str(section["input_model"]))
+            destination = work_dir / f"input-model{source.suffix.lower()}"
+            shutil.copy2(source, destination)
+            _load_cobra_model(destination)
+            return StageResult(
+                (("model", destination),), {"input_sha256": sha256_file(source)}
+            )
+        model = _load_cobra_model(_dependency_path(context, "validate-input", "model"))
+        if self.id == "validate-checks":
+            from thg_protocol.validation import validate_model
+
+            report = validate_model(
+                model,
+                str(section.get("profile", "structural-fast")),
+                run_solver=section.get("run_solver"),
+            )
+            output = work_dir / "validation.json"
+            output.write_text(
+                json.dumps(report, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+            )
+            return StageResult((("validation", output),), report)
+        from thg_protocol.memote import run_memote
+
+        if bool(section.get("run_memote", False)):
+            report = run_memote(
+                _dependency_path(context, "validate-input", "model"),
+                work_dir / "memote",
+                command=tuple(section.get("memote_command", ["memote", "run"])),
+                threshold=section.get("memote_threshold"),
+            )
+        else:
+            report = {"status": "not-requested", "artifacts": {}}
+        output = work_dir / "memote.json"
+        output.write_text(
+            json.dumps(report, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+        )
+        return StageResult((("memote", output),), report)
+
+    def validate(self, result: StageResult) -> None:
+        if not result.outputs or any(not path.is_file() for _, path in result.outputs):
+            raise ValueError(f"stage '{self.id}' did not produce complete artifacts")
+
+
 def _stages(prefix: str) -> tuple[FoundationStage, ...]:
     if prefix == "beta1":
         stage_type = Beta1ScientificStage
@@ -475,7 +547,10 @@ def register_builtin_workflows(registry: Any) -> None:
             ).detailed_beta1_stages(),
         ),
         WorkflowDefinition(
-            "beta2", _stages("beta2"), frozenset({"beta2"}), "THGβ2 foundation fixture",
+            "beta2",
+            _stages("beta2"),
+            frozenset({"beta2"}),
+            "THGβ2 foundation fixture",
             scientific_stages=__import__(
                 "thg_protocol.workflow.beta2_stages",
                 fromlist=["detailed_beta2_stages"],
@@ -486,6 +561,11 @@ def register_builtin_workflows(registry: Any) -> None:
             _stages("validate"),
             frozenset({"validation"}),
             "Validation foundation fixture",
+            scientific_stages=(
+                ValidationScientificStage("validate-input"),
+                ValidationScientificStage("validate-checks", ("validate-input",)),
+                ValidationScientificStage("validate-memote", ("validate-checks",)),
+            ),
         ),
         WorkflowDefinition(
             "compare",
