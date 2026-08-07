@@ -29,6 +29,19 @@ enrich an existing model.
 
 ## Database parsing
 
+The registered offline-first collection primitives keep source access
+injected and record cache/error provenance explicitly.
+
+::: thg_protocol.database_workflow
+    options:
+      members:
+        - HarvestError
+        - NormalizedRecords
+        - harvest_snapshot
+        - normalize_records
+        - records_checksum
+        - reconstruct_snapshot
+
 ::: thg_protocol.database_parsing
     options:
       members:

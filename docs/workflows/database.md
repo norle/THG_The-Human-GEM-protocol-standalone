@@ -2,7 +2,8 @@
 
 !!! info "Status: Supported"
     The maintained `thg_protocol.database` API reconstructs models from
-    normalized records and is covered by current database tests.
+    normalized records. The Phase 4 `database_workflow` API adds explicit
+    snapshot caching, error ledgers, and a registered offline workflow.
 
 ## Outcome
 
@@ -89,6 +90,9 @@ or [model enrichment](model-build.md).
 [`reconstruct_model_from_pickle`][thg_protocol.database.reconstruct_model_from_pickle],
 [`reconstruct_model_with_services`][thg_protocol.database.reconstruct_model_with_services],
 [`summarize_biocyc_compartments`][thg_protocol.database.summarize_biocyc_compartments],
+[`harvest_snapshot`][thg_protocol.database_workflow.harvest_snapshot],
+[`normalize_records`][thg_protocol.database_workflow.normalize_records],
+[`reconstruct_snapshot`][thg_protocol.database_workflow.reconstruct_snapshot],
 and [`parse_pathway_links`][thg_protocol.database_parsing.parse_pathway_links].
 
 ## Differences from the historical workflow

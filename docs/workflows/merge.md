@@ -1,8 +1,8 @@
 # Merge
 
 !!! info "Status: Supported"
-    `merge_models`, `merge_models_from_paths`, and `MergeReport` are maintained,
-    non-mutating APIs covered by current tests.
+    Merge planning/application, bounded repair, validation, and the legacy
+    non-mutating merge APIs are maintained and covered by current tests.
 
 ## Outcome
 
@@ -74,6 +74,11 @@ Continue to [network analysis](network-analysis.md) or the
 
 [`merge_models`][thg_protocol.merge.merge_models],
 [`merge_models_from_paths`][thg_protocol.merge.merge_models_from_paths], and
+[`generate_merge_plan`][thg_protocol.merge.generate_merge_plan],
+[`apply_merge_plan`][thg_protocol.merge.apply_merge_plan],
+[`MergePolicy`][thg_protocol.merge.MergePolicy],
+[`bounded_repair`][thg_protocol.merge.bounded_repair],
+[`validate_merged_model`][thg_protocol.merge.validate_merged_model], and
 [`MergeReport`][thg_protocol.merge.MergeReport].
 
 ## Differences from the historical workflow

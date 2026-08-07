@@ -1,10 +1,10 @@
 # Merge and validate
 
 !!! warning "Scope and evidence"
-    Identifier-based merge and local structural reports are Implemented at
-    their documented boundaries. A convergence loop matching the 2023 protocol
-    paper is Not implemented; MEMOTE is an External integration and essential
-    tasks are Archived.
+    Identifier-based merge, explicit semantic merge plans, and local structural
+    reports are Implemented at their documented boundaries. A convergence loop
+    matching the 2023 protocol paper is not implemented; MEMOTE is an External
+    integration and essential tasks are Archived.
 
 ## Inputs from both branches
 
@@ -14,6 +14,12 @@ JSON or SBML, use compatible identifiers and compartments, and have documented
 model versions. Do not merge a working copy whose provenance is unknown.
 
 ## What the current merge API does
+
+[`generate_merge_plan`][thg_protocol.merge.generate_merge_plan] emits a
+reviewable plan before mutation. Explicit cross-identifiers are matched only
+when compartments agree; ambiguous and compartment-conflicting matches remain
+unresolved. [`apply_merge_plan`][thg_protocol.merge.apply_merge_plan] applies
+that plan to a private copy and then uses the retained-base merge policy.
 
 [`merge_models`][thg_protocol.merge.merge_models] copies the base model and
 adds incoming metabolites and reactions by identifier. Overlaps retain base

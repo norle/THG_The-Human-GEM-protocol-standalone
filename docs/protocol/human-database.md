@@ -1,9 +1,9 @@
 # Construct the Human Database
 
 !!! warning "Scope and evidence"
-    Deterministic reconstruction from normalized records is Implemented and
-    tested at its package boundary. The 2023 protocol paper's complete live
-    pathway-harvesting orchestration is Not implemented and has No replacement.
+    Deterministic reconstruction and the offline-first registered workflow are
+    Implemented and tested. A paper-specific pathway-list adapter is not
+    bundled; live access remains an injected, credential-owned boundary.
 
 ## What “Human Database” means in the 2023 protocol paper
 
@@ -78,12 +78,13 @@ KEGG, BioCyc, PubChem, or another service by itself.
 
 ## Current limitation
 
-There is no supported current command that accepts only a pathway list and
-recreates the paper's entire live information-gathering branch. Compose
-the maintained record, parsing, service, and reconstruction APIs manually, or
-use a separately maintained harvesting workflow and document its version and
-inputs. Historical pickle adapters are compatibility input support, not proof of
-a current live harvesting pipeline.
+The registered `human-database` workflow accepts a normalized JSON snapshot
+and produces source provenance, a reconstructed candidate, and validation
+artifacts. It does not guess a paper-specific pathway list. Use
+`thg_protocol.database_workflow.harvest_snapshot` with one injected adapter
+when a credentialed source is approved, and retain its cache manifest and
+error ledger. Historical pickle adapters are compatibility input support, not
+proof of a current live harvesting pipeline.
 
 ## Outputs and validation
 

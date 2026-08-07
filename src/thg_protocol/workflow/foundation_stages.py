@@ -537,6 +537,23 @@ def register_builtin_workflows(registry: Any) -> None:
 
     definitions = (
         WorkflowDefinition(
+            "human-database",
+            __import__(
+                "thg_protocol.workflow.phase4_stages",
+                fromlist=["human_database_stages"],
+            ).human_database_stages(),
+            frozenset({"human_database"}),
+            "Offline-first Human Database reconstruction",
+        ),
+        WorkflowDefinition(
+            "final-thg",
+            __import__(
+                "thg_protocol.workflow.phase4_stages", fromlist=["final_thg_stages"]
+            ).final_thg_stages(),
+            frozenset({"final_thg"}),
+            "Semantic β2 and Human Database merge",
+        ),
+        WorkflowDefinition(
             "beta1",
             _stages("beta1"),
             frozenset({"beta1"}),

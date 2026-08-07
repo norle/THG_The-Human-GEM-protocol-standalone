@@ -181,9 +181,17 @@ restartable engineering DAG.
 ::: thg_protocol.merge
     options:
       members:
+        - MergeDecision
+        - MergePlan
+        - MergePolicy
         - MergeReport
+        - RepairReport
+        - apply_merge_plan
+        - bounded_repair
+        - generate_merge_plan
         - merge_models
         - merge_models_from_paths
+        - validate_merged_model
 
 ## Cell-specific models
 

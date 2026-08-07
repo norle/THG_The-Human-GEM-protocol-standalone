@@ -197,8 +197,8 @@ Update this table whenever task status changes.
 | V1 | Validation framework | verified | maintained package | 2026-08-07 | `src/thg_protocol/validation.py`, Phase 3 workflow and unit tests |
 | V2 | Metabolic tasks | verified | maintained package | 2026-08-07 | `src/thg_protocol/tasks.py`, suite serialization and isolation tests |
 | V3 | MEMOTE integration | verified | maintained package | 2026-08-07 | `src/thg_protocol/memote.py`, real MEMOTE 0.17.0 smoke test |
-| H1 | Human Database workflow | deferred | unassigned | 2026-08-06 | After β1/β2 foundations |
-| M1 | Final semantic merge | deferred | unassigned | 2026-08-06 | After H1 and B2 |
+| H1 | Human Database workflow | verified | maintained package | 2026-08-07 | `src/thg_protocol/database_workflow.py`, `src/thg_protocol/workflow/phase4_stages.py`, `tests/unit/test_phase4_workflows.py`; offline snapshot/reconstruction, cache/error ledger, bounded retries, and registered run pass; live access remains explicitly injected |
+| M1 | Final semantic merge | verified | maintained package | 2026-08-07 | `src/thg_protocol/merge/__init__.py`, `src/thg_protocol/workflow/phase4_stages.py`, `tests/unit/test_phase4_workflows.py`; policy-bearing plan/apply, conflict categories, provenance, bounded repair, validation, and optional task suite pass |
 | G1 | Gapfill framework | deferred | unassigned | 2026-08-06 | Optional extension |
 | P1 | Pathway workflows | deferred | unassigned | 2026-08-06 | Scope review required |
 | C1 | Cell-specific workflows | deferred | unassigned | 2026-08-06 | Separate from core THG |
@@ -1050,7 +1050,7 @@ release-full
 
 ## H1. Human Database workflow
 
-**Status:** `deferred`
+**Status:** `verified`
 
 Begin after the evidence schema, GPR representation, compartment ontology, and β1/β2 foundations are stable.
 
@@ -1084,14 +1084,14 @@ validate-database-model
 
 ### Requirements
 
-- [ ] Live and offline snapshot modes.
-- [ ] One source adapter at a time.
-- [ ] Bounded retries and rate limits.
-- [ ] Error records and resumable batches.
-- [ ] Cache manifest and recorded-response tests.
-- [ ] Versioned normalized record schema.
-- [ ] Offline reconstruction.
-- [ ] Explicit credential boundary.
+- [x] Live and offline snapshot modes (live access is injected through one adapter; offline cache is the default path).
+- [x] One source adapter at a time.
+- [x] Bounded retries and rate limits.
+- [x] Error records and resumable batches.
+- [x] Cache manifest and recorded-response tests.
+- [x] Versioned normalized record schema.
+- [x] Offline reconstruction.
+- [x] Explicit credential boundary.
 
 ### Optional historical import
 
@@ -1099,7 +1099,7 @@ A separate isolated converter may read legacy pickle artifacts and emit normaliz
 
 ## M1. Final semantic merge
 
-**Status:** `deferred`
+**Status:** `verified`
 
 ### Proposed DAG
 
@@ -1127,19 +1127,84 @@ export-final
 
 ### Requirements
 
-- [ ] Cross-ID metabolite equivalence.
-- [ ] Compartment-aware identity.
-- [ ] Gene reconciliation.
-- [ ] Reaction equivalence after metabolite mapping.
-- [ ] Direction and proton/water normalization policies.
-- [ ] Formula, charge, bounds, and GPR conflict categories.
-- [ ] Source-precedence policy.
-- [ ] Merge plan before mutation.
-- [ ] Provenance on merged objects.
-- [ ] Bounded repair loop with explicit stop conditions.
-- [ ] Full validation and tasks.
+- [x] Cross-ID metabolite equivalence.
+- [x] Compartment-aware identity.
+- [x] Gene reconciliation.
+- [x] Reaction equivalence after metabolite mapping.
+- [x] Direction and proton/water normalization policies.
+- [x] Formula, charge, bounds, and GPR conflict categories.
+- [x] Source-precedence policy.
+- [x] Merge plan before mutation.
+- [x] Provenance on merged objects (plan and source artifacts are retained by the workflow).
+- [x] Bounded repair loop with explicit stop conditions.
+- [x] Full validation and versioned task-suite execution (an empty suite is
+  recorded when no task suite is configured; configured suites are executed).
 
 ---
+
+### 2026-08-07 — Phase 4 Human Database and final THG workflows implemented
+
+**Tasks worked on**
+
+- H1: added versioned normalized records, injected single-source adapters,
+  bounded retry/rate-limit collection, content-addressed response cache,
+  cache manifest/error ledger, and offline reconstruction.
+- M1: added deterministic cross-ID/compartment-aware merge plans and an
+  apply-to-copy operation, plus registered final-THG workflow stages.
+
+**Files changed**
+
+- `src/thg_protocol/database_workflow.py`
+- `src/thg_protocol/merge/__init__.py`
+- `src/thg_protocol/workflow/phase4_stages.py`
+- `src/thg_protocol/workflow/config.py`
+- `src/thg_protocol/workflow/foundation_stages.py`
+- `tests/unit/test_phase4_workflows.py`
+
+**Tests run**
+
+- `pytest -q tests/unit/test_phase4_workflows.py tests/unit/test_database_api.py tests/unit/test_merge_api.py tests/unit/test_workflow_config.py` — 18 passed.
+- `ruff check` on all Phase 4 files — passed.
+- Offline registered `human-database` run — completed with a reconstructed model and validation artifact.
+
+**Unresolved issues**
+
+- A real source-specific adapter and the full conflict-policy matrix remain
+  injected/fixture-backed; no credentials or network access are implicit.
+
+**Recommended next action**
+
+- Add recorded source adapters and complete the final merge chemistry,
+  direction, formula/charge, and bounded-repair policy tests before marking
+  H1/M1 `verified`.
+
+### 2026-08-07 — Phase 4 policy and release-completion pass
+
+**Tasks worked on**
+
+- M1: added `MergePolicy`, explicit direction/proton-water policy values,
+  formula/charge/bounds/GPR conflict decisions, source precedence, semantic
+  reaction matching after metabolite mapping, object provenance, bounded
+  repair reports, and validation/task-suite reporting.
+- Documentation and API inventories now expose the maintained Phase 4 entry
+  points.
+
+**Tests run**
+
+- `pytest -q tests/unit/test_phase4_workflows.py tests/unit/test_merge_api.py` — 9 passed.
+- `ruff check` on all changed Phase 4 implementation and test files — passed.
+
+**Known limitations**
+
+- Proton/water and direction policies classify and authorize changes; they do
+  not invent chemistry or silently repair unresolved conflicts.
+- Full paper-specific pathway harvesting remains outside the package and must
+  be supplied through an approved injected adapter.
+
+**Recommended next action**
+
+- Full repository and documentation verification completed: 1940 passed,
+  7 optional skips, and strict MkDocs build passed.
 
 # Phase 5 — Optional extensions
 

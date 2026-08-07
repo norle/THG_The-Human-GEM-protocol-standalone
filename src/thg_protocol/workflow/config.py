@@ -16,6 +16,29 @@ class ConfigError(ValueError):
 MODEL_SUFFIXES = {".json", ".xml", ".sbml"}
 
 WORKFLOW_SECTION_KEYS = {
+    "human_database": {
+        "records",
+        "mode",
+        "model_id",
+        "source_release",
+        "cache_dir",
+        "retries",
+        "rate_limit",
+    },
+    "final_thg": {
+        "beta2_model",
+        "database_model",
+        "source_precedence",
+        "remove_isolated_metabolites",
+        "direction",
+        "proton_water",
+        "formula_charge",
+        "bounds",
+        "gpr",
+        "task_suite",
+        "validation_profile",
+        "max_repair_iterations",
+    },
     "beta1": {
         "input_model",
         "mode",
@@ -280,7 +303,16 @@ def _resolve_workflow_paths(value: object, base: Path, *, key: str = "") -> obje
         return [_resolve_workflow_paths(item, base, key=key) for item in value]
     if isinstance(value, str) and (
         key.endswith(("_file", "_path", "_dir"))
-        or key in {"run_dir", "cache_dir", "input_model"}
+        or key
+        in {
+            "run_dir",
+            "cache_dir",
+            "input_model",
+            "records",
+            "beta2_model",
+            "database_model",
+            "task_suite",
+        }
     ):
         path = Path(value)
         return str(path if path.is_absolute() else (base / path).resolve())
