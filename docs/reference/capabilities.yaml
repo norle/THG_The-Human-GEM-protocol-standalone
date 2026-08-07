@@ -1,0 +1,54 @@
+version: 1
+description: Current product capability registry. Historical parity records are not its source of truth.
+tiers:
+  - release-supported
+  - research-supported
+  - experimental
+  - archived
+  - rejected
+capabilities:
+  - id: workflow-beta1
+    support_tier: release-supported
+    owner: thg_protocol.curation.beta1
+    entry_point: thg-run beta1 CONFIG
+    scientific_status: Curates a reference GEM through explicit evidence and decisions.
+    implementation_status: verified
+    verification: tests/integration/test_beta1_registered_workflow.py
+    workflow_coverage: beta1
+    known_limitations: Sanctioned-input and release-gate evidence are required for promotion.
+  - id: workflow-beta2
+    support_tier: research-supported
+    owner: thg_protocol.curation.beta2
+    entry_point: thg-run beta2 CONFIG
+    scientific_status: Expands GPR and localization branches from β1-equivalent input.
+    implementation_status: verified
+    verification: tests/integration/test_beta2_registered_workflow.py
+    workflow_coverage: beta2
+    known_limitations: External β1-equivalent inputs require explicit evidence.
+  - id: workflow-human-database
+    support_tier: research-supported
+    owner: thg_protocol.database_workflow
+    entry_point: thg-run start CONFIG
+    scientific_status: Reconstructs models from normalized records.
+    implementation_status: verified
+    verification: tests/integration/test_phase4_workflows.py
+    workflow_coverage: human-database
+    known_limitations: Live collection is injected; credentials and a paper-specific adapter are not implicit.
+  - id: workflow-final-thg
+    support_tier: research-supported
+    owner: thg_protocol.merge
+    entry_point: thg-run start CONFIG
+    scientific_status: Merges branches and runs configured validation.
+    implementation_status: verified
+    verification: tests/unit/test_phase4_workflows.py
+    workflow_coverage: final-thg
+    known_limitations: Exact publication-artifact reproduction is not implied.
+  - id: workflow-validation
+    support_tier: release-supported
+    owner: thg_protocol.validation
+    entry_point: thg-run validate CONFIG
+    scientific_status: Runs reusable structural and optional solver-backed checks.
+    implementation_status: verified
+    verification: tests/unit/test_phase3_validation.py
+    workflow_coverage: validate
+    known_limitations: MEMOTE and solver stages are optional external dependencies.

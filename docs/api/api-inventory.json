@@ -47,7 +47,7 @@
     {"module": "thg_protocol.cell_specific.exchange", "page": "api/workflows.md", "symbols": ["match_exchange_reactions"]},
     {"module": "thg_protocol.cell_specific.transcriptomics", "page": "api/workflows.md", "symbols": ["extract_ensembl_ids", "extract_gene_annotation_pairs", "extract_sgpr_rules", "replace_gene_symbols", "replace_index_tokens"]},
     {"module": "thg_protocol.analysis.compaction", "page": "api/analysis.md", "symbols": ["are_reactions_proportional", "combine_identical_reactions", "full_compaction"]},
-    {"module": "thg_protocol.analysis.compare", "page": "api/analysis.md", "symbols": ["compare_models", "compare_models_from_files", "compare_reactions", "reactions_by_compartment", "remove_blocked_reactions", "save_comparison_csv"]},
+    {"module": "thg_protocol.analysis.compare", "page": "api/analysis.md", "symbols": ["compare_models", "compare_models_from_files", "compare_reactions", "reactions_by_compartment", "remove_blocked_reactions", "save_comparison_csv", "compare_semantic_models", "compare_model_files_semantically", "compare_workflow_runs", "save_semantic_comparison"]},
     {"module": "thg_protocol.analysis.model_signature", "page": "api/analysis.md", "symbols": ["model_signature", "diff_model_signatures"]},
     {"module": "thg_protocol.analysis.consistency", "page": "api/analysis.md", "symbols": ["dead_end_metabolites", "orphan_metabolites", "reaction_balance", "charge_balance", "unbalanced_reactions_by_charge", "blocked_reactions", "stoichiometrically_balanced_cycles", "metabolites_not_produced", "metabolites_not_consumed", "unbounded_reactions", "unbalanced_reactions"]},
     {"module": "thg_protocol.analysis.network", "page": "api/analysis.md", "symbols": ["find_network_components", "write_component_report"]},
@@ -56,7 +56,10 @@
     {"module": "thg_protocol.analysis.compare_cli", "page": "api/cli.md", "symbols": ["build_parser", "main"]},
     {"module": "thg_protocol.gapfill.cli", "page": "api/cli.md", "symbols": ["build_parser", "main"]},
     {"module": "thg_protocol.pathway.cli", "page": "api/cli.md", "symbols": ["build_parser", "main"]},
-    {"module": "thg_protocol.workflow.cli", "page": "api/cli.md", "symbols": ["build_parser", "main"]}
+    {"module": "thg_protocol.workflow.cli", "page": "api/cli.md", "symbols": ["build_parser", "main"]},
+    {"module": "thg_protocol.validation", "page": "api/workflows.md", "symbols": ["PROFILES", "CheckResult", "load_model", "minimal_inconsistent_sets", "stoichiometric_consistency", "validate_model"]},
+    {"module": "thg_protocol.tasks", "page": "api/workflows.md", "symbols": ["MetabolicTask", "TaskSuite", "load_task_suite", "run_task", "run_tasks", "run_task_suite"]},
+    {"module": "thg_protocol.memote", "page": "api/workflows.md", "symbols": ["run_memote"]}
   ],
   "compatibility_exports": [
     {"symbol": "thg_protocol.analysis.*", "status": "compatibility-only", "canonical_modules": ["thg_protocol.analysis.compaction", "thg_protocol.analysis.compare", "thg_protocol.analysis.consistency", "thg_protocol.analysis.network"]},

@@ -51,6 +51,10 @@ for semantic model parity and artifact comparisons.
         - reactions_by_compartment
         - remove_blocked_reactions
         - save_comparison_csv
+        - compare_semantic_models
+        - compare_model_files_semantically
+        - compare_workflow_runs
+        - save_semantic_comparison
 
 ## Compaction
 

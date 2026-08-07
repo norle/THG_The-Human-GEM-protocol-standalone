@@ -1,0 +1,23 @@
+# Reproducible and resumable runs
+
+Each run has a directory containing its manifest, configuration snapshot,
+stage attempts, artifacts, checksums, and provenance. Stage fingerprints allow
+valid work to be reused; `thg-run resume RUN_DIR --force-step STAGE` invalidates
+that stage and descendants while preserving previous attempts.
+
+```bash
+thg-run status runs/beta1 --json
+thg-run resume runs/beta1
+```
+
+Record artifact roles, input references, configuration snapshots, stage
+fingerprints, package versions, and service/cache provenance. Deterministic
+outputs are guaranteed only where the workflow and injected evidence make that
+possible. Interrupted stages can be resumed after their lock is cleared using
+the documented `unlock` command and an explicit stale-lock decision.
+
+The exact contracts are generated under the [workflow API reference](../api/workflows.md).
+
+Canonical APIs: [`start`][thg_protocol.workflow.runner.start],
+[`resume`][thg_protocol.workflow.runner.resume], and
+[`get_status`][thg_protocol.workflow.runner.get_status].

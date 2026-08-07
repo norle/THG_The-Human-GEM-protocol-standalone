@@ -1,9 +1,10 @@
-# β2 compartment expansion
+# THGβ2 — Expand by GPR and location
 
-!!! warning "Candidate-stage implementation"
-    The workflow writes `thg-beta2-candidate.json` and
-    `thg-beta2-candidate.xml`. Use `beta2_release_gate` and
-    `release_beta2` before publishing the `THGβ2` filenames.
+## What this workflow does
+
+THGβ2 consumes a verified β1 artifact, resolves GPR and localization evidence,
+plans compartment expansion, applies explicit decisions, and validates a
+candidate model.
 
 β2 consumes either a checksum-verified `export-beta1` model artifact or an
 explicitly declared external β1-equivalent input. It normalizes recorded
@@ -30,7 +31,7 @@ For a direct external input, the configuration must include:
 }
 ```
 
-The maintained branch should instead reference the β1 export:
+For a maintained run, reference the β1 export:
 
 ```json
 "upstream": {
@@ -78,3 +79,10 @@ gate = beta2_release_gate("runs/example-beta2/artifacts/export-beta2/attempt-000
 if gate["passed"]:
     release_beta2("runs/example-beta2/artifacts/export-beta2/attempt-0001")
 ```
+
+## Candidate and release-gate lifecycle
+
+The workflow writes candidate JSON/SBML artifacts and supporting evidence.
+`beta2_release_gate` checks the required upstream and validation conditions;
+`release_beta2` promotes the candidate only after the gate passes. An external
+β1-equivalent input must be explicitly declared and its evidence preserved.

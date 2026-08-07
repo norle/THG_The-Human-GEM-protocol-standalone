@@ -101,7 +101,7 @@ results/practical-quickstart/
 The first branch above demonstrates local reconstruction and model enrichment
 building blocks. It omits live biological harvesting, GPR expansion, a second
 scientific model branch, merge iteration, MEMOTE, and metabolic-task analysis.
-Continue with the [complete protocol](protocol/index.md) for those distinctions.
+Continue with the [workflow overview](workflows/index.md) for those distinctions.
 
 ## Troubleshooting
 

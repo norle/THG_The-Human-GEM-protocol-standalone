@@ -1,9 +1,9 @@
-# β1 reference-model curation
+# THGβ1 — Curate a reference GEM
 
-!!! warning "Candidate-stage implementation"
-    The maintained workflow writes a `thg-beta1-candidate` model. It must not
-    be called THGβ1 until the release gate in the functional implementation
-    is satisfied for the pinned sanctioned input.
+## What this workflow does
+
+THGβ1 inventories and curates a caller-owned COBRA JSON or SBML reference GEM
+through explicit evidence, proposals, decisions, mutation, and validation.
 
 The β1 core takes a caller-owned COBRA JSON or SBML model and performs an
 offline, proposal-driven curation pass. It inventories the model, normalizes
@@ -11,7 +11,7 @@ identities and GPRs supplied by the caller, audits formula and charge balance,
 applies only configured corrections, consolidates exact duplicates, and
 writes a reproducible artifact bundle.
 
-## Python API
+## Run with Python
 
 ```python
 from thg_protocol.curation.beta1 import run_beta1
@@ -75,7 +75,7 @@ After a sanctioned run passes the gate, use
 [`release_beta1`][thg_protocol.curation.beta1.release_beta1] to promote the
 candidate files to `thg-beta1.json` and `thg-beta1.xml`.
 
-## Resumable workflow configuration
+## Configuration and CLI
 
 ```json
 {
@@ -97,6 +97,13 @@ JSON/SBML candidates, a semantic signature, validation, ledger, and inventory
 artifacts under the run directory. It also writes an explicit
 `beta1-decisions.jsonl` artifact, including an empty record set when no
 decision file is configured. The input path is never overwritten.
+
+## Candidate and release-gate lifecycle
+
+Runs produce candidate artifacts. `beta1_release_gate` checks the required
+validation and provenance conditions; `release_beta1` then promotes the bundle
+to `thg-beta1.json` and `thg-beta1.xml`. A run does not automatically make
+every candidate file a released artifact.
 
 ## Evidence boundary
 

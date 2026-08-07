@@ -1,0 +1,23 @@
+# CLI reference
+
+| Command | Purpose |
+| --- | --- |
+| `thg-run start CONFIG` | Start a generic configured workflow, including Human Database and final THG |
+| `thg-run beta1 CONFIG` | Start a registered β1 workflow |
+| `thg-run beta2 CONFIG` | Start a registered β2 workflow |
+| `thg-run validate CONFIG` | Start a registered validation workflow |
+| `thg-run compare CONFIG` | Start a registered comparison workflow |
+| `thg-run resume RUN_DIR` | Resume valid stages |
+| `thg-run status RUN_DIR [--json]` | Inspect run state |
+| `thg-run unlock RUN_DIR [--force]` | Remove a stale lock deliberately |
+| `thg-compare ...` | Compare models; add `--semantic` for semantic JSON output |
+| `thg-gapfill ...` | Run the gapfill pipeline |
+| `thg-pathway ...` | Apply a pathway configuration |
+
+`thg-run human-database` and `thg-run final-thg` are not named commands;
+those workflows currently use `thg-run start` with a corresponding `workflow`
+value. CLI failures return non-zero status and preserve the run error/provenance
+where a run directory exists. Use the [workflow guides](../workflows/index.md)
+for task context and examples.
+
+The generated parser API remains available on the [CLI API page](../api/cli.md).

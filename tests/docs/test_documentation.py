@@ -71,9 +71,11 @@ def test_documentation_build_has_no_unresolved_links_or_markup(tmp_path):
     site = _build_site(tmp_path)
     documents = _html_documents(site)
 
-    assert (site / "data-and-model-files" / "index.html").exists()
+    assert (site / "reference" / "io-and-config" / "index.html").exists()
     assert (site / "examples" / "index.html").exists()
     assert not (site / "plans").exists()
+    assert (site / "workflows" / "validation" / "index.html").exists()
+    assert not (site / "protocol").exists()
 
     unresolved: list[str] = []
     for current, parser in documents.items():
@@ -98,6 +100,26 @@ def test_documentation_build_has_no_unresolved_links_or_markup(tmp_path):
         if re.search(r":(?:func|mod):", path.read_text())
     ]
     assert not literals, "unresolved Sphinx markup: " + ", ".join(literals)
+
+
+def test_navigation_uses_current_user_oriented_information_architecture():
+    config = (ROOT / "mkdocs.yml").read_text(encoding="utf-8")
+    for label in (
+        "Getting started:",
+        "THG workflows:",
+        "Tools:",
+        "Reference:",
+        "Contributing:",
+        "About THG:",
+    ):
+        assert label in config
+    for obsolete in (
+        "Individual operations",
+        "Phase 0 foundations",
+        "Capability and evidence status",
+        "Published protocol coverage",
+    ):
+        assert obsolete not in config
 
 
 def test_canonical_api_inventory_and_workflow_links(tmp_path):

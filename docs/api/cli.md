@@ -19,7 +19,7 @@ thg-compare --help
 thg-run --help
 ```
 
-The [workflow pages](../usage.md) contain CLI examples and the generated
+The [workflow pages](../workflows/index.md) contain CLI examples and the generated
 reference pages contain the parser and error contracts.
 
 ## Recommended entry points

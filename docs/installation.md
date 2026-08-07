@@ -38,6 +38,26 @@ For example:
 python -m pip install -e '.[figures]'
 ```
 
-The relevant [task guide](usage.md) states any additional requirements. Users
-building the package, documentation, or test environment should see
-[development](development.md).
+The relevant [workflow](workflows/index.md) or [tool](tools/analysis.md) guide
+states any additional requirements.
+
+## Verify your installation
+
+Check the installed entry points:
+
+```bash
+thg-run --help
+thg-compare --help
+thg-gapfill --help
+thg-pathway --help
+```
+
+An API-level smoke test is also useful:
+
+```bash
+python -c "import thg_protocol; print(thg_protocol.__name__)"
+```
+
+The optional `memote`, solver, database, cell-specific, and figures extras are
+only needed for their corresponding features. See the [CLI reference](reference/cli.md)
+and [I/O and configuration reference](reference/io-and-config.md).

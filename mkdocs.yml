@@ -4,6 +4,32 @@ site_url: https://norle.github.io/THG_The-Human-GEM-protocol-standalone/
 docs_dir: docs
 exclude_docs: |
   plans/**
+  internal/**
+  history/**
+  project-history.md
+  api-smoke-test.md
+  workflow-overview.md
+  usage.md
+  protocol/**
+  parity/**
+  legacy-api-inventory.md
+  legacy-workflows.md
+  service-boundary-audit.md
+  api-contracts.md
+  workflows/annotation.md
+  workflows/cell-specific.md
+  workflows/comparison.md
+  workflows/database.md
+  workflows/figures.md
+  workflows/gapfill.md
+  workflows/memote.md
+  workflows/merge.md
+  workflows/model-build.md
+  workflows/network-analysis.md
+  workflows/pathway.md
+  workflows/phase0-foundations.md
+  workflows/resumable-run.md
+  api/index.md
 theme:
   name: material
   features:
@@ -59,60 +85,34 @@ plugins:
 nav:
   - Home: index.md
   - Getting started:
-      - Project history and lineage: project-history.md
       - Installation: installation.md
-      - Workflow overview: workflow-overview.md
-      - Practical quickstart: quickstart.md
-      - API smoke test: api-smoke-test.md
-  - Run the THG protocol:
-      - Complete workflow: protocol/index.md
-      - Curate an existing GEM: protocol/reference-model.md
-      - Construct the Human Database: protocol/human-database.md
-      - Merge and validate: protocol/merge-and-validate.md
-      - Worked end-to-end example: protocol/end-to-end-example.md
-      - Published protocol coverage: protocol/implementation-status.md
-      - Capability and evidence status: protocol/capability-status.md
-  - Individual operations:
-      - Operation reference: usage.md
-      - Model reconstruction: workflows/database.md
-      - Model enrichment: workflows/model-build.md
-      - Annotation and identification: workflows/annotation.md
-      - β1 reference-model curation: workflows/beta1.md
-      - β2 compartment expansion: workflows/beta2.md
-      - Pathway implementation: workflows/pathway.md
-      - Gapfill: workflows/gapfill.md
-      - Merge: workflows/merge.md
-      - Network analysis: workflows/network-analysis.md
-      - Model comparison: workflows/comparison.md
-      - MEMOTE and task analysis: workflows/memote.md
-      - Resumable engineering runs: workflows/resumable-run.md
-      - Phase 0 foundations: workflows/phase0-foundations.md
-      - Cell-specific models: workflows/cell-specific.md
-      - Figures and reports: workflows/figures.md
+      - Quickstart: quickstart.md
+      - Workflow overview: workflows/index.md
+  - THG workflows:
+      - THGβ1 — Curate a reference GEM: workflows/beta1.md
+      - THGβ2 — Expand by GPR and location: workflows/beta2.md
+      - Human Database: workflows/human-database.md
+      - Final THG — Merge and validate: workflows/final-thg.md
+      - Validation: workflows/validation.md
+      - Reproducible and resumable runs: workflows/runs.md
+  - Tools:
+      - Model construction and enrichment: tools/model-construction.md
+      - Annotation and GPRs: tools/annotation.md
+      - Pathways and gap filling: tools/pathways-gapfill.md
+      - Model comparison and analysis: tools/analysis.md
+      - Cell-specific models: tools/cell-specific.md
   - Reference:
-      - Inputs, outputs, and file formats: data-and-model-files.md
-      - Examples: examples/README.md
-      - Python and CLI overview: api/index.md
-      - Core and I/O: api/core.md
-      - Database and model construction: api/construction.md
-      - Annotation and GPR: api/annotation.md
-      - Services: api/services.md
-      - Workflows: api/workflows.md
-      - Analysis: api/analysis.md
-      - Figures: api/figures.md
-      - CLI commands: api/cli.md
-  - Maintainers:
-      - Development: development.md
-      - Documentation contribution: documentation-contributing.md
-      - Release validation: release-validation.md
-      - Dependency compatibility: dependency-compatibility.md
-      - Package architecture: architecture.md
-      - Repository map: repository-map.md
-      - Tracked artifact inventory: artifact-inventory.md
-      - Service boundary audit: service-boundary-audit.md
-      - Git LFS standalone repository: git-lfs-standalone-repository.md
-      - Legacy parity evidence: parity/README.md
-      - Parity contracts: parity/contracts/index.md
-      - Python API contracts: api-contracts.md
-      - Legacy workflow status: legacy-workflows.md
-      - Legacy API inventory: legacy-api-inventory.md
+      - Inputs, outputs, and configuration: reference/io-and-config.md
+      - CLI: reference/cli.md
+      - Python API:
+          - Core and I/O: api/core.md
+          - Construction: api/construction.md
+          - Annotation and GPR: api/annotation.md
+          - Workflows: api/workflows.md
+          - Analysis: api/analysis.md
+          - Services: api/services.md
+  - Contributing:
+      - Development and releases: contributing/development.md
+      - Architecture: contributing/architecture.md
+      - Repository and data management: contributing/repository.md
+  - About THG: about/history.md

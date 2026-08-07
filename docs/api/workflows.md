@@ -14,6 +14,33 @@ for complete user-facing operations. Use [`start`][thg_protocol.workflow.runner.
 and [`resume`][thg_protocol.workflow.runner.resume] for the documented
 restartable engineering DAG.
 
+## Validation, tasks, and MEMOTE
+
+::: thg_protocol.validation
+    options:
+      members:
+        - PROFILES
+        - CheckResult
+        - load_model
+        - minimal_inconsistent_sets
+        - stoichiometric_consistency
+        - validate_model
+
+::: thg_protocol.tasks
+    options:
+      members:
+        - MetabolicTask
+        - TaskSuite
+        - load_task_suite
+        - run_task
+        - run_tasks
+        - run_task_suite
+
+::: thg_protocol.memote
+    options:
+      members:
+        - run_memote
+
 ## β1 curation
 
 ::: thg_protocol.curation.beta1
