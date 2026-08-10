@@ -1,0 +1,28 @@
+{
+  "format_version": 2,
+  "workflow": "final-thg",
+  "run": {
+    "name": "final-thg",
+    "output_dir": "../runs/final-thg"
+  },
+  "final_thg": {
+    "beta2_upstream": {
+      "run_dir": "../runs/beta2",
+      "stage_id": "beta2-export",
+      "role": "model"
+    },
+    "database_upstream": {
+      "run_dir": "../runs/human-database",
+      "stage_id": "human-database-reconstruct",
+      "role": "model"
+    },
+    "source_precedence": "base",
+    "direction": "strict",
+    "proton_water": "strict",
+    "formula_charge": "report",
+    "bounds": "report",
+    "gpr": "report",
+    "validation_profile": "final-standard",
+    "max_repair_iterations": 0
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "format_version": 2,
+  "workflow": "human-database",
+  "run": {
+    "name": "human-database",
+    "output_dir": "../runs/human-database"
+  },
+  "human_database": {
+    "records": "../inputs/database/records.json",
+    "mode": "offline",
+    "model_id": "human-database",
+    "source_release": "offline-snapshot"
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "format_version": 2,
+  "workflow": "validate",
+  "run": {
+    "name": "validation",
+    "output_dir": "../runs/validation"
+  },
+  "validation": {
+    "input_model": "../inputs/models/final-thg.json",
+    "profile": "final-standard",
+    "run_solver": false,
+    "run_memote": false
+  }
+}

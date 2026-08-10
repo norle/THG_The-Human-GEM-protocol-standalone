@@ -1,0 +1,20 @@
+{
+  "format_version": 2,
+  "workflow": "beta2",
+  "run": {
+    "name": "beta2",
+    "output_dir": "../runs/beta2"
+  },
+  "beta2": {
+    "upstream": [
+      {
+        "run_dir": "../runs/beta1",
+        "stage_id": "beta1-export",
+        "role": "model"
+      }
+    ],
+    "mode": "apply-all",
+    "fallback_location": "cytosol",
+    "uncertainty_policy": "report"
+  }
+}

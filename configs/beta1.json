@@ -1,0 +1,13 @@
+{
+  "format_version": 2,
+  "workflow": "beta1",
+  "run": {
+    "name": "beta1",
+    "output_dir": "../runs/beta1"
+  },
+  "beta1": {
+    "input_model": "../inputs/models/human1.xml",
+    "mode": "apply-all",
+    "balance_strategy": "explicit-only"
+  }
+}

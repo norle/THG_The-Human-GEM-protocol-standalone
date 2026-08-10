@@ -20,6 +20,24 @@ A normal invocation looks like:
 thg-run beta1 configs/beta1.json
 ```
 
+The generated templates can be run in this order:
+
+```bash
+thg-run beta1 configs/beta1.json
+thg-run beta2 configs/beta2.json
+thg-run start configs/human-database.json
+thg-run start configs/final-thg.json
+thg-run validate configs/validation.json
+```
+
+`beta1` and `human-database` consume caller-owned files from `inputs/`.
+`beta2` consumes the `beta1-export` model artifact, and `final-thg` consumes
+the `beta2-export` and `human-database-reconstruct` model artifacts. Those
+upstream runs must exist and be complete before their downstream configs are
+started. The validation template points at an exported model file in
+`inputs/models/`; populate that caller-owned path with the model you want to
+validate before starting the validation run.
+
 Filesystem paths declared inside a config are resolved relative to the config
 file. For example, a config in `configs/` can refer to
 `../inputs/models/human1.xml` and write its generated run to
