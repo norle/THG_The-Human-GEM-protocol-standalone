@@ -6,7 +6,7 @@
     "output_dir": "../runs/beta1"
   },
   "beta1": {
-    "input_model": "../inputs/models/human1.xml",
+    "input_model": "../inputs/models/Human2.xml",
     "mode": "apply-all",
     "balance_strategy": "explicit-only"
   }

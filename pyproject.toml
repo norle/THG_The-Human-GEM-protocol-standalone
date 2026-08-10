@@ -16,7 +16,9 @@ dependencies = [
   "cobra>=0.26",
   "networkx>=2.6",
   "numpy",
-  "pandas",
+  # pandas 1.3.x has no Python 3.12 support and its source build is
+  # incompatible with current setuptools (it imports pkg_resources).
+  "pandas>=2.1.4",
   "python-libsbml",
   "requests",
   "scipy",
