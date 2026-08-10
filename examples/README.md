@@ -15,12 +15,12 @@ The script runs:
 
 | Example | Command | Purpose |
 | --- | --- | --- |
-| β1 | `thg-run beta1` | Curate a caller-owned reference model |
-| β2 | `thg-run beta2` | Expand a declared β1-equivalent model |
-| Human Database | `thg-run start` | Reconstruct a model from normalized records |
-| Final THG | `thg-run start` | Merge two model branches and validate the candidate |
-| Validation | `thg-run validate` | Run the structural validation workflow |
-| Comparison | `thg-run compare` | Exercise the registered comparison run |
+| β1 | `scripts/run_beta1.sh` | Curate a caller-owned reference model |
+| β2 | `scripts/run_beta2.sh` | Expand a declared β1-equivalent model |
+| Human Database | `scripts/run_human_database.sh` | Reconstruct a model from normalized records |
+| Final THG | `scripts/run_final_thg.sh` | Merge two model branches and validate the candidate |
+| Validation | `scripts/run_validation.sh` | Run the structural validation workflow |
+| Comparison | `scripts/run_compare.sh` | Exercise the registered comparison run |
 
 Generated run directories are written under `examples/output/`, which is
 ignored by Git. Delete that directory when you want a clean rerun, or use
@@ -32,6 +32,9 @@ inspected or copied as templates. Run configurations from the repository root;
 the workflow loader resolves input paths relative to each configuration file.
 The Final THG template uses `structural-fast` because the toy models do not
 represent a release-quality GEM; use `final-standard` for a real candidate.
+
+Each workflow can also be run independently with its script in
+`examples/scripts/`.
 
 For lower-level Python APIs—reconstruction, pathway implementation, analysis,
 and model comparison—run:

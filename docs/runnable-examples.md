@@ -23,6 +23,26 @@ This executes β1, β2, Human Database, Final THG, validation, and the
 registered comparison workflow. Generated run directories are written under
 `examples/output/`, which is ignored by Git.
 
+Each workflow also has its own directly runnable script:
+
+```text
+examples/scripts/
+├── run_beta1.sh
+├── run_beta2.sh
+├── run_human_database.sh
+├── run_final_thg.sh
+├── run_validation.sh
+├── run_compare.sh
+└── run_api_examples.py
+```
+
+For example:
+
+```bash
+./examples/scripts/run_beta1.sh
+./examples/scripts/run_validation.sh
+```
+
 The individual JSON templates are in `examples/configs/`:
 
 ```text
