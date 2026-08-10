@@ -81,16 +81,17 @@ candidate files to `thg-beta1.json` and `thg-beta1.xml`.
 {
   "format_version": 2,
   "workflow": "beta1",
-  "run": {"name": "example-beta1", "output_dir": "runs/example-beta1"},
+  "run": {"name": "example-beta1", "output_dir": "../runs/example-beta1"},
   "beta1": {
-    "input_model": "input-model.json",
+    "input_model": "../inputs/models/input-model.json",
     "mode": "apply-all",
     "balance_strategy": "explicit-only"
   }
 }
 ```
 
-Run it with `thg-run beta1 config.json`. A configured model run executes the
+Save it as `configs/beta1.json` and run it with `thg-run beta1
+configs/beta1.json`. A configured model run executes the
 explicit 16-stage scientific DAG, keeping evidence, proposals, application,
 cleanup, and validation as separate resumable stages. A beta1 run exports
 JSON/SBML candidates, a semantic signature, validation, ledger, and inventory

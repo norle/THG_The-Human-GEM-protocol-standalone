@@ -33,14 +33,14 @@ THG_The-Human-GEM-protocol-standalone/
 │   ├── pathway_config.json
 │   ├── metabolite_ids.json
 │   └── comparison_model.json
-└── results/
+└── runs/
 ```
 
 ## Execute in order
 
-Save the following as `results/run_miniature.py`, then run
-`python results/run_miniature.py` from the repository root. Every output path
-is caller-owned and defined in the script.
+Save the following as `runs/run_miniature.py`, then run
+`python runs/run_miniature.py` from the repository root. Every output path
+is generated under `runs/` and defined in the script.
 
 ```python
 from pathlib import Path
@@ -55,16 +55,16 @@ from thg_protocol.pathway import implement_pathway_files
 
 root = Path(__file__).resolve().parents[1]
 examples = root / "docs" / "examples"
-results = root / "results" / "worked-miniature"
-results.mkdir(parents=True, exist_ok=True)
+run_dir = root / "runs" / "worked-miniature"
+run_dir.mkdir(parents=True, exist_ok=True)
 
-reference = results / "reference-model.json"
+reference = run_dir / "reference-model.json"
 model = reconstruct_model_from_json(examples / "records.json", output_path=reference)
 assert model.id == "docs-toy"
 print("reference", len(model.metabolites), len(model.reactions))
 print("annotations", analyze_model_annotations(reference))
 
-enriched = results / "enriched-model.json"
+enriched = run_dir / "enriched-model.json"
 pathway = implement_pathway_files(
     examples / "quickstart_model.json",
     examples / "pathway_config.json",
@@ -76,11 +76,11 @@ print("enrichment", pathway["compartments_added"])
 
 loaded = load_json_model(enriched)
 components = find_network_components(loaded)
-write_component_report(components, results / "components.json")
+write_component_report(components, run_dir / "components.json")
 print("connected", components["is_fully_connected"])
 print("unbalanced", unbalanced_reactions(loaded))
 
-comparison_dir = results / "comparison"
+comparison_dir = run_dir / "comparison"
 comparison = compare_models_from_files(
     enriched, examples / "comparison_model.json", comparison_dir
 )
@@ -95,7 +95,7 @@ comparison checkpoint is the two CSV files in `comparison/`.
 ## Files after execution
 
 ```text
-results/worked-miniature/
+runs/worked-miniature/
 ├── reference-model.json
 ├── enriched-model.json
 ├── components.json

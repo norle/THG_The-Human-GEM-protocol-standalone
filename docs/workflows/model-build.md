@@ -47,9 +47,9 @@ from thg_protocol.model_build import build_model
 
 report = build_model(
     "input/reference.json",
-    "results/reference/enriched.json",
-    cache_dir="results/reference/cache",
-    errors_path="results/reference/errors.json",
+    "runs/reference/enriched.json",
+    cache_dir="runs/reference/cache",
+    errors_path="runs/reference/errors.json",
 )
 print(report.output_path, report.errors)
 ```

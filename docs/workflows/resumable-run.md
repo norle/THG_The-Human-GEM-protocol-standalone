@@ -13,10 +13,10 @@ attempt. It is offline by default and does not require a solver or MEMOTE.
 ## Commands
 
 ```bash
-thg-run start path/to/run-config.json
-thg-run status results/my-run
-thg-run resume results/my-run
-thg-run unlock results/my-run --force
+thg-run start configs/run-config.json
+thg-run status runs/my-run
+thg-run resume runs/my-run
+thg-run unlock runs/my-run --force
 ```
 
 `status` also accepts `--json`. Use `resume --force-step validation` to rerun
@@ -29,14 +29,14 @@ validation and its optional descendants without deleting earlier artifacts.
   "format_version": 1,
   "run": {
     "name": "example-thg-run",
-    "output_dir": "results/example-thg-run"
+    "output_dir": "../runs/example-thg-run"
   },
   "reference": {
     "mode": "prebuilt",
-    "input_model": "inputs/reference.json"
+    "input_model": "../inputs/models/reference.json"
   },
   "database": {
-    "records": "inputs/normalized-records.json"
+    "records": "../inputs/database/normalized-records.json"
   },
   "merge": {
     "remove_isolated_metabolites": false
@@ -47,10 +47,9 @@ validation and its optional descendants without deleting earlier artifacts.
 }
 ```
 
-Relative input paths are resolved against the configuration file. The output
-directory is resolved against the working directory when `start` is called;
-the normalized absolute values are saved in `config.snapshot.json`, so resume
-does not require the original configuration file.
+Relative filesystem paths are resolved against the configuration file. The
+normalized absolute values are saved in `config.snapshot.json`, so resume does
+not require the original configuration file.
 
 ## Artifacts
 

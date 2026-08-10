@@ -17,9 +17,9 @@ For a direct external input, the configuration must include:
 {
   "format_version": 2,
   "workflow": "beta2",
-  "run": {"name": "example-beta2", "output_dir": "runs/example-beta2"},
+  "run": {"name": "example-beta2", "output_dir": "../runs/example-beta2"},
   "beta2": {
-    "input_model": "beta1-equivalent.json",
+    "input_model": "../inputs/models/beta1-equivalent.json",
     "external_beta1_equivalent": true,
     "mode": "apply-all",
     "gene_locations": {

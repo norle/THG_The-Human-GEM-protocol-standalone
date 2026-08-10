@@ -18,7 +18,7 @@ pathway-list adapter is not implied by workflow verification.
 from thg_protocol.database import reconstruct_model_from_json
 
 model = reconstruct_model_from_json(
-    "docs/examples/records.json",
+    "inputs/database/records.json",
     output_path="runs/human-database/network.json",
 )
 ```
@@ -29,12 +29,12 @@ The generic runner is intentional:
 
 ```json
 {"format_version": 2, "workflow": "human-database",
- "run": {"name": "human-db", "output_dir": "runs/human-db"},
- "human_database": {"records": "docs/examples/records.json"}}
+ "run": {"name": "human-db", "output_dir": "../runs/human-db"},
+ "human_database": {"records": "../inputs/database/records.json"}}
 ```
 
 ```bash
-thg-run start human-database-config.json
+thg-run start configs/human-database.json
 ```
 
 ## Outputs and validation

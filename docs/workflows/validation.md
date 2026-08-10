@@ -11,8 +11,8 @@ model-test failures.
 
 ```json
 {"format_version": 2, "workflow": "validate",
- "run": {"name": "validation", "output_dir": "runs/validation"},
- "validation": {"input_model": "model.json", "profile": "final-standard",
+ "run": {"name": "validation", "output_dir": "../runs/validation"},
+ "validation": {"input_model": "../inputs/models/model.json", "profile": "final-standard",
                  "run_memote": false}}
 ```
 

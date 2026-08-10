@@ -36,8 +36,8 @@ avoid it or configure the environment when it is not available.
 ## Run from the command line
 
 ```bash
-thg-compare results/model-a.json results/model-b.json \
-  --output-dir results/comparison
+thg-compare runs/model-a.json runs/model-b.json \
+  --output-dir runs/comparison
 ```
 
 ## Run from Python
@@ -46,9 +46,9 @@ thg-compare results/model-a.json results/model-b.json \
 from thg_protocol.analysis.compare import compare_models_from_files
 
 reports = compare_models_from_files(
-    "results/model-a.json",
-    "results/model-b.json",
-    "results/comparison",
+    "runs/model-a.json",
+    "runs/model-b.json",
+    "runs/comparison",
 )
 print(reports["raw"]["_summary"])
 ```

@@ -207,7 +207,7 @@ def load_start_config(path: str | Path) -> RunConfig:
         raise ConfigError(f"configuration is not valid JSON: {error.msg}") from error
     if not isinstance(payload, dict):
         raise ConfigError("configuration must be a JSON object")
-    return _parse(payload, source.parent, output_base=Path.cwd().resolve())
+    return _parse(payload, source.parent, output_base=source.parent)
 
 
 def load_workflow_config(path: str | Path) -> WorkflowConfig:
@@ -222,7 +222,7 @@ def load_workflow_config(path: str | Path) -> WorkflowConfig:
     if not isinstance(payload, dict):
         raise ConfigError("configuration must be a JSON object")
     return _parse_workflow(
-        payload, source.parent, output_base=Path.cwd().resolve(), source=source
+        payload, source.parent, output_base=source.parent, source=source
     )
 
 

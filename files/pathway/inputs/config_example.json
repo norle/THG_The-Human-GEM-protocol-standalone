@@ -1,11 +1,11 @@
 {
   "pathway_name": "Example_Pathway",
   "model": {
-    "base": "examples/inputs/endoA_250917_3.json",
-    "output": "examples/outputs/endoA_250917_3_with_Example_Pathway.json"
+    "base": "../../../../inputs/models/endoA_250917_3.json",
+    "output": "../../../../runs/pathway/endoA_250917_3_with_Example_Pathway.json"
   },
   "visualizations": {
-    "output_directory": "examples/outputs/figures",
+    "output_directory": "../../../../runs/pathway/figures",
     "d3js": "example_pathway_network_d3.html",
     "plotly": "example_pathway_network_plotly.html",
     "graphviz_base": "example_pathway_network"
@@ -17,7 +17,7 @@
     }
   ],
   "metabolites": {
-    "database_file": "examples/outputs/data/metabolite_id_database.json",
+    "database_file": "../../../../inputs/database/metabolite_id_database.json",
     "targets": [
       "ATP",
       "ADP",

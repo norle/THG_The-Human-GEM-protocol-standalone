@@ -21,7 +21,7 @@ No network, credentials, solver, or optional extra is required.
 ```text
 project/
 ├── inputs/
-└── results/
+└── runs/
 ```
 
 The commands below use repository paths directly. In a copied project, place
@@ -43,11 +43,11 @@ from thg_protocol.database import reconstruct_model_from_json
 from thg_protocol.pathway import implement_pathway_files
 
 examples = Path("docs/examples")
-results = Path("results/practical-quickstart")
-results.mkdir(parents=True, exist_ok=True)
+run_dir = Path("runs/practical-quickstart")
+run_dir.mkdir(parents=True, exist_ok=True)
 
 # 1. Load normalized records and write a caller-owned model.
-reference_path = results / "reference-model.json"
+reference_path = run_dir / "reference-model.json"
 model = reconstruct_model_from_json(
     examples / "records.json", output_path=reference_path
 )
@@ -57,7 +57,7 @@ print(model.id, len(model.metabolites), len(model.reactions))
 print(analyze_model_annotations(reference_path))
 
 # 3. Apply a deterministic, local pathway configuration.
-enriched_path = results / "enriched-model.json"
+enriched_path = run_dir / "enriched-model.json"
 pathway_result = implement_pathway_files(
     examples / "quickstart_model.json",
     examples / "pathway_config.json",
@@ -69,13 +69,13 @@ print(pathway_result["compartments_added"])
 # 4. Check connectivity and formula balance on the enriched model.
 enriched_model = load_json_model(enriched_path)
 component_result = find_network_components(enriched_model)
-write_component_report(component_result, results / "components.json")
+write_component_report(component_result, run_dir / "components.json")
 print(component_result["is_fully_connected"])
 print(unbalanced_reactions(enriched_model))
 
 # 5. Compare the enriched model with a second prepared model.
 comparison = compare_models_from_files(
-    enriched_path, examples / "comparison_model.json", results / "comparison"
+    enriched_path, examples / "comparison_model.json", run_dir / "comparison"
 )
 print(comparison["raw"]["_summary"])
 ```
@@ -83,13 +83,13 @@ print(comparison["raw"]["_summary"])
 Expected stable checkpoints are `docs-toy 4 1`, an annotation mapping
 containing `chebi`, one added compartment, and a written JSON component report.
 The exact comparison summary is data-dependent; inspect
-`results/practical-quickstart/comparison/` rather than treating it as a
+`runs/practical-quickstart/comparison/` rather than treating it as a
 scientific quality score.
 
 ## Files after execution
 
 ```text
-results/practical-quickstart/
+runs/practical-quickstart/
 ├── reference-model.json
 ├── enriched-model.json
 ├── components.json
@@ -106,6 +106,6 @@ Continue with the [workflow overview](workflows/index.md) for those distinctions
 ## Troubleshooting
 
 Run the script from the repository root so the fixture paths resolve. If an
-output is absent, check that the selected result directory is writable. Service
+ output is absent, check that the selected run directory is writable. Service
 backed operations are intentionally excluded; use static clients or the
 operation guides when testing those boundaries offline.

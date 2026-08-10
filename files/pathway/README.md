@@ -27,7 +27,7 @@ thg-pathway \
   --model files/pathway/inputs/endoA_250917_3.json \
   --config files/pathway/inputs/config_example.json \
   --database files/pathway/data/metabolite_id_database.json \
-  --output results/example_pathway.json
+  --output runs/pathway/example_pathway.json
 ```
 
 The command loads the model and configuration, applies the configured
@@ -44,7 +44,7 @@ result = implement_pathway_files(
     "files/pathway/inputs/endoA_250917_3.json",
     "files/pathway/inputs/config_example.json",
     "files/pathway/data/metabolite_id_database.json",
-    "results/example_pathway.json",
+    "runs/pathway/example_pathway.json",
 )
 print(result["reactions_added"])
 ```
@@ -87,7 +87,7 @@ thg-pathway \
   --model path/to/model.json \
   --config files/pathway/config/config_glycocalyx_pg.json \
   --database files/pathway/data/metabolite_id_database.json \
-  --output results/glycocalyx_proteoglycans.json
+  --output runs/pathway/glycocalyx_proteoglycans.json
 ```
 
 For the full supported workflow, see

@@ -32,12 +32,12 @@ objects, isolated-metabolite removal, and the optional output path.
 from cobra.io import load_json_model
 from thg_protocol.merge import merge_models
 
-base = load_json_model("results/reference/THG-beta2-like.json")
-incoming = load_json_model("results/database/human-network.json")
+base = load_json_model("runs/beta2/THG-beta2-like.json")
+incoming = load_json_model("runs/human-database/human-network.json")
 merged, report = merge_models(
     base,
     incoming,
-    output_path="results/merge/candidate-thg.json",
+    output_path="runs/final-thg/candidate-thg.json",
     remove_isolated_metabolites=False,
 )
 print(report)
@@ -76,7 +76,7 @@ Do not conflate the following activities:
 
    ```bash
    python -m pip install 'memote'
-   memote run --filename results/validation/memote.html results/merge/candidate-thg.json
+   memote run --filename runs/validation/memote.html runs/final-thg/candidate-thg.json
    ```
 
 5. Record essential-task validation as Archived when using the historical task

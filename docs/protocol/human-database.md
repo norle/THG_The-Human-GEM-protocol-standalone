@@ -66,7 +66,7 @@ from pathlib import Path
 from thg_protocol.database import reconstruct_model_from_json
 
 records = Path("docs/examples/records.json")
-output = Path("results/human-database/network.json")
+output = Path("runs/human-database/network.json")
 model = reconstruct_model_from_json(records, output_path=output)
 print(model.id, len(model.metabolites), len(model.reactions), output.exists())
 ```

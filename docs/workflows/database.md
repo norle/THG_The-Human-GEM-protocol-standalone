@@ -55,7 +55,7 @@ from thg_protocol.database import reconstruct_model_from_json
 
 model = reconstruct_model_from_json(
     Path("docs/examples/records.json"),
-    output_path=Path("results/reconstruction/model.json"),
+    output_path=Path("runs/reconstruction/model.json"),
 )
 print(model.id, len(model.reactions))
 ```

@@ -41,9 +41,9 @@ No installed merge CLI exists. Use the Python API or a caller script.
 from thg_protocol.merge import merge_models_from_paths
 
 merged, report = merge_models_from_paths(
-    "results/reference/model.json",
-    "results/database/model.json",
-    "results/merge/merged.json",
+    "runs/beta2/model.json",
+    "runs/human-database/model.json",
+    "runs/final-thg/merged.json",
     remove_isolated_metabolites=False,
 )
 print(report.added_reactions, report.overlapping_reactions)

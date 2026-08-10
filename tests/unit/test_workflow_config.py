@@ -9,6 +9,7 @@ from thg_protocol.workflow.config import (
     config_to_dict,
     load_snapshot,
     load_start_config,
+    load_workflow_config,
     write_snapshot,
 )
 
@@ -39,6 +40,43 @@ def test_start_config_resolves_inputs_relative_to_config(tmp_path, monkeypatch):
     )
     assert config.database.records == (tmp_path / "inputs/records.json").resolve()
     assert config.run.output_dir == (tmp_path / "results/toy-run").resolve()
+
+
+def test_start_config_resolves_output_relative_to_config(tmp_path, monkeypatch):
+    config_dir = tmp_path / "configs"
+    config_dir.mkdir()
+    source = config_dir / "beta1.json"
+    payload = _payload(tmp_path)
+    payload["run"]["output_dir"] = "../runs/beta1"
+    payload["reference"]["input_model"] = "../inputs/reference.json"
+    payload["database"]["records"] = "../inputs/records.json"
+    source.write_text(json.dumps(payload), encoding="utf-8")
+    monkeypatch.chdir(tmp_path)
+
+    config = load_start_config(source)
+
+    assert config.run.output_dir == (tmp_path / "runs/beta1").resolve()
+
+
+def test_workflow_config_resolves_output_relative_to_config(tmp_path, monkeypatch):
+    config_dir = tmp_path / "configs"
+    config_dir.mkdir()
+    source = config_dir / "beta1.json"
+    source.write_text(
+        json.dumps(
+            {
+                "format_version": 2,
+                "workflow": "beta1",
+                "run": {"name": "beta1", "output_dir": "../runs/beta1"},
+            }
+        ),
+        encoding="utf-8",
+    )
+    monkeypatch.chdir(tmp_path)
+
+    config = load_workflow_config(source)
+
+    assert config.run.output_dir == (tmp_path / "runs/beta1").resolve()
 
 
 def test_unknown_keys_and_non_boolean_values_are_rejected(tmp_path):

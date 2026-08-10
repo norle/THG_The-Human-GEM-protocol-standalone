@@ -38,7 +38,7 @@ writes under the caller-selected directory and mutates only its loaded copy.
 
 ```bash
 thg-gapfill --model docs/examples/quickstart_model.json \
-  --output-dir results/gapfill
+  --output-dir runs/gapfill
 ```
 
 ## Run from Python
@@ -48,7 +48,7 @@ from thg_protocol.gapfill import run_pipeline
 
 result = run_pipeline(
     "docs/examples/quickstart_model.json",
-    "results/gapfill",
+    "runs/gapfill",
     max_additions=1,
 )
 print(result["model"])

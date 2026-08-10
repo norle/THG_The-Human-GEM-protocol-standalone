@@ -74,6 +74,38 @@ and dependency tradeoffs are described in the [installation guide](docs/installa
 For an installation-only check, run the [practical quickstart](docs/quickstart.md).
 Its small example is not a representative human reconstruction.
 
+## Workspace layout
+
+```text
+inputs/    Caller-owned models, records, evidence, and validation inputs.
+configs/   Versionable workflow run configurations.
+runs/      Generated, resumable THG runs and artifacts.
+```
+
+Inputs are caller-owned and read-only. Configs describe reproducible runs.
+Runs are generated and THG-owned. A workflow reads source material from
+`inputs/`, follows the instructions in `configs/`, and records its resumable
+execution state under `runs/`.
+
+For example, a configuration saved as `configs/beta1.json` can use paths
+relative to that file:
+
+```json
+{
+  "format_version": 2,
+  "workflow": "beta1",
+  "run": {
+    "name": "beta1",
+    "output_dir": "../runs/beta1"
+  },
+  "beta1": {
+    "input_model": "../inputs/models/human1.xml"
+  }
+}
+```
+
+Start it with `thg-run beta1 configs/beta1.json`.
+
 ```python
 from pathlib import Path
 
@@ -84,7 +116,7 @@ model = reconstruct_model(
     "smoke",
     [MetaboliteRecord("a_c", formula="C1H2"), MetaboliteRecord("b_c", formula="C1H2")],
     [ReactionRecord("R1", {"a_c": -1, "b_c": 1})],
-    output_path=Path("results/smoke/model.json"),
+    output_path=Path("runs/smoke/model.json"),
 )
 assert not unbalanced_reactions(model)
 ```
@@ -92,10 +124,10 @@ assert not unbalanced_reactions(model)
 ## Installed commands
 
 ```bash
-thg-gapfill --model model.json --output-dir results/gapfill
+thg-gapfill --model model.json --output-dir runs/gapfill
 thg-pathway --model model.json --config pathway.json \
-  --database metabolite_ids.json --output results/pathway.json
-thg-compare model_a.json model_b.json --output-dir results/compare
+  --database metabolite_ids.json --output runs/pathway.json
+thg-compare model_a.json model_b.json --output-dir runs/compare
 ```
 
 Commands and Python APIs use caller-selected paths. Keep input models unchanged,

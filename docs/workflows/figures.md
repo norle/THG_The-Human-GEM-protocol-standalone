@@ -44,7 +44,7 @@ No installed figures CLI exists. Use Python.
 from thg_protocol.figures.models import model_component_summary
 from cobra.io import load_json_model
 
-model = load_json_model("results/model.json")
+model = load_json_model("runs/model.json")
 summary = model_component_summary(model)
 print(summary.reactions, summary.metabolites)
 ```

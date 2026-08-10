@@ -40,7 +40,7 @@ mutates its model mapping. The file wrapper writes a separate explicit output.
 thg-pathway --model docs/examples/quickstart_model.json \
   --config docs/examples/pathway_config.json \
   --database docs/examples/metabolite_ids.json \
-  --output results/pathway/model.json
+  --output runs/pathway/model.json
 ```
 
 ## Run from Python
@@ -52,7 +52,7 @@ result = implement_pathway_files(
     "docs/examples/quickstart_model.json",
     "docs/examples/pathway_config.json",
     "docs/examples/metabolite_ids.json",
-    "results/pathway/model.json",
+    "runs/pathway/model.json",
 )
 print(result["compartments_added"])
 ```

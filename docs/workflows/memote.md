@@ -42,7 +42,7 @@ after installation.
 
 ```bash
 python -m pip install 'memote'
-memote run --filename results/validation/memote.html results/model.xml
+memote run --filename runs/validation/memote.html runs/model.xml
 ```
 
 ## Run from Python

@@ -46,11 +46,11 @@ No installed cell-specific CLI exists. Use Python.
 from cobra.io import load_json_model
 from thg_protocol.cell_specific import reduce_model_by_activity
 
-model = load_json_model("results/model.json")
+model = load_json_model("runs/model.json")
 tailored, report = reduce_model_by_activity(
     model,
     "inputs/activity.csv",
-    output_path="results/cell-specific/model.json",
+    output_path="runs/cell-specific/model.json",
 )
 print(report.retained_reactions, report.removed_reactions)
 ```

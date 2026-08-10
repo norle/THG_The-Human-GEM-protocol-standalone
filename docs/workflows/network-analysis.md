@@ -45,9 +45,9 @@ from cobra.io import load_json_model
 from thg_protocol.analysis import find_network_components, write_component_report
 from thg_protocol.analysis.consistency import unbalanced_reactions
 
-model = load_json_model("results/model.json")
+model = load_json_model("runs/model.json")
 components = find_network_components(model)
-write_component_report(components, "results/validation/components.json")
+write_component_report(components, "runs/validation/components.json")
 print(components["is_fully_connected"], unbalanced_reactions(model))
 ```
 
