@@ -85,7 +85,6 @@ nav:
   - Getting started:
       - Installation: installation.md
       - Quickstart: quickstart.md
-      - Runnable examples: runnable-examples.md
       - Workflow overview: workflows/index.md
   - THG workflows:
       - THGβ1 — Curate a reference GEM: workflows/beta1.md

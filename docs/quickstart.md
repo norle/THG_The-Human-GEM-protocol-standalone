@@ -6,9 +6,6 @@ configuration, check connectivity and formula balance, and compare the result.
 It uses the stable files in [`docs/examples/`](examples/README.md). The model is
 deliberately tiny and does not reproduce a research-quality human GEM.
 
-For copyable configurations covering the registered workflows, see the
-[runnable examples](runnable-examples.md).
-
 ## Prerequisites
 
 From a fresh checkout, use Python 3.10–3.12 and install the core package:
