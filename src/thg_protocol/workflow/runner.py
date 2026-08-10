@@ -2,8 +2,10 @@
 
 from __future__ import annotations
 
+import logging
 import os
 import shutil
+import time
 import traceback
 from collections.abc import Mapping
 from pathlib import Path
@@ -25,6 +27,8 @@ from .manifest import (
     write_manifest_atomic,
 )
 from .stages import STAGE_OBJECTS, Stage, StageContext, validate_stage_order
+
+LOGGER = logging.getLogger(__name__)
 
 
 class WorkflowError(RuntimeError):
@@ -138,6 +142,7 @@ def _execute(
         raise WorkflowError(f"unknown stage: {force_step}")
 
     if force_step is not None:
+        LOGGER.info("invalidating stage %s and its descendants", force_step)
         _invalidate(manifest, stages, force_step)
     for stage in stages:
         entry = _stage_entry(manifest, stage.id)
@@ -150,8 +155,9 @@ def _execute(
             )
     manifest["overall_status"] = "running"
     _write(run_dir, manifest)
+    LOGGER.info("running %s stages in %s", len(stages), run_dir)
 
-    for stage in stages:
+    for index, stage in enumerate(stages, start=1):
         entry = _stage_entry(manifest, stage.id)
         if not stage.enabled(config):
             if entry["status"] != "skipped" or entry.get("outputs"):
@@ -165,6 +171,7 @@ def _execute(
                     summary={},
                 )
                 _write(run_dir, manifest)
+            LOGGER.info("[%s/%s] %s: skipped (disabled)", index, len(stages), stage.id)
             continue
 
         fingerprint = sha256_json(
@@ -176,6 +183,10 @@ def _execute(
             and _artifacts_valid(entry, run_dir)
         )
         if valid_completed:
+            LOGGER.info(
+                "[%s/%s] %s: reused valid artifacts", index, len(stages), stage.id
+            )
+            LOGGER.debug("%s fingerprint: %s", stage.id, fingerprint)
             continue
 
         _invalidate(manifest, stages, stage.id)
@@ -198,6 +209,15 @@ def _execute(
             summary={},
         )
         _write(run_dir, manifest)
+        LOGGER.info(
+            "[%s/%s] %s: starting attempt %s",
+            index,
+            len(stages),
+            stage.id,
+            attempt,
+        )
+        LOGGER.debug("%s fingerprint: %s", stage.id, fingerprint)
+        started = time.monotonic()
         try:
             result = stage.run(
                 StageContext(config, run_dir, manifest, log_path), temporary
@@ -238,6 +258,16 @@ def _execute(
                 summary=dict(result.summary),
             )
             _write(run_dir, manifest)
+            LOGGER.info(
+                "[%s/%s] %s: completed in %.2fs",
+                index,
+                len(stages),
+                stage.id,
+                time.monotonic() - started,
+            )
+            LOGGER.debug("%s summary: %r", stage.id, dict(result.summary))
+            for record in records:
+                LOGGER.debug("%s output: %s", stage.id, record.get("path"))
         except KeyboardInterrupt as error:
             if temporary.exists():
                 failed = run_dir / "failed" / stage.id / f"attempt-{attempt:04d}"
@@ -269,12 +299,16 @@ def _execute(
             _write_exception_log(log_path, error)
             manifest["overall_status"] = "failed"
             _write(run_dir, manifest)
+            LOGGER.error(
+                "[%s/%s] %s: failed; log: %s", index, len(stages), stage.id, log_path
+            )
             raise StageFailedError(
                 f"stage '{stage.id}' failed: {_concise_error(error)}"
             ) from error
 
     manifest["overall_status"] = "completed"
     _write(run_dir, manifest)
+    LOGGER.info("workflow completed: %s", run_dir)
     return run_dir
 
 

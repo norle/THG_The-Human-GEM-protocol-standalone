@@ -7,8 +7,12 @@ that stage and descendants while preserving previous attempts.
 
 ```bash
 thg-run status runs/beta1 --json
-thg-run resume runs/beta1
+thg-run resume runs/beta1 --verbose
 ```
+
+Verbose mode reports each stage as it starts, completes, is skipped, or reuses
+a checksum-verified artifact. Use `-vv` when diagnosing a run to include stage
+fingerprints, summaries, and output paths.
 
 Record artifact roles, input references, configuration snapshots, stage
 fingerprints, package versions, and service/cache provenance. Deterministic

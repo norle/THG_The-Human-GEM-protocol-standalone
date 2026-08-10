@@ -14,6 +14,12 @@
 | `thg-gapfill ...` | Run the gapfill pipeline |
 | `thg-pathway ...` | Apply a pathway configuration |
 
+Add `-v`/`--verbose` to a starting or resume command to see live stage-level
+progress. Repeat it as `-vv` for fingerprints, result summaries, and artifact
+paths. For example: `thg-run beta1 configs/beta1.json -v` or
+`thg-run resume runs/beta1 -vv`. Progress is written to stderr so stdout remains
+available for the final result.
+
 `thg-run human-database` and `thg-run final-thg` are not named commands;
 those workflows currently use `thg-run start` with a corresponding `workflow`
 value. CLI failures return non-zero status and preserve the run error/provenance

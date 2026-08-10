@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import logging
 from pathlib import Path
 
 from .config import ConfigError
@@ -13,16 +14,50 @@ from .registered_runner import RegisteredWorkflowError
 from .runner import StageFailedError, WorkflowError, get_status, resume, start
 
 
+def _add_verbosity_argument(
+    parser: argparse.ArgumentParser, *, default: int | str = 0
+) -> None:
+    parser.add_argument(
+        "-v",
+        "--verbose",
+        action="count",
+        default=default,
+        help="show stage progress; repeat (-vv) for fingerprints and outputs",
+    )
+
+
+def _configure_logging(verbosity: int) -> None:
+    logger = logging.getLogger("thg_protocol.workflow")
+    for existing in tuple(logger.handlers):
+        if getattr(existing, "_thg_cli_handler", False):
+            logger.removeHandler(existing)
+    if verbosity < 1:
+        logger.setLevel(logging.NOTSET)
+        logger.propagate = True
+        return
+    logger.setLevel(logging.DEBUG if verbosity > 1 else logging.INFO)
+    handler = logging.StreamHandler()
+    handler._thg_cli_handler = True  # type: ignore[attr-defined]
+    handler.setFormatter(
+        logging.Formatter("%(asctime)s %(levelname)s %(message)s", "%H:%M:%S")
+    )
+    logger.addHandler(handler)
+    logger.propagate = False
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Run the THG resumable workflow.")
+    _add_verbosity_argument(parser)
     commands = parser.add_subparsers(dest="command", required=True)
 
     start_parser = commands.add_parser("start", help="start a new run")
     start_parser.add_argument("config", type=Path, help="JSON run configuration")
+    _add_verbosity_argument(start_parser, default=argparse.SUPPRESS)
 
     resume_parser = commands.add_parser("resume", help="resume an existing run")
     resume_parser.add_argument("run_dir", type=Path)
     resume_parser.add_argument("--force-step", choices=None, metavar="STAGE")
+    _add_verbosity_argument(resume_parser, default=argparse.SUPPRESS)
 
     status_parser = commands.add_parser("status", help="show validated run state")
     status_parser.add_argument("run_dir", type=Path)
@@ -43,6 +78,7 @@ def build_parser() -> argparse.ArgumentParser:
         workflow_parser.add_argument(
             "config", type=Path, help="format-2 workflow configuration"
         )
+        _add_verbosity_argument(workflow_parser, default=argparse.SUPPRESS)
     return parser
 
 
@@ -58,6 +94,7 @@ def _print_human_status(manifest: dict[str, object]) -> None:
 def main(argv: list[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
+    _configure_logging(getattr(args, "verbose", 0))
     try:
         if args.command == "start":
             print(f"run started: {start(args.config)}")
