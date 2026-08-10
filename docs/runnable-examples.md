@@ -28,11 +28,17 @@ Each workflow also has its own directly runnable script:
 ```text
 examples/scripts/
 ├── run_beta1.sh
+├── run_beta1.py
 ├── run_beta2.sh
+├── run_beta2.py
 ├── run_human_database.sh
+├── run_human_database.py
 ├── run_final_thg.sh
+├── run_final_thg.py
 ├── run_validation.sh
+├── run_validation.py
 ├── run_compare.sh
+├── run_compare.py
 └── run_api_examples.py
 ```
 
@@ -41,6 +47,13 @@ For example:
 ```bash
 ./examples/scripts/run_beta1.sh
 ./examples/scripts/run_validation.sh
+```
+
+The equivalent Python entry points use the workflow runner directly:
+
+```bash
+python examples/scripts/run_beta1.py
+python examples/scripts/run_validation.py
 ```
 
 The individual JSON templates are in `examples/configs/`:

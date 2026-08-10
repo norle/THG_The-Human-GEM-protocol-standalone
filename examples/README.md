@@ -36,6 +36,18 @@ represent a release-quality GEM; use `final-standard` for a real candidate.
 Each workflow can also be run independently with its script in
 `examples/scripts/`.
 
+Python equivalents use the same configurations through the canonical runner
+API:
+
+```bash
+python examples/scripts/run_beta1.py
+python examples/scripts/run_beta2.py
+python examples/scripts/run_human_database.py
+python examples/scripts/run_final_thg.py
+python examples/scripts/run_validation.py
+python examples/scripts/run_compare.py
+```
+
 For lower-level Python APIs—reconstruction, pathway implementation, analysis,
 and model comparison—run:
 
