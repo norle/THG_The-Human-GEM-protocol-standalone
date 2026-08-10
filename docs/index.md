@@ -6,7 +6,7 @@ scientific workflow described by Marin de Mas et al. in the [2023 protocol
 paper](https://doi.org/10.3390/bioengineering10050576), while keeping current
 software behavior and publication-artifact reproduction as separate claims.
 
-[Installation](installation.md) · [Quickstart](quickstart.md) · [Workflow overview](workflows/index.md)
+[Installation](installation.md) · [Quickstart](quickstart.md) · [Runnable examples](runnable-examples.md) · [Workflow overview](workflows/index.md)
 
 ```mermaid
 flowchart LR
@@ -27,6 +27,8 @@ flowchart LR
   cell-specific analysis.
 
 The [workflow overview](workflows/index.md) describes the scientific lifecycle.
+The [runnable examples](runnable-examples.md) provide offline configurations
+and scripts for exercising the workflows from a checkout.
 The [reference](reference/io-and-config.md) defines exact interfaces and file
 contracts. THG does not claim exact reproduction of a publication artifact
 unless a page explicitly identifies the separately verified evidence.

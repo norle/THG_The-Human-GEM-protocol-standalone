@@ -55,3 +55,6 @@ tests/fixtures/legacy_characterization/mass_balance/files/
 /files/model_variables.pkl
 /models/base/
 site/
+
+# Runnable example outputs are disposable.
+/examples/output/

@@ -15,6 +15,11 @@ independently, while β2 normally consumes a released β1 artifact.
 
 Comparison is a cross-workflow tool; use [model comparison and analysis](../tools/analysis.md).
 
+Runnable offline configurations for all of these workflow entry points are
+available in the [runnable examples](../runnable-examples.md). Use them to
+exercise the artifact and provenance flow with the repository's deterministic
+toy fixtures before adapting a configuration to a real model.
+
 ## Which workflow should I use?
 
 - Start with β1 when the input is a COBRA JSON or SBML reference GEM.

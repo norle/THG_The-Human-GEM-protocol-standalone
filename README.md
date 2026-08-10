@@ -65,6 +65,8 @@ and dependency tradeoffs are described in the [installation guide](docs/installa
 
 - [Practical quickstart](docs/quickstart.md): a small deterministic offline
   workflow through reconstruction, enrichment, checks, and comparison.
+- [Runnable examples](examples/README.md): configuration templates and a
+  convenience script for exercising the offline workflows.
 - [Complete THG workflow](docs/protocol/index.md): the scientific sequence,
   intermediate states, and current support boundaries.
 - [Operation and workflow overview](docs/index.md): annotation, reconstruction,
