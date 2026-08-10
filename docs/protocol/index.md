@@ -15,7 +15,7 @@ that scientific sequence from this package's modular operations. A GEM is a
 genome-scale metabolic model; Human1 is the reference GEM used by the paper;
 THG is the resulting Human GEM concept. For the relationship between the paper,
 the historical code, and this standalone package, see the [project history and
-lineage](../project-history.md).
+lineage](../about/history.md).
 
 ## The complete workflow
 

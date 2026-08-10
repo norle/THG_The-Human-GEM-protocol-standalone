@@ -4,6 +4,7 @@ import json
 
 import pytest
 
+from thg_protocol.workflow.config import ConfigError
 from thg_protocol.workflow.manifest import load_workflow_manifest
 from thg_protocol.workflow.registered_runner import RegisteredWorkflowError
 from thg_protocol.workflow.runner import get_status, resume, start
@@ -98,6 +99,48 @@ def test_registered_config_snapshot_is_self_contained_and_cli_aliases_exist(tmp_
     from thg_protocol.workflow.cli import main
 
     assert main(["beta1", str(wrong)]) == 2
+
+
+def test_registered_resume_rejects_snapshot_for_a_different_run_directory(tmp_path):
+    run = start(_config(tmp_path / "config.json", "beta1", tmp_path / "run"))
+    snapshot = run / "config.snapshot.json"
+    payload = json.loads(snapshot.read_text(encoding="utf-8"))
+    payload["run"]["output_dir"] = str(tmp_path / "other-run")
+    snapshot.write_text(json.dumps(payload), encoding="utf-8")
+
+    with pytest.raises(ConfigError, match="output_dir does not match"):
+        resume(run)
+
+
+def test_registered_resume_invalidates_changed_upstream_artifact(tmp_path):
+    beta1 = start(_config(tmp_path / "beta1.json", "beta1", tmp_path / "beta1-run"))
+    beta1_export = get_status(beta1)["steps"]["beta1-export"]["outputs"][0]
+    beta2 = start(
+        _config(
+            tmp_path / "beta2.json",
+            "beta2",
+            tmp_path / "beta2-run",
+            {
+                "upstream": [
+                    {
+                        "run_dir": str(beta1),
+                        "stage_id": "beta1-export",
+                        "role": "model",
+                    }
+                ]
+            },
+        )
+    )
+    before = get_status(beta2)
+    (beta1 / beta1_export["path"]).write_text("changed\n", encoding="utf-8")
+
+    with pytest.raises(RegisteredWorkflowError, match="stage 'beta2-input' failed"):
+        resume(beta2)
+
+    after = get_status(beta2)
+    assert after["steps"]["beta2-input"]["attempt"] == 2
+    assert after["steps"]["beta2-input"]["status"] == "failed"
+    assert before["steps"]["beta2-input"]["attempt"] == 1
 
 
 def test_decision_file_change_invalidates_application_and_descendants(tmp_path):

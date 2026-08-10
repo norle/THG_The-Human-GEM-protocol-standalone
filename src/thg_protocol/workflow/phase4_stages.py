@@ -8,6 +8,7 @@ from collections.abc import Mapping
 from pathlib import Path
 from typing import Any
 
+from .artifacts import upstream_fingerprint
 from .hashing import sha256_file
 from .stages import StageContext, StageResult, _dependency_path, _load_cobra_model
 
@@ -26,11 +27,29 @@ class HumanDatabaseStage:
 
     def fingerprint_data(self, context: StageContext) -> Mapping[str, object]:
         section = context.config.sections.get("human_database", {})
-        return {
+        result: dict[str, object] = {
             "stage": self.id,
             "version": self.implementation_version,
             "config": dict(section) if isinstance(section, Mapping) else {},
+            "dependencies": {
+                dependency: [
+                    str(output.get("sha256"))
+                    for output in context.manifest.get("steps", {})
+                    .get(dependency, {})
+                    .get("outputs", [])
+                    if isinstance(output, Mapping)
+                ]
+                for dependency in self.dependencies
+            },
         }
+        if isinstance(section, Mapping):
+            records = section.get("records")
+            result["records_sha256"] = (
+                sha256_file(records)
+                if isinstance(records, str) and Path(records).is_file()
+                else None
+            )
+        return result
 
     def run(self, context: StageContext, work_dir: Path) -> StageResult:
         section = context.config.sections.get("human_database", {})
@@ -147,11 +166,56 @@ class FinalTHGStage:
 
     def fingerprint_data(self, context: StageContext) -> Mapping[str, object]:
         section = context.config.sections.get("final_thg", {})
-        return {
+        result: dict[str, object] = {
             "stage": self.id,
             "version": self.implementation_version,
             "config": dict(section) if isinstance(section, Mapping) else {},
+            "dependencies": {
+                dependency: [
+                    str(output.get("sha256"))
+                    for output in context.manifest.get("steps", {})
+                    .get(dependency, {})
+                    .get("outputs", [])
+                    if isinstance(output, Mapping)
+                ]
+                for dependency in self.dependencies
+            },
         }
+        if isinstance(section, Mapping):
+            input_hashes: dict[str, object] = {}
+            for path_key, upstream_key in (
+                ("beta2_model", "beta2_upstream"),
+                ("database_model", "database_upstream"),
+            ):
+                direct = section.get(path_key)
+                if isinstance(direct, str):
+                    input_hashes[path_key] = (
+                        sha256_file(direct) if Path(direct).is_file() else None
+                    )
+                upstream = section.get(upstream_key)
+                if isinstance(upstream, Mapping):
+                    try:
+                        input_hashes[upstream_key] = upstream_fingerprint(
+                            [upstream],
+                            base_dir=(
+                                context.config.source_path.parent
+                                if context.config.source_path is not None
+                                else None
+                            ),
+                        )
+                    except Exception as error:
+                        # Keep the fingerprint calculable so the runner can
+                        # execute the stage and persist the actionable failure.
+                        input_hashes[upstream_key] = {
+                            "error": f"{type(error).__name__}: {error}"
+                        }
+            task_suite = section.get("task_suite")
+            if isinstance(task_suite, str):
+                result["task_suite_sha256"] = (
+                    sha256_file(task_suite) if Path(task_suite).is_file() else None
+                )
+            result["inputs"] = input_hashes
+        return result
 
     def run(self, context: StageContext, work_dir: Path) -> StageResult:
         section = context.config.sections.get("final_thg", {})

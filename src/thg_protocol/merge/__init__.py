@@ -317,13 +317,65 @@ def apply_merge_plan(
     for source, target in sorted(plan.reaction_map.items()):
         if incoming.reactions.has_id(source) and not incoming.reactions.has_id(target):
             incoming.reactions.get_by_id(source).id = target
-    return merge_models(
+    merged, report = merge_models(
         base_model,
         incoming,
         output_path=output_path,
         source_precedence=plan.policy.source_precedence,
         provenance=True,
     )
+
+    # ``MergePolicy`` controls each conflict family independently.  The
+    # low-level merge function intentionally exposes only a broad source
+    # precedence switch, so apply the reviewed structural decisions here
+    # after the copied merge has been constructed.
+    for incoming_metabolite in incoming.metabolites:
+        identifier = incoming_metabolite.id
+        if not merged.metabolites.has_id(identifier):
+            continue
+        target = merged.metabolites.get_by_id(identifier)
+        base = (
+            base_model.metabolites.get_by_id(identifier)
+            if base_model.metabolites.has_id(identifier)
+            else None
+        )
+        if base is None:
+            continue
+        if plan.policy.formula_charge == "incoming":
+            if incoming_metabolite.formula is not None:
+                target.formula = incoming_metabolite.formula
+            if incoming_metabolite.charge is not None:
+                target.charge = incoming_metabolite.charge
+        else:
+            # ``base`` and ``report`` both retain the reviewed base value;
+            # ``report`` records the conflict without silently choosing it.
+            target.formula = base.formula
+            target.charge = base.charge
+
+    for incoming_reaction in incoming.reactions:
+        identifier = incoming_reaction.id
+        if not merged.reactions.has_id(identifier):
+            continue
+        target = merged.reactions.get_by_id(identifier)
+        base = (
+            base_model.reactions.get_by_id(identifier)
+            if base_model.reactions.has_id(identifier)
+            else None
+        )
+        if base is None:
+            continue
+        if plan.policy.bounds == "incoming":
+            target.bounds = incoming_reaction.bounds
+        else:
+            target.bounds = base.bounds
+        if plan.policy.gpr == "incoming":
+            target.gene_reaction_rule = incoming_reaction.gene_reaction_rule
+        else:
+            target.gene_reaction_rule = base.gene_reaction_rule
+
+    if output_path is not None:
+        _write_model(merged, Path(output_path))
+    return merged, report
 
 
 @dataclass(frozen=True)

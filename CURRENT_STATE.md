@@ -1,6 +1,6 @@
 # THG Protocol Refactoring: Current State
 
-Last reviewed: 2026-08-05
+Last reviewed: 2026-08-10
 
 This document is the concise operational snapshot for the refactoring described
 in `docs/plans/REFACTORING_PLAN.md`, with closeout requirements in
@@ -27,9 +27,9 @@ remain unverified.
 ## Repository Snapshot
 
 - Branch: `refactoring-cleanup`
-- Reviewed commit: `0c91fdec` (`fix: chagned contirbuting md`)
-- Working tree at review: one intentional supplementary-notebook migration is
-  pending; no legacy source or artifact directories are present
+- Reviewed commit: `2c4294d` (`docs: change tone`)
+- Working tree before the current fix set was clean; the current review has
+  uncommitted fixes; no legacy source or artifact directories are present
 - Logical closeout commits: `c8f85a3` (documentation and artifact ownership),
   `77634e6` (maintained test migration), and `dc32a9e` (legacy implementation
   removal and artifact relocation), followed by `2626038` (canonical artifact

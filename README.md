@@ -16,7 +16,7 @@
 > [biosustain/THG](https://github.com/biosustain/THG). Please refer to those
 > repositories for the original project lineage and upstream history. For the
 > publishing rationale and procedure, see
-> [the standalone-repository runbook](docs/git-lfs-standalone-repository.md).
+> [the repository and data-management guide](docs/contributing/repository.md).
 
 THG Protocol is a Python package and command-line toolset for constructing,
 curating, expanding, and validating human genome-scale metabolic models. The
@@ -31,7 +31,7 @@ the THG workflow. The implementation uses explicit provenance, resumability,
 service boundaries, and model-ownership semantics. Historical repositories and
 the 2023 paper provide scientific context and legacy references; they are not
 compatibility targets or the behavioral specification for this package. See the
-[project history and lineage](docs/project-history.md) for background.
+[project history and lineage](docs/about/history.md) for background.
 
 Inputs are caller-owned JSON/SBML models or normalized pathway and database
 records. Maintained workflows produce revised models, structured validation and
@@ -67,12 +67,12 @@ and dependency tradeoffs are described in the [installation guide](docs/installa
   workflow through reconstruction, enrichment, checks, and comparison.
 - [Complete THG workflow](docs/protocol/index.md): the scientific sequence,
   intermediate states, and current support boundaries.
-- [Operation reference](docs/usage.md): annotation, reconstruction,
+- [Operation and workflow overview](docs/index.md): annotation, reconstruction,
   pathway, gapfill, merge, comparison, figures, and downstream tools.
 - [API reference](docs/api/index.md): Python and installed CLI contracts.
 
-For an installation-only check, run the [API smoke test](docs/api-smoke-test.md).
-The two-metabolite example there is not a representative human reconstruction.
+For an installation-only check, run the [practical quickstart](docs/quickstart.md).
+Its small example is not a representative human reconstruction.
 
 ```python
 from pathlib import Path
@@ -119,7 +119,7 @@ and is maintained separately from the historical implementation. Please cite
 [biosustain/THG](https://github.com/biosustain/THG) when using THG in research.
 
 Developer, release, repository, and legacy records are in the [maintainer
-reference](docs/development.md). The active closeout requirements are recorded
+reference](docs/contributing/development.md). The active closeout requirements are recorded
 in the [next refactoring plan](docs/plans/REFACTORING_PLAN_NEXT.md). Project
 materials are distributed under the [Creative Commons Attribution 4.0
 International license](LICENSE).

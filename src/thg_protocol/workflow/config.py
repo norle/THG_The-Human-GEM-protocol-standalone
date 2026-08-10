@@ -456,12 +456,17 @@ def load_snapshot(run_dir: str | Path) -> RunConfig:
     if not isinstance(payload, dict):
         raise ConfigError("configuration snapshot must be a JSON object")
     if payload.get("format_version") == 2:
-        return _parse_workflow(
+        config = _parse_workflow(
             payload,
             Path("/"),
             output_base=Path("/"),
             source=path,
-        )  # type: ignore[return-value]
+        )
+        if config.run.output_dir != run_path:
+            raise ConfigError(
+                "configuration snapshot output_dir does not match run directory"
+            )
+        return config  # type: ignore[return-value]
     # Snapshot paths are already absolute.  The snapshot is deliberately
     # parsed using its own values, never by consulting the original config.
     config = _parse(payload, Path("/"), output_base=Path("/"))

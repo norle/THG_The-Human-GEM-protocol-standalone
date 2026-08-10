@@ -10,6 +10,9 @@ from thg_protocol.merge import (
     generate_merge_plan,
     validate_merged_model,
 )
+from thg_protocol.workflow.config import RunSettings, WorkflowConfig
+from thg_protocol.workflow.phase4_stages import FinalTHGStage
+from thg_protocol.workflow.stages import StageContext
 
 
 class Adapter:
@@ -28,6 +31,32 @@ def test_harvest_snapshot_is_cached_and_records_manifest(tmp_path):
     assert not second_errors
     manifest = json.loads((tmp_path / "cache" / "cache-manifest.json").read_text())
     assert manifest["adapter_release"] == "fixture-1"
+
+
+def test_harvest_snapshot_refetches_when_adapter_release_changes(tmp_path):
+    calls = []
+
+    class AdapterV1:
+        release = "fixture-1"
+
+        def fetch(self, key):
+            calls.append((self.release, key))
+            return {"release": self.release}
+
+    class AdapterV2:
+        release = "fixture-2"
+
+        def fetch(self, key):
+            calls.append((self.release, key))
+            return {"release": self.release}
+
+    cache = tmp_path / "cache"
+    harvest_snapshot(["a"], AdapterV1(), cache)
+    responses, errors = harvest_snapshot(["a"], AdapterV2(), cache)
+
+    assert not errors
+    assert responses == {"a": {"release": "fixture-2"}}
+    assert calls == [("fixture-1", "a"), ("fixture-2", "a")]
 
 
 def test_normalized_records_are_versioned_and_deterministic():
@@ -72,7 +101,13 @@ def test_merge_policy_reports_conflicts_and_apply_adds_provenance():
     r_right.add_metabolites({b: -1})
     r_right.gene_reaction_rule = "G1"
     right.add_reactions([r_right])
-    plan = generate_merge_plan(left, right, policy=MergePolicy(bounds="incoming"))
+    plan = generate_merge_plan(
+        left,
+        right,
+        policy=MergePolicy(
+            bounds="incoming", formula_charge="incoming", gpr="incoming"
+        ),
+    )
     categories = {decision.category for decision in plan.decisions}
     assert {
         "bounds-conflict",
@@ -82,6 +117,36 @@ def test_merge_policy_reports_conflicts_and_apply_adds_provenance():
     } <= categories
     merged, _ = apply_merge_plan(left, right, plan)
     assert merged.reactions.R.annotation["thg.provenance"]["source_model"] == "right"
+    assert merged.reactions.R.bounds == (-2, 3)
+    assert merged.reactions.R.gene_reaction_rule == "G1"
+    assert merged.metabolites.a_c.formula == "C2"
+    assert merged.metabolites.a_c.charge == 1
+
+
+def test_final_thg_fingerprint_includes_direct_input_content(tmp_path):
+    beta2 = tmp_path / "beta2.json"
+    database = tmp_path / "database.json"
+    beta2.write_text("beta2-v1", encoding="utf-8")
+    database.write_text("database-v1", encoding="utf-8")
+    config = WorkflowConfig(
+        format_version=2,
+        workflow="final-thg",
+        run=RunSettings("final", tmp_path / "run"),
+        sections={
+            "final_thg": {
+                "beta2_model": str(beta2),
+                "database_model": str(database),
+            }
+        },
+    )
+    stage = FinalTHGStage("final-thg-load")
+    context = StageContext(config, tmp_path / "run", {"steps": {}})
+
+    first = stage.fingerprint_data(context)
+    beta2.write_text("beta2-v2", encoding="utf-8")
+    second = stage.fingerprint_data(context)
+
+    assert first["inputs"]["beta2_model"] != second["inputs"]["beta2_model"]
 
 
 def test_bounded_repair_has_explicit_stop_conditions_and_validation():

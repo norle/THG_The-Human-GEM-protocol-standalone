@@ -6,8 +6,6 @@ exclude_docs: |
   plans/**
   internal/**
   history/**
-  project-history.md
-  api-smoke-test.md
   workflow-overview.md
   usage.md
   protocol/**

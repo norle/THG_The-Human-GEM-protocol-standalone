@@ -10,7 +10,7 @@ from collections.abc import Mapping
 from pathlib import Path
 from typing import Any
 
-from .artifacts import resolve_artifact
+from .artifacts import resolve_artifact, upstream_fingerprint
 from .hashing import sha256_file
 from .stages import StageContext, StageResult, _dependency_path, _load_cobra_model
 
@@ -60,7 +60,7 @@ class DetailedBeta2Stage:
     def fingerprint_data(self, context: StageContext) -> Mapping[str, object]:
         section = dict(_section(context))
         source = section.get("input_model")
-        return {
+        result: dict[str, object] = {
             "stage": self.id,
             "implementation_version": self.implementation_version,
             "configuration": section,
@@ -78,6 +78,25 @@ class DetailedBeta2Stage:
                 for item in self.dependencies
             },
         }
+        upstream = section.get("upstream")
+        if isinstance(upstream, Mapping):
+            try:
+                result["upstream"] = upstream_fingerprint(
+                    [upstream],
+                    base_dir=(
+                        context.config.source_path.parent
+                        if context.config.source_path is not None
+                        else None
+                    ),
+                )
+            except Exception as error:
+                result["upstream_error"] = f"{type(error).__name__}: {error}"
+        decisions = section.get("decisions_file")
+        if isinstance(decisions, str):
+            from .proposals import decisions_fingerprint
+
+            result["decisions_sha256"] = decisions_fingerprint(decisions)
+        return result
 
     def run(self, context: StageContext, work_dir: Path) -> StageResult:
         from thg_protocol.curation.beta2 import (

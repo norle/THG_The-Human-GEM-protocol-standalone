@@ -358,7 +358,7 @@ class FoundationStage:
                     value, str
                 ):
                     decision_fingerprints[key] = decisions_fingerprint(value)
-        return {
+        result: dict[str, object] = {
             "stage": self.id,
             "implementation_version": self.implementation_version,
             "workflow": context.config.workflow,
@@ -367,6 +367,28 @@ class FoundationStage:
             "decision_files": decision_fingerprints,
             "dependencies": _dependency_hashes(context, self.dependencies),
         }
+        references = section.get("upstream")
+        if references is not None:
+            try:
+                if not isinstance(references, list) or not all(
+                    isinstance(item, Mapping) for item in references
+                ):
+                    raise ValueError(
+                        "workflow upstream must be a list of artifact references"
+                    )
+                result["upstream"] = upstream_fingerprint(
+                    references,
+                    base_dir=(
+                        context.config.source_path.parent
+                        if context.config.source_path is not None
+                        else context.config.run.output_dir
+                    ),
+                )
+            except Exception as error:
+                # Let stage.run persist the actionable error instead of failing
+                # before the runner can update the manifest.
+                result["upstream_error"] = f"{type(error).__name__}: {error}"
+        return result
 
     def run(self, context: StageContext, work_dir: Path) -> StageResult:
         section = self._section(context.config)

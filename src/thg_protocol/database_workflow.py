@@ -109,12 +109,25 @@ def harvest_snapshot(
         raise ValueError("retries and delay_seconds must be non-negative")
     root = Path(cache_dir)
     root.mkdir(parents=True, exist_ok=True)
+    adapter_release = str(getattr(adapter, "release", "unknown"))
+    manifest_path = root / "cache-manifest.json"
+    cache_compatible = False
+    if manifest_path.is_file():
+        try:
+            previous_manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            previous_manifest = None
+        cache_compatible = (
+            isinstance(previous_manifest, dict)
+            and previous_manifest.get("schema_version") == SCHEMA_VERSION
+            and previous_manifest.get("adapter_release") == adapter_release
+        )
     responses: dict[str, Mapping[str, Any]] = {}
     errors: list[HarvestError] = []
     for key in sorted(set(str(item) for item in keys)):
         digest = hashlib.sha256(key.encode()).hexdigest()
         path = root / f"{digest}.json"
-        if path.is_file():
+        if cache_compatible and path.is_file():
             payload = json.loads(path.read_text(encoding="utf-8"))
             if isinstance(payload, dict):
                 responses[key] = payload
@@ -139,7 +152,7 @@ def harvest_snapshot(
                     time.sleep(delay_seconds)
     manifest = {
         "schema_version": SCHEMA_VERSION,
-        "adapter_release": str(getattr(adapter, "release", "unknown")),
+        "adapter_release": adapter_release,
         "keys": sorted(responses),
         "errors": [asdict(error) for error in errors],
     }
