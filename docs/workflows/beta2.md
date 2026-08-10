@@ -1,6 +1,6 @@
 # THGβ2 — Expand by GPR and location
 
-## What this workflow does
+## Workflow scope
 
 THGβ2 consumes a verified β1 artifact, resolves GPR and localization evidence,
 plans compartment expansion, applies explicit decisions, and validates a

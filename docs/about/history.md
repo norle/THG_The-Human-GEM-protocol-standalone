@@ -10,7 +10,7 @@ This repository is the maintained software implementation. It includes
 offline-first workflows, explicit evidence and proposal records, resumable
 runs, and optional injected service integrations. Historical refactoring,
 parity, and migration records are retained for maintainers where useful but
-are not part of the normal user journey.
+are not part of the maintained workflow documentation.
 
 Verification of a maintained workflow is not a claim that it reproduces every
 publication artifact. Publication reproduction requires separately pinned

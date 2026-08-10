@@ -26,13 +26,12 @@ Metabolism* (2023). It has two branches: curate an existing reference GEM such
 as Human1, or construct a Human Database from pathway/database information;
 merge the branches and validate the result.
 
-This standalone repository is an independent maintained implementation of the
-THG workflow. It improves the historical software's architecture, provenance,
-resumability, service boundaries, and model-ownership semantics. Historical
-repositories and the 2023 paper provide scientific context and useful legacy
-references; they are not compatibility targets or the behavioral specification
-for this package. See the [project history and lineage](docs/project-history.md)
-for background.
+This standalone repository is an independently maintained implementation of
+the THG workflow. The implementation uses explicit provenance, resumability,
+service boundaries, and model-ownership semantics. Historical repositories and
+the 2023 paper provide scientific context and legacy references; they are not
+compatibility targets or the behavioral specification for this package. See the
+[project history and lineage](docs/project-history.md) for background.
 
 Inputs are caller-owned JSON/SBML models or normalized pathway and database
 records. Maintained workflows produce revised models, structured validation and
@@ -58,9 +57,9 @@ source .venv/bin/activate
 python -m pip install -e '.[full]'
 ```
 
-This installs the core package and all runtime capabilities. For the smaller
-core-only install, use `python -m pip install -e .`; the full profiles and
-their tradeoffs are described in the [installation guide](docs/installation.md).
+This installs the core package and all optional runtime capabilities. For a
+core-only installation, use `python -m pip install -e .`. Installation profiles
+and dependency tradeoffs are described in the [installation guide](docs/installation.md).
 
 ## Documentation entry points
 

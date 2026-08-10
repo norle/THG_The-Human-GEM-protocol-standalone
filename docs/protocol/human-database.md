@@ -5,7 +5,7 @@
     Implemented and tested. A paper-specific pathway-list adapter is not
     bundled; live access remains an injected, credential-owned boundary.
 
-## What “Human Database” means in the 2023 protocol paper
+## Human Database in the 2023 protocol paper
 
 The paper's Human Database is the complementary human metabolic network
 assembled from a list of human metabolic pathways and information gathered from

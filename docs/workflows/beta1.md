@@ -1,6 +1,6 @@
 # THGβ1 — Curate a reference GEM
 
-## What this workflow does
+## Workflow scope
 
 THGβ1 inventories and curates a caller-owned COBRA JSON or SBML reference GEM
 through explicit evidence, proposals, decisions, mutation, and validation.

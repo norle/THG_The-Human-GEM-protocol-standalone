@@ -1,6 +1,6 @@
 # Human Database
 
-## What this workflow does
+## Workflow scope
 
 The Human Database workflow reconstructs a model from normalized human
 metabolite, reaction, gene, and pathway records. Offline reconstruction is a

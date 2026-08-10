@@ -5,7 +5,7 @@
     not a regeneration of THG from live databases and omits stages recorded as
     Not implemented in the capability matrix.
 
-## What this miniature represents
+## Scope of the example
 
 It represents local normalized-record reconstruction, deterministic pathway
 enrichment, connectivity/balance inspection, and comparison. It does not

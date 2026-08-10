@@ -5,10 +5,10 @@
     published THG construction and final-artifact reproduction are Not
     implemented and Not yet verified.
 
-## Purpose and intended audience
+## Scope
 
-This is the canonical route for researchers who want to understand or compose
-the construction strategy described in Marin de Mas et al., [*A Protocol for
+This page describes the construction strategy described in Marin de Mas et al.,
+[*A Protocol for
 the Automatic Construction of Highly Curated Genome-Scale Models of Human
 Metabolism* (2023)](https://doi.org/10.3390/bioengineering10050576). It separates
 that scientific sequence from this package's modular operations. A GEM is a

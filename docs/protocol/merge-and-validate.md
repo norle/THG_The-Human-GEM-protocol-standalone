@@ -13,7 +13,7 @@ constructed Human Database/network unchanged. They must be readable as COBRA
 JSON or SBML, use compatible identifiers and compartments, and have documented
 model versions. Do not merge a working copy whose provenance is unknown.
 
-## What the current merge API does
+## Merge API behavior
 
 [`generate_merge_plan`][thg_protocol.merge.generate_merge_plan] emits a
 reviewable plan before mutation. Explicit cross-identifiers are matched only
