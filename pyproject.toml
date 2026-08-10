@@ -54,6 +54,16 @@ figures = [
   "matplotlib",
   "seaborn",
 ]
+full = [
+  "dill",
+  "memote",
+  "pulp>=2.7",
+  "swiglpk",
+  "pathos",
+  "troppo",
+  "matplotlib",
+  "seaborn",
+]
 
 [project.scripts]
 thg-gapfill = "thg_protocol.gapfill.cli:main"

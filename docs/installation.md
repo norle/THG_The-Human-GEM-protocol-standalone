@@ -8,21 +8,22 @@ cd THG_The-Human-GEM-protocol-standalone
 python -m venv .venv
 source .venv/bin/activate
 python -m pip install --upgrade pip
-python -m pip install -e .
+python -m pip install -e '.[full]'
 ```
 
-This installs the core workflows and the `thg-gapfill`, `thg-pathway`,
-`thg-compare`, and `thg-run` commands. Confirm that the command surface is
-available with:
+This installs the core workflows, all optional runtime capabilities, and the
+`thg-gapfill`, `thg-pathway`, `thg-compare`, and `thg-run` commands. Confirm
+that the command surface is available with:
 
 ```bash
 thg-gapfill --help
 thg-run --help
 ```
 
-## Optional capabilities
+## Installation profiles
 
-Install an extra only when your chosen workflow needs it:
+The `full` profile above is the simplest choice for a general-purpose
+installation. It includes:
 
 | Extra | Use it for |
 | --- | --- |
@@ -32,14 +33,16 @@ Install an extra only when your chosen workflow needs it:
 | `cell-specific` | Troppo-based cell-specific workflows |
 | `figures` | Rendering figures |
 
-For example:
+For a smaller environment, install only the core package and add capabilities
+as needed:
 
 ```bash
+python -m pip install -e .
 python -m pip install -e '.[figures]'
 ```
 
 The relevant [workflow](workflows/index.md) or [tool](tools/analysis.md) guide
-states any additional requirements.
+states any external services, credentials, or configuration still required.
 
 ## Verify your installation
 
@@ -58,6 +61,6 @@ An API-level smoke test is also useful:
 python -c "import thg_protocol; print(thg_protocol.__name__)"
 ```
 
-The optional `memote`, solver, database, cell-specific, and figures extras are
-only needed for their corresponding features. See the [CLI reference](reference/cli.md)
-and [I/O and configuration reference](reference/io-and-config.md).
+Installing `full` makes the optional tools available; it does not run MEMOTE,
+contact external services, or enable a workflow stage automatically. See the
+[CLI reference](reference/cli.md) and [I/O and configuration reference](reference/io-and-config.md).
