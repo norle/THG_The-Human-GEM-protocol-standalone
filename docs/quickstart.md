@@ -1,10 +1,12 @@
 # Practical quickstart
 
-This offline example demonstrates a small but realistic workflow: load a
+This offline example demonstrates a small but realistic direct-API workflow: load a
 normalized record bundle, inspect annotations, apply a deterministic pathway
 configuration, check connectivity and formula balance, and compare the result.
-It uses the stable files in [`docs/examples/`](examples/README.md). The model is
-deliberately tiny and does not reproduce a research-quality human GEM.
+It intentionally uses the tracked documentation fixtures in
+[`docs/examples/`](examples/README.md), rather than caller-owned workspace
+inputs. The model is deliberately tiny and does not reproduce a research-quality
+human GEM or create a resumable `thg-run` manifest.
 
 ## Prerequisites
 
@@ -18,16 +20,10 @@ No network, credentials, solver, or optional extra is required.
 
 ## Files before execution
 
-```text
-project/
-├── inputs/
-└── runs/
-```
-
-The commands below use repository paths directly. In a copied project, place
-`docs/examples/records.json`, `quickstart_model.json`,
-`pathway_config.json`, `metabolite_ids.json`, and `comparison_model.json` under
-`inputs/`.
+The commands below use the repository's tracked `docs/examples/` fixtures
+directly. For a real research run, place caller-owned source material under
+`inputs/`, author a config under `configs/`, and use the registered workflows
+documented in [THG workflows](workflows/index.md).
 
 ## Run the workflow
 
@@ -46,7 +42,7 @@ examples = Path("docs/examples")
 run_dir = Path("runs/practical-quickstart")
 run_dir.mkdir(parents=True, exist_ok=True)
 
-# 1. Load normalized records and write a caller-owned model.
+# 1. Load normalized records and write a generated run artifact.
 reference_path = run_dir / "reference-model.json"
 model = reconstruct_model_from_json(
     examples / "records.json", output_path=reference_path
@@ -99,13 +95,15 @@ runs/practical-quickstart/
 ```
 
 The first branch above demonstrates local reconstruction and model enrichment
-building blocks. It omits live biological harvesting, GPR expansion, a second
+building blocks. It writes generated artifacts under `runs/`, but does not
+create the manifest, stage attempts, or resume behavior of a registered
+workflow. It omits live biological harvesting, GPR expansion, a second
 scientific model branch, merge iteration, MEMOTE, and metabolic-task analysis.
 Continue with the [workflow overview](workflows/index.md) for those distinctions.
 
 ## Troubleshooting
 
 Run the script from the repository root so the fixture paths resolve. If an
- output is absent, check that the selected run directory is writable. Service
+output is absent, check that the selected run directory is writable. Service
 backed operations are intentionally excluded; use static clients or the
 operation guides when testing those boundaries offline.

@@ -35,7 +35,7 @@ For a maintained run, reference the β1 export:
 
 ```json
 "upstream": {
-  "run_dir": "../beta1-run",
+  "run_dir": "../runs/beta1",
   "stage_id": "export-beta1",
   "role": "model"
 }

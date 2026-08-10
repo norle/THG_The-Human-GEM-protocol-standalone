@@ -6,11 +6,11 @@ independently, while β2 normally consumes a released β1 artifact.
 
 | Workflow | Use it when | Main entry point |
 | --- | --- | --- |
-| [THGβ1](beta1.md) | Curating an existing reference GEM | `thg-run beta1 config.json` |
-| [THGβ2](beta2.md) | Expanding GPR and localization branches | `thg-run beta2 config.json` |
-| [Human Database](human-database.md) | Reconstructing from normalized records | `thg-run start config.json` with `workflow: "human-database"` |
-| [Final THG](final-thg.md) | Merging branches and validating a candidate | `thg-run start config.json` with `workflow: "final-thg"` |
-| [Validation](validation.md) | Running reusable checks or MEMOTE | `thg-run validate config.json` |
+| [THGβ1](beta1.md) | Curating an existing reference GEM | `thg-run beta1 configs/beta1.json` |
+| [THGβ2](beta2.md) | Expanding GPR and localization branches | `thg-run beta2 configs/beta2.json` |
+| [Human Database](human-database.md) | Reconstructing from normalized records | `thg-run start configs/human-database.json` |
+| [Final THG](final-thg.md) | Merging branches and validating a candidate | `thg-run start configs/final-thg.json` |
+| [Validation](validation.md) | Running reusable checks or MEMOTE | `thg-run validate configs/validation.json` |
 | [Runs](runs.md) | Resuming, auditing, or recovering a run | `thg-run resume RUN_DIR` |
 
 Comparison is a cross-workflow tool; use [model comparison and analysis](../tools/analysis.md).

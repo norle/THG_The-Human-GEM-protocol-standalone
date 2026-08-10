@@ -1,7 +1,7 @@
 # Worked end-to-end example
 
 !!! warning "Scope and evidence"
-    This is a deterministic worked miniature of the workflow structure. It is
+    This is a deterministic worked miniature of the direct-API workflow structure. It is
     not a regeneration of THG from live databases and omits stages recorded as
     Not implemented in the capability matrix.
 
@@ -33,14 +33,14 @@ THG_The-Human-GEM-protocol-standalone/
 │   ├── pathway_config.json
 │   ├── metabolite_ids.json
 │   └── comparison_model.json
-└── runs/
+└── runs/                         # created by the script
 ```
 
 ## Execute in order
 
-Save the following as `runs/run_miniature.py`, then run
-`python runs/run_miniature.py` from the repository root. Every output path
-is generated under `runs/` and defined in the script.
+Save the following as `docs/run_miniature.py`, then run
+`python docs/run_miniature.py` from the repository root. The script itself is
+not a run artifact; its generated outputs are written under `runs/`.
 
 ```python
 from pathlib import Path
@@ -91,6 +91,10 @@ After the reconstruction checkpoint, inspect `reference-model.json` and the
 printed annotation mapping. After enrichment, inspect the added compartment.
 After analysis, review `components.json` and the unbalanced-reaction list. The
 comparison checkpoint is the two CSV files in `comparison/`.
+
+This miniature uses direct APIs and therefore does not create a manifest or
+resumable stage attempts. Use the version-controlled configs in `configs/`
+with `thg-run` when you need a registered, resumable workflow.
 
 ## Files after execution
 

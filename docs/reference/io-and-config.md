@@ -5,8 +5,9 @@
 Models may be COBRA JSON or SBML. Human Database reconstruction accepts a
 normalized JSON bundle with required `metabolites` and `reactions` arrays and
 optional `genes`, `pathways`, and `model_name`. Task suites and workflow
-configuration are JSON contracts; keep machine-readable fixtures under
-`docs/examples/` and link them contextually.
+configuration are JSON contracts. Small documentation fixtures live under
+`docs/examples/`; caller-owned research inputs belong under `inputs/` and
+version-controlled run specifications belong under `configs/`.
 
 ## Workflow configuration
 

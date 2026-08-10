@@ -16,7 +16,9 @@ allowing non-empty annotations and missing GPRs to enrich it.
 ```python
 from thg_protocol.merge import apply_merge_plan, generate_merge_plan
 
-plan = generate_merge_plan("runs/beta2/model.json", "runs/human-db/network.json")
+plan = generate_merge_plan(
+    "inputs/models/beta2.json", "inputs/models/human-database.json"
+)
 merged, report = apply_merge_plan(plan, output_path="runs/final-thg/candidate.json")
 print(report)
 ```
@@ -34,6 +36,8 @@ interfaces and their boundaries.
 Final THG currently uses `thg-run start` with `workflow: "final-thg"`; there is
 no separate `thg-run final-thg` command. The configuration selects input
 artifacts, merge policy, repair bounds, validation profile, and output directory.
+Use `thg-run start configs/final-thg.json` for the resumable route; it resolves
+the β2 and Human Database inputs through their recorded run artifact references.
 
 The output is a candidate/final artifact only to the extent that the documented
 scientific review and release criteria pass. It must not be described as an

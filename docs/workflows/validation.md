@@ -4,8 +4,9 @@ Validation has three related interfaces.
 
 ## Registered validation workflow
 
-Run `thg-run validate config.json` with a model and a reusable profile. It can
-write structural, chemical, topology, and optional solver-backed checks, plus
+Save the configuration as `configs/validation.json` and run
+`thg-run validate configs/validation.json` with a model and a reusable profile.
+It can write structural, chemical, topology, and optional solver-backed checks, plus
 an optional MEMOTE stage. A failed external tool is recorded distinctly from
 model-test failures.
 
