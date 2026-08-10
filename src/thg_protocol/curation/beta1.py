@@ -14,6 +14,7 @@ from collections import Counter, defaultdict
 from collections.abc import Iterable, Mapping
 from dataclasses import dataclass, field
 from pathlib import Path
+from types import SimpleNamespace
 from typing import Any
 
 from thg_protocol.analysis.consistency import reaction_balance
@@ -1247,6 +1248,23 @@ def _affected_audits(model: Any, metabolite_id: str) -> list[dict[str, object]]:
     ]
 
 
+def _reaction_audit_view(
+    reaction: Any, stoichiometry: Mapping[str, float], model: Any
+) -> Any:
+    """Build a lightweight reaction view for proposal-only balance audits."""
+    metabolites = {
+        model.metabolites.get_by_id(str(metabolite_id)): float(coefficient)
+        for metabolite_id, coefficient in stoichiometry.items()
+    }
+    return SimpleNamespace(
+        id=str(reaction.id),
+        name=getattr(reaction, "name", ""),
+        boundary=bool(getattr(reaction, "boundary", False)),
+        gene_reaction_rule=getattr(reaction, "gene_reaction_rule", ""),
+        metabolites=metabolites,
+    )
+
+
 def _corrected_model(
     model: Any,
     *,
@@ -1273,10 +1291,35 @@ def generate_balance_proposals(
     if strategy not in {"explicit-only", "proton-water"}:
         raise ValueError("strategy must be 'explicit-only' or 'proton-water'")
     proposals: list[Proposal] = []
+    species_by_compartment: dict[str, tuple[Any | None, Any | None]] = {}
+    if strategy == "proton-water":
+        water_candidates: defaultdict[str, list[Any]] = defaultdict(list)
+        proton_candidates: defaultdict[str, list[Any]] = defaultdict(list)
+        for metabolite in model.metabolites:
+            compartment = str(getattr(metabolite, "compartment", ""))
+            atoms = formula_atoms(str(getattr(metabolite, "formula", "") or ""))
+            if atoms == {"H": 2, "O": 1} and getattr(metabolite, "charge", None) == 0:
+                water_candidates[compartment].append(metabolite)
+            elif atoms == {"H": 1} and getattr(metabolite, "charge", None) in {-1, 1}:
+                proton_candidates[compartment].append(metabolite)
+        for compartment in set(water_candidates) | set(proton_candidates):
+            water = min(
+                water_candidates.get(compartment, ()),
+                key=lambda item: str(item.id),
+                default=None,
+            )
+            proton = min(
+                proton_candidates.get(compartment, ()),
+                key=lambda item: str(item.id),
+                default=None,
+            )
+            species_by_compartment[compartment] = (water, proton)
     for reaction in sorted(model.reactions, key=lambda item: str(item.id)):
         rid = str(reaction.id)
         if strategy == "proton-water" and not corrections:
-            automatic = _proton_water_correction(model, reaction)
+            automatic = _proton_water_correction(
+                model, reaction, species_by_compartment=species_by_compartment
+            )
             if automatic is not None:
                 before, after, trial_reaction, changed_species = automatic
                 proposals.append(
@@ -1317,20 +1360,7 @@ def generate_balance_proposals(
                 )
                 if abs(after[metabolite_id]) <= 1e-12:
                     del after[metabolite_id]
-            trial = model.copy()
-            trial_reaction = trial.reactions.get_by_id(rid)
-            trial_reaction.add_metabolites(
-                {
-                    metabolite: -float(coefficient)
-                    for metabolite, coefficient in trial_reaction.metabolites.items()
-                }
-            )
-            trial_reaction.add_metabolites(
-                {
-                    trial.metabolites.get_by_id(metabolite_id): float(coefficient)
-                    for metabolite_id, coefficient in after.items()
-                }
-            )
+            trial_reaction = _reaction_audit_view(reaction, after, model)
             proposals.append(
                 Proposal(
                     proposal_id=proposal_id(
@@ -1428,7 +1458,10 @@ def generate_balance_proposals(
 
 
 def _proton_water_correction(
-    model: Any, reaction: Any
+    model: Any,
+    reaction: Any,
+    *,
+    species_by_compartment: Mapping[str, tuple[Any | None, Any | None]] | None = None,
 ) -> (
     tuple[
         dict[str, float],
@@ -1457,30 +1490,34 @@ def _proton_water_correction(
     if len(compartments) != 1:
         return None
     compartment = next(iter(compartments))
-    local = [
-        metabolite
-        for metabolite in model.metabolites
-        if str(getattr(metabolite, "compartment", "")) == compartment
-    ]
-    water = next(
-        (
+    if species_by_compartment is not None:
+        water, proton = species_by_compartment.get(compartment, (None, None))
+    else:
+        local = [
             metabolite
-            for metabolite in sorted(local, key=lambda item: str(item.id))
-            if formula_atoms(str(getattr(metabolite, "formula", "") or ""))
-            == {"H": 2, "O": 1}
-            and getattr(metabolite, "charge", None) == 0
-        ),
-        None,
-    )
-    proton = next(
-        (
-            metabolite
-            for metabolite in sorted(local, key=lambda item: str(item.id))
-            if formula_atoms(str(getattr(metabolite, "formula", "") or "")) == {"H": 1}
-            and getattr(metabolite, "charge", None) in {-1, 1}
-        ),
-        None,
-    )
+            for metabolite in model.metabolites
+            if str(getattr(metabolite, "compartment", "")) == compartment
+        ]
+        water = next(
+            (
+                metabolite
+                for metabolite in sorted(local, key=lambda item: str(item.id))
+                if formula_atoms(str(getattr(metabolite, "formula", "") or ""))
+                == {"H": 2, "O": 1}
+                and getattr(metabolite, "charge", None) == 0
+            ),
+            None,
+        )
+        proton = next(
+            (
+                metabolite
+                for metabolite in sorted(local, key=lambda item: str(item.id))
+                if formula_atoms(str(getattr(metabolite, "formula", "") or ""))
+                == {"H": 1}
+                and getattr(metabolite, "charge", None) in {-1, 1}
+            ),
+            None,
+        )
     if water is None or proton is None:
         return None
     water_coefficient = -float(audit.mass_residual.get("O", 0.0))
@@ -1501,20 +1538,7 @@ def _proton_water_correction(
         after[str(metabolite.id)] = after.get(str(metabolite.id), 0.0) + coefficient
         if abs(after[str(metabolite.id)]) <= 1e-12:
             del after[str(metabolite.id)]
-    trial = model.copy()
-    trial_reaction = trial.reactions.get_by_id(str(reaction.id))
-    trial_reaction.add_metabolites(
-        {
-            metabolite: -float(coefficient)
-            for metabolite, coefficient in trial_reaction.metabolites.items()
-        }
-    )
-    trial_reaction.add_metabolites(
-        {
-            trial.metabolites.get_by_id(metabolite_id): coefficient
-            for metabolite_id, coefficient in after.items()
-        }
-    )
+    trial_reaction = _reaction_audit_view(reaction, after, model)
     corrected = audit_reaction(trial_reaction)
     if corrected.mass_status != "balanced" or corrected.charge_status != "balanced":
         return None

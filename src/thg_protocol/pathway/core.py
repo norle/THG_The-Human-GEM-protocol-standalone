@@ -274,10 +274,25 @@ def create_compartment_reactions(
     del compartment_abbrev  # retained for compatibility with the workflow API
     new_reactions: list[dict[str, Any]] = []
     existing_ids = {reaction["id"] for reaction in model.get("reactions", [])}
+    next_number = 1
+    for reaction_id in existing_ids:
+        if reaction_id.startswith("MAR") and len(reaction_id) >= 8:
+            try:
+                next_number = max(next_number, int(reaction_id[3:8]) + 1)
+            except ValueError:
+                continue
     for reaction_config in config.get("reactions", []):
-        reaction_id = reaction_config.get("id") or get_next_reaction_id(
-            {**model, "reactions": model.get("reactions", []) + new_reactions}
-        )
+        reaction_id = reaction_config.get("id")
+        if not reaction_id:
+            while f"MAR{next_number:05d}" in existing_ids:
+                next_number += 1
+            reaction_id = f"MAR{next_number:05d}"
+            next_number += 1
+        elif str(reaction_id).startswith("MAR") and len(str(reaction_id)) >= 8:
+            try:
+                next_number = max(next_number, int(str(reaction_id)[3:8]) + 1)
+            except ValueError:
+                pass
         if reaction_id in existing_ids:
             continue
         equation = substitute_compartment_abbreviations(

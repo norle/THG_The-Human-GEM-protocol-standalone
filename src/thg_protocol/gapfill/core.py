@@ -395,9 +395,17 @@ def _read_candidates(path: str | Path) -> list[dict[str, Any]]:
 
 
 def _add_transport(
-    model: dict[str, Any], candidate: dict[str, Any], prefix: str, index: int
+    model: dict[str, Any],
+    candidate: dict[str, Any],
+    prefix: str,
+    index: int,
+    metabolite_ids: set[str] | None = None,
 ) -> str | None:
-    ids = {met["id"] for met in model.get("metabolites", [])}
+    ids = (
+        metabolite_ids
+        if metabolite_ids is not None
+        else {met["id"] for met in model.get("metabolites", [])}
+    )
     if candidate["met1"] not in ids or candidate["met2"] not in ids:
         return None
     reaction_id = (
@@ -441,6 +449,7 @@ def run_phase2(
         return component
 
     selected: list[dict[str, Any]] = []
+    metabolite_ids = {met["id"] for met in model.get("metabolites", [])}
     rank = {"A": 0, "B": 1, "C": 2}
     for row in sorted(
         rows,
@@ -458,7 +467,9 @@ def run_phase2(
         selected.append(row)
     created = []
     for index, row in enumerate(selected):
-        reaction_id = _add_transport(model, row, "TRANS_MIN", index)
+        reaction_id = _add_transport(
+            model, row, "TRANS_MIN", index, metabolite_ids
+        )
         if reaction_id:
             created.append({**row, "reaction_id": reaction_id})
     csv_path = _write_csv(Path(output_dir) / "selected_minimal_connectors.csv", created)
@@ -479,25 +490,48 @@ def run_phase3(
     )
     selected: list[dict[str, Any]] = []
     remaining = list(rows)
+    metabolite_ids = {met["id"] for met in model.get("metabolites", [])}
+    produced_counts: dict[str, int] = {}
+    consumed_counts: dict[str, int] = {}
+    for reaction in model.get("reactions", []):
+        for metabolite_id, coefficient in reaction.get("metabolites", {}).items():
+            if coefficient > 0:
+                produced_counts[metabolite_id] = (
+                    produced_counts.get(metabolite_id, 0) + 1
+                )
+            elif coefficient < 0:
+                consumed_counts[metabolite_id] = (
+                    consumed_counts.get(metabolite_id, 0) + 1
+                )
+
+    def deadends() -> set[str]:
+        ids = set(produced_counts) | set(consumed_counts)
+        return {
+            metabolite_id
+            for metabolite_id in ids
+            if bool(produced_counts.get(metabolite_id))
+            != bool(consumed_counts.get(metabolite_id))
+        }
+
     for index in range(max_additions):
-        produced, consumed = set(), set()
-        for reaction in model.get("reactions", []):
-            for mid, coefficient in reaction.get("metabolites", {}).items():
-                (produced if coefficient > 0 else consumed).add(mid)
-        deadends = produced ^ consumed
+        current_deadends = deadends()
         best = next(
             (
                 row
                 for row in remaining
-                if row["met1"] in deadends or row["met2"] in deadends
+                if row["met1"] in current_deadends or row["met2"] in current_deadends
             ),
             None,
         )
         if best is None:
             break
-        reaction_id = _add_transport(model, best, "PH3_TRANS", index)
+        reaction_id = _add_transport(
+            model, best, "PH3_TRANS", index, metabolite_ids
+        )
         remaining.remove(best)
         if reaction_id:
+            consumed_counts[best["met1"]] = consumed_counts.get(best["met1"], 0) + 1
+            produced_counts[best["met2"]] = produced_counts.get(best["met2"], 0) + 1
             selected.append({**best, "reaction_id": reaction_id})
     csv_path = _write_csv(Path(output_dir) / "selected_phase3_connectors.csv", selected)
     return {"model": model, "selected": selected, "output": csv_path}

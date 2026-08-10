@@ -123,7 +123,6 @@ def retry_metabolite_annotations(
                     round_failures.append(record)
                 else:
                     annotation_file.write(result)
-                    annotation_file.flush()
                     round_successes.append(record)
 
         retried_annotations.extend(round_successes)

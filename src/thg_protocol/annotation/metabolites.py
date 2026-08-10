@@ -149,10 +149,19 @@ def global_met_annotation_file():
 def gather_metabolites(model: cobra.Model) -> List[Tuple[str, str, str, str]]:
     """Gather metabolites info from a `model`, filtering out from `identifiers`."""
     met_list = []
+    seen: set[str] = set()
     for met in model.metabolites:
         met_tuple = (met.name, met.formula, met.annotation, met.id[:-1])
-        if met_tuple not in met_list:
-            met_list.append(met_tuple)
+        # ``annotation`` is commonly a dict and therefore cannot itself be
+        # placed in a set. Serialize a canonical key once instead of scanning
+        # the growing output list for every metabolite.
+        key = json.dumps(
+            met_tuple, ensure_ascii=False, sort_keys=True, default=str
+        )
+        if key in seen:
+            continue
+        seen.add(key)
+        met_list.append(met_tuple)
     return met_list
 
 

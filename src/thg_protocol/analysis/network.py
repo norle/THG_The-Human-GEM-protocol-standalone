@@ -15,7 +15,7 @@ except ImportError:  # pragma: no cover - exercised by clean-wheel smoke tests
 def find_network_components(model: Any) -> dict[str, Any]:
     """Return weakly connected metabolite/reaction components.
 
-    The input model is copied before analysis. The returned graph is directed:
+    The model is traversed read-only. The returned graph is directed:
     consumed metabolites point to reactions and reactions point to products.
     Solver-backed blocked-reaction cleanup and HTML visualization remain
     separate legacy operations.
@@ -23,14 +23,13 @@ def find_network_components(model: Any) -> dict[str, Any]:
     if nx is None:
         raise RuntimeError("Network analysis requires the 'networkx' dependency")
 
-    model_copy = model.copy()
     graph = nx.DiGraph()
-    metabolite_ids = {("metabolite", met.id) for met in model_copy.metabolites}
-    reaction_ids = {("reaction", reaction.id) for reaction in model_copy.reactions}
+    metabolite_ids = {("metabolite", met.id) for met in model.metabolites}
+    reaction_ids = {("reaction", reaction.id) for reaction in model.reactions}
 
-    for metabolite in model_copy.metabolites:
+    for metabolite in model.metabolites:
         graph.add_node(("metabolite", metabolite.id), bipartite="metabolite")
-    for reaction in model_copy.reactions:
+    for reaction in model.reactions:
         reaction_node = ("reaction", reaction.id)
         graph.add_node(reaction_node, bipartite="reaction")
         for metabolite, coefficient in reaction.metabolites.items():
@@ -44,11 +43,11 @@ def find_network_components(model: Any) -> dict[str, Any]:
     component_info = []
     compartments = {
         ("metabolite", metabolite.id): getattr(metabolite, "compartment", None)
-        for metabolite in model_copy.metabolites
+        for metabolite in model.metabolites
     }
     reaction_compartments = {
         ("reaction", reaction.id): set(getattr(reaction, "compartments", ()))
-        for reaction in model_copy.reactions
+        for reaction in model.reactions
     }
     for index, component in enumerate(components, start=1):
         reaction_count = len(component & reaction_ids)
@@ -72,7 +71,7 @@ def find_network_components(model: Any) -> dict[str, Any]:
 
     largest = components[0] if components else set()
     return {
-        "model": model_copy,
+        "model": model,
         "graph": graph,
         "components": components,
         "largest_component": largest,

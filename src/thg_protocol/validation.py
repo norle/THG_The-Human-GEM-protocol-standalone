@@ -6,6 +6,7 @@ owned by its caller and solver checks copy it before changing bounds.
 
 from __future__ import annotations
 
+from collections import Counter
 from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 from pathlib import Path
@@ -82,7 +83,9 @@ def _ids(model: Any) -> dict[str, object]:
     }
     duplicates = {
         name: sorted(
-            {item.id for item in items if [x.id for x in items].count(item.id) > 1}
+            identifier
+            for identifier, count in Counter(item.id for item in items).items()
+            if count > 1
         )
         for name, items in collections.items()
     }
@@ -281,6 +284,49 @@ def validate_model(
     if profile not in PROFILES:
         raise ValueError(f"unknown validation profile: {profile}")
     solver = bool(PROFILES[profile]["solver"]) if run_solver is None else run_solver
+    # Several checks consume the same model-wide topology/solver result. Cache
+    # those values for the duration of this validation pass; in particular,
+    # blocked-reaction and FVA analyses can each invoke a full LP/MILP sweep.
+    cached: dict[str, object] = {}
+
+    def _cached(name: str, fn: Callable[[], object]) -> object:
+        if name not in cached:
+            cached[name] = fn()
+        return cached[name]
+
+    def _dead_ends() -> list[str]:
+        return list(
+            _cached(
+                "dead-end-metabolites",
+                lambda: consistency.dead_end_metabolites(model),
+            )
+        )
+
+    def _not_produced() -> list[str]:
+        return list(
+            _cached(
+                "not-produced", lambda: consistency.metabolites_not_produced(model)
+            )
+        )
+
+    def _not_consumed() -> list[str]:
+        return list(
+            _cached("not-consumed", lambda: consistency.metabolites_not_consumed(model))
+        )
+
+    def _blocked() -> list[str]:
+        return list(
+            _cached("blocked-reactions", lambda: consistency.blocked_reactions(model))
+        )
+
+    def _cycles() -> list[str]:
+        return list(
+            _cached(
+                "balanced-cycles",
+                lambda: consistency.stoichiometrically_balanced_cycles(model),
+            )
+        )
+
     checks = [
         _check("reference-integrity", "structural", lambda: _references(model)),
         _check("identifier-uniqueness", "structural", lambda: _ids(model)),
@@ -295,8 +341,8 @@ def validate_model(
             "dead-end-topology",
             "topology",
             lambda: {
-                "metabolites": consistency.dead_end_metabolites(model),
-                "passed": not consistency.dead_end_metabolites(model),
+                "metabolites": _dead_ends(),
+                "passed": not _dead_ends(),
             },
             blocking=False,
         ),
@@ -304,12 +350,9 @@ def validate_model(
             "unconserved-metabolites",
             "topology",
             lambda: {
-                "not-produced": consistency.metabolites_not_produced(model),
-                "not-consumed": consistency.metabolites_not_consumed(model),
-                "passed": not (
-                    consistency.metabolites_not_produced(model)
-                    or consistency.metabolites_not_consumed(model)
-                ),
+                "not-produced": _not_produced(),
+                "not-consumed": _not_consumed(),
+                "passed": not (_not_produced() or _not_consumed()),
             },
             blocking=False,
         ),
@@ -339,27 +382,28 @@ def validate_model(
                     "flux-consistency",
                     "solver",
                     lambda: {
-                        "blocked": consistency.blocked_reactions(model),
-                        "passed": not consistency.blocked_reactions(model),
+                        "blocked": _blocked(),
+                        "passed": not _blocked(),
                     },
                 ),
                 _check(
                     "energy-generating-cycles",
                     "solver",
                     lambda: {
-                        "reactions": consistency.stoichiometrically_balanced_cycles(
-                            model
-                        ),
-                        "passed": not consistency.stoichiometrically_balanced_cycles(
-                            model
-                        ),
+                        "reactions": _cycles(),
+                        "passed": not _cycles(),
                     },
                     blocking=False,
                 ),
                 _check(
                     "minimal-inconsistent-sets",
                     "solver",
-                    lambda: minimal_inconsistent_sets(model),
+                    lambda: {
+                        "method": "singleton-blocked-reactions",
+                        "complete": True,
+                        "sets": [[reaction_id] for reaction_id in _blocked()],
+                        "passed": not _blocked(),
+                    },
                     blocking=False,
                 ),
                 _check(

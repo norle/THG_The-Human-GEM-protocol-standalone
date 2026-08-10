@@ -198,7 +198,47 @@ def generate_expansion_plan(
     compartment_registry = normalize_compartment_registry(compartments)
     names = {name: key for key, name in compartment_registry.items()}
     plans: list[dict[str, object]] = []
-    for reaction in sorted(model.reactions, key=lambda item: str(item.id)):
+    ordered_reactions = sorted(model.reactions, key=lambda item: str(item.id))
+
+    def chemistry_key(
+        reaction: Any,
+        compartment_override: str | None = None,
+    ) -> tuple[str, tuple[tuple[str, object, float], ...]]:
+        compartments = {
+            str(getattr(metabolite, "compartment", ""))
+            for metabolite in reaction.metabolites
+        }
+        stoichiometry = tuple(
+            sorted(
+                (
+                    str(getattr(metabolite, "formula", "") or ""),
+                    getattr(metabolite, "charge", None),
+                    float(coefficient),
+                )
+                for metabolite, coefficient in reaction.metabolites.items()
+            )
+        )
+        compartment = (
+            compartment_override
+            if compartment_override is not None
+            else next(iter(compartments))
+            if len(compartments) == 1
+            else ""
+        )
+        return compartment, stoichiometry
+
+    # Equivalence is independent of metabolite IDs, but depends on the target
+    # compartment and normalized chemistry. Index once instead of scanning all
+    # reactions for every localized expansion proposal.
+    equivalent_index: dict[
+        tuple[str, tuple[tuple[str, object, float], ...]], list[str]
+    ] = {}
+    for existing in ordered_reactions:
+        equivalent_index.setdefault(chemistry_key(existing), []).append(
+            str(existing.id)
+        )
+
+    for reaction in ordered_reactions:
         policy = reaction_policy(reaction)
         eligible = bool(policy["eligible"])
         reaction_class = str(policy["reaction_class"])
@@ -275,30 +315,13 @@ def generate_expansion_plan(
                 )
                 for metabolite in reaction.metabolites
             }
-            equivalent = []
-            target_stoich = sorted(
-                (
-                    str(getattr(m, "formula", "") or ""),
-                    getattr(m, "charge", None),
-                    float(c),
+            equivalent = [
+                identifier
+                for identifier in equivalent_index.get(
+                    chemistry_key(reaction, target), ()
                 )
-                for m, c in reaction.metabolites.items()
-            )
-            for existing in model.reactions:
-                if str(existing.id) == str(reaction.id):
-                    continue
-                if {str(m.compartment) for m in existing.metabolites} != {target}:
-                    continue
-                existing_stoich = sorted(
-                    (
-                        str(getattr(m, "formula", "") or ""),
-                        getattr(m, "charge", None),
-                        float(c),
-                    )
-                    for m, c in existing.metabolites.items()
-                )
-                if existing_stoich == target_stoich:
-                    equivalent.append(str(existing.id))
+                if identifier != str(reaction.id)
+            ]
             subunits = (
                 dict(subunit_stoichiometry.get(str(reaction.id), {}))
                 if isinstance(subunit_stoichiometry, Mapping)
