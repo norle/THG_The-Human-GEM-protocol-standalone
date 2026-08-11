@@ -29,7 +29,7 @@ jobs:
       - name: Install documentation dependencies
         run: |
           python -m pip install --upgrade pip
-          python -m pip install -e ".[docs,dev]"
+          python -m pip install -c constraints/py312-glpk.txt -e ".[docs,dev]"
 
       - name: Build documentation strictly
         run: mkdocs build --strict
@@ -58,7 +58,7 @@ jobs:
       - name: Install documentation dependencies
         run: |
           python -m pip install --upgrade pip
-          python -m pip install -e ".[docs]"
+          python -m pip install -c constraints/py312-glpk.txt -e ".[docs]"
 
       - name: Build documentation strictly
         run: mkdocs build --strict
