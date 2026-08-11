@@ -11,12 +11,12 @@ def get_project_root() -> Path:
     """Return the source checkout root, or the installed package directory.
 
     A wheel has no repository root.  Source checkouts are detected by the
-    plan file marker; installed packages instead return their own directory so
+    packaging marker; installed packages instead return their own directory so
     callers never resolve paths through an unrelated interpreter prefix.
     """
     package_path = Path(__file__).resolve()
     for parent in package_path.parents:
-        if (parent / "docs" / "plans" / "REFACTORING_PLAN.md").exists():
+        if (parent / "pyproject.toml").exists():
             return parent
     return package_path.parent
 

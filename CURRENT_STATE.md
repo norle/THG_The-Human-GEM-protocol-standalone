@@ -2,9 +2,9 @@
 
 Last reviewed: 2026-08-10
 
-This document is the concise operational snapshot for the refactoring described
-in `docs/plans/REFACTORING_PLAN.md`, with closeout requirements in
-`docs/plans/REFACTORING_PLAN_NEXT.md`. It replaces the chronological progress diary.
+This document is the concise operational snapshot for the closeout requirements in
+`docs/plans/REFACTORING_PLAN_NEXT.md`. It replaces the completed implementation
+plans and chronological progress diary.
 Update it when implementation status, validation evidence, blockers, or the
 next reviewable work changes. Git history remains the source for detailed
 historical implementation notes.
@@ -86,8 +86,8 @@ remain unverified.
   Complete beta1/beta2 construction, live harvesting, publication-compatible
   merge, and exact final-artifact reproduction remain Not implemented or Not
   yet verified.
-- The resumable v1 DAG is represented in the API inventories and wheel/CI smoke
-  checks, including the installed `thg-run` command.
+- The registered resumable DAG is represented in the API inventories and wheel/CI
+  smoke checks, including the installed `thg-run` command.
 
 ## Validation Evidence
 
@@ -254,8 +254,7 @@ refactoring progress.
 ## Completion Criteria
 
 The refactor is complete when the definition of done in
-`docs/plans/REFACTORING_PLAN_NEXT.md` (and the carried-forward requirements from
-`docs/plans/REFACTORING_PLAN.md`) passes and:
+`docs/plans/REFACTORING_PLAN_NEXT.md` passes and:
 
 - No maintained workflow silently loses historical behavior.
 - Every intentionally removed behavior has an approved and documented

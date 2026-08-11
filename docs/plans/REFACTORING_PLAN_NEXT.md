@@ -1,8 +1,6 @@
 # THG Protocol Refactoring Closeout Plan
 
-This plan supersedes the remaining work in `REFACTORING_PLAN.md`. The original
-plan remains the record of the target architecture and completed migration
-decisions. This document is the executable closeout plan for:
+This is the executable closeout plan for:
 
 1. proving that supported `src/thg_protocol` behavior covers the legacy
    checkout interfaces;
@@ -21,11 +19,6 @@ This closeout has a directory-level end state: no legacy checkout directory
 may remain in the final repository. `Equivalent`, `Intentional difference`, and
 `Archived` are temporary statuses used while executing the removal batches;
 they are not permission to retain a legacy directory indefinitely.
-
-The exact removal batches, artifact disposition, caller migration, and
-verification commands are defined in
-[`REFACTORING_PLAN_LEGACY_REMOVAL.md`](REFACTORING_PLAN_LEGACY_REMOVAL.md).
-That plan is part of this closeout and must be followed to completion.
 
 The final removal manifest must make these top-level directories absent:
 
@@ -202,8 +195,7 @@ Exit gate:
 
 ## Phase E: Remove legacy implementations and close every legacy directory
 
-After Phases A–D pass, execute the full directory-removal plan in
-`REFACTORING_PLAN_LEGACY_REMOVAL.md` in small, reviewable groups. The order is:
+After Phases A–D pass, remove the legacy directories in small, reviewable groups. The order is:
 
 1. duplicate pure utilities;
 2. wrappers whose parity tests now target package APIs;
@@ -243,8 +235,7 @@ directories alive.
 
 ## Phase F: Complete the original plan’s remaining release gates
 
-Carry forward these unfinished items from `REFACTORING_PLAN.md` and
-`CURRENT_STATE.md`:
+Carry forward these unfinished items from `CURRENT_STATE.md`:
 
 ### F1. Current-head CI matrix
 

@@ -9,7 +9,7 @@ def test_package_exposes_version():
 
 
 def test_config_module_resolves_project_root():
-    marker = config.get_project_root() / "docs" / "plans" / "REFACTORING_PLAN.md"
+    marker = config.get_project_root() / "pyproject.toml"
     if not marker.exists():
         pytest.skip("repository marker is unavailable in an installed wheel")
     assert marker.exists()
