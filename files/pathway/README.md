@@ -91,4 +91,4 @@ thg-pathway \
 ```
 
 For the full supported workflow, see
-[`docs/workflows/pathway.md`](../../docs/workflows/pathway.md).
+[`docs/tools/pathways-gapfill.md`](../../docs/tools/pathways-gapfill.md).

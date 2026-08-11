@@ -2,11 +2,8 @@
 
 ## Workflow scope
 
-THGβ1 inventories and curates a caller-owned COBRA JSON or SBML reference GEM
-through explicit evidence, proposals, decisions, mutation, and validation.
-
-The β1 core takes a caller-owned COBRA JSON or SBML model and performs an
-offline, proposal-driven curation pass. It inventories the model, normalizes
+THGβ1 performs an offline, proposal-driven curation pass on a caller-owned COBRA
+JSON or SBML model. It inventories the model, normalizes
 identities and GPRs supplied by the caller, audits formula and charge balance,
 applies only configured corrections, consolidates exact duplicates, and
 writes a reproducible artifact bundle.
@@ -39,30 +36,12 @@ run_beta1(
 )
 ```
 
-Optional complex subunit evidence is kept as a separate, deterministic S-GPR
-annotation and does not alter the Boolean GPR. For example, the registered
-workflow accepts `subunit_stoichiometry: {"RXN": {"ENSG...": 2}}` and records
-the canonical AST under `thg_s_gpr`.
-
-No arbitrary numerical balancing is inferred. Ambiguous identity matches and
-unresolved balance cases are retained in reports.
-
-Generic groups, glycans, and polymers are not silently treated as ordinary
-chemical formulas. Their audit class is recorded, and an explicit
-`formula_policy` such as `{"glycan": "exclude"}` is required to classify that
-case as intentionally excluded. Reaction identity conflicts produce
-annotation-only flag proposals; they never silently change stoichiometry or
-bounds.
-
-When no service-backed evidence is configured, the registered workflow uses
-existing model annotations as offline evidence. Reversed reaction matches are
-recorded as annotation-only directionality proposals; stoichiometry and bounds
-are not changed automatically. Duplicate cleanup uses deterministic IDs and
-merges secondary annotations onto the retained object.
-
-The registered `beta1` section also accepts `run_flux_consistency: true` for an
-optional solver-backed blocked-reaction report. This report is diagnostic and
-does not by itself satisfy the release gate.
+- Complex subunit evidence is stored under `thg_s_gpr` without changing Boolean GPRs.
+- Ambiguous identities and unresolved balance cases remain in reports.
+- Generic groups, glycans, and polymers require an explicit `formula_policy`.
+- Reaction conflicts and reversed matches create annotation-only proposals.
+- Without service evidence, the workflow uses existing model annotations.
+- `run_flux_consistency: true` adds a diagnostic blocked-reaction report.
 
 API details: [`run_beta1`][thg_protocol.curation.beta1.run_beta1],
 [`inventory_model`][thg_protocol.curation.beta1.inventory_model],

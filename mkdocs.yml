@@ -14,19 +14,6 @@ exclude_docs: |
   legacy-workflows.md
   service-boundary-audit.md
   api-contracts.md
-  workflows/annotation.md
-  workflows/cell-specific.md
-  workflows/comparison.md
-  workflows/database.md
-  workflows/figures.md
-  workflows/gapfill.md
-  workflows/memote.md
-  workflows/merge.md
-  workflows/model-build.md
-  workflows/network-analysis.md
-  workflows/pathway.md
-  workflows/phase0-foundations.md
-  workflows/resumable-run.md
   api/index.md
 theme:
   name: material

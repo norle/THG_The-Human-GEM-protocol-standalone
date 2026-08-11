@@ -2,9 +2,7 @@
 Contributing
 ============
 
-Contributions are welcome and appreciated. You can help by reporting a
-problem, fixing a bug, implementing a feature, improving the documentation,
-or sharing feedback.
+Contributions are welcome.
 
 Reporting Problems
 ------------------
@@ -21,48 +19,28 @@ Include, where applicable:
   when possible.
 * The complete error message or traceback.
 
-Before opening an issue, search the existing issues and documentation. For
-security-sensitive problems, do not disclose details in a public issue.
+Do not disclose security-sensitive details in a public issue.
 
 Proposing Changes
 -----------------
 
-Bug fixes, focused features, tests, and documentation improvements are all
-welcome. For a substantial change, open an issue first so that the scope and
-design can be discussed before implementation.
-
-When proposing a feature:
-
-* Explain the problem it solves and how the proposed behavior would work.
-* Keep the scope as narrow as possible.
-* Add or update tests for behavior that can be checked automatically.
-* Update the relevant documentation and command/API examples.
-* Preserve reproducibility: record input, output, package, service, and solver
-  versions when they affect the result.
+For substantial changes, open an issue first. Explain the problem, keep the
+scope narrow, test the behavior, update its documentation, and record versions
+that affect reproducibility.
 
 Getting Started
 ---------------
 
-THG Protocol supports Python 3.10 through 3.12. Create a virtual environment
-and install the package with its development dependencies:
+THG Protocol supports Python 3.10 through 3.12:
 
 .. code-block:: console
 
-   $ git clone https://github.com/norle/THG_The-Human-GEM-protocol-standalone.git
-   $ cd THG_The-Human-GEM-protocol-standalone
    $ python -m venv .venv
    $ source .venv/bin/activate
-   $ python -m pip install --upgrade pip
-   $ python -m pip install -e ".[dev]"
+   $ python -m pip install -e ".[docs,dev]"
 
 On Windows, activate the environment with
 ``.venv\\Scripts\\activate`` instead of ``source .venv/bin/activate``.
-
-Create a branch for your change:
-
-.. code-block:: console
-
-   $ git switch -c name-of-your-change
 
 Run the Local Checks
 --------------------
@@ -74,24 +52,17 @@ Run the default offline test suite and linter from the repository root:
    $ pytest -m "not slow and not online and not solver and not gurobi and not memote"
    $ ruff check src tests
 
-If you change documentation, install the documentation extra and build it in
-strict mode:
+For documentation changes, also run:
 
 .. code-block:: console
 
-   $ python -m pip install -e ".[docs,dev]"
    $ mkdocs build --strict
    $ pytest tests/docs
 
-Some tests are marked ``slow``, ``online``, ``solver``, ``gurobi``, or
-``memote``. Run those only when their required services or dependencies are
-available. Solver reproducibility uses the constraints file documented in
-``docs/development.md``.
-
-For changes involving model quality or validation, install MEMOTE with
-``python -m pip install -e ".[memote]"`` and follow the
-`MEMOTE and task analysis guide
-<docs/workflows/memote.md>`_.
+Run optional marked tests only when their services or dependencies are
+available. See the `development guide <docs/contributing/development.md>`_ for
+release checks and the `validation guide <docs/workflows/validation.md>`_ for
+MEMOTE.
 
 Submitting a Pull Request
 -------------------------
@@ -107,14 +78,5 @@ Before submitting a pull request:
 * Summarize the change, tests run, and any known limitations in the pull
   request description.
 
-Push your branch to your fork and open a pull request against the repository's
-``refactoring-cleanup`` branch, unless the maintainers specify another target:
-
-.. code-block:: console
-
-   $ git add path/to/changed-file
-   $ git commit -m "Describe the change"
-   $ git push origin name-of-your-change
-
-Please respond to review feedback and keep the pull request up to date with
-the target branch.
+Open the pull request against ``refactoring-cleanup`` unless maintainers specify
+another target, then respond to review feedback.

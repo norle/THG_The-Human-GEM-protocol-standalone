@@ -18,13 +18,6 @@ python -m pip install -e .
 
 No network, credentials, solver, or optional extra is required.
 
-## Files before execution
-
-The commands below use the repository's tracked `docs/examples/` fixtures
-directly. For a real research run, place caller-owned source material under
-`inputs/`, author a config under `configs/`, and use the registered workflows
-documented in [THG workflows](workflows/index.md).
-
 ## Run the workflow
 
 ```python
@@ -94,16 +87,5 @@ runs/practical-quickstart/
     └── compartments_comparison_no_blocked.csv
 ```
 
-The first branch above demonstrates local reconstruction and model enrichment
-building blocks. It writes generated artifacts under `runs/`, but does not
-create the manifest, stage attempts, or resume behavior of a registered
-workflow. It omits live biological harvesting, GPR expansion, a second
-scientific model branch, merge iteration, MEMOTE, and metabolic-task analysis.
-Continue with the [workflow overview](workflows/index.md) for those distinctions.
-
-## Troubleshooting
-
-Run the script from the repository root so the fixture paths resolve. If an
-output is absent, check that the selected run directory is writable. Service
-backed operations are intentionally excluded; use static clients or the
-operation guides when testing those boundaries offline.
+For full model workflows, resumable runs, and external-service boundaries, see
+the [workflow overview](workflows/index.md).

@@ -14,16 +14,6 @@ configs/final-thg.json
 configs/validation.json
 ```
 
-A normal invocation looks like:
-
-```bash
-thg-run beta1 configs/beta1.json --verbose
-```
-
-`--verbose` (or `-v`) prints live stage starts, completions, skips, and reused
-artifacts to stderr. Use `-vv` to also show fingerprints, stage summaries, and
-artifact paths. The option works with every starting command and with `resume`.
-
 The generated templates can be run in this order:
 
 ```bash

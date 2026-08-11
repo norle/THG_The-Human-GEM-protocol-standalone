@@ -17,21 +17,6 @@ flowchart LR
     E --> F[Validation]
 ```
 
-## Supported workflows and operations
-
-- Reference-model curation with THGβ1.
-- GPR and localization expansion with THGβ2.
-- Human Database reconstruction from normalized records.
-- Branch merging and validation for final THG candidates.
-- Model comparison, pathway implementation, gap filling, annotation, and
-  cell-specific analysis.
-
-The [workflow overview](workflows/index.md) describes the scientific lifecycle.
-The [practical quickstart](quickstart.md) provides a small offline workflow
-using the maintained documentation fixtures.
-The [reference](reference/io-and-config.md) defines exact interfaces and file
-contracts. THG does not claim exact reproduction of a publication artifact
-unless a page explicitly identifies the separately verified evidence.
-
-Historical migration evidence is retained outside the published navigation;
-the closeout record is `REFACTORING_PLAN_NEXT.md`.
+Choose a route in the [workflow overview](workflows/index.md), run the small
+offline [quickstart](quickstart.md), or consult the exact [I/O and configuration
+contracts](reference/io-and-config.md).

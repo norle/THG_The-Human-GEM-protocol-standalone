@@ -19,14 +19,6 @@ inputs/
 └── validation/
 ```
 
-The categories are intended for:
-
-- `inputs/models/`: COBRA JSON or SBML input models;
-- `inputs/database/`: normalized database and pathway record bundles;
-- `inputs/evidence/`: gene, reaction, metabolite, localization, and other
-  evidence;
-- `inputs/validation/`: metabolic-task suites and other validation inputs.
-
 Workflow runs should create their own checksummed copies or snapshots of
 consumed inputs inside the corresponding run directory. Those run-owned copies
 provide exact provenance for the execution without modifying the caller-owned

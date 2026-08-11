@@ -12,13 +12,7 @@ python -m pip install -e '.[full]'
 ```
 
 This installs the core workflows, all optional runtime capabilities, and the
-`thg-gapfill`, `thg-pathway`, `thg-compare`, and `thg-run` commands. Confirm
-that the command surface is available with:
-
-```bash
-thg-gapfill --help
-thg-run --help
-```
+four THG commands.
 
 ## Installation profiles
 

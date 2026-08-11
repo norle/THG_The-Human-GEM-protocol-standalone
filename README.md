@@ -4,48 +4,15 @@
 [![Documentation](https://github.com/norle/THG_The-Human-GEM-protocol-standalone/actions/workflows/docs.yml/badge.svg)](https://github.com/norle/THG_The-Human-GEM-protocol-standalone/actions/workflows/docs.yml)
 [![Hosted documentation](https://img.shields.io/badge/docs-GitHub%20Pages-blue?logo=github)](https://norle.github.io/THG_The-Human-GEM-protocol-standalone/)
 
-> [!NOTE]
-> This is a standalone repository derived from
-> [MarindeMasLab/THG_The-Human-GEM-protocol](https://github.com/MarindeMasLab/THG_The-Human-GEM-protocol).
-> It was created with rewritten Git history to migrate repository artifacts to
-> Git LFS, because new LFS objects cannot be added to the existing public fork
-> network. It is intentionally **not** part of that repository's GitHub fork
-> network.
->
-> The source repository is itself a fork of
-> [biosustain/THG](https://github.com/biosustain/THG). Please refer to those
-> repositories for the original project lineage and upstream history. For the
-> publishing rationale and procedure, see
-> [the repository and data-management guide](docs/contributing/repository.md).
-
 THG Protocol is a Python package and command-line toolset for constructing,
-curating, expanding, and validating human genome-scale metabolic models. The
-scientific workflow comes from Marin de Mas et al., *A Protocol for the
-Automatic Construction of Highly Curated Genome-Scale Models of Human
-Metabolism* (2023). It has two branches: curate an existing reference GEM such
-as Human1, or construct a Human Database from pathway/database information;
-merge the branches and validate the result.
+curating, expanding, and validating human genome-scale metabolic models. It
+supports reference-model curation and reconstruction from normalized biological
+records, then merges and validates the resulting branches.
 
-This standalone repository is an independently maintained implementation of
-the THG workflow. The implementation uses explicit provenance, resumability,
-service boundaries, and model-ownership semantics. Historical repositories and
-the 2023 paper provide scientific context and legacy references; they are not
-compatibility targets or the behavioral specification for this package. See the
-[project history and lineage](docs/about/history.md) for background.
-
-Inputs are caller-owned JSON/SBML models or normalized pathway and database
-records. Maintained workflows produce revised models, structured validation and
-comparison reports, reproducible run artifacts, and optional service caches;
-output paths and provenance remain under caller control.
-
-The Human Database workflow separates source collection from model
-reconstruction. Offline runs consume normalized records directly. For a live or
-credentialed source, callers provide a small source adapter with a `fetch(key)`
-method to `harvest_snapshot`; THG supplies bounded retries, deterministic
-caching, an error ledger, and normalized-record reconstruction. This explicit
-adapter boundary is intentional: network access, credentials, source-specific
-queries, and rate limits remain visible and caller-owned rather than being
-hidden inside the core workflow.
+The repository is independently maintained from its source repositories,
+[MarindeMasLab/THG_The-Human-GEM-protocol](https://github.com/MarindeMasLab/THG_The-Human-GEM-protocol)
+and [biosustain/THG](https://github.com/biosustain/THG). See the [project
+history](docs/about/history.md) for lineage and publication context.
 
 ## Installation
 
@@ -57,101 +24,49 @@ source .venv/bin/activate
 python -m pip install -e '.[full]'
 ```
 
-This installs the core package and all optional runtime capabilities. For a
-core-only installation, use `python -m pip install -e .`. Installation profiles
-and dependency tradeoffs are described in the [installation guide](docs/installation.md).
+For a core-only installation, use `python -m pip install -e .`. See the
+[installation guide](docs/installation.md) for optional capabilities.
 
-## Documentation entry points
+## Start here
 
-- [Practical quickstart](docs/quickstart.md): a small deterministic offline
-  workflow through reconstruction, enrichment, checks, and comparison.
-- [Complete THG workflow](docs/protocol/index.md): the scientific sequence,
-  intermediate states, and current support boundaries.
-- [Operation and workflow overview](docs/index.md): annotation, reconstruction,
-  pathway, gapfill, merge, comparison, figures, and downstream tools.
-- [API reference](docs/api/index.md): Python and installed CLI contracts.
+- [Quickstart](docs/quickstart.md): run a small deterministic offline example.
+- [Workflow overview](docs/workflows/index.md): choose and configure a workflow.
+- [API reference](docs/api/index.md): use the Python and CLI interfaces.
 
-For an installation-only check, run the [practical quickstart](docs/quickstart.md).
-Its small example is not a representative human reconstruction.
-
-## Workspace layout
+## Workspace
 
 ```text
-inputs/    Caller-owned models, records, evidence, and validation inputs.
-configs/   Versionable workflow run configurations.
-runs/      Generated, resumable THG runs and artifacts.
+inputs/    Read-only source models, records, and evidence.
+configs/   Version-controlled workflow configurations.
+runs/      Generated resumable runs and artifacts.
 ```
 
-Inputs are caller-owned and read-only. Configs describe reproducible runs.
-Runs are generated and THG-owned. A workflow reads source material from
-`inputs/`, follows the instructions in `configs/`, and records its resumable
-execution state under `runs/`.
+Start a configured workflow with, for example:
 
-For example, a configuration saved as `configs/beta1.json` can use paths
-relative to that file:
-
-```json
-{
-  "format_version": 2,
-  "workflow": "beta1",
-  "run": {
-    "name": "beta1",
-    "output_dir": "../runs/beta1"
-  },
-  "beta1": {
-    "input_model": "../inputs/models/human1.xml"
-  }
-}
+```bash
+thg-run beta1 configs/beta1.json
 ```
 
-Start it with `thg-run beta1 configs/beta1.json`.
-
-```python
-from pathlib import Path
-
-from thg_protocol.analysis.consistency import unbalanced_reactions
-from thg_protocol.database import MetaboliteRecord, ReactionRecord, reconstruct_model
-
-model = reconstruct_model(
-    "smoke",
-    [MetaboliteRecord("a_c", formula="C1H2"), MetaboliteRecord("b_c", formula="C1H2")],
-    [ReactionRecord("R1", {"a_c": -1, "b_c": 1})],
-    output_path=Path("runs/smoke/model.json"),
-)
-assert not unbalanced_reactions(model)
-```
+Commands and Python APIs use caller-selected paths. Keep input models unchanged
+and retain reports, caches, versions, and provenance with generated models.
 
 ## Installed commands
 
 ```bash
-thg-gapfill --model model.json --output-dir runs/gapfill
-thg-pathway --model model.json --config pathway.json \
-  --database metabolite_ids.json --output runs/pathway.json
-thg-compare model_a.json model_b.json --output-dir runs/compare
+thg-run --help
+thg-gapfill --help
+thg-pathway --help
+thg-compare --help
 ```
 
-Commands and Python APIs use caller-selected paths. Keep input models unchanged,
-save reports/caches with their models, and record package, service, solver, and
-optional dependency versions for reproducibility.
+## Status and citation
 
-## Project status
+Supported package workflows are implemented and tested. External services and
+credentialed collection are opt-in through explicit clients or source adapters.
+The [current state](CURRENT_STATE.md) records the remaining release gate.
 
-The supported package workflows are implemented and tested. The standalone
-package defines its own maintained behavior and contracts; historical behavior
-is preserved only where it remains useful or has been deliberately retained.
-External services and credentialed source collection are opt-in and must be
-provided through explicit clients or source adapters.
-
-## Lineage and citation
-
-The scientific workflow is described in [the 2023 protocol paper](https://doi.org/10.3390/bioengineering10050576).
-This standalone repository is derived from
-[MarindeMasLab/THG_The-Human-GEM-protocol](https://github.com/MarindeMasLab/THG_The-Human-GEM-protocol)
-and is maintained separately from the historical implementation. Please cite
+The scientific workflow is described in [the 2023 protocol
+paper](https://doi.org/10.3390/bioengineering10050576). Please cite
 [biosustain/THG](https://github.com/biosustain/THG) when using THG in research.
-
-Developer, release, repository, and legacy records are in the [maintainer
-reference](docs/contributing/development.md). The active closeout requirements are recorded
-in the [next refactoring plan](docs/plans/REFACTORING_PLAN_NEXT.md). Project
-materials are distributed under the [Creative Commons Attribution 4.0
-International license](LICENSE).
+Project materials use the [Creative Commons Attribution 4.0 International
+license](LICENSE).

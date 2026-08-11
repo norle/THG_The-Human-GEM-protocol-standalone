@@ -229,9 +229,3 @@ def test_inventory_and_contracts_define_the_required_evidence_fields():
     assert "No replacement" in inventory
     assert "Intentional difference" in inventory
     assert "Archived" in inventory
-
-
-def test_closeout_plan_is_referenced_by_supported_documentation():
-    for relative_path in ("README.md", "docs/index.md", "CURRENT_STATE.md"):
-        text = (ROOT / relative_path).read_text(encoding="utf-8")
-        assert "REFACTORING_PLAN_NEXT.md" in text
