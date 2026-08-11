@@ -21,7 +21,7 @@ VERIFICATIONS = {
 WORKFLOW_COVERAGE = {
     "Operation",
     "Orchestrated stage",
-    "Workflow-complete for documented v1 scope",
+    "Workflow-complete for documented scope",
     "Published stage complete",
     "N/A",
 }

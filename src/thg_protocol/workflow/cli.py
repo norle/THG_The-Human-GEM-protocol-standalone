@@ -11,7 +11,7 @@ from .config import ConfigError
 from .lock import RunLockedError, unlock_run
 from .manifest import ManifestError
 from .registered_runner import RegisteredWorkflowError
-from .runner import StageFailedError, WorkflowError, get_status, resume, start
+from .runner import WorkflowError, get_status, resume, start
 
 
 def _add_verbosity_argument(
@@ -69,8 +69,7 @@ def build_parser() -> argparse.ArgumentParser:
     unlock_parser.add_argument("run_dir", type=Path)
     unlock_parser.add_argument("--force", action="store_true")
 
-    # Public names make the maintained workflow entry points discoverable
-    # while retaining ``start`` for generic and legacy configurations.
+    # Public names make the maintained workflow entry points discoverable.
     for workflow_id in ("beta1", "beta2", "validate", "compare"):
         workflow_parser = commands.add_parser(
             workflow_id, help=f"start a {workflow_id} registered workflow"
@@ -130,8 +129,6 @@ def main(argv: list[str] | None = None) -> int:
         print(f"error: {error}", file=__import__("sys").stderr)
         if isinstance(error, RunLockedError):
             return 3
-        if isinstance(error, StageFailedError):
-            return 4
         return 2
     except KeyboardInterrupt:
         return 130

@@ -47,25 +47,17 @@ def test_verbose_cli_reports_registered_stage_progress(tmp_path, capsys):
 
 
 def test_status_json_is_read_only_and_parseable(tmp_path, capsys):
-    from thg_protocol.workflow.config import (
-        DatabaseSettings,
-        MergeSettings,
-        ReferenceSettings,
-        RunConfig,
-        RunSettings,
-        ValidationSettings,
+    from thg_protocol.workflow.config import RunSettings, WorkflowConfig
+    from thg_protocol.workflow.manifest import (
+        new_workflow_manifest,
+        write_manifest_atomic,
     )
-    from thg_protocol.workflow.manifest import new_manifest, write_manifest_atomic
+    from thg_protocol.workflow.registry import get_workflow
 
-    config = RunConfig(
-        1,
-        RunSettings("status-run", tmp_path),
-        ReferenceSettings("prebuilt", tmp_path / "reference.json"),
-        DatabaseSettings(tmp_path / "records.json"),
-        MergeSettings(),
-        ValidationSettings(),
+    config = WorkflowConfig(2, "beta1", RunSettings("status-run", tmp_path), {})
+    write_manifest_atomic(
+        tmp_path, new_workflow_manifest(config, get_workflow("beta1").stages)
     )
-    write_manifest_atomic(tmp_path, new_manifest(config))
     before = (tmp_path / "manifest.json").read_text(encoding="utf-8")
     assert main(["status", str(tmp_path), "--json"]) == 0
     output = json.loads(capsys.readouterr().out)

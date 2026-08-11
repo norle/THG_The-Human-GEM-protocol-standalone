@@ -6,8 +6,6 @@ from collections.abc import Iterable
 from dataclasses import dataclass
 from typing import Any
 
-from .contracts import ContractRegistry, StageContract, contract_for_stage
-
 
 class WorkflowRegistryError(ValueError):
     """Raised for unknown workflows, duplicate IDs, or invalid DAGs."""
@@ -68,34 +66,15 @@ class WorkflowDefinition:
 class WorkflowRegistry:
     def __init__(self) -> None:
         self._workflows: dict[str, WorkflowDefinition] = {}
-        self.contracts = ContractRegistry()
 
     def register(
         self,
         definition: WorkflowDefinition,
-        *,
-        contracts: Iterable[StageContract] = (),
     ) -> WorkflowDefinition:
         definition.validate()
         if definition.id in self._workflows:
             raise WorkflowRegistryError(f"duplicate workflow ID: {definition.id}")
         self._workflows[definition.id] = definition
-        contract_items = tuple(contracts)
-        all_stages = definition.stages + definition.scientific_stages
-        for stage in all_stages:
-            if stage.id in self.contracts.as_mapping():
-                continue
-            contract = next(
-                (item for item in contract_items if item.id == stage.id), None
-            )
-            self.contracts.register(
-                contract
-                or contract_for_stage(
-                    stage.id,
-                    definition.id,
-                    classification=str(getattr(stage, "kind", "analysis")),
-                )
-            )
         return definition
 
     def get(self, workflow_id: str) -> WorkflowDefinition:
@@ -110,12 +89,6 @@ class WorkflowRegistry:
     def validate_all(self) -> None:
         for definition in self._workflows.values():
             definition.validate()
-        self.contracts.validate(
-            workflows={
-                item.id: item.stage_ids + item.scientific_stage_ids
-                for item in self._workflows.values()
-            }
-        )
 
 
 REGISTRY = WorkflowRegistry()
@@ -127,7 +100,6 @@ def register_workflow(
     *,
     allowed_sections: Iterable[str] = (),
     description: str = "",
-    contracts: Iterable[StageContract] = (),
 ) -> WorkflowDefinition:
     return REGISTRY.register(
         WorkflowDefinition(
@@ -136,7 +108,6 @@ def register_workflow(
             frozenset(allowed_sections),
             description,
         ),
-        contracts=contracts,
     )
 
 

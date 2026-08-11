@@ -1,10 +1,7 @@
 # Phase 0 workflow foundations
 
-Phase 0 adds a format-2 registry without breaking the existing format-1
-resumable runner. Format 1 remains the compatibility path for the historical
-`reference → database → merge → validation → memote` manifest. Format 2 is
-selected explicitly with a top-level `workflow` key and uses the registered
-DAG for its manifest, dependency checks, and resume behavior.
+The workflow registry selects a DAG from the top-level `workflow` key and owns
+its manifest, dependency checks, and resume behavior.
 
 The registered workflows are `beta1`, `beta2`, `validate`, and `compare`.
 `beta1` and `beta2` have separate scientific DAGs when model inputs are
@@ -43,8 +40,6 @@ manifest fingerprints in the downstream stage output.
 
 ## Shared records
 
-- Stage contracts are validated machine-readable boundaries covering inputs,
-  outputs, mutation, side effects, provenance, and validation.
 - Evidence is append-only JSONL. Raw responses can be stored in a
   SHA-256-addressed cache, while normalized results carry their own checksum.
 - Proposals are generated independently of application mode. `apply-all`,

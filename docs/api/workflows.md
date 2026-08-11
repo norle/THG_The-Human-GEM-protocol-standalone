@@ -102,14 +102,10 @@ restartable engineering DAG.
       members:
         - ConfigError
         - RunSettings
-        - ReferenceSettings
-        - DatabaseSettings
-        - MergeSettings
-        - ValidationSettings
-        - RunConfig
-        - load_start_config
-        - config_to_dict
-        - write_snapshot
+        - WorkflowConfig
+        - load_workflow_config
+        - workflow_config_to_dict
+        - write_workflow_snapshot
         - load_snapshot
 
 ::: thg_protocol.workflow.hashing
@@ -125,16 +121,15 @@ restartable engineering DAG.
       members:
         - ManifestError
         - utc_now
-        - new_manifest
-        - validate_manifest
-        - load_manifest
+        - new_workflow_manifest
+        - validate_workflow_manifest
+        - load_workflow_manifest
         - write_manifest_atomic
 
 ::: thg_protocol.workflow.runner
     options:
       members:
         - WorkflowError
-        - StageFailedError
         - start
         - resume
         - get_status
@@ -145,12 +140,6 @@ restartable engineering DAG.
         - StageContext
         - StageResult
         - Stage
-        - ReferenceStage
-        - DatabaseStage
-        - MergeStage
-        - ValidationStage
-        - MemoteStage
-        - validate_stage_order
 
 ::: thg_protocol.workflow.lock
     options:

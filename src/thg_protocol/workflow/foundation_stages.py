@@ -619,31 +619,3 @@ def register_builtin_workflows(registry: Any) -> None:
         except WorkflowRegistryError as error:
             if "duplicate workflow ID" not in str(error):
                 raise
-    # Keep the scientific contract vocabulary explicit even while the
-    # resumable adapter groups these contracts into six stable checkpoints.
-    from .contracts import contract_for_stage
-
-    detailed_beta1_stages = (
-        "beta1-inventory",
-        "collect-metabolite-evidence",
-        "resolve-metabolite-identities",
-        "collect-reaction-evidence",
-        "resolve-reaction-identities",
-        "normalize-genes",
-        "curate-gprs",
-        "generate-curation-proposals",
-        "apply-curation",
-        "balance-audit",
-        "generate-balance-proposals",
-        "apply-balance-proposals",
-        "deduplicate-and-clean",
-        "validate-beta1",
-        "export-beta1",
-    )
-    for stage_id in detailed_beta1_stages:
-        if stage_id not in registry.contracts.as_mapping():
-            registry.contracts.register(
-                contract_for_stage(
-                    stage_id, "beta1", purpose="Phase 1 β1 scientific stage."
-                )
-            )

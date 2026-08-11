@@ -28,10 +28,10 @@ source/test paths behind each row.
 | `merge.publication_compatible` | Legacy similarity-aware model merge | Not implemented | Not yet verified | N/A | No replacement | Not yet verified | No maintained API ports legacy cross-identifier and chemistry matching |
 | `analysis.consistency` | Structural network and consistency reports | Implemented | Integration-tested | Orchestrated stage | Intentional difference | N/A | Current reports are a smaller structural subset and are not scientific convergence |
 | `analysis.model_signature` | Semantic COBRA model signature and diff | Implemented | Unit-tested | Operation | No legacy target | N/A | Signature normalization is a maintained comparison contract, not proof of parity with the paper |
-| `workflow.resumable_v1` | Resumable v1 engineering workflow DAG | Implemented | Integration-tested | Workflow-complete for documented v1 scope | No legacy target | N/A | The DAG composes maintained operations; it does not execute the paper's complete construction |
+| `workflow.resumable` | Resumable registered engineering workflow DAG | Implemented | Integration-tested | Workflow-complete for documented scope | No legacy target | N/A | The DAG composes maintained operations; it does not execute the paper's complete construction |
 | `workflow.memote` | MEMOTE validation stage | External integration | Integration-tested | Orchestrated stage | No legacy target | N/A | The executable and report semantics belong to the separately installed MEMOTE tool |
 | `workflow.essential_tasks` | Essential metabolic tasks | Archived | Not yet verified | N/A | No replacement | Not yet verified | Ordinary MEMOTE and structural checks do not establish essential-task success |
-| `publication.reference_beta1` | Complete THG beta1 construction | Implemented | Integration-tested | Workflow-complete for documented v1 scope | Not assessed | Not yet verified | The maintained release is fixture-sanctioned and policy-scoped; it is not a claim of reproducing the 2023 publication artifact |
+| `publication.reference_beta1` | Complete THG beta1 construction | Implemented | Integration-tested | Workflow-complete for documented scope | Not assessed | Not yet verified | The maintained release is fixture-sanctioned and policy-scoped; it is not a claim of reproducing the 2023 publication artifact |
 | `publication.reference_beta2` | Complete THG beta2 construction | Not implemented | Not yet verified | Operation | Not assessed | Not yet verified | No complete maintained GPR/location and isoenzyme-expansion workflow |
 | `publication.final_artifact` | Exact THG reconstruction from the paper | Not implemented | Not yet verified | N/A | Not assessed | Not yet verified | No frozen paper-stage input, artifact, or full workflow result is available |
 
@@ -41,7 +41,7 @@ source/test paths behind each row.
 | --- | --- |
 | Implementation | `Implemented`, `External integration`, `Archived`, `Not implemented` |
 | Verification | `Unit-tested`, `Integration-tested`, `Parity-tested`, `Artifact-reproduction-tested`, `Not yet verified` |
-| Workflow coverage | `Operation`, `Orchestrated stage`, `Workflow-complete for documented v1 scope`, `Published stage complete`, `N/A` |
+| Workflow coverage | `Operation`, `Orchestrated stage`, `Workflow-complete for documented scope`, `Published stage complete`, `N/A` |
 | Legacy relationship | `Verified equivalent`, `Intentional difference`, `No replacement`, `No legacy target`, `Not assessed` |
 | Published reproduction | `Verified`, `Not yet verified`, `N/A` |
 

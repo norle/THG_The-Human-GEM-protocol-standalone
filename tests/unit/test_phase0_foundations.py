@@ -10,7 +10,6 @@ from thg_protocol.workflow.artifacts import (
     resolve_artifact,
 )
 from thg_protocol.workflow.config import ConfigError, load_workflow_config
-from thg_protocol.workflow.contracts import ContractError, StageContract
 from thg_protocol.workflow.evidence import EvidenceError, EvidenceRecord, EvidenceStore
 from thg_protocol.workflow.ids import DeterministicIdRegistry, IdRegistryError
 from thg_protocol.workflow.proposals import (
@@ -59,19 +58,13 @@ def test_beta1_config_rejects_unknown_section_keys(tmp_path):
         load_workflow_config(path)
 
 
-def test_builtin_workflows_have_independently_validated_dags_and_contracts():
+def test_builtin_workflows_have_independently_validated_dags():
     assert {"beta1", "beta2", "validate", "compare"}.issubset(list_workflows())
     REGISTRY.validate_all()
     for workflow_id in ("beta1", "beta2"):
         definition = REGISTRY.get(workflow_id)
         assert len(definition.stage_ids) == 6
-        for stage_id in definition.stage_ids:
-            assert REGISTRY.contracts.get(stage_id).workflow == workflow_id
-
-
-def test_stage_contract_requires_the_complete_boundary_schema():
-    with pytest.raises(ContractError, match="missing required"):
-        StageContract.from_mapping({"id": "incomplete"})
+        assert definition.stage_ids
 
 
 def test_evidence_store_connects_raw_checksum_and_rejects_schema_drift(tmp_path):

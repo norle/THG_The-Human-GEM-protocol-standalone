@@ -47,7 +47,7 @@ memote run --filename runs/validation/memote.html runs/model.xml
 
 ## Run from Python
 
-The maintained `MemoteStage` invokes the external command from a caller-owned
+The validation workflow invokes the external command from a caller-owned
 `thg-run` configuration and records its version, HTML output, and stage log.
 Direct callers may still invoke MEMOTE themselves when they do not use the
 resumable workflow.

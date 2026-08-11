@@ -26,23 +26,14 @@ validation and its optional descendants without deleting earlier artifacts.
 
 ```json
 {
-  "format_version": 1,
+  "format_version": 2,
+  "workflow": "beta1",
   "run": {
     "name": "example-thg-run",
     "output_dir": "../runs/example-thg-run"
   },
-  "reference": {
-    "mode": "prebuilt",
+  "beta1": {
     "input_model": "../inputs/models/reference.json"
-  },
-  "database": {
-    "records": "../inputs/database/normalized-records.json"
-  },
-  "merge": {
-    "remove_isolated_metabolites": false
-  },
-  "validation": {
-    "run_memote": false
   }
 }
 ```
@@ -63,25 +54,14 @@ run/
 └── .tmp/
 ```
 
-The version 1 stages are `reference` and `database`, followed by `merge`,
-`validation`, and optional external `memote`. The independent first two
-branches are executed sequentially today, but their dependency relationship is
-recorded explicitly.
-
-`reference` in `prebuilt` mode copies and reads a JSON or SBML model. In
-`build_model` mode it calls `build_model_batch` with run-owned output, cache,
-and error paths. The reference stage writes a checksummed cache manifest;
-configured external caches are inventoried but remain caller-owned. `database` accepts normalized JSON records and calls
-`reconstruct_model_from_json`; it does not harvest online services.
+Stages come from the selected registered workflow. See the beta1, beta2,
+validation, comparison, and database workflow pages for their exact DAGs.
 
 ## Resume and recovery
 
 On resume, a completed stage is reused only when its implementation/configuration
-fingerprint and every recorded output checksum still match. A changed reference
-input reruns `reference`, `merge`, `validation`, and enabled MEMOTE, while the
-independent database stage remains reusable. A changed records bundle reruns
-the other branch and those same descendants. A deleted report reruns only its
-stage and descendants. Previous successful attempt directories are retained.
+fingerprint and every recorded output checksum still match. A changed input or
+deleted report reruns the affected stage and its descendants. Previous successful attempt directories are retained.
 The manifest records the latest attempt for each stage; retained directories
 preserve files but are not a structured complete attempt history.
 
@@ -117,7 +97,7 @@ This is a checkpointed composition of current APIs, not a scientific acceptance
 or convergence engine. Live KEGG/BioCyc/PubChem harvesting, a complete GPR,
 location, and isoenzyme THGbeta2 branch, historical similarity-aware merging,
 essential metabolic-task analysis, and exact published-artifact regeneration
-remain outside version 1. Outputs should be named and interpreted as neutral
+remain outside the maintained workflows. Outputs should be named and interpreted as neutral
 artifacts such as `reference-model` and `candidate-thg`.
 
 ## API reference
