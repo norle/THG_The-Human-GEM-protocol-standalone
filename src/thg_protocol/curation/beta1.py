@@ -8,6 +8,7 @@ All mutating operations begin with a model copy and produce auditable records.
 
 from __future__ import annotations
 
+import ast
 import json
 import re
 from collections import Counter, defaultdict
@@ -518,69 +519,25 @@ class GPRExpression:
         return {self.kind: [child.to_dict() for child in self.children]}
 
 
-_GPR_TOKEN = re.compile(r"\s*(\(|\)|\bAND\b|\bOR\b|[A-Za-z0-9_.:-]+)", re.IGNORECASE)
-
-
 def parse_gpr(expression: str) -> GPRExpression:
     """Parse a Boolean GPR into a canonicalizable AST."""
     text = str(expression).strip()
     if not text:
         raise ValueError("GPR is empty")
-    tokens: list[str] = []
-    position = 0
-    while position < len(text):
-        match = _GPR_TOKEN.match(text, position)
-        if not match:
-            raise ValueError(f"invalid GPR token near: {text[position:]}")
-        tokens.append(match.group(1))
-        position = match.end()
-    index = 0
+    from cobra.core.gene import GPR
 
-    def primary() -> GPRExpression:
-        nonlocal index
-        if index >= len(tokens):
-            raise ValueError("incomplete GPR")
-        token = tokens[index]
-        if token == "(":
-            index += 1
-            result = disjunction()
-            if index >= len(tokens) or tokens[index] != ")":
-                raise ValueError("unclosed GPR parenthesis")
-            index += 1
-            return result
-        if token.upper() in {"AND", "OR", ")"}:
-            raise ValueError(f"unexpected GPR token: {token}")
-        index += 1
-        return GPRExpression("gene", token)
+    def convert(node: ast.AST) -> GPRExpression:
+        if isinstance(node, ast.Name):
+            return GPRExpression("gene", node.id)
+        if isinstance(node, ast.BoolOp):
+            kind = "and" if isinstance(node.op, ast.And) else "or"
+            return GPRExpression(kind, children=tuple(map(convert, node.values)))
+        raise ValueError(f"unsupported GPR node: {type(node).__name__}")
 
-    def conjunction() -> GPRExpression:
-        nonlocal index
-        values = [primary()]
-        while index < len(tokens) and tokens[index].upper() == "AND":
-            index += 1
-            values.append(primary())
-        return (
-            GPRExpression("and", children=tuple(values))
-            if len(values) > 1
-            else values[0]
-        )
-
-    def disjunction() -> GPRExpression:
-        nonlocal index
-        values = [conjunction()]
-        while index < len(tokens) and tokens[index].upper() == "OR":
-            index += 1
-            values.append(conjunction())
-        return (
-            GPRExpression("or", children=tuple(values))
-            if len(values) > 1
-            else values[0]
-        )
-
-    result = disjunction()
-    if index != len(tokens):
-        raise ValueError(f"unexpected GPR token: {tokens[index]}")
-    return canonicalize_gpr(result)
+    body = GPR.from_string(text).body
+    if body is None:
+        raise ValueError("invalid GPR")
+    return canonicalize_gpr(convert(body))
 
 
 def canonicalize_gpr(expression: GPRExpression | str) -> GPRExpression:

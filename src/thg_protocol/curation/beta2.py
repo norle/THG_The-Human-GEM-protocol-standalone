@@ -69,7 +69,12 @@ def normalize_compartment_registry(
 
 
 def _parse(rule: str) -> ast.AST:
-    return ast.parse(rule, mode="eval").body
+    from cobra.core.gene import GPR
+
+    body = GPR.from_string(rule).body
+    if body is None:
+        raise ValueError("invalid GPR")
+    return body
 
 
 def _locations(node: ast.AST, genes: Mapping[str, set[str]]) -> set[str]:
@@ -126,8 +131,8 @@ def resolve_gpr_locations(
     }
     try:
         tree = _parse(gpr)
-    except SyntaxError as error:
-        return LocationResolution({}, (), (f"invalid-gpr:{error.msg}",))
+    except ValueError as error:
+        return LocationResolution({}, (), (f"invalid-gpr:{error}",))
     fallback = normalize_location(fallback_location) if fallback_location else None
     fallback_genes = set()
     if fallback:

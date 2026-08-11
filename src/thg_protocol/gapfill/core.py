@@ -21,7 +21,6 @@ __all__ = [
     "GapfillResult",
     "GapfillStrategy",
     "DeterministicGapfillStrategy",
-    "MILPGapfillStrategy",
     "run_gapfill",
 ]
 
@@ -167,33 +166,6 @@ class DeterministicGapfillStrategy(GapfillStrategy):
         )
 
 
-class MILPGapfillStrategy(DeterministicGapfillStrategy):
-    """MILP-compatible strategy boundary with explicit solver provenance.
-
-    Candidate selection remains deterministic when a solver is unavailable; callers
-    can distinguish that fallback from a failed solve through the metadata.
-    """
-
-    name = "milp"
-
-    def solve(
-        self,
-        model: Any,
-        candidates: list[GapfillCandidate],
-        *,
-        max_additions: int | None = None,
-    ) -> GapfillResult:
-        result = super().solve(model, candidates, max_additions=max_additions)
-        result.solver.update(
-            {
-                "method": "bounded-candidate-milp",
-                "status": result.status,
-                "temporary_reactions": 0,
-            }
-        )
-        return result
-
-
 def run_gapfill(
     model: Any,
     candidates: list[GapfillCandidate | dict[str, Any]],
@@ -209,7 +181,6 @@ def run_gapfill(
     if isinstance(strategy, str):
         strategies = {
             "deterministic": DeterministicGapfillStrategy,
-            "milp": MILPGapfillStrategy,
         }
         if strategy not in strategies:
             raise ValueError(f"unknown gapfill strategy: {strategy}")

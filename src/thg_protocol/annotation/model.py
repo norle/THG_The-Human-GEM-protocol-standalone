@@ -13,8 +13,6 @@ from collections.abc import Mapping
 from pathlib import Path
 from typing import Any
 
-from tqdm import tqdm
-
 LOGGER = logging.getLogger(__name__)
 
 __all__ = ["annotate_cobra_model"]
@@ -42,13 +40,11 @@ def annotate_cobra_model(
     second_path.parent.mkdir(parents=True, exist_ok=True)
 
     with model:
-        for metabolite in tqdm(model.metabolites, desc="Processing metabolites"):
+        for metabolite in model.metabolites:
             annotation = met_annotation.get(str(metabolite)[:-1])
             if annotation:
                 metabolite.annotation.update(annotation)
-        for reaction_id, annotation in tqdm(
-            reac_annotation.items(), desc="Processing reactions"
-        ):
+        for reaction_id, annotation in reac_annotation.items():
             model.reactions.get_by_id(reaction_id).annotation["kegg.reaction"] = (
                 annotation["kegg.reaction"]
             )

@@ -22,7 +22,6 @@ dependencies = [
   "python-libsbml",
   "requests",
   "scipy",
-  "tqdm",
 ]
 
 [project.optional-dependencies]
@@ -45,26 +44,17 @@ memote = [
   "memote",
 ]
 solver = [
-  "pulp>=2.7",
   "swiglpk",
 ]
-cell-specific = [
-  "pathos",
-  "troppo",
-]
+cell-specific = []
 figures = [
   "matplotlib",
-  "seaborn",
 ]
 full = [
   "dill",
   "memote",
-  "pulp>=2.7",
   "swiglpk",
-  "pathos",
-  "troppo",
   "matplotlib",
-  "seaborn",
 ]
 
 [project.scripts]

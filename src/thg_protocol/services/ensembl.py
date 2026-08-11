@@ -2,10 +2,11 @@
 
 from __future__ import annotations
 
-import time
 from collections.abc import Iterable
 from dataclasses import asdict, dataclass, field
 from typing import Any, Protocol
+
+from ._http import request
 
 try:  # Keep package imports safe for no-dependency wheel smoke tests.
     import requests
@@ -93,24 +94,20 @@ class EnsemblClient:
         self._cache: dict[str, EnsemblAnnotation | None] = {}
 
     def _request(self, method: str, path: str) -> Any:
-        last_error: Exception | None = None
-        for attempt in range(self.retries + 1):
-            try:
-                response = self.session.request(
-                    method,
-                    f"{self.base_url}{path}",
-                    timeout=self.timeout,
-                    headers={"Accept": "application/json"},
-                )
-                if response.status_code == 404:
-                    return None
-                response.raise_for_status()
-                return response.json()
-            except (requests.RequestException, ValueError) as error:
-                last_error = error
-                if attempt < self.retries:
-                    time.sleep(self.backoff * (2**attempt))
-        raise EnsemblError(f"Ensembl request failed for {path}") from last_error
+        url = f"{self.base_url}{path}"
+        try:
+            response = request(
+                self.session, method.lower(), url, timeout=self.timeout,
+                retries=self.retries, backoff=self.backoff,
+                headers={"Accept": "application/json"},
+            )
+            return response.json()
+        except requests.HTTPError as error:
+            if error.response is not None and error.response.status_code == 404:
+                return None
+            raise EnsemblError(f"Ensembl request failed for {path}") from error
+        except (requests.RequestException, ValueError) as error:
+            raise EnsemblError(f"Ensembl request failed for {path}") from error
 
     @staticmethod
     def _annotation(payload: dict[str, Any]) -> EnsemblAnnotation | None:

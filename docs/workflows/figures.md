@@ -32,7 +32,7 @@ require an explicit report/input path and output directory.
 ## Requirements
 
 Summary functions are local. Install `python -m pip install -e '.[figures]'`
-for matplotlib/seaborn rendering. No network or solver is implicit.
+for matplotlib rendering. No network or solver is implicit.
 
 ## Run from the command line
 

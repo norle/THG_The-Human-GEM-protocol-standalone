@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import pickle
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
@@ -10,21 +9,6 @@ if TYPE_CHECKING:
     from . import ModelBuildReport
 
 __all__ = ["build_model_batch"]
-
-
-def _write_compatibility_caches(cache_dir: Path) -> None:
-    """Create the cache names consumed by the historical batch workflow."""
-    cache_dir.mkdir(parents=True, exist_ok=True)
-    for filename in (
-        "ensembl_cache_batch.pkl",
-        "kegg_reaction_cache_batch.pkl",
-        "getgpr_cache_batch.pkl",
-        "variables_batch.pkl",
-    ):
-        path = cache_dir / filename
-        if not path.exists():
-            with path.open("wb") as handle:
-                pickle.dump({}, handle)
 
 
 def build_model_batch(
@@ -41,9 +25,8 @@ def build_model_batch(
 
     The model, output, cache, and error paths are explicit. Service clients
     are injectable for offline tests and production adapters are instantiated
-    lazily by [`build_model`][thg_protocol.model_build.build_model]. Four legacy cache
-    filenames are retained so existing batch automation can resume safely;
-    package-owned JSON caches remain the source of annotation state.
+    lazily by [`build_model`][thg_protocol.model_build.build_model]. Package-owned
+    JSON caches are the source of annotation state.
     """
     from . import build_model
 
@@ -59,7 +42,6 @@ def build_model_batch(
         kegg_client=kegg_client,
         ensembl_client=ensembl_client,
     )
-    _write_compatibility_caches(cache_root)
     if output_errors is not None:
         error_path = Path(output_errors)
         error_path.parent.mkdir(parents=True, exist_ok=True)

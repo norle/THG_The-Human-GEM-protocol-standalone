@@ -2,7 +2,6 @@ import json
 
 from thg_protocol.gapfill import (
     DeterministicGapfillStrategy,
-    MILPGapfillStrategy,
     generate_candidates,
     run_gapfill,
     run_pipeline,
@@ -57,8 +56,6 @@ def test_strategy_contract_is_non_mutating_and_records_coverage():
     assert result.candidate_coverage == {"TG1": "selected"}
     assert len(model["reactions"]) == 2
     assert len(result.model["reactions"]) == 3
-    milp = run_gapfill(model, candidates, strategy=MILPGapfillStrategy())
-    assert milp.solver["temporary_reactions"] == 0
 
 
 def test_gapfill_reports_invalid_candidate_without_partial_mutation():

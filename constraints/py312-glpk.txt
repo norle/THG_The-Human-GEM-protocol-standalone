@@ -11,7 +11,6 @@ python-libsbml==5.20.4
 requests==2.32.5
 scipy==1.15.2
 swiglpk==5.0.12
-tqdm==4.67.1
 
 # Test runner used for the recorded offline gate.
 pytest==8.4.2

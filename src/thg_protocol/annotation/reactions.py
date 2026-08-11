@@ -6,7 +6,6 @@ import re
 from io import StringIO
 
 import pandas as pd
-from tqdm import tqdm
 
 __all__ = [
     "execute_jaccard",
@@ -30,9 +29,8 @@ def process_reac(
     with open(input_file) as handle:
         variable_file = handle.read()
 
-    for n, reaction in tqdm(
-        enumerate(re.findall(r"<reaction.+?</reaction>", variable_file, re.DOTALL)),
-        desc="Processing reactions",
+    for n, reaction in enumerate(
+        re.findall(r"<reaction.+?</reaction>", variable_file, re.DOTALL)
     ):
         if take < n:
             result += identify_reaction(reaction, n, MetID, MetIDH, MetIDH2O)
@@ -77,11 +75,7 @@ def execute_jaccard(b: pd.DataFrame, c2: pd.DataFrame) -> pd.DataFrame:
 
     results = []
     for i, (b_left, b_right, b_id) in enumerate(
-        tqdm(
-            zip(b_left_sets, b_right_sets, b_ids, strict=True),
-            total=len(b_ids),
-            desc="Processing Jaccard",
-        )
+        zip(b_left_sets, b_right_sets, b_ids, strict=True)
     ):
         for j, (c2_left, c2_right, c2_id) in enumerate(
             zip(c2_left_sets, c2_right_sets, c2_ids, strict=True)

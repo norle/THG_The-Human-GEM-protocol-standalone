@@ -2,9 +2,10 @@
 
 from __future__ import annotations
 
-import time
 from dataclasses import dataclass, field
 from typing import Protocol
+
+from ._http import request
 
 try:  # Keep imports safe in a minimal installed wheel.
     import requests
@@ -60,18 +61,15 @@ class BioCycClient:
     def _get(self, url: str) -> str:
         if url in self._cache:
             return self._cache[url]
-        last_error: Exception | None = None
-        for attempt in range(self.retries + 1):
-            try:
-                response = self.session.get(url, timeout=self.timeout)
-                response.raise_for_status()
-                self._cache[url] = response.text
-                return response.text
-            except requests.RequestException as error:
-                last_error = error
-                if attempt < self.retries:
-                    time.sleep(self.backoff * (2**attempt))
-        raise BioCycError(f"BioCyc request failed for {url}") from last_error
+        try:
+            response = request(
+                self.session, "get", url, timeout=self.timeout,
+                retries=self.retries, backoff=self.backoff,
+            )
+        except requests.RequestException as error:
+            raise BioCycError(f"BioCyc request failed for {url}") from error
+        self._cache[url] = response.text
+        return response.text
 
     def get_ec_html(self, ec_number: str, org: str = "META") -> str:
         return self._get(
