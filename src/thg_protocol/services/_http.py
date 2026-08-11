@@ -3,7 +3,10 @@
 import time
 from typing import Any
 
-import requests
+try:  # Keep package imports safe in no-dependency wheel smoke tests.
+    import requests
+except ImportError:  # pragma: no cover - covered by subprocess smoke test
+    requests = None  # type: ignore[assignment]
 
 
 def request(
@@ -16,6 +19,8 @@ def request(
     backoff: float,
     **kwargs: Any,
 ) -> Any:
+    if requests is None:
+        raise RuntimeError("HTTP requests require the 'requests' dependency")
     last_error: Exception | None = None
     for attempt in range(retries + 1):
         try:
