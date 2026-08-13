@@ -30,3 +30,5 @@ interface for those references.
 Workflow-specific directories such as `beta1/`, `beta2/`,
 `human-database/`, `final-thg/`, and `validation/` are created when workflows
 execute and are intentionally not committed to Git.
+
+`logs/run.log` preserves the workflow messages shown by verbose console runs.

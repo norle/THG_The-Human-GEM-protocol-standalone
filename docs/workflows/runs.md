@@ -14,6 +14,8 @@ Verbose mode reports each stage as it starts, completes, is skipped, or reuses
 a checksum-verified artifact. Use `-vv` when diagnosing a run to include stage
 fingerprints, summaries, and output paths.
 
+Verbose workflow messages are also preserved in `RUN_DIR/logs/run.log`.
+
 Record artifact roles, input references, configuration snapshots, stage
 fingerprints, package versions, and service/cache provenance. Deterministic
 outputs are guaranteed only where the workflow and injected evidence make that

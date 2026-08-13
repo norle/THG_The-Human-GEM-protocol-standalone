@@ -107,11 +107,41 @@ def _next_attempt(run_dir: Path, stage_id: str, entry: Mapping[str, object]) -> 
     return number
 
 
+def _attach_run_log(run_dir: Path) -> logging.Handler:
+    path = run_dir / "logs" / "run.log"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    handler = logging.FileHandler(path, encoding="utf-8")
+    handler.setFormatter(
+        logging.Formatter("%(asctime)s %(levelname)s %(message)s", "%H:%M:%S")
+    )
+    logging.getLogger("thg_protocol.workflow").addHandler(handler)
+    return handler
+
+
 def _error(error: BaseException) -> str:
     return f"{type(error).__name__}: {str(error).strip().replace(chr(10), ' ')}"[:1000]
 
 
 def _execute(
+    config: WorkflowConfig,
+    run_dir: Path,
+    manifest: dict[str, object],
+    stages: tuple[Stage, ...],
+    *,
+    force_step: str | None = None,
+) -> Path:
+    handler = _attach_run_log(run_dir)
+    try:
+        return _execute_stages(
+            config, run_dir, manifest, stages, force_step=force_step
+        )
+    finally:
+        logger = logging.getLogger("thg_protocol.workflow")
+        logger.removeHandler(handler)
+        handler.close()
+
+
+def _execute_stages(
     config: WorkflowConfig,
     run_dir: Path,
     manifest: dict[str, object],

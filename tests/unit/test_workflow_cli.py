@@ -44,6 +44,10 @@ def test_verbose_cli_reports_registered_stage_progress(tmp_path, capsys):
     assert "beta1 workflow" in captured.err
     assert "starting attempt 1" in captured.err
     assert "workflow completed" in captured.err
+    log = (tmp_path / "run" / "logs" / "run.log").read_text(encoding="utf-8")
+    assert "beta1 workflow" in log
+    assert "starting attempt 1" in log
+    assert "workflow completed" in log
 
 
 def test_status_json_is_read_only_and_parseable(tmp_path, capsys):
