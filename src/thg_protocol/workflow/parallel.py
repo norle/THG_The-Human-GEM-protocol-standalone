@@ -6,7 +6,6 @@ from collections.abc import Callable, Iterable
 from concurrent.futures import ProcessPoolExecutor
 from typing import TypeVar
 
-
 Item = TypeVar("Item")
 Result = TypeVar("Result")
 

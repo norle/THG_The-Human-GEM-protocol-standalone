@@ -319,7 +319,6 @@ class DetailedBeta1Stage:
             apply_cleanup_proposals,
             apply_model_proposals,
             audit_model,
-            canonicalize_gpr,
             generate_balance_proposals,
             generate_cleanup_proposals,
             generate_curation_proposals,
