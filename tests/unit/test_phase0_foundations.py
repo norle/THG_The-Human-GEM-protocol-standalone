@@ -58,6 +58,24 @@ def test_beta1_config_rejects_unknown_section_keys(tmp_path):
         load_workflow_config(path)
 
 
+def test_beta1_config_accepts_positive_n_jobs_and_rejects_invalid_values(tmp_path):
+    path = tmp_path / "config.json"
+    payload = {
+        "format_version": 2,
+        "workflow": "beta1",
+        "run": {"name": "run", "output_dir": str(tmp_path / "run")},
+        "beta1": {"n_jobs": 2},
+    }
+    path.write_text(json.dumps(payload), encoding="utf-8")
+    loaded = load_workflow_config(path)
+    assert loaded.sections["beta1"]["n_jobs"] == 2
+
+    payload["beta1"]["n_jobs"] = 0
+    path.write_text(json.dumps(payload), encoding="utf-8")
+    with pytest.raises(ConfigError, match="positive integer"):
+        load_workflow_config(path)
+
+
 def test_builtin_workflows_have_independently_validated_dags():
     assert {"beta1", "beta2", "validate", "compare"}.issubset(list_workflows())
     REGISTRY.validate_all()

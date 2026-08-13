@@ -42,6 +42,7 @@ WORKFLOW_SECTION_KEYS = {
         "max_repair_iterations",
     },
     "beta1": {
+        "n_jobs",
         "input_model",
         "mode",
         "balance_strategy",
@@ -73,6 +74,7 @@ WORKFLOW_SECTION_KEYS = {
         "upstream",
     },
     "beta2": {
+        "n_jobs",
         "upstream",
         "input_model",
         "decisions_file",
@@ -140,6 +142,12 @@ def _required_string(value: dict[str, Any], key: str, name: str) -> str:
     if not isinstance(result, str) or not result.strip():
         raise ConfigError(f"'{name}.{key}' must be a non-empty string")
     return result
+
+
+def _positive_integer(value: object, label: str) -> int:
+    if isinstance(value, bool) or not isinstance(value, int) or value < 1:
+        raise ConfigError(f"'{label}' must be a positive integer")
+    return value
 
 
 def _input_path(
@@ -216,6 +224,11 @@ def _parse_workflow(
             allowed_keys = WORKFLOW_SECTION_KEYS.get(section)
             if allowed_keys is not None:
                 _keys(value, allowed_keys, section)
+            if "n_jobs" in value:
+                value = dict(value)
+                value["n_jobs"] = _positive_integer(
+                    value["n_jobs"], f"{section}.n_jobs"
+                )
             if section == "beta1" and "input_model" in value:
                 value = dict(value)
                 value["input_model"] = str(

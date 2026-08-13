@@ -21,6 +21,8 @@ from .config import (
 from .hashing import artifact_record, sha256_json, verify_artifact
 from .lock import acquire_run_lock
 from .manifest import (
+    ManifestError,
+    load_workflow_manifest,
     new_workflow_manifest,
     utc_now,
     write_manifest_atomic,
@@ -120,6 +122,16 @@ def _attach_run_log(run_dir: Path) -> logging.Handler:
 
 def _error(error: BaseException) -> str:
     return f"{type(error).__name__}: {str(error).strip().replace(chr(10), ' ')}"[:1000]
+
+
+def _resume_config_key(config: WorkflowConfig) -> dict[str, object]:
+    payload = workflow_config_to_dict(config)
+    section = payload.get(config.workflow)
+    if isinstance(section, dict):
+        payload[config.workflow] = {
+            key: value for key, value in section.items() if key != "n_jobs"
+        }
+    return payload
 
 
 def _execute(
@@ -335,7 +347,19 @@ def start_registered(config_path: str | Path) -> Path:
     if run_dir.exists() and not run_dir.is_dir():
         raise ConfigError(f"run output path is not a directory: {run_dir}")
     if run_dir.exists() and any(run_dir.iterdir()):
-        raise ConfigError("run directory is nonempty; choose a new output directory")
+        try:
+            saved_config = load_snapshot(run_dir)
+            load_workflow_manifest(run_dir)
+        except (ConfigError, ManifestError) as error:
+            raise ConfigError(
+                "run directory is nonempty and is not a resumable registered run"
+            ) from error
+        if _resume_config_key(saved_config) != _resume_config_key(config):
+            raise ConfigError(
+                "run directory contains a different configuration; "
+                "choose a new output directory"
+            )
+        return resume_registered(run_dir, _config_override=config)
     run_dir.mkdir(parents=True, exist_ok=True)
     with acquire_run_lock(run_dir):
         write_workflow_snapshot(config, run_dir)
@@ -344,25 +368,43 @@ def start_registered(config_path: str | Path) -> Path:
         return _execute(config, run_dir, manifest, stages)
 
 
-def resume_registered(run_dir: str | Path, *, force_step: str | None = None) -> Path:
+def resume_registered(
+    run_dir: str | Path,
+    *,
+    force_step: str | None = None,
+    _config_override: WorkflowConfig | None = None,
+) -> Path:
     directory = Path(run_dir).resolve()
     with acquire_run_lock(directory):
-        config = load_snapshot(directory)
+        saved_config = load_snapshot(directory)
+        config = saved_config
         if not isinstance(config, WorkflowConfig):
             raise ConfigError("run is not a format-2 registered workflow")
         try:
             definition = get_workflow(config.workflow)
         except WorkflowRegistryError as error:
             raise ConfigError(str(error)) from error
-        from .manifest import load_workflow_manifest
-
         manifest = load_workflow_manifest(directory)
         if manifest.get("config_sha256") != sha256_json(
-            workflow_config_to_dict(config)
+            workflow_config_to_dict(saved_config)
         ):
             raise RegisteredWorkflowError(
                 "manifest config_sha256 does not match config snapshot"
             )
+        if _config_override is not None:
+            if _resume_config_key(_config_override) != _resume_config_key(
+                saved_config
+            ):
+                raise ConfigError(
+                    "run directory contains a different configuration; "
+                    "choose a new output directory"
+            )
+            config = _config_override
+            write_workflow_snapshot(config, directory)
+            manifest["config_sha256"] = sha256_json(
+                workflow_config_to_dict(config)
+            )
+            _write(directory, manifest)
         if manifest.get("workflow") != config.workflow:
             raise RegisteredWorkflowError(
                 "manifest workflow does not match config snapshot"

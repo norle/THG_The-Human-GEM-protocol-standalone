@@ -5,6 +5,10 @@ stage attempts, artifacts, checksums, and provenance. Stage fingerprints allow
 valid work to be reused; `thg-run resume RUN_DIR --force-step STAGE` invalidates
 that stage and descendants while preserving previous attempts.
 
+Starting a config whose output directory already contains the matching
+registered run resumes it automatically. Only `n_jobs` may differ; other
+configuration changes require a new output directory.
+
 ```bash
 thg-run status runs/beta1 --json
 thg-run resume runs/beta1 --verbose

@@ -10,6 +10,7 @@ from thg_protocol.curation.beta1 import (
     MetaboliteCandidate,
     apply_cleanup_proposals,
     apply_model_proposals,
+    audit_model,
     audit_reaction,
     beta1_release_gate,
     compare_reaction_identity,
@@ -52,6 +53,13 @@ def test_inventory_and_audit_are_non_mutating_and_explicit_about_scope():
     assert json.dumps(model.annotation, sort_keys=True) == before
 
 
+def test_parallel_balance_audit_matches_serial_results():
+    model = _model()
+    serial = [item.to_dict() for item in audit_model(model)]
+    parallel = [item.to_dict() for item in audit_model(model, n_jobs=2)]
+    assert parallel == serial
+
+
 def test_gpr_round_trip_is_canonical_and_identity_ties_remain_unresolved():
     assert serialize_gpr(parse_gpr("G3 or (G1 and G2)")) == "G1 and G2 or G3"
     result = resolve_metabolite_identity(
@@ -62,6 +70,27 @@ def test_gpr_round_trip_is_canonical_and_identity_ties_remain_unresolved():
     )
     assert result["status"] == "ambiguous"
     assert result["selected"] is None
+    cross_database = resolve_metabolite_identity(
+        [
+            {"identity": "CHEBI:1", "namespace": "chebi", "score": 1},
+            {"identity": "C00001", "namespace": "kegg", "score": 1},
+            {"identity": "SBO:0000247", "namespace": "sbo", "score": 1},
+        ]
+    )
+    assert cross_database["status"] == "matched"
+    assert cross_database["selected"]["namespace"] == "chebi"
+    assert len(cross_database["candidates"]) == 3
+    model = _model()
+    model.metabolites.a_c.annotation = {"sbo": ["SBO:0000247"]}
+    identity_proposals = generate_curation_proposals(
+        model, metabolite_identities={"a_c": cross_database}
+    )
+    identity = next(
+        item for item in identity_proposals if item.operation == "annotate-identity"
+    )
+    assert identity.after["chebi"] == ["1"]
+    assert identity.after["kegg"] == ["C00001"]
+    assert identity.after["sbo"] == ["SBO:0000247"]
     ranked = resolve_metabolite_identity(
         [
             MetaboliteCandidate(

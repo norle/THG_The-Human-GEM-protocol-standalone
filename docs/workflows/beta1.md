@@ -38,6 +38,9 @@ run_beta1(
 
 - Complex subunit evidence is stored under `thg_s_gpr` without changing Boolean GPRs.
 - Ambiguous identities and unresolved balance cases remain in reports.
+- Cross-database metabolite references are preserved together; one canonical
+  reference is selected for reporting, while conflicting IDs within the same
+  namespace remain unresolved.
 - Generic groups, glycans, and polymers require an explicit `formula_policy`.
 - Reaction conflicts and reversed matches create annotation-only proposals.
 - Without service evidence, the workflow uses existing model annotations.
@@ -62,6 +65,7 @@ candidate files to `thg-beta1.json` and `thg-beta1.xml`.
   "workflow": "beta1",
   "run": {"name": "example-beta1", "output_dir": "../runs/example-beta1"},
   "beta1": {
+    "n_jobs": 1,
     "input_model": "../inputs/models/input-model.json",
     "mode": "apply-all",
     "balance_strategy": "explicit-only"
@@ -76,7 +80,9 @@ cleanup, and validation as separate resumable stages. A beta1 run exports
 JSON/SBML candidates, a semantic signature, validation, ledger, and inventory
 artifacts under the run directory. It also writes an explicit
 `beta1-decisions.jsonl` artifact, including an empty record set when no
-decision file is configured. The input path is never overwritten.
+decision file is configured. Set `n_jobs` above 1 to parallelize the
+CPU-bound per-metabolite and per-reaction analysis; mutation and solver work
+remains serial. The input path is never overwritten.
 
 ## Candidate and release-gate lifecycle
 

@@ -31,6 +31,7 @@ def _config(tmp_path, *, external: bool = True):
                 "workflow": "beta2",
                 "run": {"name": "beta2-fixture", "output_dir": str(tmp_path / "run")},
                 "beta2": {
+                    "n_jobs": 2,
                     "input_model": str(source),
                     "external_beta1_equivalent": external,
                     "gene_locations": {"G_A": ["mitochondrion"], "G_B": ["cytosol"]},

@@ -19,6 +19,7 @@ For a direct external input, the configuration must include:
   "workflow": "beta2",
   "run": {"name": "example-beta2", "output_dir": "../runs/example-beta2"},
   "beta2": {
+    "n_jobs": 1,
     "input_model": "../inputs/models/beta1-equivalent.json",
     "external_beta1_equivalent": true,
     "mode": "apply-all",
@@ -46,7 +47,8 @@ complex branches are retained in the evidence report rather than assigned to
 an implicit cytosol. `fallback_location` and `uncertainty_policy` are explicit
 configuration choices. Exchange, demand, sink, biomass, pseudo, spontaneous,
 transport, and multi-compartment reactions are reported and excluded from
-generic cloning.
+generic cloning. Set `n_jobs` above 1 to parallelize GPR and localization
+resolution; expansion application and solver work remain serial.
 
 The resumable DAG is:
 

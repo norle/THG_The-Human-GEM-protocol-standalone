@@ -33,6 +33,7 @@ def test_configured_beta1_workflow_produces_candidate_and_resumes(tmp_path):
                 "workflow": "beta1",
                 "run": {"name": "configured", "output_dir": str(run_dir)},
                 "beta1": {
+                    "n_jobs": 2,
                     "input_model": "input.json",
                     "mode": "apply-all",
                     "balance_strategy": "explicit-only",

@@ -22,6 +22,7 @@ from thg_protocol.analysis.consistency import reaction_balance
 from thg_protocol.analysis.model_signature import model_signature
 from thg_protocol.model_build.mass_balance import formula_atoms
 from thg_protocol.workflow.hashing import sha256_file
+from thg_protocol.workflow.parallel import parallel_map
 from thg_protocol.workflow.proposals import (
     Decision,
     Proposal,
@@ -59,6 +60,21 @@ BALANCE_STATUSES = (
 )
 
 GENERIC_FORMULA_POLICIES = {"flag", "exclude"}
+
+IDENTITY_NAMESPACE_PRIORITY = (
+    "inchikey",
+    "inchi",
+    "smiles",
+    "chebi",
+    "kegg",
+    "hmdb",
+    "pubchem",
+    "metanetx.chemical",
+    "bigg.metabolite",
+    "vmhmetabolite",
+    "lipidmaps",
+)
+NON_CHEMICAL_IDENTITY_NAMESPACES = {"sbo", "ontology"}
 
 
 def _json(value: object) -> object:
@@ -106,6 +122,21 @@ def _merge_annotations(first: object, second: object) -> dict[str, object]:
         }
         result[str(namespace)] = [unique[key] for key in sorted(unique)]
     return result
+
+
+def _annotation_identity_exists(
+    annotation: object, namespace: str, identity: str
+) -> bool:
+    if not isinstance(annotation, Mapping):
+        return False
+    value = annotation.get(namespace)
+    values = value if isinstance(value, (list, tuple, set, frozenset)) else (value,)
+    normalized = normalize_namespace(identity, namespace)[1]
+    return any(
+        normalize_namespace(str(item), namespace)[1] == normalized
+        for item in values
+        if item is not None
+    )
 
 
 def classify_reaction(reaction: Any) -> str:
@@ -331,7 +362,12 @@ def resolve_metabolite_identity(
     reference_charge: int | None = None,
     reference_structural_identifiers: Iterable[str] = (),
 ) -> dict[str, object]:
-    """Select a candidate only when the best evidence is not tied or conflicting."""
+    """Select a canonical candidate while retaining all cross-references.
+
+    Different databases normally describe the same metabolite. A score tie is
+    therefore broken by stable namespace precedence; only competing IDs
+    within the same namespace remain ambiguous.
+    """
     service_errors = tuple(str(error) for error in errors)
     if service_errors:
         return {
@@ -377,7 +413,13 @@ def resolve_metabolite_identity(
                     else None
                 ),
             )
+        original_namespace = str(item.namespace)
         namespace, identity = normalize_namespace(item.identity, item.namespace)
+        if (
+            original_namespace.casefold() in NON_CHEMICAL_IDENTITY_NAMESPACES
+            or (namespace or "").casefold() in NON_CHEMICAL_IDENTITY_NAMESPACES
+        ):
+            namespace, identity = original_namespace, item.identity
         calculated_score, calculated_reason = score_metabolite_candidate(
             item,
             reference_name=reference_name,
@@ -411,25 +453,56 @@ def resolve_metabolite_identity(
             "evidence": [],
             "reason": "no candidate was supplied",
         }
-    top = ordered[0]
-    tied = [item for item in ordered if item.score == top.score]
-    if len({(item.namespace, item.identity) for item in tied}) > 1:
+    usable = [
+        item
+        for item in ordered
+        if item.namespace.casefold() not in NON_CHEMICAL_IDENTITY_NAMESPACES
+    ]
+    if not usable:
+        return {
+            "status": "no-match",
+            "selected": None,
+            "candidates": [_json(item.__dict__) for item in ordered],
+            "errors": [],
+            "evidence": sorted(
+                {evidence for item in ordered for evidence in item.evidence}
+            ),
+            "reason": "only non-chemical ontology annotations were supplied",
+        }
+    top_score = usable[0].score
+    tied = [item for item in usable if item.score == top_score]
+    priority = {
+        namespace: index
+        for index, namespace in enumerate(IDENTITY_NAMESPACE_PRIORITY)
+    }
+    best_priority = min(
+        priority.get(item.namespace.casefold(), len(priority)) for item in tied
+    )
+    preferred = [
+        item
+        for item in tied
+        if priority.get(item.namespace.casefold(), len(priority)) == best_priority
+    ]
+    if len({(item.namespace, item.identity) for item in preferred}) > 1:
         return {
             "status": "ambiguous",
             "selected": None,
             "candidates": [_json(item.__dict__) for item in ordered],
             "errors": [],
             "evidence": sorted(
-                {evidence for item in tied for evidence in item.evidence}
+                {evidence for item in preferred for evidence in item.evidence}
             ),
-            "reason": "top candidates have equal evidence scores",
+            "reason": "top candidates conflict within the preferred namespace",
         }
+    top = preferred[0]
     return {
         "status": "matched",
         "selected": _json(top.__dict__),
         "candidates": [_json(item.__dict__) for item in ordered],
         "errors": [],
-        "evidence": list(top.evidence),
+        "evidence": sorted(
+            {evidence for item in usable for evidence in item.evidence}
+        ),
         "reason": top.reason,
     }
 
@@ -664,8 +737,10 @@ def generate_curation_proposals(
     """Generate identity, GPR, and explicit balance proposals as one set.
 
     ``metabolite_identities`` contains the result of
-    ``resolve_metabolite_identity``; ambiguous and failed resolutions are
-    deliberately left out of the mutation set.
+    ``resolve_metabolite_identity``. The selected candidate is canonical for
+    reporting, while all supplied cross-references are merged into the model.
+    Ambiguous and failed resolutions are deliberately left out of the mutation
+    set.
     """
     proposals: list[Proposal] = []
     for metabolite_id, resolution in sorted(metabolite_identities.items()):
@@ -674,51 +749,56 @@ def generate_curation_proposals(
         selected = resolution.get("selected")
         if not isinstance(selected, Mapping):
             continue
-        namespace, identity = (
-            str(selected.get("namespace", "")),
-            str(selected.get("identity", "")),
-        )
-        if not namespace or not identity:
-            continue
+        references = [
+            candidate
+            for candidate in resolution.get("candidates", [])
+            if isinstance(candidate, Mapping)
+        ] or [selected]
         metabolite = model.metabolites.get_by_id(metabolite_id)
         before = _json(getattr(metabolite, "annotation", {}) or {})
-        after = dict(before) if isinstance(before, Mapping) else {}
-        values = (
-            list(after.get(namespace, []))
-            if isinstance(after.get(namespace), (list, tuple, set))
-            else ([after[namespace]] if namespace in after else [])
-        )
-        if identity not in values:
-            values.append(identity)
-        after[namespace] = sorted({str(item) for item in values})
-        if after != before:
-            proposals.append(
-                Proposal(
-                    proposal_id=proposal_id(
-                        operation="annotate-identity",
-                        object_type="metabolite",
-                        object_id=metabolite_id,
-                        before=before,
-                        after=after,
-                    ),
+        additions: dict[str, list[str]] = {}
+        for candidate in references:
+            namespace = str(candidate.get("namespace", ""))
+            identity = str(candidate.get("identity", ""))
+            if (
+                namespace
+                and identity
+                and namespace.casefold() not in NON_CHEMICAL_IDENTITY_NAMESPACES
+                and not _annotation_identity_exists(before, namespace, identity)
+            ):
+                additions.setdefault(namespace, []).append(identity)
+        after = _merge_annotations(before, additions)
+        namespace = str(selected.get("namespace", ""))
+        identity = str(selected.get("identity", ""))
+        if not namespace or not identity or after == before:
+            continue
+        proposals.append(
+            Proposal(
+                proposal_id=proposal_id(
                     operation="annotate-identity",
                     object_type="metabolite",
                     object_id=metabolite_id,
                     before=before,
                     after=after,
-                    evidence=tuple(
-                        str(x)
-                        for x in (
-                            resolution.get("evidence", [])
-                            or selected.get("evidence", [])
-                        )
-                    ),
-                    confidence=str(selected.get("score", "matched")),
-                    policy="identity-precedence",
-                    stage="beta1-resolve-metabolite-identities",
-                    reason=str(selected.get("reason", "selected normalized identity")),
-                )
+                ),
+                operation="annotate-identity",
+                object_type="metabolite",
+                object_id=metabolite_id,
+                before=before,
+                after=after,
+                evidence=tuple(
+                    str(x)
+                    for x in (
+                        resolution.get("evidence", [])
+                        or selected.get("evidence", [])
+                    )
+                ),
+                confidence=str(selected.get("score", "matched")),
+                policy="identity-precedence",
+                stage="beta1-resolve-metabolite-identities",
+                reason=str(selected.get("reason", "selected normalized identity")),
             )
+        )
     normalized_genes = normalize_gene_mapping(gene_mapping)
     for reaction in sorted(model.reactions, key=lambda item: str(item.id)):
         rule = str(getattr(reaction, "gene_reaction_rule", "") or "").strip()
@@ -953,6 +1033,27 @@ def compare_reaction_identity(
     )
 
 
+def _compare_reaction_identity_payload(
+    payload: tuple[
+        tuple[object, ...],
+        Mapping[str, float],
+        Mapping[str, str],
+        str,
+        tuple[str, ...],
+    ]
+) -> ReactionIdentity:
+    reaction, target, metabolite_mapping, proton_water_policy, normalization_species = (
+        payload
+    )
+    return compare_reaction_identity(
+        _reaction_from_payload(reaction),
+        target,
+        metabolite_mapping=metabolite_mapping,
+        proton_water_policy=proton_water_policy,
+        normalization_species=normalization_species,
+    )
+
+
 def reaction_identity_key(
     reaction: Any, *, metabolite_mapping: Mapping[str, str] | None = None
 ) -> tuple[tuple[str, float], ...]:
@@ -1184,15 +1285,108 @@ def audit_reaction(
     )
 
 
+class _MetaboliteView:
+    __slots__ = ("id", "name", "formula", "charge", "compartment", "annotation")
+
+    def __init__(
+        self,
+        identifier: str,
+        name: str,
+        formula: str,
+        charge: int | None,
+        compartment: str,
+        annotation: Mapping[str, object],
+    ) -> None:
+        self.id = identifier
+        self.name = name
+        self.formula = formula
+        self.charge = charge
+        self.compartment = compartment
+        self.annotation = dict(annotation)
+
+    __hash__ = object.__hash__
+
+
+def _reaction_payload(reaction: Any) -> tuple[object, ...]:
+    return (
+        str(reaction.id),
+        str(getattr(reaction, "name", "") or ""),
+        bool(getattr(reaction, "boundary", False)),
+        str(getattr(reaction, "gene_reaction_rule", "") or ""),
+        tuple(
+            (
+                str(metabolite.id),
+                str(getattr(metabolite, "name", "") or ""),
+                str(getattr(metabolite, "formula", "") or ""),
+                getattr(metabolite, "charge", None),
+                str(getattr(metabolite, "compartment", "") or ""),
+                dict(getattr(metabolite, "annotation", {}) or {}),
+                float(coefficient),
+            )
+            for metabolite, coefficient in reaction.metabolites.items()
+        ),
+    )
+
+
+def _reaction_from_payload(payload: tuple[object, ...]) -> SimpleNamespace:
+    identifier, name, boundary, gene_reaction_rule, metabolite_payloads = payload
+    metabolites = {}
+    for (
+        metabolite_id,
+        metabolite_name,
+        formula,
+        charge,
+        compartment,
+        annotation,
+        coefficient,
+    ) in metabolite_payloads:
+        metabolite = _MetaboliteView(
+            str(metabolite_id),
+            str(metabolite_name),
+            str(formula),
+            charge,
+            str(compartment),
+            annotation,
+        )
+        metabolites[metabolite] = float(coefficient)
+    return SimpleNamespace(
+        id=str(identifier),
+        name=str(name),
+        boundary=bool(boundary),
+        gene_reaction_rule=str(gene_reaction_rule),
+        metabolites=metabolites,
+    )
+
+
+def _audit_reaction_payload(
+    payload: tuple[tuple[object, ...], Mapping[str, str]],
+) -> BalanceAudit:
+    reaction, formula_policy = payload
+    return audit_reaction(
+        _reaction_from_payload(reaction), formula_policy=formula_policy
+    )
+
+
 def audit_model(
     model: Any,
     *,
     formula_policy: Mapping[str, str] | None = None,
+    n_jobs: int = 1,
 ) -> tuple[BalanceAudit, ...]:
-    return tuple(
-        audit_reaction(reaction, formula_policy=formula_policy)
-        for reaction in sorted(model.reactions, key=lambda item: str(item.id))
+    if isinstance(n_jobs, bool) or not isinstance(n_jobs, int) or n_jobs < 1:
+        raise ValueError("n_jobs must be a positive integer")
+    reactions = tuple(sorted(model.reactions, key=lambda item: str(item.id)))
+    if n_jobs == 1:
+        return tuple(
+            audit_reaction(reaction, formula_policy=formula_policy)
+            for reaction in reactions
+        )
+    payloads = tuple(
+        (_reaction_payload(reaction), dict(formula_policy or {}))
+        for reaction in reactions
     )
+    del reactions, model
+    return parallel_map(_audit_reaction_payload, payloads, n_jobs=n_jobs)
 
 
 def _affected_audits(model: Any, metabolite_id: str) -> list[dict[str, object]]:
@@ -1278,7 +1472,14 @@ def generate_balance_proposals(
                 model, reaction, species_by_compartment=species_by_compartment
             )
             if automatic is not None:
-                before, after, trial_reaction, changed_species = automatic
+                (
+                    before,
+                    after,
+                    trial_reaction,
+                    changed_species,
+                    before_audit,
+                    after_audit,
+                ) = automatic
                 proposals.append(
                     Proposal(
                         proposal_id=proposal_id(
@@ -1299,8 +1500,8 @@ def generate_balance_proposals(
                         stage="beta1-balance-proposals",
                         reason="added only proton/water species required by residuals",
                         metadata={
-                            "imbalance_before": audit_reaction(reaction).to_dict(),
-                            "imbalance_after": audit_reaction(trial_reaction).to_dict(),
+                            "imbalance_before": before_audit.to_dict(),
+                            "imbalance_after": after_audit.to_dict(),
                             "changed_species": changed_species,
                             "semantic_impact": (
                                 "stoichiometry and solver behavior may change"
@@ -1425,6 +1626,8 @@ def _proton_water_correction(
         dict[str, float],
         Any,
         list[str],
+        BalanceAudit,
+        BalanceAudit,
     ]
     | None
 ):
@@ -1499,7 +1702,14 @@ def _proton_water_correction(
     corrected = audit_reaction(trial_reaction)
     if corrected.mass_status != "balanced" or corrected.charge_status != "balanced":
         return None
-    return before, after, trial_reaction, sorted({str(water.id), str(proton.id)})
+    return (
+        before,
+        after,
+        trial_reaction,
+        sorted({str(water.id), str(proton.id)}),
+        audit,
+        corrected,
+    )
 
 
 def apply_model_proposals(

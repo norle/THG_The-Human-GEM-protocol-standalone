@@ -10,6 +10,7 @@ from pathlib import Path
 from typing import Any
 
 from .hashing import sha256_file, sha256_json
+from .parallel import parallel_map
 from .proposals import (
     decisions_fingerprint,
     read_decisions,
@@ -157,6 +158,63 @@ def _decision_items(section: Mapping[str, object]) -> tuple[Any, ...]:
     return read_decisions(path) if isinstance(path, str) else ()
 
 
+def _resolve_metabolite_payload(
+    payload: tuple[str, Mapping[str, object], str | None, str | None, int | None]
+) -> tuple[str, dict[str, object]]:
+    from thg_protocol.curation.beta1 import resolve_metabolite_identity
+
+    object_id, record, reference_name, reference_formula, reference_charge = payload
+    return object_id, resolve_metabolite_identity(
+        record.get("candidates", []),
+        errors=record.get("errors", [])
+        if isinstance(record.get("errors", []), (list, tuple))
+        else (),
+        reference_name=reference_name,
+        reference_formula=reference_formula,
+        reference_charge=reference_charge,
+    )
+
+
+def _curate_gpr_payload(
+    payload: tuple[
+        str,
+        str,
+        Mapping[str, str],
+        tuple[str, ...],
+        Mapping[str, object],
+        bool,
+    ]
+) -> tuple[dict[str, object], list[dict[str, str]]] | None:
+    from thg_protocol.curation.beta1 import (
+        canonicalize_gpr,
+        rewrite_gpr,
+        serialize_gpr,
+        serialize_s_gpr,
+    )
+
+    reaction_id, before, mapping, known_genes, subunits, has_subunits = payload
+    if not before:
+        return None
+    after = serialize_gpr(canonicalize_gpr(before))
+    if mapping:
+        after = rewrite_gpr(after, mapping)
+    ast = canonicalize_gpr(after)
+    dangling = [
+        {"reaction_id": reaction_id, "gene_id": gene_id}
+        for gene_id in sorted(_gpr_gene_ids(ast) - set(known_genes))
+    ]
+    return (
+        {
+            "reaction_id": reaction_id,
+            "before": before,
+            "after": after,
+            "valid": not dangling,
+            "s_gpr": serialize_s_gpr(after, subunits) if has_subunits else None,
+        },
+        dangling,
+    )
+
+
 def _software_versions() -> dict[str, str]:
     versions = {"python": platform.python_version()}
     for package in ("cobra", "libsbml"):
@@ -238,12 +296,19 @@ class DetailedBeta1Stage:
         result = {
             "stage": self.id,
             "implementation_version": self.implementation_version,
-            "configuration": dict(section),
+            "configuration": {
+                key: value for key, value in section.items() if key != "n_jobs"
+            },
             "input_sha256": sha256_file(source)
             if isinstance(source, str) and Path(source).is_file()
             else None,
             "dependencies": dependency_hashes,
         }
+        if self.id in {
+            "resolve-metabolite-identities",
+            "generate-curation-proposals",
+        }:
+            result["identity_policy_version"] = 3
         decisions = section.get("decisions_file")
         if isinstance(decisions, str):
             result["decisions_sha256"] = decisions_fingerprint(decisions)
@@ -260,9 +325,6 @@ class DetailedBeta1Stage:
             generate_curation_proposals,
             inventory_model,
             normalize_gene_mapping,
-            resolve_metabolite_identity,
-            serialize_gpr,
-            serialize_s_gpr,
         )
 
         section = _section(context)
@@ -332,12 +394,13 @@ class DetailedBeta1Stage:
                     context, "collect-metabolite-evidence", "evidence"
                 ).read_text(encoding="utf-8")
             )
+            model = _model(context, "beta1-input")
             resolutions: dict[str, object] = {}
+            tasks = []
             for object_id, record in sorted(evidence.get("records", {}).items()):
                 if isinstance(record, Mapping) and "status" in record:
                     resolutions[object_id] = dict(record)
                 elif isinstance(record, Mapping):
-                    model = _model(context, "beta1-input")
                     try:
                         metabolite = model.metabolites.get_by_id(object_id)
                     except KeyError:
@@ -351,18 +414,15 @@ class DetailedBeta1Stage:
                             ),
                         }
                     else:
-                        resolutions[object_id] = resolve_metabolite_identity(
-                            record.get("candidates", []),
-                            errors=record.get("errors", [])
-                            if isinstance(record.get("errors", []), (list, tuple))
-                            else (),
-                            reference_name=str(getattr(metabolite, "name", "") or "")
-                            or None,
-                            reference_formula=str(
-                                getattr(metabolite, "formula", "") or ""
+                        tasks.append(
+                            (
+                                object_id,
+                                dict(record),
+                                str(getattr(metabolite, "name", "") or "") or None,
+                                str(getattr(metabolite, "formula", "") or "")
+                                or None,
+                                getattr(metabolite, "charge", None),
                             )
-                            or None,
-                            reference_charge=getattr(metabolite, "charge", None),
                         )
                 else:
                     resolutions[object_id] = {
@@ -370,6 +430,13 @@ class DetailedBeta1Stage:
                         "selected": None,
                         "candidates": [],
                     }
+            del model
+            for object_id, result in parallel_map(
+                _resolve_metabolite_payload,
+                tasks,
+                n_jobs=int(section.get("n_jobs", 1)),
+            ):
+                resolutions[object_id] = result
             output = _dump(
                 work_dir / "metabolite-identities.json",
                 {"schema_version": 1, "resolutions": resolutions},
@@ -425,7 +492,8 @@ class DetailedBeta1Stage:
 
         if self.id == "resolve-reaction-identities":
             from thg_protocol.curation.beta1 import (
-                compare_reaction_identity,
+                _compare_reaction_identity_payload,
+                _reaction_payload,
                 duplicate_reaction_groups,
             )
 
@@ -453,6 +521,11 @@ class DetailedBeta1Stage:
                 and result["selected"].get("identity")
             }
             resolutions: dict[str, object] = {}
+            tasks = []
+            task_ids = []
+            duplicate_groups = duplicate_reaction_groups(
+                model, metabolite_mapping=metabolite_mapping
+            )
             targets = configured if isinstance(configured, Mapping) else {}
             for reaction in sorted(model.reactions, key=lambda item: str(item.id)):
                 target = targets.get(reaction.id)
@@ -493,41 +566,57 @@ class DetailedBeta1Stage:
                     }
                     continue
                 if isinstance(target, Mapping):
-                    result = compare_reaction_identity(
-                        reaction,
-                        target,
-                        metabolite_mapping=metabolite_mapping,
-                        proton_water_policy=str(
-                            section.get("proton_water_policy", "strict")
-                        ),
-                        normalization_species=section.get("normalization_species", ())
-                        if isinstance(
-                            section.get("normalization_species", ()), (list, tuple)
+                    task_ids.append(str(reaction.id))
+                    tasks.append(
+                        (
+                            _reaction_payload(reaction),
+                            dict(target),
+                            metabolite_mapping,
+                            str(section.get("proton_water_policy", "strict")),
+                            tuple(
+                                str(item)
+                                for item in section.get("normalization_species", ())
+                            )
+                            if isinstance(
+                                section.get("normalization_species", ()), (list, tuple)
+                            )
+                            else (),
                         )
-                        else (),
                     )
-                    resolutions[str(reaction.id)] = {
-                        "status": result.status,
-                        "normalized": dict(result.normalized),
-                        "reversed": result.reversed,
-                        "reason": result.reason,
-                        "normalization_policy": result.normalization_policy,
-                        "evidence": list(
-                            evidence_record.get("evidence", [])
-                            if isinstance(evidence_record, Mapping)
-                            else []
-                        ),
-                    }
+            del model
+            for reaction_id, result in zip(
+                task_ids,
+                parallel_map(
+                    _compare_reaction_identity_payload,
+                    tasks,
+                    n_jobs=int(section.get("n_jobs", 1)),
+                ),
+                strict=True,
+            ):
+                evidence_record = (
+                    evidence_records.get(reaction_id, {})
+                    if isinstance(evidence_records, Mapping)
+                    else {}
+                )
+                resolutions[reaction_id] = {
+                    "status": result.status,
+                    "normalized": dict(result.normalized),
+                    "reversed": result.reversed,
+                    "reason": result.reason,
+                    "normalization_policy": result.normalization_policy,
+                    "evidence": list(
+                        evidence_record.get("evidence", [])
+                        if isinstance(evidence_record, Mapping)
+                        else []
+                    ),
+                }
             output = _dump(
                 work_dir / "reaction-identities.json",
                 {
                     "schema_version": 1,
                     "resolutions": resolutions,
                     "duplicate_chemistry": [
-                        list(group)
-                        for group in duplicate_reaction_groups(
-                            model, metabolite_mapping=metabolite_mapping
-                        )
+                        list(group) for group in duplicate_groups
                     ],
                 },
             )
@@ -576,45 +665,30 @@ class DetailedBeta1Stage:
                 str(value) for value in mapping.values()
             }
             dangling_references: list[dict[str, object]] = []
-            for reaction in sorted(model.reactions, key=lambda item: str(item.id)):
-                before = str(reaction.gene_reaction_rule or "")
-                if before:
-                    after = serialize_gpr(canonicalize_gpr(before))
-                    if mapping:
-                        from thg_protocol.curation.beta1 import rewrite_gpr
-
-                        after = rewrite_gpr(after, mapping)
-                    ast = canonicalize_gpr(after)
-                    dangling = sorted(_gpr_gene_ids(ast) - known_genes)
-                    if dangling:
-                        dangling_references.extend(
-                            {
-                                "reaction_id": str(reaction.id),
-                                "gene_id": gene_id,
-                            }
-                            for gene_id in dangling
-                        )
-                    records.append(
-                        {
-                            "reaction_id": str(reaction.id),
-                            "before": before,
-                            "after": after,
-                            "valid": not dangling,
-                            "s_gpr": (
-                                serialize_s_gpr(
-                                    after,
-                                    subunit_mapping.get(str(reaction.id), {})
-                                    if isinstance(
-                                        subunit_mapping.get(str(reaction.id), {}),
-                                        Mapping,
-                                    )
-                                    else {},
-                                )
-                                if str(reaction.id) in subunit_mapping
-                                else None
-                            ),
-                        }
-                    )
+            tasks = tuple(
+                (
+                    str(reaction.id),
+                    str(reaction.gene_reaction_rule or ""),
+                    dict(mapping),
+                    tuple(sorted(known_genes)),
+                    dict(subunit_mapping.get(str(reaction.id), {}))
+                    if isinstance(subunit_mapping.get(str(reaction.id), {}), Mapping)
+                    else {},
+                    str(reaction.id) in subunit_mapping,
+                )
+                for reaction in sorted(model.reactions, key=lambda item: str(item.id))
+            )
+            del model
+            for result in parallel_map(
+                _curate_gpr_payload,
+                tasks,
+                n_jobs=int(section.get("n_jobs", 1)),
+            ):
+                if result is None:
+                    continue
+                record, dangling = result
+                records.append(record)
+                dangling_references.extend(dangling)
             output = _dump(
                 work_dir / "gpr-curation.json",
                 {
@@ -703,6 +777,7 @@ class DetailedBeta1Stage:
                     if isinstance(section.get("formula_policy", {}), Mapping)
                     else {}
                 ),
+                n_jobs=int(section.get("n_jobs", 1)),
             )
             output = _dump(
                 work_dir / "balance-audit.json",
@@ -863,6 +938,7 @@ class DetailedBeta1Stage:
                     if isinstance(section.get("formula_policy", {}), Mapping)
                     else {}
                 ),
+                n_jobs=int(section.get("n_jobs", 1)),
             )
             from thg_protocol.curation.beta1 import is_unresolved_balance
 

@@ -50,7 +50,7 @@ def build_parser() -> argparse.ArgumentParser:
     _add_verbosity_argument(parser)
     commands = parser.add_subparsers(dest="command", required=True)
 
-    start_parser = commands.add_parser("start", help="start a new run")
+    start_parser = commands.add_parser("start", help="start or resume a run")
     start_parser.add_argument("config", type=Path, help="JSON run configuration")
     _add_verbosity_argument(start_parser, default=argparse.SUPPRESS)
 
@@ -96,7 +96,7 @@ def main(argv: list[str] | None = None) -> int:
     _configure_logging(getattr(args, "verbose", 0))
     try:
         if args.command == "start":
-            print(f"run started: {start(args.config)}")
+            print(f"run started/resumed: {start(args.config)}")
         elif args.command in {"beta1", "beta2", "validate", "compare"}:
             from .config import load_workflow_config
 
@@ -106,7 +106,7 @@ def main(argv: list[str] | None = None) -> int:
                     f"configuration selects workflow '{config.workflow}', "
                     f"not '{args.command}'"
                 )
-            print(f"run started: {start(args.config)}")
+            print(f"run started/resumed: {start(args.config)}")
         elif args.command == "resume":
             print(f"run resumed: {resume(args.run_dir, force_step=args.force_step)}")
         elif args.command == "status":

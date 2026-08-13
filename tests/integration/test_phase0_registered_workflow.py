@@ -101,6 +101,40 @@ def test_registered_config_snapshot_is_self_contained_and_cli_aliases_exist(tmp_
     assert main(["beta1", str(wrong)]) == 2
 
 
+def test_start_resumes_matching_run_and_allows_worker_count_change(tmp_path):
+    config = _config(
+        tmp_path / "config.json",
+        "beta1",
+        tmp_path / "run",
+        {"n_jobs": 1},
+    )
+    run = start(config)
+    before = get_status(run)
+    config.write_text(
+        json.dumps(
+            {
+                "format_version": 2,
+                "workflow": "beta1",
+                "run": {"name": "beta1", "output_dir": str(run)},
+                "beta1": {"n_jobs": 2},
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    assert start(config) == run
+    after = get_status(run)
+    assert after["config_sha256"] != before["config_sha256"]
+    assert all(
+        after["steps"][stage]["attempt"] == before["steps"][stage]["attempt"]
+        for stage in before["steps"]
+    )
+    assert (
+        json.loads((run / "config.snapshot.json").read_text())["beta1"]["n_jobs"]
+        == 2
+    )
+
+
 def test_registered_resume_rejects_snapshot_for_a_different_run_directory(tmp_path):
     run = start(_config(tmp_path / "config.json", "beta1", tmp_path / "run"))
     snapshot = run / "config.snapshot.json"

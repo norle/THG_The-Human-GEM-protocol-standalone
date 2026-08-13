@@ -363,7 +363,9 @@ class FoundationStage:
             "implementation_version": self.implementation_version,
             "workflow": context.config.workflow,
             "kind": self.kind,
-            "configuration": section,
+            "configuration": {
+                key: value for key, value in section.items() if key != "n_jobs"
+            },
             "decision_files": decision_fingerprints,
             "dependencies": _dependency_hashes(context, self.dependencies),
         }

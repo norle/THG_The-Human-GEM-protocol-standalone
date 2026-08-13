@@ -12,6 +12,7 @@ from typing import Any
 
 from .artifacts import resolve_artifact, upstream_fingerprint
 from .hashing import sha256_file
+from .parallel import parallel_map
 from .stages import StageContext, StageResult, _dependency_path, _load_cobra_model
 
 DETAILED_BETA2_STAGE_IDS = (
@@ -42,6 +43,65 @@ def _section(context: StageContext) -> Mapping[str, object]:
     return value if isinstance(value, Mapping) else {}
 
 
+def _resolve_gpr_payload(
+    payload: tuple[str, str, Mapping[str, object], tuple[str, ...]]
+):
+    from thg_protocol.curation.beta1 import canonicalize_gpr, serialize_gpr
+
+    reaction_id, raw, stoich, genes = payload
+    try:
+        canonical = serialize_gpr(canonicalize_gpr(raw)) if raw else ""
+        valid = True
+    except (SyntaxError, ValueError):
+        canonical, valid = raw, False
+    return reaction_id, {
+        "gpr": canonical,
+        "original_gpr": raw,
+        "genes": list(genes),
+        "subunit_stoichiometry": dict(stoich),
+        "valid": valid,
+    }
+
+
+def _resolve_location_payload(
+    payload: tuple[
+        str,
+        str,
+        tuple[tuple[str, object], ...],
+        tuple[tuple[str, object], ...],
+        str | None,
+        Mapping[str, object],
+    ]
+):
+    from thg_protocol.curation.beta2 import resolve_gpr_locations
+
+    reaction_id, gpr, location_items, raw_location_items, fallback, record = payload
+    locations = dict(location_items)
+    result = resolve_gpr_locations(gpr, locations, fallback_location=fallback)
+    evidence = [{"reaction_id": reaction_id, **item} for item in result.evidence]
+    genes = record.get("genes", [])
+    for gene, value in raw_location_items:
+        if isinstance(value, Mapping) and gene in genes:
+            evidence.append(
+                {
+                    "reaction_id": reaction_id,
+                    "gene_id": gene,
+                    "status": value.get("status", "direct"),
+                    "locations": value.get("locations", []),
+                    "evidence_id": value.get("evidence_id"),
+                }
+            )
+    return (
+        reaction_id,
+        {
+            "rules": dict(result.rules),
+            "subunit_stoichiometry": record.get("subunit_stoichiometry", {}),
+        },
+        evidence,
+        [f"{reaction_id}:{item}" for item in result.unresolved],
+    )
+
+
 def _model(context: StageContext, stage: str, role: str = "model") -> Any:
     return _load_cobra_model(_dependency_path(context, stage, role))
 
@@ -58,7 +118,11 @@ class DetailedBeta2Stage:
         return True
 
     def fingerprint_data(self, context: StageContext) -> Mapping[str, object]:
-        section = dict(_section(context))
+        section = {
+            key: value
+            for key, value in _section(context).items()
+            if key != "n_jobs"
+        }
         source = section.get("input_model")
         result: dict[str, object] = {
             "stage": self.id,
@@ -104,7 +168,6 @@ class DetailedBeta2Stage:
             generate_expansion_plan,
             normalize_compartment_registry,
             normalize_location,
-            resolve_gpr_locations,
             validate_beta2,
         )
 
@@ -228,27 +291,27 @@ class DetailedBeta2Stage:
             )
         if self.id == "resolve-gprs":
             model = _model(context, "load-beta1")
-            from thg_protocol.curation.beta1 import canonicalize_gpr, serialize_gpr
-
             stoich = section.get("subunit_stoichiometry", {})
-            records = {}
-            for r in sorted(model.reactions, key=lambda item: str(item.id)):
-                raw = str(r.gene_reaction_rule or "")
-                try:
-                    canonical = serialize_gpr(canonicalize_gpr(raw)) if raw else ""
-                    valid = True
-                except (SyntaxError, ValueError):
-                    canonical, valid = raw, False
-                records[str(r.id)] = {
-                    "gpr": canonical,
-                    "original_gpr": raw,
-                    "genes": sorted(str(g.id) for g in r.genes),
-                    "subunit_stoichiometry": dict(stoich.get(str(r.id), {}))
+            tasks = tuple(
+                (
+                    str(reaction.id),
+                    str(reaction.gene_reaction_rule or ""),
+                    dict(stoich.get(str(reaction.id), {}))
                     if isinstance(stoich, Mapping)
-                    and isinstance(stoich.get(str(r.id), {}), Mapping)
+                    and isinstance(stoich.get(str(reaction.id), {}), Mapping)
                     else {},
-                    "valid": valid,
-                }
+                    tuple(sorted(str(gene.id) for gene in reaction.genes)),
+                )
+                for reaction in sorted(model.reactions, key=lambda item: str(item.id))
+            )
+            del model
+            records = dict(
+                parallel_map(
+                    _resolve_gpr_payload,
+                    tasks,
+                    n_jobs=int(section.get("n_jobs", 1)),
+                )
+            )
             return StageResult(
                 (
                     (
@@ -363,33 +426,32 @@ class DetailedBeta2Stage:
             resolved = {}
             evidence = []
             unresolved = []
-            for reaction_id, record in gprs["records"].items():
-                result = resolve_gpr_locations(
+            tasks = tuple(
+                (
+                    str(reaction_id),
                     str(record["gpr"]),
-                    locations,
-                    fallback_location=str(section["fallback_location"])
+                    tuple(locations.items()),
+                    tuple(raw_locations.items()),
+                    str(section["fallback_location"])
                     if isinstance(section.get("fallback_location"), str)
                     else None,
+                    dict(record),
                 )
-                resolved[reaction_id] = {
-                    "rules": dict(result.rules),
-                    "subunit_stoichiometry": record.get("subunit_stoichiometry", {}),
-                }
-                evidence.extend(
-                    {"reaction_id": reaction_id, **item} for item in result.evidence
-                )
-                evidence.extend(
-                    {
-                        "reaction_id": reaction_id,
-                        "gene_id": gene,
-                        "status": value.get("status", "direct"),
-                        "locations": value.get("locations", []),
-                        "evidence_id": value.get("evidence_id"),
-                    }
-                    for gene, value in raw_locations.items()
-                    if isinstance(value, Mapping) and gene in record.get("genes", [])
-                )
-                unresolved.extend(f"{reaction_id}:{item}" for item in result.unresolved)
+                for reaction_id, record in sorted(gprs["records"].items())
+            )
+            for (
+                reaction_id,
+                reaction_result,
+                reaction_evidence,
+                reaction_unresolved,
+            ) in parallel_map(
+                _resolve_location_payload,
+                tasks,
+                n_jobs=int(section.get("n_jobs", 1)),
+            ):
+                resolved[reaction_id] = reaction_result
+                evidence.extend(reaction_evidence)
+                unresolved.extend(reaction_unresolved)
             output = {
                 "schema_version": 1,
                 "rules": resolved,
