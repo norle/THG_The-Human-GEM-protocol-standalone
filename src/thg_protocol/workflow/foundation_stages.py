@@ -34,7 +34,7 @@ class Beta1ScientificStage:
     promoted artifacts under the resumable runner.
     """
 
-    implementation_version = 1
+    implementation_version = 2
 
     def __init__(
         self,
@@ -164,7 +164,7 @@ class Beta1ScientificStage:
                 corrections=_mapping(section.get("corrections")),
                 formula_corrections=_string_mapping(section.get("formula_corrections")),
                 charge_corrections=_int_mapping(section.get("charge_corrections")),
-                strategy=str(section.get("balance_strategy", "explicit-only")),
+                strategy=str(section.get("balance_strategy", "proton-water")),
             )
             output = work_dir / "beta1-proposals.jsonl"
             write_proposals(output, proposals)

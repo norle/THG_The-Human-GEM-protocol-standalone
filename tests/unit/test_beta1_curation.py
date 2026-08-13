@@ -136,7 +136,7 @@ def test_proton_water_strategy_only_proposes_a_verified_local_repair():
     reaction.add_metabolites({water: -1, proton: 1})
     model.add_reactions([reaction])
 
-    proposals = generate_balance_proposals(model, strategy="proton-water")
+    proposals = generate_balance_proposals(model)
 
     assert len(proposals) == 1
     assert proposals[0].policy == "proton-water"
@@ -163,8 +163,10 @@ def test_balance_audit_distinguishes_missing_and_generic_formula_cases():
     generic_reaction.add_metabolites({generic: -1, product: 1})
     model.add_reactions([reaction, generic_reaction])
     assert audit_reaction(reaction).mass_status == "not-evaluable-missing-formula"
+    assert audit_reaction(generic_reaction).mass_status == "excluded-generic-formula"
     assert (
-        audit_reaction(generic_reaction).mass_status == "not-evaluable-generic-formula"
+        audit_reaction(generic_reaction, formula_policy={}).mass_status
+        == "not-evaluable-generic-formula"
     )
 
 

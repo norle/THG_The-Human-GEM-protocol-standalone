@@ -41,7 +41,8 @@ run_beta1(
 - Cross-database metabolite references are preserved together; one canonical
   reference is selected for reporting, while conflicting IDs within the same
   namespace remain unresolved.
-- Generic groups, glycans, and polymers require an explicit `formula_policy`.
+- Generic groups, glycans, polymers, R-groups, and X-groups default to an
+  excluded mass-balance policy because their formulas are not inferable.
 - Reaction conflicts and reversed matches create annotation-only proposals.
 - Without service evidence, the workflow uses existing model annotations.
 - `run_flux_consistency: true` adds a diagnostic blocked-reaction report.
@@ -68,7 +69,7 @@ candidate files to `thg-beta1.json` and `thg-beta1.xml`.
     "n_jobs": 1,
     "input_model": "../inputs/models/input-model.json",
     "mode": "apply-all",
-    "balance_strategy": "explicit-only"
+    "balance_strategy": "proton-water"
   }
 }
 ```
@@ -80,7 +81,9 @@ cleanup, and validation as separate resumable stages. A beta1 run exports
 JSON/SBML candidates, a semantic signature, validation, ledger, and inventory
 artifacts under the run directory. It also writes an explicit
 `beta1-decisions.jsonl` artifact, including an empty record set when no
-decision file is configured. Set `n_jobs` above 1 to parallelize the
+decision file is configured. Proton/water repairs are proposed only when the
+residual is fully verified; otherwise the reaction remains unresolved. Set
+`n_jobs` above 1 to parallelize the
 CPU-bound per-metabolite and per-reaction analysis; mutation and solver work
 remains serial. The input path is never overwritten.
 

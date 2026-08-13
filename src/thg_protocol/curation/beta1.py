@@ -60,6 +60,14 @@ BALANCE_STATUSES = (
 )
 
 GENERIC_FORMULA_POLICIES = {"flag", "exclude"}
+DEFAULT_FORMULA_POLICY = {
+    "generic-group": "exclude",
+    "glycan": "exclude",
+    "polymer": "exclude",
+    "r-group": "exclude",
+    "x-group": "exclude",
+}
+DEFAULT_BALANCE_STRATEGY = "proton-water"
 
 IDENTITY_NAMESPACE_PRIORITY = (
     "inchikey",
@@ -1224,9 +1232,13 @@ def audit_reaction(
             }
         )
     )
-    selected_policy = {
-        str(key): str(value) for key, value in (formula_policy or {}).items()
-    }
+    selected_policy = (
+        {
+            str(key): str(value) for key, value in formula_policy.items()
+        }
+        if formula_policy is not None
+        else dict(DEFAULT_FORMULA_POLICY)
+    )
     invalid_policies = set(selected_policy.values()) - GENERIC_FORMULA_POLICIES
     if invalid_policies:
         raise ValueError(
@@ -1381,8 +1393,11 @@ def audit_model(
             audit_reaction(reaction, formula_policy=formula_policy)
             for reaction in reactions
         )
+    selected_policy = (
+        DEFAULT_FORMULA_POLICY if formula_policy is None else formula_policy
+    )
     payloads = tuple(
-        (_reaction_payload(reaction), dict(formula_policy or {}))
+        (_reaction_payload(reaction), dict(selected_policy))
         for reaction in reactions
     )
     del reactions, model
@@ -1436,9 +1451,9 @@ def generate_balance_proposals(
     corrections: Mapping[str, Mapping[str, float]] | None = None,
     formula_corrections: Mapping[str, str] | None = None,
     charge_corrections: Mapping[str, int] | None = None,
-    strategy: str = "explicit-only",
+    strategy: str = DEFAULT_BALANCE_STRATEGY,
 ) -> tuple[Proposal, ...]:
-    """Create balance proposals; no numerical repair is inferred by default."""
+    """Create balance proposals using only verified proton/water repairs by default."""
     if strategy not in {"explicit-only", "proton-water"}:
         raise ValueError("strategy must be 'explicit-only' or 'proton-water'")
     proposals: list[Proposal] = []
@@ -2129,7 +2144,7 @@ def run_beta1(
     output_dir: str | Path,
     *,
     mode: str = "apply-all",
-    balance_strategy: str = "explicit-only",
+    balance_strategy: str = DEFAULT_BALANCE_STRATEGY,
     corrections: Mapping[str, Mapping[str, float]] | None = None,
     formula_corrections: Mapping[str, str] | None = None,
     charge_corrections: Mapping[str, int] | None = None,
@@ -2139,7 +2154,7 @@ def run_beta1(
     metabolite_identities: Mapping[str, Mapping[str, object]] = {},
     gene_mapping: Mapping[str, str] = {},
     reaction_identities: Mapping[str, Mapping[str, object]] = {},
-    formula_policy: Mapping[str, str] = {},
+    formula_policy: Mapping[str, str] | None = None,
     subunit_stoichiometry: Mapping[str, Mapping[str, float]] = {},
     run_solver_checks: bool = False,
     run_flux_consistency: bool = False,
@@ -2463,6 +2478,9 @@ def run_beta1(
         "evidence": evidence_dir / "manifest.json",
         "mappings": mappings_dir / "identity-mappings.json",
     }
+    effective_formula_policy = (
+        DEFAULT_FORMULA_POLICY if formula_policy is None else formula_policy
+    )
     provenance_path.write_text(
         json.dumps(
             {
@@ -2472,7 +2490,7 @@ def run_beta1(
                 "configuration": {
                     "mode": mode,
                     "balance_strategy": balance_strategy,
-                    "formula_policy": dict(formula_policy),
+                    "formula_policy": dict(effective_formula_policy),
                     "subunit_stoichiometry": dict(subunit_stoichiometry),
                     "remove_isolated": remove_isolated,
                     "sanctioned_model": sanctioned_model,

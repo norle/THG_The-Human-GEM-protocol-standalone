@@ -268,7 +268,7 @@ def _run_provenance(
 class DetailedBeta1Stage:
     """One stage in the explicit Phase 1 scientific DAG."""
 
-    implementation_version = 2
+    implementation_version = 3
 
     def __init__(self, stage_id: str, dependencies: tuple[str, ...] = ()) -> None:
         self.id = stage_id
@@ -772,9 +772,9 @@ class DetailedBeta1Stage:
             audits = audit_model(
                 _model(context, "apply-curation"),
                 formula_policy=(
-                    section.get("formula_policy", {})
-                    if isinstance(section.get("formula_policy", {}), Mapping)
-                    else {}
+                    section.get("formula_policy")
+                    if isinstance(section.get("formula_policy"), Mapping)
+                    else None
                 ),
                 n_jobs=int(section.get("n_jobs", 1)),
             )
@@ -798,7 +798,7 @@ class DetailedBeta1Stage:
                 corrections=_mapping(section.get("corrections")),
                 formula_corrections=_string_mapping(section.get("formula_corrections")),
                 charge_corrections=_int_mapping(section.get("charge_corrections")),
-                strategy=str(section.get("balance_strategy", "explicit-only")),
+                strategy=str(section.get("balance_strategy", "proton-water")),
             )
             output = work_dir / "balance-proposals.jsonl"
             write_proposals(output, proposals)
@@ -933,9 +933,9 @@ class DetailedBeta1Stage:
             audits = audit_model(
                 model,
                 formula_policy=(
-                    section.get("formula_policy", {})
-                    if isinstance(section.get("formula_policy", {}), Mapping)
-                    else {}
+                    section.get("formula_policy")
+                    if isinstance(section.get("formula_policy"), Mapping)
+                    else None
                 ),
                 n_jobs=int(section.get("n_jobs", 1)),
             )
