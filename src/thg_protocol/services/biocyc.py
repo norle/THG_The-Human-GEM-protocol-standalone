@@ -2,6 +2,9 @@
 
 from __future__ import annotations
 
+import json
+import os
+from collections.abc import Mapping
 from dataclasses import dataclass, field
 from typing import Protocol
 
@@ -24,6 +27,8 @@ class BioCycClientProtocol(Protocol):
 
     def get_page(self, url: str) -> str: ...
 
+    def get_cco(self, identifier: str) -> Mapping[str, object] | None: ...
+
 
 @dataclass
 class StaticBioCycClient:
@@ -31,6 +36,8 @@ class StaticBioCycClient:
 
     ec_pages: dict[tuple[str, str], str] = field(default_factory=dict)
     pages: dict[str, str] = field(default_factory=dict)
+    cco_terms: dict[str, Mapping[str, object]] = field(default_factory=dict)
+    cco_graph: dict[str, Mapping[str, object]] = field(default_factory=dict)
 
     def get_ec_html(self, ec_number: str, org: str = "META") -> str:
         return self.ec_pages.get((org.upper(), str(ec_number)), "")
@@ -38,9 +45,14 @@ class StaticBioCycClient:
     def get_page(self, url: str) -> str:
         return self.pages.get(url, "")
 
+    def get_cco(self, identifier: str) -> Mapping[str, object] | None:
+        return (self.cco_terms or self.cco_graph).get(str(identifier))
+
 
 class BioCycClient:
     """BioCyc HTTP adapter with explicit timeout, retry, and page caching."""
+
+    base_url = "https://websvc.biocyc.org"
 
     def __init__(
         self,
@@ -49,6 +61,8 @@ class BioCycClient:
         timeout: float = 30.0,
         retries: int = 3,
         backoff: float = 0.5,
+        email: str | None = None,
+        password: str | None = None,
     ) -> None:
         if requests is None:
             raise RuntimeError("BioCycClient requires the 'requests' dependency")
@@ -57,14 +71,43 @@ class BioCycClient:
         self.retries = max(0, retries)
         self.backoff = max(0.0, backoff)
         self._cache: dict[str, str] = {}
+        email = email if email is not None else os.environ.get("BIOCYC_EMAIL")
+        password = (
+            password if password is not None else os.environ.get("BIOCYC_PASSWORD")
+        )
+        if bool(email) != bool(password):
+            raise BioCycError("BioCyc email and password must be provided together")
+        if email and password:
+            self._login(email, password)
+
+    def _login(self, email: str, password: str) -> None:
+        try:
+            response = request(
+                self.session,
+                "post",
+                f"{self.base_url}/ajax-login",
+                timeout=self.timeout,
+                retries=self.retries,
+                backoff=self.backoff,
+                data={"email": email, "password": password},
+            )
+            payload = response.json()
+        except (requests.RequestException, ValueError) as error:
+            raise BioCycError("BioCyc login failed") from error
+        if not isinstance(payload, Mapping) or not payload.get("success"):
+            raise BioCycError("BioCyc login failed")
 
     def _get(self, url: str) -> str:
         if url in self._cache:
             return self._cache[url]
         try:
             response = request(
-                self.session, "get", url, timeout=self.timeout,
-                retries=self.retries, backoff=self.backoff,
+                self.session,
+                "get",
+                url,
+                timeout=self.timeout,
+                retries=self.retries,
+                backoff=self.backoff,
             )
         except requests.RequestException as error:
             raise BioCycError(f"BioCyc request failed for {url}") from error
@@ -73,8 +116,18 @@ class BioCycClient:
 
     def get_ec_html(self, ec_number: str, org: str = "META") -> str:
         return self._get(
-            f"https://websvc.biocyc.org/{org}/NEW-IMAGE?type=EC-NUMBER&object=EC-{ec_number}"
+            f"{self.base_url}/{org}/NEW-IMAGE?type=EC-NUMBER&object=EC-{ec_number}"
         )
 
     def get_page(self, url: str) -> str:
         return self._get(url)
+
+    def get_cco(self, identifier: str) -> Mapping[str, object] | None:
+        """Retrieve a normalized CCO term when a live caller requests it."""
+        try:
+            payload = json.loads(
+                self._get(f"{self.base_url}/ONTOLOGY?object={identifier}")
+            )
+        except (TypeError, json.JSONDecodeError):
+            return None
+        return payload if isinstance(payload, Mapping) else None

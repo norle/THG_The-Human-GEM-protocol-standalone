@@ -40,9 +40,12 @@ from .beta2 import (
     normalize_location,
     reaction_policy,
     release_beta2,
+    resolve_compartment,
+    resolve_compartment_evidence,
     resolve_gpr_locations,
     validate_beta2,
 )
+from .go import load_obo, normalize_go_id, parse_obo, resolve_go_compartment
 
 __all__ = [
     "BalanceAudit",
@@ -82,6 +85,12 @@ __all__ = [
     "normalize_location",
     "reaction_policy",
     "release_beta2",
+    "resolve_compartment",
+    "resolve_compartment_evidence",
     "resolve_gpr_locations",
     "validate_beta2",
+    "load_obo",
+    "normalize_go_id",
+    "parse_obo",
+    "resolve_go_compartment",
 ]

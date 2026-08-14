@@ -6,13 +6,11 @@
   },
   "beta2": {
     "n_jobs": 1,
-    "upstream": [
-      {
-        "run_dir": "../runs/beta1",
-        "stage_id": "beta1-export",
-        "role": "model"
-      }
-    ],
+    "upstream": {
+      "run_dir": "../runs/beta1",
+      "stage_id": "export-beta1",
+      "role": "model"
+    },
     "mode": "apply-all",
     "fallback_location": "cytosol",
     "uncertainty_policy": "report"

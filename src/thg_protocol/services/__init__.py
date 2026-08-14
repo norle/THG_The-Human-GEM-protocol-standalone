@@ -13,6 +13,8 @@ from .ensembl import (
     EnsemblError,
     StaticEnsemblClient,
 )
+from .go import GOALoader, GOALoaderProtocol, StaticGOALoader
+from .goa import GOAAnnotation, GOAClient, GOAClientProtocol, StaticGOAClient, parse_gaf
 from .kegg import KeggClient, KeggClientProtocol, KeggError, StaticKeggClient
 from .location import (
     LocationClient,
@@ -26,6 +28,14 @@ from .pubchem import (
     PubChemCompound,
     PubChemError,
     StaticPubChemClient,
+)
+from .reactome import ReactomeClient, ReactomeClientProtocol, StaticReactomeClient
+from .rhea import RheaClient, RheaClientProtocol, StaticRheaClient
+from .uniprot import (
+    StaticUniProtClient,
+    UniProtAnnotation,
+    UniProtClient,
+    UniProtClientProtocol,
 )
 
 __all__ = [
@@ -42,6 +52,24 @@ __all__ = [
     "KeggClientProtocol",
     "KeggError",
     "StaticKeggClient",
+    "GOAAnnotation",
+    "GOALoader",
+    "GOALoaderProtocol",
+    "StaticGOALoader",
+    "GOAClient",
+    "GOAClientProtocol",
+    "StaticGOAClient",
+    "parse_gaf",
+    "RheaClientProtocol",
+    "RheaClient",
+    "StaticRheaClient",
+    "ReactomeClientProtocol",
+    "ReactomeClient",
+    "StaticReactomeClient",
+    "StaticUniProtClient",
+    "UniProtAnnotation",
+    "UniProtClientProtocol",
+    "UniProtClient",
     "PubChemClient",
     "PubChemClientProtocol",
     "PubChemCompound",

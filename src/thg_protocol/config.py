@@ -2,9 +2,67 @@
 
 from __future__ import annotations
 
+import ast
 import json
+import os
+import re
+from collections.abc import Iterable
 from pathlib import Path
 from typing import Any
+
+_ENV_KEY = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
+
+
+def _read_dotenv(path: Path) -> dict[str, str]:
+    """Read simple ``KEY=VALUE`` dotenv files without executing them."""
+    values: dict[str, str] = {}
+    for line in path.read_text(encoding="utf-8").splitlines():
+        text = line.strip()
+        if not text or text.startswith("#"):
+            continue
+        if text.startswith("export "):
+            text = text[7:].lstrip()
+        key, separator, value = text.partition("=")
+        key = key.strip()
+        if not separator or not _ENV_KEY.fullmatch(key):
+            continue
+        value = value.strip()
+        if len(value) >= 2 and value[0] == value[-1] and value[0] in "'\"":
+            try:
+                value = str(ast.literal_eval(value))
+            except (SyntaxError, ValueError):
+                continue
+        values[key] = value
+    return values
+
+
+def load_environment_files(
+    paths: Iterable[str | Path] | None = None,
+) -> tuple[Path, ...]:
+    """Load trusted dotenv files without overriding existing environment values.
+
+    By default, files are considered in this order: ``THG_ENV_FILE`` when set,
+    the current working directory, then the THG package/project directory.
+    Earlier files and explicit process environment variables take precedence.
+    """
+    if paths is None:
+        candidates: list[Path] = []
+        explicit = os.environ.get("THG_ENV_FILE")
+        if explicit:
+            candidates.append(Path(explicit).expanduser())
+        candidates.extend((Path.cwd() / ".env", get_project_root() / ".env"))
+    else:
+        candidates = [Path(item).expanduser() for item in paths]
+
+    loaded: list[Path] = []
+    for path in candidates:
+        path = path.resolve()
+        if not path.is_file() or path in loaded:
+            continue
+        for key, value in _read_dotenv(path).items():
+            os.environ.setdefault(key, value)
+        loaded.append(path)
+    return tuple(loaded)
 
 
 def get_project_root() -> Path:

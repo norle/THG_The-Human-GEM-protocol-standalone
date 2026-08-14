@@ -3,25 +3,109 @@
 from __future__ import annotations
 
 import re
+from html import unescape
+from html.parser import HTMLParser
 from typing import Any
+from urllib.parse import parse_qs, urlparse
 
 from thg_protocol.services.biocyc import BioCycClient, BioCycClientProtocol
 from thg_protocol.services.kegg import KeggClient, KeggClientProtocol
 
+PARSER_VERSION = "biocyc-gene-anchor-v1"
+
+
+class _GenePageParser(HTMLParser):
+    """Read visible BioCyc gene blocks; HTML attributes are never content."""
+
+    def __init__(self) -> None:
+        super().__init__(convert_charrefs=True)
+        self._bold = False
+        self._pending = False
+        self._in_gene = False
+        self._anchor_depth = 0
+        self._anchor_text: list[str] = []
+        self._anchor_href = ""
+        self._tokens: list[str] = []
+        self._pairs: set[tuple[str, str]] = set()
+
+    @staticmethod
+    def _identifier(href: str) -> str:
+        values = parse_qs(urlparse(href).query).get("object", [])
+        return values[0].strip() if values else ""
+
+    def _finish(self) -> None:
+        if not self._in_gene:
+            return
+        if self._anchor_text:
+            symbol = "".join(self._anchor_text).strip()
+            identifier = self._identifier(self._anchor_href)
+            if symbol and identifier:
+                self._pairs.add((symbol, identifier))
+        values = re.findall(r"[A-Za-z0-9_-]+", " ".join(self._tokens))
+        if len(values) >= 2:
+            self._pairs.add((values[0], values[1]))
+        self._in_gene = False
+        self._pending = False
+        self._anchor_depth = 0
+        self._anchor_text = []
+        self._anchor_href = ""
+        self._tokens = []
+
+    def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
+        tag = tag.lower()
+        if tag == "b":
+            self._bold = True
+        elif tag == "a" and (self._pending or self._in_gene):
+            if not self._in_gene:
+                self._in_gene = True
+                self._pending = False
+            self._anchor_depth += 1
+            if self._anchor_depth == 1:
+                self._anchor_href = dict(attrs).get("href") or ""
+        elif tag in {"br", "p", "div", "li", "tr"}:
+            self._finish()
+
+    def handle_endtag(self, tag: str) -> None:
+        tag = tag.lower()
+        if tag == "b":
+            self._bold = False
+        elif tag == "a" and self._anchor_depth:
+            self._anchor_depth -= 1
+        elif tag in {"p", "div", "li", "tr"}:
+            self._finish()
+
+    def handle_data(self, data: str) -> None:
+        text = data.strip()
+        if self._bold and text.lower() == "gene:":
+            self._pending = True
+            return
+        if self._pending and not text:
+            return
+        if self._pending:
+            self._in_gene = True
+            self._pending = False
+        if not self._in_gene:
+            return
+        if self._anchor_depth:
+            self._anchor_text.append(data)
+        else:
+            self._tokens.append(data)
+
+    def pairs(self) -> list[tuple[str, str]]:
+        self._finish()
+        return sorted(self._pairs)
+
 
 def parse_gene_pairs(page: str) -> list[tuple[str, str]]:
-    """Extract gene symbol/identifier pairs from common BioCyc HTML forms."""
-    patterns = (
-        r"<b>Gene:</b>\s*([A-Za-z0-9_-]+).*?([A-Za-z0-9:_-]+)<br>",
-        r"&lt;b&gt;Gene:&lt;/b&gt;\s*([A-Za-z0-9_-]+)\s+([A-Za-z0-9:_-]+)",
-    )
-    pairs: set[tuple[str, str]] = set()
-    for pattern in patterns:
-        pairs.update(
-            (symbol.strip(), identifier.strip())
-            for symbol, identifier in re.findall(pattern, page, re.I)
-        )
-    return sorted(pairs)
+    """Extract visible gene symbol/identifier pairs from BioCyc HTML."""
+    for value in (page, unescape(page)):
+        parser = _GenePageParser()
+        parser.feed(value)
+        parser.close()
+        pairs = parser.pairs()
+        if pairs:
+            return pairs
+    return []
 
 
 def _kegg_genes(page: str) -> list[str]:
@@ -30,6 +114,14 @@ def _kegg_genes(page: str) -> list[str]:
 
 def _safe_gpr(symbols: list[str]) -> str:
     return " or ".join(f"({symbol})" for symbol in symbols)
+
+
+def _access_warning(page: str, organization: str) -> str | None:
+    title = re.search(r"<title[^>]*>(.*?)</title>", page, re.I | re.S)
+    marker = re.sub(r"\s+", " ", title.group(1)).strip().lower() if title else ""
+    if marker in {"subscription required", "create account", "biocyc login"}:
+        return f"{organization.lower()}cyc-access-required:{marker.replace(' ', '-')}"
+    return None
 
 
 def get_gpr(
@@ -45,15 +137,52 @@ def get_gpr(
     access is behind injectable clients, making an empty/static lookup fully
     offline and deterministic.
     """
+    evidence = get_gpr_evidence(
+        ec_number,
+        session,
+        biocyc_client=biocyc_client,
+        kegg_client=kegg_client,
+    )
+    symbols = list(evidence["gene_symbols"])
+    identifiers = list(evidence["gene_identifiers"])
+    if not symbols:
+        return [], "", "", "", ""
+    gpr = _safe_gpr(symbols)
+    stoichiometric_gpr = " or ".join(f"({symbol}*1)" for symbol in symbols)
+    return symbols, ", ".join(symbols), ", ".join(identifiers), stoichiometric_gpr, gpr
+
+
+def get_gpr_evidence(
+    ec_number: str,
+    session: Any | None = None,
+    *,
+    biocyc_client: BioCycClientProtocol | None = None,
+    kegg_client: KeggClientProtocol | None = None,
+) -> dict[str, object]:
+    """Resolve an EC number and retain source/fallback provenance."""
+    from datetime import datetime, timezone
+
+    # Keep the historical positional ``get_gpr(ec, client)`` usage working;
+    # ordinary requests sessions do not expose ``get_ec_html``.
+    if biocyc_client is None and hasattr(session, "get_ec_html"):
+        biocyc_client, session = session, None
     if biocyc_client is None:
         biocyc_client = BioCycClient(session=session)
     pairs: list[tuple[str, str]] = []
+    source = ""
+    warnings: list[str] = []
     for organization in ("HUMAN", "META"):
         try:
-            pairs = parse_gene_pairs(biocyc_client.get_ec_html(ec_number, organization))
-        except Exception:
+            page = biocyc_client.get_ec_html(ec_number, organization)
+            warning = _access_warning(page, organization)
+            if warning:
+                warnings.append(warning)
+            pairs = parse_gene_pairs(page)
+        except Exception as error:
+            warnings.append(f"{organization.lower()}cyc-lookup-failed:{type(error).__name__}")
             pairs = []
         if pairs:
+            source = "biocyc" if organization == "HUMAN" else "metacyc"
             break
 
     symbols = [symbol for symbol, _ in pairs]
@@ -66,13 +195,22 @@ def get_gpr(
                 page = kegg_client.get_ec_html(ec_number)
             symbols = _kegg_genes(page)
             identifiers = list(symbols)
-        except Exception:
+            source = "kegg" if symbols else ""
+        except Exception as error:
+            warnings.append(f"kegg-lookup-failed:{type(error).__name__}")
             symbols, identifiers = [], []
-    if not symbols:
-        return [], "", "", "", ""
-    gpr = _safe_gpr(symbols)
-    stoichiometric_gpr = " or ".join(f"({symbol}*1)" for symbol in symbols)
-    return symbols, ", ".join(symbols), ", ".join(identifiers), stoichiometric_gpr, gpr
+    return {
+        "ec": str(ec_number),
+        "source": source or "none",
+        "retrieved_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
+        "source_version": "unknown",
+        "parser_version": PARSER_VERSION,
+        "gene_symbols": symbols,
+        "gene_identifiers": identifiers,
+        "candidate_gpr": _safe_gpr(symbols) if symbols else "",
+        "status": "candidate" if symbols else "unresolved",
+        "warnings": warnings or (["no-gpr-evidence"] if not symbols else []),
+    }
 
 
-__all__ = ["get_gpr", "parse_gene_pairs"]
+__all__ = ["PARSER_VERSION", "get_gpr", "get_gpr_evidence", "parse_gene_pairs"]

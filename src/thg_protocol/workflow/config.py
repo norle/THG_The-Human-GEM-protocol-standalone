@@ -82,6 +82,22 @@ WORKFLOW_SECTION_KEYS = {
         "gene_locations",
         "compartments",
         "catalysis_evidence",
+        "evidence_mode",
+        "evidence_file",
+        "gpr_policy",
+        "location_policy",
+        "reaction_location_evidence",
+        "cco_graph",
+        "go_graph",
+        "compartment_go_terms",
+        "location_sources",
+        "reaction_sources",
+        "go_ontology_file",
+        "go_annotation_file",
+        "uniprot_snapshot",
+        "rhea_snapshot",
+        "reactome_snapshot",
+        "source_releases",
         "external_beta1_equivalent",
         "compartment_ontology_version",
         "fallback_location",
@@ -246,6 +262,53 @@ def _parse_workflow(
                         MODEL_SUFFIXES,
                     )
                 )
+            if section == "beta2":
+                evidence_mode = value.get("evidence_mode", "provided")
+                if evidence_mode not in {"provided", "snapshot", "live"}:
+                    raise ConfigError(
+                        "'beta2.evidence_mode' must be provided, snapshot, or live"
+                    )
+                if value.get("gpr_policy", "model-then-ec") != "model-then-ec":
+                    raise ConfigError("unsupported 'beta2.gpr_policy'")
+                if (
+                    value.get("location_policy", "provided-then-evidence")
+                    != "provided-then-evidence"
+                ):
+                    raise ConfigError("unsupported 'beta2.location_policy'")
+                if "evidence_file" in value:
+                    value = dict(value)
+                    evidence_path = Path(
+                        _required_string(value, "evidence_file", "beta2")
+                    )
+                    if not evidence_path.is_absolute():
+                        evidence_path = input_base / evidence_path
+                    evidence_path = evidence_path.resolve()
+                    if evidence_mode == "snapshot" and not evidence_path.is_file():
+                        raise ConfigError(
+                            "'beta2.evidence_file' must point to an existing snapshot: "
+                            + str(evidence_path)
+                        )
+                    value["evidence_file"] = str(evidence_path)
+                for file_key in (
+                    "go_ontology_file",
+                    "go_annotation_file",
+                    "uniprot_snapshot",
+                    "rhea_snapshot",
+                    "reactome_snapshot",
+                ):
+                    if file_key not in value or not isinstance(value[file_key], str):
+                        continue
+                    candidate = Path(value[file_key])
+                    if not candidate.is_absolute():
+                        candidate = input_base / candidate
+                    candidate = candidate.resolve()
+                    if evidence_mode != "live" and not candidate.is_file():
+                        raise ConfigError(
+                            f"'beta2.{file_key}' must point to an existing regular "
+                            "file: " + str(candidate)
+                        )
+                    value = dict(value)
+                    value[file_key] = str(candidate)
             sections[section] = _resolve_workflow_paths(value, input_base)
     return WorkflowConfig(
         workflow=workflow,
@@ -277,6 +340,9 @@ def _resolve_workflow_paths(value: object, base: Path, *, key: str = "") -> obje
             "beta2_model",
             "database_model",
             "task_suite",
+            "uniprot_snapshot",
+            "rhea_snapshot",
+            "reactome_snapshot",
         }
     ):
         path = Path(value)

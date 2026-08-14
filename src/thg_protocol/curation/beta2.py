@@ -39,6 +39,144 @@ LOCATION_ALIASES = {
 }
 
 
+def resolve_compartment(
+    raw_location: str,
+    cco_id: str | None,
+    cco_graph: Mapping[str, Mapping[str, object]] | None,
+    compartments: Mapping[str, str],
+) -> dict[str, object]:
+    """Resolve one recorded location to the configured registry, offline.
+
+    Only exact names/synonyms and explicit ontology edges are followed.  The
+    resolver intentionally ignores spatial-neighbour relations.
+    """
+    registry = normalize_compartment_registry(compartments)
+    by_name = {normalize_location(name): key for key, name in registry.items()}
+    normalized = normalize_location(raw_location)
+    if normalized in by_name:
+        key = by_name[normalized]
+        return {
+            "raw_location": raw_location,
+            "normalized_location": normalized,
+            "status": "resolved",
+            "resolution_method": "configured-name",
+            "resolution_path": [{"name": normalized}],
+            "target_compartment_id": key,
+            "target_compartment_name": registry[key],
+        }
+
+    graph = {str(key): value for key, value in (cco_graph or {}).items()}
+    start = str(cco_id) if cco_id else None
+    if start not in graph:
+        for identifier, term in graph.items():
+            names = [term.get("name", ""), *(term.get("synonyms", []) or [])]
+            if normalized in {normalize_location(str(name)) for name in names}:
+                start = identifier
+                break
+    if start not in graph:
+        return {
+            "raw_location": raw_location,
+            "normalized_location": normalized,
+            "status": "rejected",
+            "reason": "location-not-in-registry",
+        }
+
+    queue: list[tuple[str, list[dict[str, object]], int]] = [(start, [], 0)]
+    candidates: list[tuple[int, int, str, list[dict[str, object]]]] = []
+    visited: set[tuple[str, tuple[str, ...]]] = set()
+    while queue:
+        identifier, path, distance = queue.pop(0)
+        term = graph.get(identifier, {})
+        name = normalize_location(str(term.get("name", identifier)))
+        current_path = path + [{"cco_id": identifier, "name": name}]
+        key = by_name.get(name)
+        if key is not None:
+            candidates.append((distance, 0, key, current_path))
+        # Containment is more authoritative than a generic superclass.
+        edges = [(str(item), 0) for item in term.get("component_of", []) or []]
+        edges += [(str(item), 1) for item in term.get("superclasses", []) or []]
+        for next_id, relation_rank in edges:
+            if next_id not in graph:
+                continue
+            marker = (next_id, tuple(item.get("cco_id", "") for item in current_path))
+            if marker in visited:
+                continue
+            visited.add(marker)
+            queue.append(
+                (
+                    next_id,
+                    current_path
+                    + [
+                        {
+                            "relation": "component-of"
+                            if relation_rank == 0
+                            else "superclass"
+                        }
+                    ],
+                    distance + 1,
+                )
+            )
+    if not candidates:
+        return {
+            "raw_location": raw_location,
+            "normalized_location": normalized,
+            "cco_id": cco_id,
+            "status": "rejected",
+            "reason": "location-not-in-registry",
+        }
+    nearest = min((item[0], item[1]) for item in candidates)
+    selected = [item for item in candidates if (item[0], item[1]) == nearest]
+    targets = sorted({item[2] for item in selected})
+    if len(targets) != 1:
+        return {
+            "raw_location": raw_location,
+            "normalized_location": normalized,
+            "cco_id": cco_id,
+            "status": "rejected",
+            "reason": "ambiguous-compartment-resolution",
+            "candidate_targets": targets,
+        }
+    key = targets[0]
+    chosen = sorted(
+        (item for item in selected if item[2] == key), key=lambda item: item[3]
+    )[0]
+    return {
+        "raw_location": raw_location,
+        "normalized_location": normalized,
+        "cco_id": cco_id,
+        "status": "resolved",
+        "resolution_method": (
+            "cco-id"
+            if chosen[0] == 0 and cco_id
+            else "cco-name"
+            if chosen[0] == 0
+            else "cco-component-of"
+            if chosen[1] == 0
+            else "cco-superclass"
+        ),
+        "resolution_path": chosen[3],
+        "target_compartment_id": key,
+        "target_compartment_name": registry[key],
+    }
+
+
+def resolve_compartment_evidence(
+    locations: list[Mapping[str, object]],
+    cco_graph: Mapping[str, Mapping[str, object]] | None,
+    compartments: Mapping[str, str],
+) -> list[dict[str, object]]:
+    """Resolve all location records without network access."""
+    return [
+        resolve_compartment(
+            str(item.get("raw_location", item.get("location", ""))),
+            str(item["cco_id"]) if item.get("cco_id") else None,
+            cco_graph,
+            compartments,
+        )
+        for item in locations
+    ]
+
+
 @dataclass(frozen=True)
 class LocationResolution:
     rules: Mapping[str, str]
@@ -384,8 +522,7 @@ def apply_expansion_plan(
     unknown_decisions = sorted(set(decisions) - plan_ids)
     if unknown_decisions:
         raise ValueError(
-            "β2 decisions reference unknown proposals: "
-            + ", ".join(unknown_decisions)
+            "β2 decisions reference unknown proposals: " + ", ".join(unknown_decisions)
         )
     ledger: list[dict[str, object]] = []
     for original_plan in plans:
@@ -736,6 +873,8 @@ __all__ = [
     "LocationResolution",
     "normalize_location",
     "normalize_compartment_registry",
+    "resolve_compartment",
+    "resolve_compartment_evidence",
     "resolve_gpr_locations",
     "reaction_policy",
     "generate_expansion_plan",
