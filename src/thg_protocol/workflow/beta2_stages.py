@@ -430,8 +430,16 @@ class DetailedBeta2Stage:
                 (
                     str(reaction_id),
                     str(record["gpr"]),
-                    tuple(locations.items()),
-                    tuple(raw_locations.items()),
+                    tuple(
+                        (gene, locations[gene])
+                        for gene in (str(item) for item in record.get("genes", ()))
+                        if gene in locations
+                    ),
+                    tuple(
+                        (gene, raw_locations[gene])
+                        for gene in (str(item) for item in record.get("genes", ()))
+                        if gene in raw_locations
+                    ),
                     str(section["fallback_location"])
                     if isinstance(section.get("fallback_location"), str)
                     else None,

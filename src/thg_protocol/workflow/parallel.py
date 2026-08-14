@@ -23,8 +23,9 @@ def parallel_map(
     if n_jobs == 1 or len(values) < 2:
         return tuple(function(item) for item in values)
     workers = min(n_jobs, len(values))
+    chunksize = max(1, len(values) // (workers * 8))
     with ProcessPoolExecutor(max_workers=workers) as executor:
-        return tuple(executor.map(function, values))
+        return tuple(executor.map(function, values, chunksize=chunksize))
 
 
 __all__ = ["parallel_map"]
