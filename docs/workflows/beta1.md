@@ -62,7 +62,6 @@ candidate files to `thg-beta1.json` and `thg-beta1.xml`.
 
 ```json
 {
-  "format_version": 2,
   "workflow": "beta1",
   "run": {"name": "example-beta1", "output_dir": "../runs/example-beta1"},
   "beta1": {

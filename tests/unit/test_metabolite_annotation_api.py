@@ -85,6 +85,7 @@ def test_generate_met_annotation_resumes_from_an_input_fingerprinted_checkpoint(
 
     checkpoint = tmp_path / "met_annotation.checkpoint.json"
     saved = json.loads(checkpoint.read_text())
+    assert saved["format_version"] == 2
     assert saved["next_index"] == 1
     assert not output.exists()
 

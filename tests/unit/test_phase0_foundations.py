@@ -29,7 +29,6 @@ def test_workflow_config_rejects_sections_for_another_workflow(tmp_path):
     path.write_text(
         json.dumps(
             {
-                "format_version": 2,
                 "workflow": "beta1",
                 "run": {"name": "run", "output_dir": str(tmp_path / "run")},
                 "beta2": {},
@@ -46,7 +45,6 @@ def test_beta1_config_rejects_unknown_section_keys(tmp_path):
     path.write_text(
         json.dumps(
             {
-                "format_version": 2,
                 "workflow": "beta1",
                 "run": {"name": "run", "output_dir": str(tmp_path / "run")},
                 "beta1": {"not_a_beta1_option": True},
@@ -61,7 +59,6 @@ def test_beta1_config_rejects_unknown_section_keys(tmp_path):
 def test_beta1_config_accepts_positive_n_jobs_and_rejects_invalid_values(tmp_path):
     path = tmp_path / "config.json"
     payload = {
-        "format_version": 2,
         "workflow": "beta1",
         "run": {"name": "run", "output_dir": str(tmp_path / "run")},
         "beta1": {"n_jobs": 2},
@@ -164,6 +161,7 @@ def test_deterministic_ids_are_stable_and_conflicts_fail(tmp_path):
     first_id = first.generate(object_type="metabolite", source_id="A", compartment="c")
     first.generate(object_type="metabolite", source_id="unrelated", compartment="c")
     first.save()
+    assert json.loads((tmp_path / "ids.json").read_text())["format_version"] == 2
     second = DeterministicIdRegistry(tmp_path / "ids.json")
     assert (
         second.generate(object_type="metabolite", source_id="A", compartment="c")

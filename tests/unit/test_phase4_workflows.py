@@ -132,7 +132,6 @@ def test_final_thg_fingerprint_includes_direct_input_content(tmp_path):
     beta2.write_text("beta2-v1", encoding="utf-8")
     database.write_text("database-v1", encoding="utf-8")
     config = WorkflowConfig(
-        format_version=2,
         workflow="final-thg",
         run=RunSettings("final", tmp_path / "run"),
         sections={
@@ -178,7 +177,6 @@ def test_final_thg_apply_reuses_persisted_merge_plan(tmp_path, monkeypatch):
     plan_path.write_text(json.dumps(plan.to_dict()), encoding="utf-8")
 
     config = WorkflowConfig(
-        format_version=2,
         workflow="final-thg",
         run=RunSettings("final", run_dir),
         sections={"final_thg": {"validation_profile": "structural-fast"}},

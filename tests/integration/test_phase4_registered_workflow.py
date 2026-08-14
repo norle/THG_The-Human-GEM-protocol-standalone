@@ -21,7 +21,6 @@ def test_human_database_resume_invalidates_changed_records(tmp_path):
     config.write_text(
         json.dumps(
             {
-                "format_version": 2,
                 "workflow": "human-database",
                 "run": {
                     "name": "human-database",

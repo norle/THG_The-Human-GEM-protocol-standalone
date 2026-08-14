@@ -28,7 +28,7 @@ model = reconstruct_model_from_json(
 The generic runner is intentional:
 
 ```json
-{"format_version": 2, "workflow": "human-database",
+{"workflow": "human-database",
  "run": {"name": "human-db", "output_dir": "../runs/human-db"},
  "human_database": {"records": "../inputs/database/records.json"}}
 ```

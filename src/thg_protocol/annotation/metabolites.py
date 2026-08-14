@@ -306,7 +306,7 @@ def generate_met_annotation(
 
     def write_checkpoint(state: dict) -> None:
         payload = {
-            "format_version": 1,
+            "format_version": 2,
             "input_sha256": fingerprint,
             **state,
         }
@@ -324,7 +324,7 @@ def generate_met_annotation(
             raise ValueError(
                 f"annotation checkpoint is unreadable: {checkpoint_path}"
             ) from error
-        if checkpoint.get("format_version") != 1:
+        if checkpoint.get("format_version") != 2:
             raise ValueError("unsupported annotation checkpoint format")
         if checkpoint.get("input_sha256") != fingerprint:
             raise ValueError(

@@ -92,7 +92,7 @@ class DeterministicIdRegistry:
 
     def to_dict(self) -> dict[str, object]:
         return {
-            "format_version": 1,
+            "format_version": 2,
             "policy_version": ID_POLICY_VERSION,
             "mappings": dict(sorted(self.mappings.items())),
             "aliases": dict(sorted(self.aliases.items())),
@@ -119,7 +119,7 @@ class DeterministicIdRegistry:
             raise IdRegistryError(f"cannot read ID registry: {source}") from error
         if (
             not isinstance(payload, dict)
-            or payload.get("format_version") != 1
+            or payload.get("format_version") != 2
             or payload.get("policy_version") != ID_POLICY_VERSION
         ):
             raise IdRegistryError("unsupported ID registry schema or policy version")

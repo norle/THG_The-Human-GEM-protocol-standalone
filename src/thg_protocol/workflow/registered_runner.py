@@ -1,4 +1,4 @@
-"""Runner for dynamically registered format-2 workflow DAGs."""
+"""Runner for dynamically registered workflow DAGs."""
 
 from __future__ import annotations
 
@@ -34,7 +34,7 @@ LOGGER = logging.getLogger(__name__)
 
 
 class RegisteredWorkflowError(RuntimeError):
-    """Raised when a format-2 workflow cannot be executed."""
+    """Raised when a registered workflow cannot be executed."""
 
 
 def _descendants(stages: tuple[Stage, ...], stage_id: str) -> set[str]:
@@ -379,7 +379,7 @@ def resume_registered(
         saved_config = load_snapshot(directory)
         config = saved_config
         if not isinstance(config, WorkflowConfig):
-            raise ConfigError("run is not a format-2 registered workflow")
+            raise ConfigError("run is not a registered workflow")
         try:
             definition = get_workflow(config.workflow)
         except WorkflowRegistryError as error:

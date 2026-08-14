@@ -15,7 +15,6 @@ For a direct external input, the configuration must include:
 
 ```json
 {
-  "format_version": 2,
   "workflow": "beta2",
   "run": {"name": "example-beta2", "output_dir": "../runs/example-beta2"},
   "beta2": {

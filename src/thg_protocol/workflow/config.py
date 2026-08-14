@@ -111,14 +111,13 @@ class RunSettings:
 
 @dataclass(frozen=True)
 class WorkflowConfig:
-    """Version 2 configuration shared by registered workflow DAGs.
+    """Configuration shared by registered workflow DAGs.
 
     ``sections`` contains only the section(s) allowed by the selected
     workflow.  Values remain JSON-shaped so configuration snapshots are
     portable and auditable.
     """
 
-    format_version: int
     workflow: str
     run: RunSettings
     sections: Mapping[str, object]
@@ -173,7 +172,7 @@ def _directory_path(value: str, base: Path) -> Path:
 
 
 def load_workflow_config(path: str | Path) -> WorkflowConfig:
-    """Load a format-2 config and validate sections against its workflow DAG."""
+    """Load a workflow config and validate sections against its workflow DAG."""
     source = Path(path).resolve()
     try:
         payload = json.loads(source.read_text(encoding="utf-8"))
@@ -197,9 +196,7 @@ def _parse_workflow(
 ) -> WorkflowConfig:
     from .registry import WorkflowRegistryError, get_workflow
 
-    allowed_base = {"format_version", "workflow", "run"}
-    if payload.get("format_version") != 2:
-        raise ConfigError("'format_version' must be 2 for a registered workflow")
+    allowed_base = {"workflow", "run"}
     workflow = _required_string(payload, "workflow", "configuration")
     try:
         definition = get_workflow(workflow)
@@ -251,7 +248,6 @@ def _parse_workflow(
                 )
             sections[section] = _resolve_workflow_paths(value, input_base)
     return WorkflowConfig(
-        format_version=2,
         workflow=workflow,
         run=RunSettings(
             name=name, output_dir=_directory_path(output_value, output_base)
@@ -289,9 +285,8 @@ def _resolve_workflow_paths(value: object, base: Path, *, key: str = "") -> obje
 
 
 def workflow_config_to_dict(config: WorkflowConfig) -> dict[str, object]:
-    """Return a normalized, JSON-safe format-2 snapshot."""
+    """Return a normalized, JSON-safe workflow configuration snapshot."""
     return {
-        "format_version": 2,
         "workflow": config.workflow,
         "run": {"name": config.run.name, "output_dir": str(config.run.output_dir)},
         **{key: value for key, value in sorted(config.sections.items())},

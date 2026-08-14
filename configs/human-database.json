@@ -1,5 +1,4 @@
 {
-  "format_version": 2,
   "workflow": "human-database",
   "run": {
     "name": "human-database",

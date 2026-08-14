@@ -75,7 +75,7 @@ def build_parser() -> argparse.ArgumentParser:
             workflow_id, help=f"start a {workflow_id} registered workflow"
         )
         workflow_parser.add_argument(
-            "config", type=Path, help="format-2 workflow configuration"
+            "config", type=Path, help="workflow configuration"
         )
         _add_verbosity_argument(workflow_parser, default=argparse.SUPPRESS)
     return parser

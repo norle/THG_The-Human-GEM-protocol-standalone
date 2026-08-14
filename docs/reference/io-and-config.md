@@ -11,8 +11,8 @@ version-controlled run specifications belong under `configs/`.
 
 ## Workflow configuration
 
-Format-2 configurations have `format_version`, `workflow`, `run`, and a
-workflow-specific section. Registered workflow IDs include `beta1`, `beta2`,
+Workflow configurations have `workflow`, `run`, and a workflow-specific
+section. Registered workflow IDs include `beta1`, `beta2`,
 `validate`, and `compare`. Generic `start` also accepts `human-database` and
 `final-thg` configurations.
 

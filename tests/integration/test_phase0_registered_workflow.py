@@ -12,7 +12,6 @@ from thg_protocol.workflow.runner import get_status, resume, start
 
 def _config(path, workflow, output, section=None):
     payload = {
-        "format_version": 2,
         "workflow": workflow,
         "run": {"name": workflow, "output_dir": str(output)},
     }
@@ -113,7 +112,6 @@ def test_start_resumes_matching_run_and_allows_worker_count_change(tmp_path):
     config.write_text(
         json.dumps(
             {
-                "format_version": 2,
                 "workflow": "beta1",
                 "run": {"name": "beta1", "output_dir": str(run)},
                 "beta1": {"n_jobs": 2},

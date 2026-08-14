@@ -29,7 +29,6 @@ def test_configured_beta1_workflow_produces_candidate_and_resumes(tmp_path):
     config.write_text(
         json.dumps(
             {
-                "format_version": 2,
                 "workflow": "beta1",
                 "run": {"name": "configured", "output_dir": str(run_dir)},
                 "beta1": {
@@ -84,7 +83,6 @@ def test_reaction_identity_stage_uses_resolved_metabolite_identities(tmp_path):
     config.write_text(
         json.dumps(
             {
-                "format_version": 2,
                 "workflow": "beta1",
                 "run": {"name": "identity-wiring", "output_dir": str(run_dir)},
                 "beta1": {
@@ -132,7 +130,6 @@ def test_reaction_identity_stage_accepts_reaction_identities_configuration(tmp_p
     config.write_text(
         json.dumps(
             {
-                "format_version": 2,
                 "workflow": "beta1",
                 "run": {"name": "identity-config", "output_dir": str(run_dir)},
                 "beta1": {
@@ -182,7 +179,6 @@ def test_recorded_service_failure_is_preserved_as_evidence_and_resumes_offline(
     config.write_text(
         json.dumps(
             {
-                "format_version": 2,
                 "workflow": "beta1",
                 "run": {"name": "recorded-evidence", "output_dir": str(run_dir)},
                 "beta1": {
@@ -230,7 +226,6 @@ def test_sanctioned_fixture_passes_candidate_release_gate(tmp_path):
     config.write_text(
         json.dumps(
             {
-                "format_version": 2,
                 "workflow": "beta1",
                 "run": {"name": "sanctioned", "output_dir": str(run_dir)},
                 "beta1": {
@@ -261,7 +256,6 @@ def test_detailed_beta1_force_rerun_invalidates_only_descendants(tmp_path):
     config.write_text(
         json.dumps(
             {
-                "format_version": 2,
                 "workflow": "beta1",
                 "run": {"name": "rerun", "output_dir": str(run_dir)},
                 "beta1": {"input_model": str(fixture)},

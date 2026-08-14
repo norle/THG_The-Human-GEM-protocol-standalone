@@ -31,7 +31,6 @@ def test_verbose_cli_reports_registered_stage_progress(tmp_path, capsys):
     config.write_text(
         json.dumps(
             {
-                "format_version": 2,
                 "workflow": "beta1",
                 "run": {"name": "verbose", "output_dir": str(tmp_path / "run")},
             }
@@ -58,7 +57,7 @@ def test_status_json_is_read_only_and_parseable(tmp_path, capsys):
     )
     from thg_protocol.workflow.registry import get_workflow
 
-    config = WorkflowConfig(2, "beta1", RunSettings("status-run", tmp_path), {})
+    config = WorkflowConfig("beta1", RunSettings("status-run", tmp_path), {})
     write_manifest_atomic(
         tmp_path, new_workflow_manifest(config, get_workflow("beta1").stages)
     )

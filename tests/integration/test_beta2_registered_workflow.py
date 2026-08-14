@@ -27,7 +27,6 @@ def _config(tmp_path, *, external: bool = True):
     config.write_text(
         json.dumps(
             {
-                "format_version": 2,
                 "workflow": "beta2",
                 "run": {"name": "beta2-fixture", "output_dir": str(tmp_path / "run")},
                 "beta2": {
@@ -97,7 +96,6 @@ def test_beta2_consumes_only_verified_beta1_export(tmp_path):
     beta1_config.write_text(
         json.dumps(
             {
-                "format_version": 2,
                 "workflow": "beta1",
                 "run": {"name": "beta1-fixture", "output_dir": str(beta1_run)},
                 "beta1": {"input_model": source, "mode": "apply-all"},
@@ -126,7 +124,6 @@ def test_sanctioned_beta1_to_beta2_candidate_passes_gate(tmp_path):
     beta1_config.write_text(
         json.dumps(
             {
-                "format_version": 2,
                 "workflow": "beta1",
                 "run": {"name": "sanctioned-beta1", "output_dir": str(beta1_run)},
                 "beta1": {
@@ -148,7 +145,6 @@ def test_sanctioned_beta1_to_beta2_candidate_passes_gate(tmp_path):
     beta2_config.write_text(
         json.dumps(
             {
-                "format_version": 2,
                 "workflow": "beta2",
                 "run": {"name": "sanctioned-beta2", "output_dir": str(beta2_run)},
                 "beta2": {

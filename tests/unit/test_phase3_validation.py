@@ -110,7 +110,6 @@ def test_registered_validation_workflow_writes_check_and_memote_artifacts(tmp_pa
     config.write_text(
         json.dumps(
             {
-                "format_version": 2,
                 "workflow": "validate",
                 "run": {"name": "phase3", "output_dir": str(tmp_path / "run")},
                 "validation": {
