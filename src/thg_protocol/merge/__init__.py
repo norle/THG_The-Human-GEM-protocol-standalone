@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import copy
+from collections.abc import Mapping
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -77,6 +78,33 @@ class MergePlan:
                 copy.deepcopy(decision.__dict__) for decision in self.decisions
             ],
         }
+
+    @classmethod
+    def from_dict(cls, payload: Mapping[str, object]) -> MergePlan:
+        policy = payload.get("policy", {})
+        decisions = payload.get("decisions", ())
+        if not isinstance(policy, Mapping) or not isinstance(decisions, (list, tuple)):
+            raise ValueError("invalid merge plan payload")
+        return cls(
+            {
+                str(key): str(value)
+                for key, value in dict(payload.get("metabolite_map", {})).items()
+            },
+            {
+                str(key): str(value)
+                for key, value in dict(payload.get("gene_map", {})).items()
+            },
+            {
+                str(key): str(value)
+                for key, value in dict(payload.get("reaction_map", {})).items()
+            },
+            tuple(
+                MergeDecision(**dict(item))
+                for item in decisions
+                if isinstance(item, Mapping)
+            ),
+            MergePolicy(**dict(policy)),
+        )
 
 
 def _reaction_signature(

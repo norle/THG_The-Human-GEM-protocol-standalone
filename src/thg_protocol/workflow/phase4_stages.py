@@ -271,31 +271,43 @@ class FinalTHGStage:
                 (*copied, ("provenance", provenance)),
                 {"inputs": input_records},
             )
-        from thg_protocol.merge import MergePolicy, generate_merge_plan
+        from thg_protocol.merge import MergePlan, MergePolicy, generate_merge_plan
 
-        policy = MergePolicy(
-            source_precedence=str(section.get("source_precedence", "base")),
-            direction=str(section.get("direction", "strict")),
-            proton_water=str(section.get("proton_water", "strict")),
-            formula_charge=str(section.get("formula_charge", "report")),
-            bounds=str(section.get("bounds", "report")),
-            gpr=str(section.get("gpr", "report")),
+        if self.id == "final-thg-plan":
+            policy = MergePolicy(
+                source_precedence=str(section.get("source_precedence", "base")),
+                direction=str(section.get("direction", "strict")),
+                proton_water=str(section.get("proton_water", "strict")),
+                formula_charge=str(section.get("formula_charge", "report")),
+                bounds=str(section.get("bounds", "report")),
+                gpr=str(section.get("gpr", "report")),
+            )
+            left = _load_cobra_model(
+                _dependency_path(context, "final-thg-load", "beta2")
+            )
+            right = _load_cobra_model(
+                _dependency_path(context, "final-thg-load", "database")
+            )
+            plan = generate_merge_plan(left, right, policy=policy)
+            output = work_dir / "merge-plan.json"
+            output.write_text(
+                json.dumps(plan.to_dict(), indent=2, sort_keys=True) + "\n",
+                encoding="utf-8",
+            )
+            return StageResult(
+                (("merge-plan", output),), {"decisions": len(plan.decisions)}
+            )
+
+        plan_source = _dependency_path(context, "final-thg-plan", "merge-plan")
+        plan = MergePlan.from_dict(
+            json.loads(plan_source.read_text(encoding="utf-8"))
         )
-
+        output = work_dir / "merge-plan.json"
+        shutil.copy2(plan_source, output)
         left = _load_cobra_model(_dependency_path(context, "final-thg-load", "beta2"))
         right = _load_cobra_model(
             _dependency_path(context, "final-thg-load", "database")
         )
-        plan = generate_merge_plan(left, right, policy=policy)
-        output = work_dir / "merge-plan.json"
-        output.write_text(
-            json.dumps(plan.to_dict(), indent=2, sort_keys=True) + "\n",
-            encoding="utf-8",
-        )
-        if self.id == "final-thg-plan":
-            return StageResult(
-                (("merge-plan", output),), {"decisions": len(plan.decisions)}
-            )
         from thg_protocol.merge import apply_merge_plan
 
         merged, report = apply_merge_plan(left, right, plan)
