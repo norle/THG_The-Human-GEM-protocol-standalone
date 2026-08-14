@@ -24,7 +24,6 @@ installation. It includes:
 | `database` | Reading historical pickle checkpoints |
 | `solver` | Solver-backed workflows |
 | `memote` | MEMOTE and task analysis |
-| `cell-specific` | Troppo-based cell-specific workflows |
 | `figures` | Rendering figures |
 
 For a smaller environment, install only the core package and add capabilities

@@ -422,11 +422,3 @@ def resume_registered(
                 f"manifest stages do not match workflow '{config.workflow}'"
             )
         return _execute(config, directory, manifest, stages, force_step=force_step)
-
-
-def is_registered_config(path: str | Path) -> bool:
-    try:
-        payload = __import__("json").loads(Path(path).read_text(encoding="utf-8"))
-    except (OSError, ValueError):
-        return False
-    return isinstance(payload, dict) and payload.get("format_version") == 2

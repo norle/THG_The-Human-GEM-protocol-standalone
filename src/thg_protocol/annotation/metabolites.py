@@ -53,24 +53,6 @@ LOGGER = logging.getLogger(__name__)
 H_PATTERN = re.compile(r"H[0-9]+")
 CHARGE_PATTERN = re.compile(r"[-\+][0-9]+")
 
-# Rate limiting: Track last request time to ensure max 5 requests per second
-_last_request_time = 0
-_min_request_interval = 0.2  # Minimum 0.2 seconds between API calls (max 5 req/sec)
-
-
-def _rate_limit():
-    """Ensure we don't exceed 5 requests per second to PubChem API."""
-    global _last_request_time
-    current_time = time.time()
-    time_since_last = current_time - _last_request_time
-
-    if time_since_last < _min_request_interval:
-        sleep_time = _min_request_interval - time_since_last
-        time.sleep(sleep_time)
-
-    _last_request_time = time.time()
-
-
 def setup_proxy():
     """
     Setup proxy for PubChem requests to avoid IP rate limiting.
@@ -126,9 +108,6 @@ def setup_proxy():
         LOGGER.info("No proxy configured - using direct connection")
 
     return proxy
-
-
-PROXY_CONFIG = None
 
 
 def global_met_annotation_file():

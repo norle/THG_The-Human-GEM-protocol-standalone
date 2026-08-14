@@ -328,6 +328,3 @@ def load_snapshot(run_dir: str | Path) -> WorkflowConfig:
             "configuration snapshot output_dir does not match run directory"
         )
     return config
-
-
-load_any_snapshot = load_snapshot

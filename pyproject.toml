@@ -46,7 +46,6 @@ memote = [
 solver = [
   "swiglpk",
 ]
-cell-specific = []
 figures = [
   "matplotlib",
 ]
