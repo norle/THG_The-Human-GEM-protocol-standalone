@@ -1,8 +1,10 @@
 import json
+import os
 
 import pytest
 
 from thg_protocol import config
+from thg_protocol.config import load_environment_files
 
 
 def test_load_config_resolves_relative_path_from_cwd(tmp_path, monkeypatch):
@@ -22,6 +24,44 @@ def test_get_model_paths_resolves_relative_paths_from_project_root():
 
     assert base_path == str(config.get_project_root() / "models/base.xml")
     assert output_path == str(config.get_project_root() / "models/output.xml")
+
+
+def test_load_environment_files_does_not_override_process_environment(
+    tmp_path, monkeypatch
+):
+    dotenv = tmp_path / ".env"
+    dotenv.write_text(
+        "# comment\n"
+        "export BIOCYC_EMAIL=file@example.com\n"
+        "BIOCYC_PASSWORD='secret value'\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setenv("BIOCYC_EMAIL", "process@example.com")
+    monkeypatch.delenv("BIOCYC_PASSWORD", raising=False)
+
+    loaded = load_environment_files([dotenv])
+
+    assert loaded == (dotenv.resolve(),)
+    assert os.environ["BIOCYC_EMAIL"] == "process@example.com"
+    assert os.environ["BIOCYC_PASSWORD"] == "secret value"
+
+
+def test_load_environment_files_checks_cwd_before_package_root(tmp_path, monkeypatch):
+    cwd = tmp_path / "cwd"
+    package = tmp_path / "package"
+    cwd.mkdir()
+    package.mkdir()
+    (cwd / ".env").write_text("THG_DOTENV_ORDER=cwd\n", encoding="utf-8")
+    (package / ".env").write_text("THG_DOTENV_ORDER=package\n", encoding="utf-8")
+    monkeypatch.chdir(cwd)
+    monkeypatch.setattr(config, "get_project_root", lambda: package)
+    monkeypatch.delenv("THG_ENV_FILE", raising=False)
+    monkeypatch.delenv("THG_DOTENV_ORDER", raising=False)
+
+    loaded = load_environment_files()
+
+    assert loaded == ((cwd / ".env").resolve(), (package / ".env").resolve())
+    assert os.environ["THG_DOTENV_ORDER"] == "cwd"
 
 
 def test_get_compartments_validates_required_fields():

@@ -1,7 +1,7 @@
 from thg_protocol.gpr.location import resolve_locations
 from thg_protocol.gpr.lookup import get_gpr
 from thg_protocol.model_build.mass_balance import reformulate_glycan_equation
-from thg_protocol.services.biocyc import StaticBioCycClient
+from thg_protocol.services.biocyc import BioCycClient, StaticBioCycClient
 from thg_protocol.services.ensembl import EnsemblAnnotation, StaticEnsemblClient
 from thg_protocol.services.kegg import KeggClient, StaticKeggClient
 from thg_protocol.services.location import StaticLocationClient
@@ -16,6 +16,40 @@ def test_static_biocyc_client_returns_configured_ec_and_page_responses():
     assert client.get_ec_html("1.2.3.4", "HUMAN") == "human EC page"
     assert client.get_page("https://example.test/gene") == "gene page"
     assert client.get_ec_html("missing") == ""
+
+
+def test_biocyc_client_logs_in_before_authenticated_requests():
+    class Response:
+        text = "<html>page</html>"
+
+        def raise_for_status(self):
+            return None
+
+        def json(self):
+            return {"success": True}
+
+    class Session:
+        def __init__(self):
+            self.calls = []
+
+        def post(self, url, timeout, data):
+            self.calls.append(("post", url, timeout, data))
+            return Response()
+
+        def get(self, url, timeout):
+            self.calls.append(("get", url, timeout))
+            return Response()
+
+    session = Session()
+    client = BioCycClient(
+        session=session,
+        retries=0,
+        email="user@example.com",
+        password="secret",
+    )
+    assert client.get_ec_html("1.2.3.4", "HUMAN") == "<html>page</html>"
+    assert session.calls[0][0:2] == ("post", "https://websvc.biocyc.org/ajax-login")
+    assert session.calls[1][0] == "get"
 
 
 def test_package_gpr_lookup_uses_injected_biocyc_pages():

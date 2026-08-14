@@ -7,8 +7,11 @@ from pathlib import Path
 import pandas as pd
 import pytest
 
+from thg_protocol.config import load_environment_files
 from thg_protocol.gpr.lookup import get_gpr
 from thg_protocol.services.biocyc import BioCycClient
+
+load_environment_files()
 
 pytestmark = [pytest.mark.online, pytest.mark.slow]
 

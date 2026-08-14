@@ -49,7 +49,7 @@ def test_beta2_registered_workflow_exports_bundle_and_resumes(tmp_path):
     start(config)
     status = get_status(run_dir)
     assert status["overall_status"] == "completed"
-    assert len(status["steps"]) == 12
+    assert len(status["steps"]) == 15
     export = status["steps"]["export-beta2"]
     assert {item["role"] for item in export["outputs"]} == {
         "model",
@@ -60,6 +60,15 @@ def test_beta2_registered_workflow_exports_bundle_and_resumes(tmp_path):
         "id-registry",
         "ledger",
         "location-evidence",
+        "gene-location-evidence",
+        "gpr-evidence",
+        "reaction-identity-evidence",
+        "reaction-location-evidence",
+        "compartment-resolution-evidence",
+        "location-reconciliation",
+        "go-release",
+        "go-compartment-subgraph",
+        "evidence-snapshot",
         "diff",
         "unresolved",
         "summary",
