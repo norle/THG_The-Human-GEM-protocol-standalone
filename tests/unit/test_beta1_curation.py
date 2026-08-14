@@ -7,6 +7,7 @@ from cobra.core import Group
 from cobra.io import load_json_model, save_json_model
 
 from thg_protocol.curation.beta1 import (
+    BalanceAudit,
     MetaboliteCandidate,
     apply_cleanup_proposals,
     apply_model_proposals,
@@ -58,6 +59,24 @@ def test_parallel_balance_audit_matches_serial_results():
     serial = [item.to_dict() for item in audit_model(model)]
     parallel = [item.to_dict() for item in audit_model(model, n_jobs=2)]
     assert parallel == serial
+
+
+def test_balance_audit_round_trips_for_workflow_reuse():
+    audit = audit_reaction(_model().reactions.R_A)
+    assert BalanceAudit.from_dict(audit.to_dict()) == audit
+
+
+def test_balance_proposals_can_reuse_persisted_audits(monkeypatch):
+    import thg_protocol.curation.beta1 as beta1_module
+
+    model = _model()
+    audit = audit_reaction(model.reactions.R_A)
+
+    def unexpected_audit(*args, **kwargs):
+        raise AssertionError("balance audit should have been reused")
+
+    monkeypatch.setattr(beta1_module, "audit_reaction", unexpected_audit)
+    assert generate_balance_proposals(model, audits={"R_A": audit}) == ()
 
 
 def test_gpr_round_trip_is_canonical_and_identity_ties_remain_unresolved():

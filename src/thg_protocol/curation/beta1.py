@@ -1125,6 +1125,40 @@ class BalanceAudit:
             "formula_policy": dict(self.formula_policy),
         }
 
+    @classmethod
+    def from_dict(cls, payload: Mapping[str, object]) -> BalanceAudit:
+        def strings(key: str) -> tuple[str, ...]:
+            value = payload.get(key, ())
+            return (
+                tuple(str(item) for item in value)
+                if isinstance(value, (list, tuple))
+                else ()
+            )
+
+        residual = payload.get("mass_residual", {})
+        policy = payload.get("formula_policy", {})
+        charge = payload.get("charge_residual")
+        return cls(
+            reaction_id=str(payload["reaction_id"]),
+            reaction_class=str(payload.get("reaction_class", "unknown")),
+            mass_status=str(payload.get("mass_status", "unknown")),
+            charge_status=str(payload.get("charge_status", "unknown")),
+            mass_residual={
+                str(key): float(value)
+                for key, value in residual.items()
+            }
+            if isinstance(residual, Mapping)
+            else {},
+            charge_residual=float(charge) if charge is not None else None,
+            missing_formula=strings("missing_formula"),
+            missing_charge=strings("missing_charge"),
+            invalid_formula=strings("invalid_formula"),
+            formula_classes=strings("formula_classes"),
+            formula_policy={str(key): str(value) for key, value in policy.items()}
+            if isinstance(policy, Mapping)
+            else {},
+        )
+
 
 def is_unresolved_balance(audit: BalanceAudit) -> bool:
     """Return whether an audit needs an exception or further curation."""
@@ -1452,6 +1486,7 @@ def generate_balance_proposals(
     formula_corrections: Mapping[str, str] | None = None,
     charge_corrections: Mapping[str, int] | None = None,
     strategy: str = DEFAULT_BALANCE_STRATEGY,
+    audits: Mapping[str, BalanceAudit] | None = None,
 ) -> tuple[Proposal, ...]:
     """Create balance proposals using only verified proton/water repairs by default."""
     if strategy not in {"explicit-only", "proton-water"}:
@@ -1484,7 +1519,10 @@ def generate_balance_proposals(
         rid = str(reaction.id)
         if strategy == "proton-water" and not corrections:
             automatic = _proton_water_correction(
-                model, reaction, species_by_compartment=species_by_compartment
+                model,
+                reaction,
+                species_by_compartment=species_by_compartment,
+                audit=audits.get(rid) if audits is not None else None,
             )
             if automatic is not None:
                 (
@@ -1635,6 +1673,7 @@ def _proton_water_correction(
     reaction: Any,
     *,
     species_by_compartment: Mapping[str, tuple[Any | None, Any | None]] | None = None,
+    audit: BalanceAudit | None = None,
 ) -> (
     tuple[
         dict[str, float],
@@ -1653,7 +1692,7 @@ def _proton_water_correction(
     and O and for which local proton and water species are present.  A repair
     is proposed only when both elemental and charge residuals are removed.
     """
-    audit = audit_reaction(reaction)
+    audit = audit or audit_reaction(reaction)
     if audit.mass_status != "unbalanced" or audit.charge_status != "unbalanced":
         return None
     if set(audit.mass_residual) - {"H", "O"}:

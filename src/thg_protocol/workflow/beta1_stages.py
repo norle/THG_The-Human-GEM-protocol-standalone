@@ -316,6 +316,7 @@ class DetailedBeta1Stage:
 
     def run(self, context: StageContext, work_dir: Path) -> StageResult:
         from thg_protocol.curation.beta1 import (
+            BalanceAudit,
             apply_cleanup_proposals,
             apply_model_proposals,
             audit_model,
@@ -793,12 +794,24 @@ class DetailedBeta1Stage:
 
         if self.id == "generate-balance-proposals":
             model = _model(context, "apply-curation")
+            audit_payload = json.loads(
+                _dependency_path(context, "balance-audit", "audit").read_text(
+                    encoding="utf-8"
+                )
+            )
+            audits = {
+                audit.reaction_id: audit
+                for item in audit_payload.get("audits", ())
+                if isinstance(item, Mapping)
+                for audit in (BalanceAudit.from_dict(item),)
+            }
             proposals = generate_balance_proposals(
                 model,
                 corrections=_mapping(section.get("corrections")),
                 formula_corrections=_string_mapping(section.get("formula_corrections")),
                 charge_corrections=_int_mapping(section.get("charge_corrections")),
                 strategy=str(section.get("balance_strategy", "proton-water")),
+                audits=audits,
             )
             output = work_dir / "balance-proposals.jsonl"
             write_proposals(output, proposals)
