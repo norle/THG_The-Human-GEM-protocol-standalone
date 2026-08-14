@@ -37,6 +37,38 @@ python -m pip install -e '.[figures]'
 The relevant [workflow](workflows/index.md) or [tool](tools/analysis.md) guide
 states any external services, credentials, or configuration still required.
 
+## Optional live-service credentials
+
+The opt-in BioCyc verification uses `BIOCYC_EMAIL` and `BIOCYC_PASSWORD`.
+THG also reads simple, trusted dotenv files without adding a dotenv dependency.
+It checks them in this order:
+
+1. `THG_ENV_FILE`, when set;
+2. `.env` in the current working directory;
+3. `.env` in the THG project/package directory.
+
+Existing environment variables always win. Files earlier in the list also win
+when the same variable appears more than once. A dotenv file supports simple
+`KEY=VALUE` and `export KEY=VALUE` lines; it is not executed as shell code.
+Keep it private and never commit it:
+
+```dotenv
+BIOCYC_EMAIL=you@example.com
+BIOCYC_PASSWORD=your-password
+```
+
+Then run the opt-in check:
+
+```bash
+pytest -q tests/integration/test_legacy_gpr_online.py
+```
+
+For a one-off file from any directory:
+
+```bash
+THG_ENV_FILE=/secure/path/thg.env pytest -q tests/integration/test_legacy_gpr_online.py
+```
+
 ## Verify your installation
 
 Check the installed entry points:
