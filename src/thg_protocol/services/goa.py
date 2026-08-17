@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import gzip
+import hashlib
 from collections.abc import Iterable, Mapping
 from dataclasses import dataclass, field
 from typing import Protocol
@@ -91,9 +92,17 @@ class GOAClient:
 
     url = "https://current.geneontology.org/annotations/goa_human.gaf.gz"
 
-    def __init__(self, *, timeout: float = 30.0, session: object | None = None) -> None:
+    def __init__(
+        self,
+        *,
+        timeout: float = 30.0,
+        session: object | None = None,
+        release: str = "",
+    ) -> None:
         self.timeout = timeout
         self.session = session or (requests.Session() if requests is not None else None)
+        self.release = release
+        self.metadata: dict[str, object] = {}
         self._annotations: list[GOAAnnotation] | None = None
 
     def _load(self) -> list[GOAAnnotation]:
@@ -108,9 +117,16 @@ class GOAClient:
                 retries=2,
                 backoff=0.5,
             )
+            self.metadata = {
+                "source": "GOA",
+                "release": self.release,
+                "url": self.url,
+                "raw_response_sha256": hashlib.sha256(response.content).hexdigest(),
+                "parser_version": "1",
+            }
             self._annotations = parse_gaf(
                 gzip.decompress(response.content).decode("utf-8"),
-                source_release="live",
+                source_release=self.release,
             )
         return self._annotations
 

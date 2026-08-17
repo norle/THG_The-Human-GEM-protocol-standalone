@@ -1,6 +1,11 @@
+import gzip
+import hashlib
+
 from thg_protocol.curation.go import parse_obo, resolve_go_compartment
+from thg_protocol.services import biocyc, goa, reactome, rhea, uniprot
 from thg_protocol.services.goa import parse_gaf
 from thg_protocol.services.reactome import catalyst_candidate_gpr
+from thg_protocol.services.uniprot import StaticUniProtClient
 
 
 def test_go_resolution_uses_only_is_a_and_part_of_and_preserves_path():
@@ -104,3 +109,131 @@ def test_reactome_only_emits_and_for_an_explicit_complex():
         )
         == "(A) or (B)"
     )
+    assert (
+        catalyst_candidate_gpr(
+            {"catalyst": {"type": "unknown", "members": [{"gene": "A"}]}}
+        )
+        == ""
+    )
+
+
+def test_uniprot_sl_to_go_mapping_is_location_specific():
+    result = StaticUniProtClient(
+        [
+            {
+                "gene": "GENE1",
+                "location": "mitochondrion",
+                "sl_id": "SL-001",
+                "sl_to_go": {
+                    "SL-001": ["GO:0005739"],
+                    "SL-002": ["GO:0005829"],
+                },
+            }
+        ]
+    ).annotations_for(["GENE1"])
+    assert [(item.sl_id, item.go_id) for item in result] == [
+        ("SL-001", "GO:0005739")
+    ]
+
+
+def test_live_provider_metadata_records_release_and_raw_checksum(monkeypatch):
+    gaf = "!gaf-version: 2.2\n" + "\t".join(
+        [
+            "UniProt",
+            "P1",
+            "GENE1",
+            "",
+            "GO:0005739",
+            "PMID:1",
+            "IDA",
+            "",
+            "C",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "GOA",
+        ]
+    )
+
+    class Response:
+        def __init__(self, content, payload=None):
+            self.content = content
+            self.text = content.decode(errors="replace")
+            self._payload = payload
+
+        def json(self):
+            return self._payload
+
+    def fake_request(_session, _method, url, **_kwargs):
+        if "goa" in url:
+            return Response(gzip.compress(gaf.encode(), mtime=0))
+        if "uniprot" in url:
+            return Response(b'{"results": []}', {"results": []})
+        if "rhea" in url:
+            return Response(b"[]", [])
+        if "reactome" in url:
+            return Response(b'{"results": []}', {"results": []})
+        return Response(b"<html/>")
+
+    for module in (biocyc, goa, reactome, rhea, uniprot):
+        monkeypatch.setattr(module, "request", fake_request)
+
+    clients = (
+        (goa.GOAClient(session=object(), release="goa-1"), "goa"),
+        (uniprot.UniProtClient(session=object(), release="uniprot-1"), "uniprot"),
+        (rhea.RheaClient(session=object(), release="rhea-1"), "rhea"),
+        (reactome.ReactomeClient(session=object(), release="reactome-1"), "reactome"),
+        (
+            biocyc.BioCycClient(
+                session=object(), email="", password="", release="biocyc-1"
+            ),
+            "biocyc",
+        ),
+    )
+    clients[0][0].annotations_for(["GENE1"])
+    clients[1][0].annotations_for(["GENE1"])
+    clients[2][0].reactions_for_ec("1.1.1.1")
+    clients[3][0].reactions_for_rhea("RHEA:1")
+    clients[4][0].get_ec_html("1.1.1.1")
+
+    for client, source in clients:
+        metadata = client.metadata
+        assert metadata["source"].lower() == source
+        assert metadata["release"] == f"{source}-1"
+        assert metadata["raw_response_sha256"] == hashlib.sha256(
+            client_metadata_payload(source)
+        ).hexdigest()
+
+
+def client_metadata_payload(source):
+    return {
+        "goa": gzip.compress(
+            ("!gaf-version: 2.2\n" + "\t".join(
+                [
+                    "UniProt",
+                    "P1",
+                    "GENE1",
+                    "",
+                    "GO:0005739",
+                    "PMID:1",
+                    "IDA",
+                    "",
+                    "C",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "",
+                    "GOA",
+                ]
+            )
+        ).encode(),
+            mtime=0,
+        ),
+        "uniprot": b'{"results": []}',
+        "rhea": b"[]",
+        "reactome": b'{"results": []}',
+        "biocyc": b"<html/>",
+    }[source]

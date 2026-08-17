@@ -5,6 +5,7 @@ import pytest
 
 from thg_protocol import config
 from thg_protocol.config import load_environment_files
+from thg_protocol.workflow.config import ConfigError, load_workflow_config
 
 
 def test_load_config_resolves_relative_path_from_cwd(tmp_path, monkeypatch):
@@ -99,3 +100,25 @@ def test_resolve_compartment_abbreviation_reports_missing_compartment():
         "existing_abbrev": None,
         "name": "peroxisome",
     }
+
+
+def test_beta2_go_targets_are_validated_at_load_time(tmp_path):
+    path = tmp_path / "beta2.json"
+    path.write_text(
+        json.dumps(
+            {
+                "workflow": "beta2",
+                "run": {"name": "check", "output_dir": str(tmp_path / "run")},
+                "beta2": {
+                    "compartments": {"x": "Mitochondria", "y": "Cytosol"},
+                    "compartment_go_terms": {
+                        "x": "GO:0005739",
+                        "y": "GO:0005739",
+                    },
+                },
+            }
+        ),
+        encoding="utf-8",
+    )
+    with pytest.raises(ConfigError, match="must be unique"):
+        load_workflow_config(path)

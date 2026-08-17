@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 from collections.abc import Mapping
@@ -63,6 +64,7 @@ class BioCycClient:
         backoff: float = 0.5,
         email: str | None = None,
         password: str | None = None,
+        release: str = "",
     ) -> None:
         if requests is None:
             raise RuntimeError("BioCycClient requires the 'requests' dependency")
@@ -71,6 +73,8 @@ class BioCycClient:
         self.retries = max(0, retries)
         self.backoff = max(0.0, backoff)
         self._cache: dict[str, str] = {}
+        self.source_release = release
+        self.metadata: dict[str, object] = {}
         email = email if email is not None else os.environ.get("BIOCYC_EMAIL")
         password = (
             password if password is not None else os.environ.get("BIOCYC_PASSWORD")
@@ -112,6 +116,15 @@ class BioCycClient:
         except requests.RequestException as error:
             raise BioCycError(f"BioCyc request failed for {url}") from error
         self._cache[url] = response.text
+        self.metadata = {
+            "source": "BioCyc",
+            "release": self.source_release,
+            "url": url,
+            "raw_response_sha256": hashlib.sha256(
+                getattr(response, "content", response.text.encode())
+            ).hexdigest(),
+            "parser_version": "1",
+        }
         return response.text
 
     def get_ec_html(self, ec_number: str, org: str = "META") -> str:

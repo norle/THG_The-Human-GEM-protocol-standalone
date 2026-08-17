@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hashlib
 from collections.abc import Mapping
 from dataclasses import dataclass, field
 from typing import Protocol
@@ -35,7 +36,7 @@ def catalyst_candidate_gpr(record: Mapping[str, object]) -> str:
     """Render explicit Reactome catalyst structure without inventing ANDs."""
     catalyst = record.get("catalyst", record.get("catalyst_activity", {}))
     if not isinstance(catalyst, Mapping):
-        return str(record.get("candidate_gpr", ""))
+        return ""
     members = catalyst.get("members", catalyst.get("proteins", []))
     if not isinstance(members, list):
         return ""
@@ -49,11 +50,19 @@ def catalyst_candidate_gpr(record: Mapping[str, object]) -> str:
     )
     if not genes:
         return ""
-    operator = (
-        " and "
-        if str(catalyst.get("type", "")).lower() in {"complex", "protein-complex"}
-        else " or "
-    )
+    catalyst_type = str(catalyst.get("type", "")).lower()
+    if catalyst_type in {"complex", "protein-complex"}:
+        operator = " and "
+    elif catalyst_type in {
+        "entity-set",
+        "entity set",
+        "alternative",
+        "alternatives",
+        "isoenzyme",
+    }:
+        operator = " or "
+    else:
+        return ""
     return operator.join(f"({gene})" for gene in genes)
 
 
@@ -61,23 +70,38 @@ class ReactomeClient(StaticReactomeClient):
     base_url = "https://reactome.org/ContentService/data"
 
     def __init__(
-        self, *, session: object | None = None, timeout: float = 30.0, **kwargs: object
+        self,
+        *,
+        session: object | None = None,
+        timeout: float = 30.0,
+        release: str = "",
+        **kwargs: object,
     ):
         super().__init__(**kwargs)
         self.session = session or (requests.Session() if requests is not None else None)
         self.timeout = timeout
+        self.source_release = release
+        self.metadata: dict[str, object] = {}
 
     def _remote(self, path: str) -> object:
         if self.session is None:
             raise RuntimeError("ReactomeClient requires the 'requests' dependency")
-        return request(
+        response = request(
             self.session,
             "get",
             self.base_url + path,
             timeout=self.timeout,
             retries=2,
             backoff=0.5,
-        ).json()
+        )
+        self.metadata = {
+            "source": "Reactome",
+            "release": self.source_release,
+            "url": self.base_url + path,
+            "raw_response_sha256": hashlib.sha256(response.content).hexdigest(),
+            "parser_version": "1",
+        }
+        return response.json()
 
     def reactions_for_rhea(self, rhea_id: str) -> list[Mapping[str, object]]:
         local = super().reactions_for_rhea(rhea_id)

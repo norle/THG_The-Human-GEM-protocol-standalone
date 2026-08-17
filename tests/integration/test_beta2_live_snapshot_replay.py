@@ -108,6 +108,13 @@ def test_live_smoke_snapshot_replay_is_semantically_identical(tmp_path, monkeypa
             "candidate_gpr": f"({gene})",
             "status": "candidate",
             "warnings": [],
+            "source_metadata": {
+                "source": "BioCyc",
+                "release": "fixture-release",
+                "url": "https://fixture.invalid/ec",
+                "raw_response_sha256": "a" * 64,
+                "parser_version": "fixture-parser-v1",
+            },
         }
 
     class FakeBioCycClient:
@@ -181,6 +188,17 @@ def test_live_smoke_snapshot_replay_is_semantically_identical(tmp_path, monkeypa
     )
 
     snapshot = _artifact(live_run, "evidence-snapshot")
+    snapshot_metadata = next(
+        json.loads(line)
+        for line in snapshot.read_text().splitlines()
+        if json.loads(line).get("record_type") == "metadata"
+    )
+    assert snapshot_metadata["source_releases"]["biocyc"]["release"] == (
+        "fixture-release"
+    )
+    assert snapshot_metadata["source_releases"]["biocyc"][
+        "raw_response_sha256"
+    ] == "a" * 64
     snapshot_config = tmp_path / "snapshot.json"
     snapshot_run = tmp_path / "snapshot-run"
     _config(

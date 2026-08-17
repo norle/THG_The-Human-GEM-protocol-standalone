@@ -69,6 +69,12 @@ def _record_kind(record: Mapping[str, object]) -> str:
     ).lower()
 
 
+def _source_release(section: Mapping[str, object], source: str) -> str:
+    releases = section.get("source_releases", {})
+    item = releases.get(source, {}) if isinstance(releases, Mapping) else {}
+    return str(item.get("release", "")) if isinstance(item, Mapping) else str(item)
+
+
 def _ec_numbers(value: object) -> list[str]:
     if isinstance(value, str):
         value = [value]
@@ -106,6 +112,16 @@ def _gpr_expression_genes(node: object) -> set[str]:
         for child in getattr(node, "children", ())
         for gene in _gpr_expression_genes(child)
     }
+
+
+def _accepted_external_gpr(record: Mapping[str, object]) -> bool:
+    status = str(record.get("status", "")).lower()
+    confidence = str(record.get("confidence", "")).lower()
+    if status in {"unresolved", "ambiguous", "conflict", "candidate"} and (
+        confidence != "reaction-matched"
+    ):
+        return False
+    return confidence in {"authoritative", "strong", "reaction-matched"}
 
 
 def _resolve_gpr_payload(
@@ -336,6 +352,13 @@ class DetailedBeta2Stage:
                         else [],
                         "gpr": str(reaction.gene_reaction_rule or ""),
                         "source": "model-annotation",
+                        "rhea_id": (
+                            reaction.annotation.get("rhea")
+                            or reaction.annotation.get("rhea-id")
+                            or reaction.annotation.get("rhea_id")
+                        )
+                        if isinstance(reaction.annotation, Mapping)
+                        else None,
                     },
                 )
             return StageResult(
@@ -382,6 +405,7 @@ class DetailedBeta2Stage:
                 for ec in ecs:
                     requests.setdefault(ec, []).append(str(reaction.id))
             candidates: dict[str, dict[str, object]] = {}
+            source_metadata: dict[str, object] = {}
             if mode == "live":
                 from thg_protocol.gpr.lookup import get_gpr_evidence
                 from thg_protocol.services.biocyc import (
@@ -396,7 +420,9 @@ class DetailedBeta2Stage:
                     str(item).lower() for item in section["reaction_sources"]
                 }
                 biocyc_client = (
-                    BioCycClient() if biocyc_enabled else StaticBioCycClient()
+                    BioCycClient(release=_source_release(section, "biocyc"))
+                    if biocyc_enabled
+                    else StaticBioCycClient()
                 )
                 kegg_client = KeggClient()
                 for ec in sorted(requests):
@@ -405,6 +431,8 @@ class DetailedBeta2Stage:
                         biocyc_client=biocyc_client,
                         kegg_client=kegg_client,
                     )
+                    if getattr(biocyc_client, "metadata", None):
+                        source_metadata["biocyc"] = dict(biocyc_client.metadata)
             elif mode == "snapshot":
                 for item in snapshot:
                     if _record_kind(item) not in {"gpr", "gpr-evidence"}:
@@ -434,6 +462,7 @@ class DetailedBeta2Stage:
                     else StaticRheaClient
                 )
                 rhea = client_type(
+                    release=_source_release(section, "rhea"),
                     by_ec={
                         str(key): list(value)
                         for key, value in rhea_payload.get("by_ec", {}).items()
@@ -511,13 +540,77 @@ class DetailedBeta2Stage:
                         "confidence": "reaction-matched",
                         "warnings": [],
                     }
+                if getattr(rhea, "metadata", None):
+                    source_metadata["rhea"] = dict(rhea.metadata)
+            if "rhea" in reaction_sources:
+                rhea_file = section.get("rhea_snapshot")
+                rhea_payload = {}
+                if isinstance(rhea_file, str) and Path(rhea_file).is_file():
+                    loaded = json.loads(Path(rhea_file).read_text(encoding="utf-8"))
+                    rhea_payload = loaded if isinstance(loaded, Mapping) else {}
+                direct_by_ec = rhea_payload.get("reactions", {})
+                for reaction_id, record in catalysis.items():
+                    if not isinstance(record, Mapping) or not record.get("rhea_id"):
+                        continue
+                    rhea_id = str(record["rhea_id"])
+                    reaction = (
+                        direct_by_ec.get(rhea_id, {})
+                        if isinstance(direct_by_ec, Mapping)
+                        else {}
+                    )
+                    proteins = (
+                        rhea_payload.get("proteins", {}).get(rhea_id, [])
+                        if isinstance(rhea_payload.get("proteins"), Mapping)
+                        else []
+                    )
+                    proteins = [
+                        item
+                        for item in proteins
+                        if isinstance(item, Mapping)
+                        and (
+                            not str(item.get("organism", item.get("taxon", "")))
+                            or any(
+                                marker in str(
+                                    item.get("organism", item.get("taxon", ""))
+                                ).lower()
+                                for marker in ("human", "9606", "homo sapiens")
+                            )
+                        )
+                    ]
+                    genes = sorted(
+                        {
+                            str(item.get("gene", item.get("gene_symbol", "")))
+                            for item in proteins
+                            if isinstance(item, Mapping)
+                            and item.get("gene", item.get("gene_symbol"))
+                        }
+                    )
+                    candidates.setdefault(
+                        f"direct:{reaction_id}",
+                        {
+                            "reaction_id": reaction_id,
+                            "rhea_id": rhea_id,
+                            "candidate_gpr": " or ".join(
+                                f"({gene})" for gene in genes
+                            ),
+                            "gene_symbols": genes,
+                            "source": "rhea",
+                            "status": "candidate" if genes else "unresolved",
+                            "confidence": "reaction-matched",
+                            "identity": dict(reaction)
+                            if isinstance(reaction, Mapping)
+                            else {},
+                        },
+                    )
             if mode == "live" and "reactome" in reaction_sources:
                 from thg_protocol.services.reactome import (
                     ReactomeClient,
                     catalyst_candidate_gpr,
                 )
 
-                reactome = ReactomeClient()
+                reactome = ReactomeClient(
+                    release=_source_release(section, "reactome")
+                )
                 for _ec, candidate in candidates.items():
                     rhea_id = candidate.get("rhea_id")
                     if not rhea_id:
@@ -530,6 +623,10 @@ class DetailedBeta2Stage:
                         candidate["candidate_gpr"] = candidate_gpr
                         candidate["source"] = "reactome"
                         candidate["confidence"] = "strong"
+                        candidate["status"] = "resolved"
+                        candidate["source_metadata"] = dict(reactome.metadata)
+                if reactome.metadata:
+                    source_metadata["reactome"] = dict(reactome.metadata)
             if "reactome" in reaction_sources:
                 reactome_file = section.get("reactome_snapshot")
                 if isinstance(reactome_file, str) and Path(reactome_file).is_file():
@@ -553,12 +650,21 @@ class DetailedBeta2Stage:
                                 **dict(item),
                                 "candidate_gpr": candidate_gpr,
                                 "source": "reactome",
-                                "status": "candidate",
+                                "status": "resolved",
+                                "confidence": "strong",
+                                "source_metadata": {
+                                    "source": "Reactome",
+                                    "release": _source_release(section, "reactome"),
+                                },
                             }
             records: list[dict[str, object]] = []
             for reaction_id in sorted(str(item.id) for item in model.reactions):
                 if reaction_id in snapshot_by_reaction:
                     records.append(dict(snapshot_by_reaction[reaction_id]))
+                    continue
+                direct = candidates.get(f"direct:{reaction_id}")
+                if direct is not None:
+                    records.append({**direct, "reaction_id": reaction_id})
                     continue
                 record = catalysis.get(reaction_id, {})
                 for ec in _ec_numbers(
@@ -589,7 +695,15 @@ class DetailedBeta2Stage:
             )
             output = work_dir / "beta2-gpr-evidence.jsonl"
             output.write_text(
-                "".join(json.dumps(item, sort_keys=True) + "\n" for item in records),
+                "".join(json.dumps(item, sort_keys=True) + "\n" for item in records)
+                + json.dumps(
+                    {
+                        "record_type": "source-metadata",
+                        "source_metadata": source_metadata,
+                    },
+                    sort_keys=True,
+                )
+                + "\n",
                 encoding="utf-8",
             )
             return StageResult(
@@ -625,11 +739,14 @@ class DetailedBeta2Stage:
                     candidate, candidate_genes = _usable_gpr(item.get("candidate_gpr"))
                     if candidate:
                         candidates.append((candidate, candidate_genes, item))
+                accepted = [
+                    item for item in candidates if _accepted_external_gpr(item[2])
+                ]
                 selected = model_gpr
                 selected_genes = model_genes or list(genes)
                 conflicts = []
-                if not selected and candidates:
-                    selected, selected_genes, _ = candidates[0]
+                if not selected and accepted:
+                    selected, selected_genes, _ = accepted[0]
                 elif selected:
                     conflicts = [
                         item
@@ -775,6 +892,7 @@ class DetailedBeta2Stage:
                 if isinstance(configured_sources, list)
                 else set()
             )
+            source_metadata: dict[str, object] = {}
             model = _model(context, "resolve-gprs")
             model_genes = sorted(
                 str(gene.id) for reaction in model.reactions for gene in reaction.genes
@@ -800,7 +918,9 @@ class DetailedBeta2Stage:
                     records[gene] = record
                 evidence = record.setdefault("supporting_evidence", [])
                 if isinstance(evidence, list):
-                    evidence.append({"source": source, **dict(location)})
+                    item = {"source": source, **dict(location)}
+                    if item not in evidence:
+                        evidence.append(item)
                 if record.get("source") == "configuration":
                     return
                 raw = dict(location)
@@ -825,11 +945,30 @@ class DetailedBeta2Stage:
                     annotations = parse_gaf(
                         Path(annotation_file).read_text(encoding="utf-8"),
                         source_release=str(
-                            section.get("compartment_ontology_version", "")
+                            section.get("source_releases", {}).get("goa", {}).get(
+                                "release", ""
+                            )
+                            if isinstance(section.get("source_releases"), Mapping)
+                            and isinstance(
+                                section.get("source_releases", {}).get("goa"),
+                                Mapping,
+                            )
+                            else section.get("compartment_ontology_version", "")
                         ),
                     )
                 elif mode == "live":
-                    annotations = GOAClient().annotations_for(model_genes)
+                    goa_release = section.get("source_releases", {}).get("goa", {})
+                    goa_release = (
+                        goa_release.get("release", "")
+                        if isinstance(goa_release, Mapping)
+                        else ""
+                    )
+                    goa_client = GOAClient(
+                        release=str(goa_release)
+                    )
+                    annotations = goa_client.annotations_for(model_genes)
+                    if goa_client.metadata:
+                        source_metadata["goa"] = dict(goa_client.metadata)
                 for annotation in StaticGOAClient(annotations).annotations_for(
                     model_genes
                 ):
@@ -866,7 +1005,12 @@ class DetailedBeta2Stage:
                         value if isinstance(value, list) else value.get("records", [])
                     )
                 elif mode == "live":
-                    annotations = UniProtClient().annotations_for(model_genes)
+                    uniprot_client = UniProtClient(
+                        release=_source_release(section, "uniprot")
+                    )
+                    annotations = uniprot_client.annotations_for(model_genes)
+                    if uniprot_client.metadata:
+                        source_metadata["uniprot"] = dict(uniprot_client.metadata)
                 for annotation in StaticUniProtClient(annotations).annotations_for(
                     model_genes
                 ):
@@ -875,6 +1019,7 @@ class DetailedBeta2Stage:
                         {
                             "raw_location": annotation.raw_location,
                             "go_id": annotation.go_id,
+                            "sl_id": annotation.sl_id,
                             "protein_id": annotation.protein_id,
                             "evidence_code": annotation.evidence_code,
                             "reference": annotation.reference,
@@ -945,6 +1090,7 @@ class DetailedBeta2Stage:
                                     )
                                 ),
                                 "gene_locations": records,
+                                "source_metadata": source_metadata,
                                 "source": "configuration"
                                 if mode == "provided"
                                 else mode,
@@ -975,13 +1121,39 @@ class DetailedBeta2Stage:
                 if isinstance(section.get("go_graph"), Mapping)
                 else {}
             )
+            source_releases = (
+                dict(section.get("source_releases", {}))
+                if isinstance(section.get("source_releases"), Mapping)
+                else {}
+            )
             ontology_file = section.get("go_ontology_file")
             if isinstance(ontology_file, str) and Path(ontology_file).is_file():
                 go_graph = load_obo(ontology_file)
             elif go_terms and str(section.get("evidence_mode", "provided")) == "live":
                 from thg_protocol.services.go import GOALoader
 
-                go_graph = dict(GOALoader().load())
+                release_info = section.get("source_releases", {})
+                release_info = (
+                    release_info.get("go", release_info.get("go_ontology", {}))
+                    if isinstance(release_info, Mapping)
+                    else {}
+                )
+                release_info = release_info if isinstance(release_info, Mapping) else {}
+                loader = GOALoader(
+                    url=str(
+                        section.get("go_ontology_url", release_info.get("url", ""))
+                    )
+                    or None,
+                    release=str(
+                        section.get(
+                            "go_ontology_release", release_info.get("release", "")
+                        )
+                    )
+                    or None,
+                )
+                go_graph = dict(loader.load())
+                if loader.metadata:
+                    source_releases["go"] = loader.metadata
             if str(section.get("evidence_mode", "provided")) == "snapshot":
                 metadata = next(
                     (
@@ -997,11 +1169,6 @@ class DetailedBeta2Stage:
                     metadata.get("compartment_go_terms"), Mapping
                 ):
                     go_terms = dict(metadata["compartment_go_terms"])
-            source_releases = (
-                dict(section.get("source_releases", {}))
-                if isinstance(section.get("source_releases"), Mapping)
-                else {}
-            )
             for source_key in (
                 "go_ontology_file",
                 "go_annotation_file",
@@ -1012,7 +1179,14 @@ class DetailedBeta2Stage:
                 source_file = section.get(source_key)
                 if not isinstance(source_file, str) or not Path(source_file).is_file():
                     continue
-                current = source_releases.get(source_key, {})
+                source_name = {
+                    "go_ontology_file": "go",
+                    "go_annotation_file": "goa",
+                    "uniprot_snapshot": "uniprot",
+                    "rhea_snapshot": "rhea",
+                    "reactome_snapshot": "reactome",
+                }[source_key]
+                current = source_releases.get(source_name, {})
                 current = (
                     dict(current)
                     if isinstance(current, Mapping)
@@ -1021,7 +1195,7 @@ class DetailedBeta2Stage:
                 current.update(
                     {"file": source_file, "sha256": sha256_file(source_file)}
                 )
-                source_releases[source_key] = current
+                source_releases[source_name] = current
             payload = {
                 "schema_version": 1,
                 "ontology_version": str(
@@ -1073,6 +1247,7 @@ class DetailedBeta2Stage:
                 if isinstance(configured_sources, list)
                 else set()
             )
+            source_metadata: dict[str, object] = {}
             if "reactome" in sources:
                 snapshot_file = section.get("reactome_snapshot")
                 if isinstance(snapshot_file, str) and Path(snapshot_file).is_file():
@@ -1112,11 +1287,17 @@ class DetailedBeta2Stage:
                     not isinstance(section.get("reaction_sources"), list)
                     or "biocyc" in sources
                 )
-                client = BioCycClient() if biocyc_enabled else StaticBioCycClient()
+                client = (
+                    BioCycClient(release=_source_release(section, "biocyc"))
+                    if biocyc_enabled
+                    else StaticBioCycClient()
+                )
                 if "reactome" in sources:
                     from thg_protocol.services.reactome import ReactomeClient
 
-                    reactome = ReactomeClient()
+                    reactome = ReactomeClient(
+                        release=_source_release(section, "reactome")
+                    )
                     for record in records.values():
                         reactome_id = record.get("reactome_id")
                         if not reactome_id:
@@ -1131,6 +1312,8 @@ class DetailedBeta2Stage:
                             location = {"raw_location": str(location)}
                         if isinstance(location, Mapping):
                             record.setdefault("locations", []).append(location)
+                    if reactome.metadata:
+                        source_metadata["reactome"] = dict(reactome.metadata)
                 for record in records.values():
                     graph = (
                         dict(section.get("cco_graph", {}))
@@ -1162,6 +1345,8 @@ class DetailedBeta2Stage:
                                 )
                     if graph:
                         record["cco_graph"] = graph
+                if getattr(client, "metadata", None):
+                    source_metadata["biocyc"] = dict(client.metadata)
             output = work_dir / "beta2-reaction-location-evidence.jsonl"
             output.write_text(
                 "".join(
@@ -1170,6 +1355,17 @@ class DetailedBeta2Stage:
                 ),
                 encoding="utf-8",
             )
+            with output.open("a", encoding="utf-8") as handle:
+                handle.write(
+                    json.dumps(
+                        {
+                            "record_type": "source-metadata",
+                            "source_metadata": source_metadata,
+                        },
+                        sort_keys=True,
+                    )
+                    + "\n"
+                )
             return StageResult((("evidence", output),), {"reactions": len(records)})
         if self.id == "resolve-compartment-evidence":
             from thg_protocol.curation.beta2 import resolve_compartment
@@ -1302,6 +1498,17 @@ class DetailedBeta2Stage:
                     dict(record) if isinstance(record, Mapping) else {}
                 )
                 gene_locations[gene]["locations"] = sorted(set(targets))
+                if len(set(targets)) > 1:
+                    gene_locations[gene]["status"] = "conflicting"
+                    resolution_records.append(
+                        {
+                            "gene_id": gene,
+                            "status": "location-conflict",
+                            "reason": "same-precedence-evidence-disagree",
+                            "candidate_targets": sorted(set(targets)),
+                        }
+                    )
+                    unresolved.append(f"{gene}:same-precedence-evidence-disagree")
             reaction_resolutions = []
             recorded_reactions: dict[str, list[dict[str, object]]] = {}
             for item in _snapshot_records(section):
@@ -1842,11 +2049,37 @@ class DetailedBeta2Stage:
                     context, "normalize-compartments", "registry"
                 ).read_text(encoding="utf-8")
             )
+            source_releases = dict(registry_payload.get("source_releases", {}))
+
+            def merge_source_metadata(value: object) -> None:
+                if not isinstance(value, Mapping):
+                    return
+                if "source" in value:
+                    source = str(value.get("source", "")).lower()
+                    if source:
+                        current = source_releases.get(source, {})
+                        current = dict(current) if isinstance(current, Mapping) else {}
+                        current.update(dict(value))
+                        source_releases[source] = current
+                    return
+                for source, metadata in value.items():
+                    if not isinstance(metadata, Mapping):
+                        continue
+                    current = source_releases.get(str(source), {})
+                    current = dict(current) if isinstance(current, Mapping) else {}
+                    current.update(dict(metadata))
+                    source_releases[str(source)] = current
+
+            for record in _jsonl(work_dir / "gpr-evidence.jsonl"):
+                merge_source_metadata(record.get("source_metadata"))
+            for record in _jsonl(work_dir / "reaction-location-evidence.jsonl"):
+                merge_source_metadata(record.get("source_metadata"))
+            merge_source_metadata(location_payload.get("source_metadata"))
             go_release_path = _dump(
                 work_dir / "go-release.json",
                 {
                     "ontology_version": registry_payload.get("ontology_version"),
-                    "source_releases": registry_payload.get("source_releases", {}),
+                    "source_releases": source_releases,
                     "go_ontology_file": section.get("go_ontology_file"),
                     "go_ontology_sha256": sha256_file(section["go_ontology_file"])
                     if isinstance(section.get("go_ontology_file"), str)
@@ -1920,7 +2153,7 @@ class DetailedBeta2Stage:
                     "compartment_go_terms": registry_payload.get(
                         "compartment_go_terms", {}
                     ),
-                    "source_releases": registry_payload.get("source_releases", {}),
+                    "source_releases": source_releases,
                 }
             )
             snapshot_path.write_text(
@@ -2000,6 +2233,7 @@ class DetailedBeta2Stage:
                             context, "normalize-compartments", "registry"
                         ).read_text(encoding="utf-8")
                     ).get("ontology_version"),
+                    "source_releases": source_releases,
                     "software": {
                         "python": platform.python_version(),
                         "cobra": __import__("cobra").__version__,

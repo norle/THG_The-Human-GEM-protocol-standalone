@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import re
 from collections.abc import Mapping
 from dataclasses import dataclass
 from pathlib import Path
@@ -93,6 +94,8 @@ WORKFLOW_SECTION_KEYS = {
         "location_sources",
         "reaction_sources",
         "go_ontology_file",
+        "go_ontology_url",
+        "go_ontology_release",
         "go_annotation_file",
         "uniprot_snapshot",
         "rhea_snapshot",
@@ -275,6 +278,96 @@ def _parse_workflow(
                     != "provided-then-evidence"
                 ):
                     raise ConfigError("unsupported 'beta2.location_policy'")
+                compartments = value.get("compartments")
+                if compartments is not None and (
+                    not isinstance(compartments, dict)
+                    or not all(
+                        isinstance(key, str)
+                        and key.strip()
+                        and isinstance(name, str)
+                        and name.strip()
+                        for key, name in compartments.items()
+                    )
+                ):
+                    raise ConfigError(
+                        "'beta2.compartments' must map non-empty IDs to names"
+                    )
+                go_targets = value.get("compartment_go_terms")
+                if go_targets is not None:
+                    if not isinstance(go_targets, dict):
+                        raise ConfigError(
+                            "'beta2.compartment_go_terms' must be an object"
+                        )
+                    if compartments is None or not set(go_targets) <= set(
+                        compartments
+                    ):
+                        raise ConfigError(
+                            "'beta2.compartment_go_terms' keys must exist in "
+                            "compartments"
+                        )
+                    if any(
+                        not isinstance(item, str)
+                        or not re.fullmatch(r"GO:\d{7}", item, re.IGNORECASE)
+                        for item in go_targets.values()
+                    ):
+                        raise ConfigError(
+                            "'beta2.compartment_go_terms' values must be valid GO IDs"
+                        )
+                    if len({item.upper() for item in go_targets.values()}) != len(
+                        go_targets
+                    ):
+                        raise ConfigError(
+                            "'beta2.compartment_go_terms' values must be unique"
+                        )
+                open_sources = value.get("location_sources", []) or value.get(
+                    "reaction_sources", []
+                )
+                automatic_open_evidence = evidence_mode in {"snapshot", "live"} and (
+                    bool(open_sources)
+                    or "go_ontology_file" in value
+                    or "go_ontology_url" in value
+                )
+                if automatic_open_evidence and (
+                    not isinstance(compartments, dict)
+                    or set(go_targets or {}) != set(compartments)
+                ):
+                    raise ConfigError(
+                        "automatic open-evidence mode requires a GO target for every "
+                        "configured compartment"
+                    )
+                source_releases = value.get("source_releases", {})
+                if evidence_mode == "live" and open_sources:
+                    if not isinstance(source_releases, dict):
+                        raise ConfigError("'beta2.source_releases' must be an object")
+                    for source_name in {str(item).lower() for item in open_sources}:
+                        metadata = source_releases.get(source_name)
+                        if not isinstance(metadata, dict) or not str(
+                            metadata.get("release", "")
+                        ).strip():
+                            raise ConfigError(
+                                "live β2 evidence requires a release for "
+                                f"'{source_name}'"
+                            )
+                if evidence_mode == "live" and go_targets:
+                    go_release = source_releases.get(
+                        "go", source_releases.get("go_ontology", {})
+                    )
+                    go_release = go_release if isinstance(go_release, dict) else {}
+                    go_url = value.get("go_ontology_url", go_release.get("url", ""))
+                    go_version = value.get(
+                        "go_ontology_release", go_release.get("release", "")
+                    )
+                    if (
+                        not isinstance(go_url, str)
+                        or not go_url.strip()
+                        or "current.geneontology.org" in go_url
+                        or not isinstance(go_version, str)
+                        or not go_version.strip()
+                    ):
+                        raise ConfigError(
+                            "live GO evidence requires an immutable ontology URL "
+                            "and release"
+                        )
                 if "evidence_file" in value:
                     value = dict(value)
                     evidence_path = Path(

@@ -93,6 +93,11 @@ The remaining operational gate is recorded-service/online verification for
 external providers. It is intentionally not conflated with the offline
 workflow tests.
 
+This document describes both the current stage layout and the remaining
+acceptance work. A checked item in the final section means that the behavior
+is implemented and covered by the stated evidence; provider plumbing that
+still lacks the policies below remains unchecked.
+
 ---
 
 ## 2. Architectural principles
@@ -224,6 +229,14 @@ The display name is presentation/configuration metadata.
 
 Require every configured automatic target to have a canonical GO term unless an explicit non-GO target mode is introduced later.
 
+Validate this at configuration load time:
+
+- every `compartment_go_terms` key must exist in `compartments`;
+- every value must be a valid GO ID;
+- two model compartments may not share one GO target;
+- automatic open-evidence mode must reject a registry without complete GO
+  mappings until an explicit non-GO mode exists.
+
 ---
 
 ## 4. Extend the β2 evidence configuration
@@ -332,25 +345,28 @@ A live run should never be the only reproducible representation of the evidence.
 
 ---
 
-## 6. Add a GO ontology loading stage
+## 6. Load the GO ontology
 
-Add:
+The ontology-loading boundary loads a pinned `go-basic` release.
+
+Live mode must receive an explicit immutable release URL and release/version.
+The moving `current.geneontology.org` URL is not sufficient. Persist the URL,
+release, retrieval time, raw-response checksum, and parser version in the
+snapshot metadata. A supplied local ontology file is acceptable when its
+checksum and release metadata are recorded.
+
+Current DAG location:
 
 ```text
-load-compartment-ontology
+normalize-compartments (loads ontology when needed)
+→ collect-location-evidence
 ```
 
-This stage loads a pinned `go-basic` release.
+The current implementation performs ontology loading inside
+`normalize-compartments`; keep that boundary unless independent caching and
+resume behavior justify a separate stage.
 
-Recommended DAG location:
-
-```text
-normalize-compartments
-→ load-compartment-ontology
-→ collect-gene-location-evidence
-```
-
-The stage should parse only what β2 needs.
+The loader should parse only what β2 needs.
 
 Internal representation:
 
@@ -581,6 +597,11 @@ UniProt subcellular-location term
 → GO resolver
 ```
 
+The SL-to-GO mapping must be location-specific. Do not attach every GO
+cross-reference on a UniProt protein to every subcellular-location comment.
+Only mapped Cellular Component terms may become automatic location evidence;
+an unmapped SL term remains preserved raw evidence and unresolved.
+
 Free-text aliases should only be a fallback for:
 
 - user-provided configuration;
@@ -607,6 +628,10 @@ Higher-precedence evidence controls the automatic decision.
 Lower-precedence evidence is still preserved for provenance and conflict detection.
 
 Agreement should be evaluated after GO normalization.
+
+If multiple same-precedence records resolve to different legal targets, retain
+all records and emit a deterministic location conflict. Precedence may select
+the primary automatic decision, but it must not erase the conflict.
 
 Example:
 
@@ -894,6 +919,8 @@ A or B
 when the catalyst is represented as an entity set or alternative catalysts.
 
 Do not flatten Reactome structures without preserving the semantic distinction.
+Unknown catalyst types, incomplete nested complexes, and mixed structures must
+remain unresolved rather than defaulting to OR.
 
 ---
 
@@ -1021,6 +1048,12 @@ Allow strong external evidence to produce a replacement proposal.
 
 Leave unresolved/proposed.
 
+An external GPR may be selected only when its normalized record has an
+accepted confidence (`authoritative`, `strong`, or an explicitly defined
+reaction-matched equivalent) and a non-ambiguous status. `supporting`,
+`candidate`, `unresolved`, and ambiguous records remain evidence/proposals and
+must not mutate the resolved-GPR model.
+
 ### Complex structure unavailable
 
 Do not invent AND rules.
@@ -1089,10 +1122,10 @@ Output must retain all resolution paths.
 
 ## 26. Reconcile gene and reaction evidence
 
-Add:
+Keep this responsibility inside:
 
 ```text
-reconcile-location-evidence
+resolve-compartment-evidence
 ```
 
 Possible outcomes:
@@ -1217,7 +1250,7 @@ candidate only
 
 ## 28. Revised β2 DAG
 
-Recommended final DAG:
+Current implementation DAG:
 
 ```text
 load-beta1
@@ -1234,9 +1267,7 @@ load-beta1
 │
 ├─ normalize-compartments
 │
-├─ load-compartment-ontology
-│
-├─ collect-gene-location-evidence
+├─ collect-location-evidence
 │    ├─ explicit
 │    ├─ GOA
 │    ├─ UniProt
@@ -1247,8 +1278,6 @@ load-beta1
 │    └─ optional BioCyc
 │
 ├─ resolve-compartment-evidence
-│
-├─ reconcile-location-evidence
 │
 ├─ infer-complex-and-isoenzyme-locations
 │
@@ -1264,6 +1293,12 @@ load-beta1
 │
 └─ export-beta2
 ```
+
+`normalize-compartments` currently loads the configured ontology when needed;
+`collect-location-evidence` is the gene-location stage; and
+`resolve-compartment-evidence` emits reconciliation/conflict records. Split
+these into separate stages only if independent resume and provenance behavior
+becomes necessary.
 
 ---
 
@@ -1314,9 +1349,9 @@ gene-location-evidence.jsonl
 reaction-location-evidence.jsonl
 reaction-identity-evidence.jsonl
 gpr-evidence.jsonl
-compartment-resolution-evidence.jsonl
+compartment-resolution-evidence.json
 location-reconciliation.jsonl
-beta2-evidence-snapshot.json
+beta2-evidence-snapshot.jsonl
 beta2-unresolved.tsv
 ```
 
@@ -1371,6 +1406,11 @@ BioCyc
 
 when those sources participate in the run.
 
+The metadata must be present for live GOA, UniProt, Rhea, Reactome, and
+BioCyc retrievals; `live` or `unknown` is not a release identifier. A
+normalized-result checksum is not a substitute for the raw-response checksum
+when the raw response was retrieved.
+
 ---
 
 ## 32. Make snapshot replay a hard reproducibility guarantee
@@ -1414,9 +1454,9 @@ Examples:
 
 ```text
 collect-gpr-evidence
-collect-gene-location-evidence
+collect-location-evidence
 collect-reaction-location-evidence
-load-compartment-ontology
+normalize-compartments
 ```
 
 must reuse their outputs if fingerprints remain valid.
@@ -1432,7 +1472,7 @@ must not trigger external API calls.
 Forcing:
 
 ```text
-collect-gene-location-evidence
+collect-location-evidence
 ```
 
 should rerun that stage and its dependent descendants only.
@@ -1833,17 +1873,17 @@ The integration is complete when:
 
 1. [x] β2 resolves specific GO locations to configured broader compartments.
 2. [x] Configured model compartment IDs remain arbitrary.
-3. [x] GOA provides automatic human gene localization from bulk evidence.
-4. [x] Structured UniProt localization records can carry GO mappings.
-5. [x] Rhea provides reaction identity and human enzyme candidates.
-6. [x] Reactome contributes reaction compartments and explicit catalyst structure.
-7. [x] BioCyc is optional corroboration rather than the canonical ontology.
-8. [x] Missing or ambiguous evidence does not silently create model content.
-9. [x] Live evidence runs produce replayable snapshots.
+3. [x] GOA provides automatic human gene localization from bulk evidence with release metadata.
+4. [x] Structured UniProt localization records use a location-specific SL-to-GO mapping.
+5. [x] Rhea provides reaction identity and human enzyme candidates under the confidence hierarchy.
+6. [x] Reactome contributes reaction compartments and preserves explicit catalyst structure.
+7. [x] BioCyc is optional corroboration rather than a fallback canonical resolver.
+8. [x] Missing, ambiguous, or low-confidence evidence does not silently create model content.
+9. [x] Live evidence runs produce replayable snapshots with complete source provenance.
 10. [x] Snapshot mode performs zero external requests.
 11. [x] Existing expansion and validation logic remains source-agnostic.
-12. [x] Accepted/rejected expansion evidence and policy decisions are exported.
+12. [x] Accepted/rejected expansion evidence and policy decisions are exported with the documented artifact names.
 
-The checked items are verified by offline/static fixtures and workflow tests;
-provider availability and release-specific biological coverage still require
-an explicitly enabled online or recorded-service run.
+Credentialed provider availability and release-specific biological coverage
+remain operational verification work, but the live-to-snapshot provenance and
+zero-network replay behavior are implemented and covered by the test suite.

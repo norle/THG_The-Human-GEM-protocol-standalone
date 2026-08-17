@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hashlib
 from collections.abc import Mapping
 from dataclasses import dataclass, field
 from typing import Protocol
@@ -25,6 +26,7 @@ class StaticRheaClient:
     by_ec: dict[str, list[Mapping[str, object]]] = field(default_factory=dict)
     reactions: dict[str, Mapping[str, object]] = field(default_factory=dict)
     proteins: dict[str, list[Mapping[str, object]]] = field(default_factory=dict)
+    release: str = ""
 
     def reactions_for_ec(self, ec_number: str) -> list[Mapping[str, object]]:
         return list(self.by_ec.get(str(ec_number), ()))
@@ -42,11 +44,18 @@ class RheaClient(StaticRheaClient):
     base_url = "https://www.rhea-db.org"
 
     def __init__(
-        self, *, session: object | None = None, timeout: float = 30.0, **kwargs: object
+        self,
+        *,
+        session: object | None = None,
+        timeout: float = 30.0,
+        release: str = "",
+        **kwargs: object,
     ):
         super().__init__(**kwargs)
         self.session = session or (requests.Session() if requests is not None else None)
         self.timeout = timeout
+        self.source_release = release
+        self.metadata: dict[str, object] = {}
 
     def _remote(self, path: str) -> object:
         if self.session is None:
@@ -59,6 +68,13 @@ class RheaClient(StaticRheaClient):
             retries=2,
             backoff=0.5,
         )
+        self.metadata = {
+            "source": "Rhea",
+            "release": self.source_release,
+            "url": self.base_url + path,
+            "raw_response_sha256": hashlib.sha256(response.content).hexdigest(),
+            "parser_version": "1",
+        }
         return response.json()
 
     def reactions_for_ec(self, ec_number: str) -> list[Mapping[str, object]]:
