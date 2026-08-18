@@ -10,7 +10,7 @@
     {"page": "workflows/runs.md", "symbols": ["thg_protocol.workflow.runner.start", "thg_protocol.workflow.runner.resume", "thg_protocol.workflow.runner.get_status"], "cli": "thg-run"},
     {"page": "tools/model-construction.md", "symbols": ["thg_protocol.database.reconstruct_model", "thg_protocol.database.reconstruct_model_from_json", "thg_protocol.model_build.build_model"], "cli": null},
     {"page": "tools/annotation.md", "symbols": ["thg_protocol.annotation.model_annotations.analyze_model_annotations", "thg_protocol.gpr.lookup.get_gpr", "thg_protocol.gpr.location.resolve_locations"], "cli": null},
-    {"page": "tools/pathways-gapfill.md", "symbols": ["thg_protocol.pathway.workflow.implement_pathway_files", "thg_protocol.pathway.workflow.implement_pathway", "thg_protocol.gapfill.core.generate_candidates", "thg_protocol.gapfill.core.run_pipeline"], "cli": null},
+    {"page": "tools/pathways-gapfill.md", "symbols": ["thg_protocol.pathway.workflow.implement_pathway_files", "thg_protocol.pathway.workflow.implement_pathway", "thg_protocol.gapfill.core.gapfill_model", "thg_protocol.gapfill.core.GapfillResult", "thg_protocol.gapfill.core.generate_candidates", "thg_protocol.gapfill.core.run_pipeline"], "cli": null},
     {"page": "tools/analysis.md", "symbols": ["thg_protocol.analysis.compare.compare_models_from_files", "thg_protocol.analysis.compare.compare_model_files_semantically", "thg_protocol.analysis.network.find_network_components"], "cli": "thg-compare"},
     {"page": "tools/cell-specific.md", "symbols": ["thg_protocol.cell_specific.reduce_model_by_activity"], "cli": null}
   ]

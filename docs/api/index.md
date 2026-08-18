@@ -37,7 +37,7 @@ See the [workflow guides](../usage.md) for end-to-end context and the
 - Annotation: [`analyze_model_annotations`][thg_protocol.annotation.model_annotations.analyze_model_annotations]
   and [`get_gpr`][thg_protocol.gpr.lookup.get_gpr].
 - Model changes: [`implement_pathway_files`][thg_protocol.pathway.workflow.implement_pathway_files],
-  [`run_pipeline`][thg_protocol.gapfill.core.run_pipeline], and
+  [`gapfill_model`][thg_protocol.gapfill.core.gapfill_model], and
   [`merge_models`][thg_protocol.merge.merge_models].
 - Analysis: [`find_network_components`][thg_protocol.analysis.network.find_network_components],
   [`compare_models_from_files`][thg_protocol.analysis.compare.compare_models_from_files],

@@ -22,6 +22,7 @@ __all__ = [
     "GapfillStrategy",
     "DeterministicGapfillStrategy",
     "run_gapfill",
+    "gapfill_model",
 ]
 
 
@@ -48,6 +49,16 @@ class GapfillResult:
     status: str
     failure: str | None = None
     solver: dict[str, Any] = field(default_factory=dict)
+    method: str = "deterministic"
+    parameters: dict[str, Any] = field(default_factory=dict)
+    before_metrics: dict[str, Any] = field(default_factory=dict)
+    after_metrics: dict[str, Any] = field(default_factory=dict)
+    stop_reason: str = ""
+
+    @property
+    def selected_reactions(self) -> list[str]:
+        """Canonical name for selected reactions (``selected`` is retained)."""
+        return self.selected
 
     def as_dict(self) -> dict[str, Any]:
         return {
@@ -56,6 +67,12 @@ class GapfillResult:
             "status": self.status,
             "failure": self.failure,
             "solver": dict(self.solver),
+            "method": self.method,
+            "parameters": dict(self.parameters),
+            "selected_reactions": list(self.selected),
+            "before_metrics": dict(self.before_metrics),
+            "after_metrics": dict(self.after_metrics),
+            "stop_reason": self.stop_reason,
         }
 
 
@@ -225,6 +242,14 @@ def _suffix(metabolite_id: str) -> str:
     )
 
 
+def _produced_consumed(model: dict[str, Any]) -> tuple[set[str], set[str]]:
+    produced, consumed = set(), set()
+    for reaction in model.get("reactions", []):
+        for metabolite_id, coefficient in reaction.get("metabolites", {}).items():
+            (produced if coefficient > 0 else consumed).add(metabolite_id)
+    return produced, consumed
+
+
 def generate_candidates(
     model: dict[str, Any],
     allowed_connections: list[tuple[str, str]] | None = None,
@@ -235,11 +260,7 @@ def generate_candidates(
     and a stable ``type`` (A/B/C) compatible with the legacy CSV workflow.
     """
     component = _components(model)
-    produced: set[str] = set()
-    consumed: set[str] = set()
-    for reaction in model.get("reactions", []):
-        for metabolite_id, coefficient in reaction.get("metabolites", {}).items():
-            (produced if coefficient > 0 else consumed).add(metabolite_id)
+    produced, consumed = _produced_consumed(model)
     met_type = {
         met["id"]: (
             "product"
@@ -438,9 +459,7 @@ def run_phase2(
         selected.append(row)
     created = []
     for index, row in enumerate(selected):
-        reaction_id = _add_transport(
-            model, row, "TRANS_MIN", index, metabolite_ids
-        )
+        reaction_id = _add_transport(model, row, "TRANS_MIN", index, metabolite_ids)
         if reaction_id:
             created.append({**row, "reaction_id": reaction_id})
     csv_path = _write_csv(Path(output_dir) / "selected_minimal_connectors.csv", created)
@@ -496,9 +515,7 @@ def run_phase3(
         )
         if best is None:
             break
-        reaction_id = _add_transport(
-            model, best, "PH3_TRANS", index, metabolite_ids
-        )
+        reaction_id = _add_transport(model, best, "PH3_TRANS", index, metabolite_ids)
         remaining.remove(best)
         if reaction_id:
             consumed_counts[best["met1"]] = consumed_counts.get(best["met1"], 0) + 1
@@ -519,3 +536,406 @@ def run_pipeline(
     output_model = Path(output_dir) / "gapfilled_model.json"
     output_model.write_text(json.dumps(model, indent=2) + "\n")
     return {"model": output_model, "phase1": phase1, "phase2": phase2, "phase3": phase3}
+
+
+# Standalone API.  The legacy phase helpers above intentionally remain public.
+_TRANSPORT_METHODS = {"greedy", "deadends"}
+_DEFAULTS = {
+    "greedy": {
+        "max_additions": 500,
+        "allowed_connections": [("c", "e"), ("c", "m")],
+        "candidate_types": ["A", "B", "C"],
+    },
+    "deadends": {
+        "max_additions": 1000,
+        "allowed_connections": [("c", "e")],
+        "candidate_types": ["A", "B"],
+    },
+    "milp": {"minimum_flux": 0.05, "penalties": {}, "max_additions": 100},
+}
+
+
+def _as_mapping(model: Any) -> dict[str, Any]:
+    if isinstance(model, dict):
+        return model
+    from cobra.io.dict import model_to_dict
+
+    return model_to_dict(model)
+
+
+def _transport_key(
+    reaction: dict[str, Any],
+) -> tuple[tuple[str, str], frozenset[str]] | None:
+    """Return pair and capacities relative to lexicographic metabolite order."""
+    metabolites = {
+        key: value for key, value in reaction["metabolites"].items() if value
+    }
+    if len(metabolites) != 2:
+        return None
+    first, second = sorted(metabolites)
+    if metabolites[first] * metabolites[second] >= 0:
+        return None
+    # Scaling does not matter: a two-metabolite transport is normalized to units.
+    positive = f"{first}>{second}" if metabolites[first] < 0 else f"{second}>{first}"
+    reverse = (
+        f"{second}>{first}" if positive == f"{first}>{second}" else f"{first}>{second}"
+    )
+    directions = set()
+    if float(reaction.get("upper_bound", 1000)) > 0:
+        directions.add(positive)
+    if float(reaction.get("lower_bound", 0)) < 0:
+        directions.add(reverse)
+    return (first, second), frozenset(directions)
+
+
+def _covered_transport(model: Any, candidate: GapfillCandidate) -> bool:
+    wanted = _transport_key(
+        {
+            "metabolites": candidate.metabolites,
+            "lower_bound": candidate.lower_bound,
+            "upper_bound": candidate.upper_bound,
+        }
+    )
+    if wanted is None:
+        return False
+    for reaction in _as_mapping(model)["reactions"]:
+        actual = _transport_key(reaction)
+        if actual and actual[0] == wanted[0] and actual[1] >= wanted[1]:
+            return True
+    return False
+
+
+def _metrics(model: Any) -> dict[str, int]:
+    mapped = _as_mapping(model)
+    produced, consumed = _produced_consumed(mapped)
+    deadends = produced ^ consumed
+    components = set(_components(mapped).values())
+    return {
+        "dead_ends": len(deadends),
+        "components": len(components),
+        "reactions": len(mapped["reactions"]),
+    }
+
+
+def _deadend_ids(model: Any) -> set[str]:
+    produced, consumed = _produced_consumed(_as_mapping(model))
+    return produced ^ consumed
+
+
+def _transport_candidates(
+    model: Any, allowed_connections: list[tuple[str, str]], candidate_types: list[str]
+) -> list[GapfillCandidate]:
+    mapped = _as_mapping(model)
+    allowed = {tuple(sorted(pair)) for pair in allowed_connections}
+    produced, consumed = _produced_consumed(mapped)
+    buckets: dict[str, list[dict[str, Any]]] = {}
+    for met in mapped["metabolites"]:
+        buckets.setdefault(re.sub(r"[a-z]+$", "", met["id"]), []).append(met)
+    result = []
+    for base, metabolites in sorted(buckets.items()):
+        for index, left in enumerate(sorted(metabolites, key=lambda item: item["id"])):
+            for right in sorted(metabolites[index + 1 :], key=lambda item: item["id"]):
+                compartments = tuple(
+                    sorted(
+                        (
+                            left.get("compartment") or _suffix(left["id"]),
+                            right.get("compartment") or _suffix(right["id"]),
+                        )
+                    )
+                )
+                if compartments not in allowed:
+                    continue
+                left_kind = (
+                    "product"
+                    if left["id"] in produced - consumed
+                    else "substrate"
+                    if left["id"] in consumed - produced
+                    else "none"
+                )
+                right_kind = (
+                    "product"
+                    if right["id"] in produced - consumed
+                    else "substrate"
+                    if right["id"] in consumed - produced
+                    else "none"
+                )
+                kind = (
+                    "A"
+                    if {left_kind, right_kind} == {"product", "substrate"}
+                    else "B"
+                    if left_kind == right_kind and left_kind != "none"
+                    else "C"
+                )
+                if kind not in candidate_types:
+                    continue
+                first, second = sorted((left["id"], right["id"]))
+                reaction_id = re.sub(r"[^A-Za-z0-9_]", "_", f"GAPFILL_{first}_{second}")
+                result.append(
+                    GapfillCandidate(
+                        reaction_id,
+                        {first: -1.0, second: 1.0},
+                        -1000.0,
+                        1000.0,
+                        annotation={"type": kind, "base": base},
+                    )
+                )
+    return sorted(result, key=lambda candidate: candidate.id)
+
+
+def _resolved_parameters(
+    method: str, parameters: dict[str, Any] | None
+) -> dict[str, Any]:
+    if method not in {*_TRANSPORT_METHODS, "milp"}:
+        raise ValueError(f"unknown gapfill method: {method}")
+    values = {**_DEFAULTS[method], **(parameters or {})}
+    unsupported = {"allow_exchange", "allow_demand"} & set(values)
+    if unsupported:
+        raise ValueError(
+            f"unsupported gapfill parameters: {', '.join(sorted(unsupported))}"
+        )
+    foreign = (
+        {"universal_model", "objective", "minimum_flux", "penalties"}
+        if method in _TRANSPORT_METHODS
+        else {"allowed_connections", "candidate_types"}
+    ) & set(values)
+    if foreign:
+        raise ValueError(
+            f"parameters not supported by {method}: {', '.join(sorted(foreign))}"
+        )
+    if not isinstance(values.get("max_additions"), int) or values["max_additions"] <= 0:
+        raise ValueError("max_additions must be positive")
+    if method in _TRANSPORT_METHODS:
+        values["allowed_connections"] = [
+            tuple(pair) for pair in values["allowed_connections"]
+        ]
+        if any(len(pair) != 2 for pair in values["allowed_connections"]):
+            raise ValueError(
+                "allowed_connections entries must contain two compartments"
+            )
+        if set(values["candidate_types"]) - {"A", "B", "C"}:
+            raise ValueError("candidate_types may only contain A, B, and C")
+    return values
+
+
+def _run_transport(
+    model: Any, method: str, parameters: dict[str, Any]
+) -> GapfillResult:
+    result_model = _candidate_model_copy(model)
+    before = _metrics(result_model)
+    candidates = _transport_candidates(
+        result_model, parameters["allowed_connections"], parameters["candidate_types"]
+    )
+    known_compartments = {
+        met.get("compartment") for met in _as_mapping(result_model)["metabolites"]
+    }
+    for pair in parameters["allowed_connections"]:
+        if not set(pair) <= known_compartments:
+            raise ValueError(f"unknown compartment pair: {pair}")
+    coverage = {
+        candidate.id: "already-present"
+        if _covered_transport(result_model, candidate)
+        else "available"
+        for candidate in candidates
+    }
+    candidates = [
+        candidate for candidate in candidates if coverage[candidate.id] == "available"
+    ]
+    existing_ids = {
+        reaction["id"] for reaction in _as_mapping(result_model)["reactions"]
+    }
+    collisions = [
+        candidate.id for candidate in candidates if candidate.id in existing_ids
+    ]
+    if collisions:
+        return GapfillResult(
+            result_model,
+            [],
+            coverage,
+            "failed",
+            f"reaction-ID collision: {collisions[0]}",
+            {"strategy": method},
+            method,
+            parameters,
+            before,
+            before,
+            "reaction-id-collision",
+        )
+    selected: list[str] = []
+    rank = {"A": 0, "B": 1, "C": 2}
+    stop_reason = "no-improving-candidate"
+    while len(selected) < parameters["max_additions"]:
+        current = _metrics(result_model)
+        scored = []
+        for candidate in candidates:
+            if _covered_transport(result_model, candidate):
+                coverage[candidate.id] = "already-present"
+                continue
+            trial = _candidate_model_copy(result_model)
+            _add_candidate(trial, candidate)
+            after = _metrics(trial)
+            improvement = (
+                current["dead_ends"] - after["dead_ends"],
+                current["components"] - after["components"],
+            )
+            if improvement != (0, 0):
+                scored.append(
+                    (
+                        (
+                            -improvement[0],
+                            -improvement[1],
+                            rank[candidate.annotation["type"]],
+                            candidate.id,
+                        ),
+                        candidate,
+                    )
+                )
+        if not scored:
+            break
+        _, best = min(scored)
+        _add_candidate(result_model, best)
+        selected.append(best.id)
+        coverage[best.id] = "selected"
+        candidates.remove(best)
+    after = _metrics(result_model)
+    remaining_improvement = False
+    targetable = False
+    current_deadends = _metrics(result_model)["dead_ends"]
+    for candidate in candidates:
+        trial = _candidate_model_copy(result_model)
+        _add_candidate(trial, candidate)
+        trial_metrics = _metrics(trial)
+        remaining_improvement |= (
+            trial_metrics["dead_ends"] < current_deadends
+            or trial_metrics["components"] < after["components"]
+        )
+        targetable |= bool(set(candidate.metabolites) & _deadend_ids(result_model))
+    at_limit = len(selected) == parameters["max_additions"]
+    if at_limit:
+        stop_reason = "max-additions"
+    status = (
+        "partial"
+        if at_limit and (remaining_improvement if method == "greedy" else targetable)
+        else "solved"
+    )
+    return GapfillResult(
+        result_model,
+        selected,
+        coverage,
+        status,
+        solver={"strategy": method},
+        method=method,
+        parameters=parameters,
+        before_metrics=before,
+        after_metrics=after,
+        stop_reason=stop_reason,
+    )
+
+
+def _run_milp(model: Any, parameters: dict[str, Any]) -> GapfillResult:
+    import cobra
+    from cobra.flux_analysis.gapfilling import GapFiller
+    from cobra.io import load_json_model, read_sbml_model
+
+    universal_path = Path(parameters["universal_model"])
+    if not universal_path.is_file():
+        raise ValueError("universal_model must be a readable model file")
+    working = _candidate_model_copy(model)
+    if not hasattr(working, "reactions"):
+        raise ValueError("milp requires a COBRApy model")
+    if parameters["objective"] not in working.reactions:
+        raise ValueError(f"objective not found: {parameters['objective']}")
+    universal = (
+        load_json_model(str(universal_path))
+        if universal_path.suffix.lower() == ".json"
+        else read_sbml_model(str(universal_path))
+    )
+    working.objective = parameters["objective"]
+    before = _metrics(working)
+    filler = GapFiller(
+        working,
+        universal=universal,
+        lower_bound=parameters["minimum_flux"],
+        penalties=parameters["penalties"],
+        demand_reactions=False,
+        exchange_reactions=False,
+    )
+    additions = filler.fill(iterations=1)[0]
+    if len(additions) > parameters["max_additions"]:
+        return GapfillResult(
+            working,
+            [],
+            {},
+            "failed",
+            "max_additions exceeded",
+            {"strategy": "milp"},
+            "milp",
+            parameters,
+            before,
+            before,
+            "max-additions",
+        )
+    existing = {reaction.id for reaction in working.reactions}
+    if any(reaction.id in existing for reaction in additions):
+        return GapfillResult(
+            working,
+            [],
+            {},
+            "failed",
+            "reaction-ID collision",
+            {"strategy": "milp"},
+            "milp",
+            parameters,
+            before,
+            before,
+            "reaction-id-collision",
+        )
+    working.add_reactions([reaction.copy() for reaction in additions])
+    solution = working.optimize()
+    status = (
+        "solved"
+        if solution.status == "optimal"
+        and abs(solution.fluxes[parameters["objective"]]) >= parameters["minimum_flux"]
+        else "failed"
+    )
+    return GapfillResult(
+        working,
+        [reaction.id for reaction in additions],
+        {reaction.id: "selected" for reaction in additions},
+        status,
+        None if status == "solved" else "configured objective is infeasible",
+        {
+            "strategy": "milp",
+            "solver": str(working.solver),
+            "cobra_version": cobra.__version__,
+        },
+        "milp",
+        parameters,
+        before,
+        _metrics(working),
+        "objective-feasible" if status == "solved" else "objective-infeasible",
+    )
+
+
+def gapfill_model(
+    model: Any, *, method: str, parameters: dict[str, Any] | None = None
+) -> GapfillResult:
+    """Gap-fill a copied COBRApy or JSON model with one standalone method."""
+    try:
+        values = _resolved_parameters(method, dict(parameters or {}))
+        return (
+            _run_milp(model, values)
+            if method == "milp"
+            else _run_transport(model, method, values)
+        )
+    except Exception as error:
+        return GapfillResult(
+            _candidate_model_copy(model),
+            [],
+            {},
+            "failed",
+            str(error),
+            {"strategy": method},
+            method,
+            dict(parameters or {}),
+            stop_reason="validation-or-execution-error",
+        )

@@ -65,6 +65,19 @@ validation, semantic β1-to-β2 diff, unresolved records, provenance, and a
 summary. Resume reuses valid attempts; forcing a stage invalidates that stage
 and its descendants while preserving previous attempt directories.
 
+## Optional post-β2 gapfill
+
+Gap filling is a separate, optional operation after a β2 release candidate;
+it is not a β2 stage or release-gate input. For example:
+
+```bash
+thg-gapfill --model runs/beta2/artifacts/export-beta2/attempt-0001/thg-beta2-candidate.json --method greedy --output-dir runs/beta2-gapfill
+```
+
+The same command accepts external JSON or SBML models. A caller, not the β2
+workflow, chooses whether downstream work consumes its original model or the
+standalone gap-filled output.
+
 Python release API:
 
 - [`thg_protocol.curation.beta2.resolve_gpr_locations`](../api/workflows.md#thg_protocol.curation.beta2.resolve_gpr_locations)

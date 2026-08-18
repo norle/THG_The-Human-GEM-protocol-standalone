@@ -10,6 +10,7 @@ from .core import (
     GapfillCandidate,
     GapfillResult,
     GapfillStrategy,
+    gapfill_model,
     generate_candidates,
     run_gapfill,
     run_phase1,
@@ -20,6 +21,7 @@ from .core import (
 
 __all__ = [
     "generate_candidates",
+    "gapfill_model",
     "run_phase1",
     "run_phase2",
     "run_phase3",

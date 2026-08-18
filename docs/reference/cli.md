@@ -11,7 +11,7 @@
 | `thg-run status RUN_DIR [--json]` | Inspect run state |
 | `thg-run unlock RUN_DIR [--force]` | Remove a stale lock deliberately |
 | `thg-compare ...` | Compare models; add `--semantic` for semantic JSON output |
-| `thg-gapfill ...` | Run the gapfill pipeline |
+| `thg-gapfill --model MODEL --method {milp,greedy,deadends} --output-dir DIR` | Run standalone gap filling; optional `--parameters`, `--max-additions`, and repeated `--allowed-connection c:e` |
 | `thg-pathway ...` | Apply a pathway configuration |
 
 Add `-v`/`--verbose` to a starting or resume command to see live stage-level

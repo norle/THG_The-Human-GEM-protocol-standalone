@@ -6,7 +6,7 @@ points are documented on the [CLI page](cli.md).
 
 ## Recommended entry points
 
-Use [`run_pipeline`][thg_protocol.gapfill.core.run_pipeline],
+Use [`gapfill_model`][thg_protocol.gapfill.core.gapfill_model],
 [`implement_pathway_files`][thg_protocol.pathway.workflow.implement_pathway_files],
 [`merge_models`][thg_protocol.merge.merge_models], or
 [`reduce_model_by_activity`][thg_protocol.cell_specific.reduce_model_by_activity]
@@ -154,6 +154,8 @@ restartable engineering DAG.
     options:
       members:
         - generate_candidates
+        - gapfill_model
+        - GapfillResult
         - run_phase1
         - run_phase2
         - run_phase3

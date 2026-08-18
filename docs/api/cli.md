@@ -5,7 +5,7 @@ require explicit input and output paths for actual work.
 
 | Command | Python entry point | Purpose |
 | --- | --- | --- |
-| `thg-gapfill` | `thg_protocol.gapfill.cli:main` | Deterministic three-phase JSON gapfill |
+| `thg-gapfill` | `thg_protocol.gapfill.cli:main` | Standalone COBRA JSON/SBML gap filling |
 | `thg-pathway` | `thg_protocol.pathway.cli:main` | Apply a pathway configuration to a JSON model |
 | `thg-compare` | `thg_protocol.analysis.compare_cli:main` | Compare model reactions and write CSV reports |
 | `thg-run` | `thg_protocol.workflow.cli:main` | Start and resume a checksum-verified workflow DAG |
