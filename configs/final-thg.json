@@ -7,7 +7,7 @@
   "final_thg": {
     "beta2_upstream": {
       "run_dir": "../runs/beta2",
-      "stage_id": "beta2-export",
+      "stage_id": "export-beta2",
       "role": "model"
     },
     "database_upstream": {
