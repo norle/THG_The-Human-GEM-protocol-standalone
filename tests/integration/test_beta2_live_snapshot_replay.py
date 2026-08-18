@@ -131,6 +131,7 @@ def test_live_smoke_snapshot_replay_is_semantically_identical(tmp_path, monkeypa
             }
 
     def fake_locations(*args, **kwargs):
+        assert "ensembl_client" not in kwargs
         del args, kwargs
         return {}, {"Mitochondria": "(G)"}, {}, {}
 
@@ -157,6 +158,12 @@ def test_live_smoke_snapshot_replay_is_semantically_identical(tmp_path, monkeypa
     )
     start(live_config)
     assert get_status(live_run)["overall_status"] == "completed"
+    for role in (
+        "fallback-checkpoint",
+        "rhea-checkpoint",
+        "reactome-checkpoint",
+    ):
+        assert _stage_artifact(live_run, "collect-gpr-evidence", role).is_file()
     assert (
         calls.count("1.1.1.1")
         == calls.count("2.2.2.2")

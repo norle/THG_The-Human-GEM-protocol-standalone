@@ -117,6 +117,149 @@ def test_reactome_only_emits_and_for_an_explicit_complex():
     )
 
 
+def test_reactome_search_uses_content_service_endpoint_for_numeric_rhea_ids(
+    monkeypatch,
+):
+    calls = []
+
+    class Response:
+        content = b'{"results": [{"entries": [{"stId": "R-HSA-1"}]}]}'
+
+        def json(self):
+            return {"results": [{"entries": [{"stId": "R-HSA-1"}]}]}
+
+    def fake_request(_session, _method, url, **_kwargs):
+        calls.append(url)
+        return Response()
+
+    monkeypatch.setattr(reactome, "request", fake_request)
+
+    result = reactome.ReactomeClient(session=object()).reactions_for_rhea("34019")
+
+    assert result == [{"stId": "R-HSA-1"}]
+    assert calls == [
+        "https://reactome.org/ContentService/search/query?query=RHEA%3A34019&types=Reaction"
+    ]
+
+
+def test_reactome_search_treats_no_match_as_empty(monkeypatch):
+    class Error(Exception):
+        response = type("Response", (), {"status_code": 404})()
+
+    def fake_request(_session, _method, _url, **_kwargs):
+        raise Error("not found")
+
+    monkeypatch.setattr(reactome, "request", fake_request)
+
+    assert reactome.ReactomeClient(session=object()).reactions_for_rhea("34019") == []
+
+
+def test_reactome_search_skips_unavailable_requests(monkeypatch):
+    class Error(Exception):
+        response = type("Response", (), {"status_code": 521})()
+
+    def fake_request(_session, _method, _url, **_kwargs):
+        raise Error("unavailable")
+
+    monkeypatch.setattr(reactome, "request", fake_request)
+
+    client = reactome.ReactomeClient(session=object())
+    assert client.reactions_for_rhea("34019") == []
+    assert client.failed_requests == 1
+
+
+def test_uniprot_search_deduplicates_and_batches_identifiers(monkeypatch):
+    calls = []
+
+    class Response:
+        content = b'{"results": []}'
+
+        def json(self):
+            return {"results": []}
+
+    def fake_request(_session, _method, _url, **kwargs):
+        calls.append(kwargs["params"]["query"])
+        return Response()
+
+    monkeypatch.setattr(uniprot, "request", fake_request)
+
+    identifiers = [f"GENE{index}" for index in range(101)] + ["GENE0"]
+    assert uniprot.UniProtClient(session=object()).annotations_for(identifiers) == []
+    assert [query.count("gene:") for query in calls] == [100, 1]
+    assert " OR " in calls[0]
+    assert calls[0].split(" OR ").count("gene:GENE0") == 1
+
+
+def test_uniprot_search_uses_cross_references_for_ensembl_identifiers(monkeypatch):
+    class Response:
+        content = b'{"results": []}'
+
+        def json(self):
+            return {"results": []}
+
+    calls = []
+
+    def fake_request(_session, _method, _url, **kwargs):
+        calls.append(kwargs["params"]["query"])
+        return Response()
+
+    monkeypatch.setattr(uniprot, "request", fake_request)
+
+    uniprot.UniProtClient(session=object()).annotations_for(
+        ["ENSG00000000419", "DPM1"]
+    )
+
+    assert calls == ["gene:DPM1 OR xref:ensembl-ENSG00000000419"]
+
+
+def test_uniprot_search_preserves_matched_ensembl_gene_identifier(monkeypatch):
+    class Response:
+        content = b'{"results": []}'
+
+        def json(self):
+            return {
+                "results": [
+                    {
+                        "primaryAccession": "Q5QPJ9",
+                        "genes": [{"geneName": {"value": "DPM1"}}],
+                        "uniProtKBCrossReferences": [
+                            {
+                                "database": "Ensembl",
+                                "id": "ENST00000413082.1",
+                                "properties": [
+                                    {
+                                        "key": "GeneId",
+                                        "value": "ENSG00000000419.15",
+                                    }
+                                ],
+                            }
+                        ],
+                        "comments": [
+                            {
+                                "commentType": "SUBCELLULAR LOCATION",
+                                "subcellularLocations": [
+                                    {
+                                        "location": {
+                                            "value": "Cytoplasm",
+                                            "id": "SL-0086",
+                                        }
+                                    }
+                                ],
+                            }
+                        ],
+                    }
+                ]
+            }
+
+    monkeypatch.setattr(uniprot, "request", lambda *_args, **_kwargs: Response())
+
+    annotations = uniprot.UniProtClient(session=object()).annotations_for(
+        ["ENSG00000000419"]
+    )
+    assert [item.gene_id for item in annotations] == ["ENSG00000000419"]
+    assert StaticUniProtClient(annotations).annotations_for(["ENSG00000000419"])
+
+
 def test_uniprot_sl_to_go_mapping_is_location_specific():
     result = StaticUniProtClient(
         [

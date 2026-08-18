@@ -3,7 +3,7 @@ from thg_protocol.gpr.lookup import get_gpr
 from thg_protocol.model_build.mass_balance import reformulate_glycan_equation
 from thg_protocol.services.biocyc import BioCycClient, StaticBioCycClient
 from thg_protocol.services.ensembl import EnsemblAnnotation, StaticEnsemblClient
-from thg_protocol.services.kegg import KeggClient, StaticKeggClient
+from thg_protocol.services.kegg import KeggClient, KeggError, StaticKeggClient
 from thg_protocol.services.location import StaticLocationClient
 
 
@@ -183,6 +183,43 @@ def test_kegg_database_batch_uses_database_prefix():
         "C00001": "ENTRY       C00001\nNAME        water\n"
     }
     assert session.calls[0][0] == "https://rest.kegg.jp/get/cpd:C00001"
+
+
+def test_kegg_ec_gene_batch_uses_link_endpoint():
+    class Response:
+        text = "ec:1.2.3.4\thsa:1234\nec:1.2.3.5\thsa:5678\n"
+
+        def raise_for_status(self):
+            return None
+
+    class Session:
+        def __init__(self):
+            self.calls = []
+
+        def get(self, url, timeout):
+            self.calls.append((url, timeout))
+            return Response()
+
+    session = Session()
+    client = KeggClient(session=session, retries=0)
+
+    assert client.link_ecs_to_genes(
+        ["1.2.3.4", "1.2.3.5"], requests_per_second=1000
+    ) == {"1.2.3.4": ["1234"], "1.2.3.5": ["5678"]}
+    assert session.calls[0][0] == (
+        "https://rest.kegg.jp/link/hsa/ec:1.2.3.4+ec:1.2.3.5"
+    )
+
+
+def test_kegg_ec_gene_batch_omits_failed_requests_for_serial_fallback():
+    client = KeggClient(session=object(), retries=0)
+
+    def fail(_url):
+        raise KeggError("unavailable")
+
+    client._get = fail
+
+    assert client.link_ecs_to_genes(["1.2.3.4"]) == {}
 
 
 def test_static_location_client_and_package_location_resolution():

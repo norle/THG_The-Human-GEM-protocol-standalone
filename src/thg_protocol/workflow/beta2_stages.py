@@ -4,16 +4,25 @@ from __future__ import annotations
 
 import ast
 import json
+import logging
 import platform
 import shutil
 from collections.abc import Mapping
 from pathlib import Path
 from typing import Any
 
+try:
+    from tqdm import tqdm
+except ImportError:  # pragma: no cover - exercised by clean-wheel checks
+    def tqdm(iterable: object, **_kwargs: object) -> object:
+        return iterable
+
 from .artifacts import resolve_artifact, upstream_fingerprint
 from .hashing import sha256_file
 from .parallel import parallel_map
 from .stages import StageContext, StageResult, _dependency_path, _load_cobra_model
+
+LOGGER = logging.getLogger("thg_protocol.workflow")
 
 DETAILED_BETA2_STAGE_IDS = (
     "load-beta1",
@@ -39,6 +48,25 @@ def _dump(path: Path, value: object) -> Path:
         json.dumps(value, indent=2, sort_keys=True) + "\n", encoding="utf-8"
     )
     return path
+
+
+def _gpr_checkpoint(
+    work_dir: Path,
+    phase: str,
+    candidates: Mapping[str, object],
+    source_metadata: Mapping[str, object],
+) -> Path:
+    return _dump(
+        work_dir / f"beta2-gpr-{phase}-checkpoint.json",
+        {
+            "schema_version": 1,
+            "phase": phase,
+            "records": {
+                key: candidates[key] for key in sorted(candidates)
+            },
+            "source_metadata": dict(source_metadata),
+        },
+    )
 
 
 def _section(context: StageContext) -> Mapping[str, object]:
@@ -406,6 +434,12 @@ class DetailedBeta2Stage:
                     requests.setdefault(ec, []).append(str(reaction.id))
             candidates: dict[str, dict[str, object]] = {}
             source_metadata: dict[str, object] = {}
+            LOGGER.debug(
+                "collect-gpr-evidence: %d reactions, %d unique ECs, mode=%s",
+                len(model.reactions),
+                len(requests),
+                mode,
+            )
             if mode == "live":
                 from thg_protocol.gpr.lookup import get_gpr_evidence
                 from thg_protocol.services.biocyc import (
@@ -425,11 +459,35 @@ class DetailedBeta2Stage:
                     else StaticBioCycClient()
                 )
                 kegg_client = KeggClient()
-                for ec in sorted(requests):
+                kegg_genes_by_ec = (
+                    kegg_client.link_ecs_to_genes(sorted(requests))
+                    if not biocyc_enabled
+                    else {}
+                )
+                if not biocyc_enabled:
+                    found = sum(bool(genes) for genes in kegg_genes_by_ec.values())
+                    LOGGER.info(
+                        "collect-gpr-evidence: KEGG returned no genes for %d/%d ECs",
+                        len(requests) - found,
+                        len(requests),
+                    )
+                for ec in tqdm(
+                    sorted(requests),
+                    desc=(
+                        "BioCyc / KEGG GPR lookup"
+                        if biocyc_enabled
+                        else "KEGG GPR lookup"
+                    ),
+                    unit="EC",
+                    disable=not LOGGER.isEnabledFor(logging.DEBUG),
+                ):
                     candidates[ec] = get_gpr_evidence(
                         ec,
                         biocyc_client=biocyc_client,
                         kegg_client=kegg_client,
+                        kegg_genes=kegg_genes_by_ec.get(ec)
+                        if not biocyc_enabled
+                        else None,
                     )
                     if getattr(biocyc_client, "metadata", None):
                         source_metadata["biocyc"] = dict(biocyc_client.metadata)
@@ -440,11 +498,18 @@ class DetailedBeta2Stage:
                     ec = str(item.get("ec", "")).strip()
                     if ec:
                         candidates[ec] = dict(item)
+            fallback_checkpoint = _gpr_checkpoint(
+                work_dir, "fallback", candidates, source_metadata
+            )
             configured_reaction_sources = section.get("reaction_sources", [])
             reaction_sources = (
                 {str(item).lower() for item in configured_reaction_sources}
                 if isinstance(configured_reaction_sources, list)
                 else set()
+            )
+            LOGGER.debug(
+                "collect-gpr-evidence: reaction sources=%s",
+                ", ".join(sorted(reaction_sources)) or "none",
             )
             if "rhea" in reaction_sources:
                 from thg_protocol.services.rhea import RheaClient, StaticRheaClient
@@ -475,7 +540,12 @@ class DetailedBeta2Stage:
                         if isinstance(value, list)
                     },
                 )
-                for ec in sorted(requests):
+                for ec in tqdm(
+                    sorted(requests),
+                    desc="Rhea",
+                    unit="EC",
+                    disable=not LOGGER.isEnabledFor(logging.DEBUG),
+                ):
                     if ec in candidates:
                         continue
                     reaction_matches = rhea.reactions_for_ec(ec)
@@ -602,6 +672,9 @@ class DetailedBeta2Stage:
                             else {},
                         },
                     )
+            rhea_checkpoint = _gpr_checkpoint(
+                work_dir, "rhea", candidates, source_metadata
+            )
             if mode == "live" and "reactome" in reaction_sources:
                 from thg_protocol.services.reactome import (
                     ReactomeClient,
@@ -611,7 +684,12 @@ class DetailedBeta2Stage:
                 reactome = ReactomeClient(
                     release=_source_release(section, "reactome")
                 )
-                for _ec, candidate in candidates.items():
+                for _ec, candidate in tqdm(
+                    candidates.items(),
+                    desc="Reactome",
+                    unit="candidate",
+                    disable=not LOGGER.isEnabledFor(logging.DEBUG),
+                ):
                     rhea_id = candidate.get("rhea_id")
                     if not rhea_id:
                         continue
@@ -627,6 +705,12 @@ class DetailedBeta2Stage:
                         candidate["source_metadata"] = dict(reactome.metadata)
                 if reactome.metadata:
                     source_metadata["reactome"] = dict(reactome.metadata)
+                if reactome.failed_requests:
+                    LOGGER.warning(
+                        "collect-gpr-evidence: skipped %d unavailable "
+                        "Reactome requests",
+                        reactome.failed_requests,
+                    )
             if "reactome" in reaction_sources:
                 reactome_file = section.get("reactome_snapshot")
                 if isinstance(reactome_file, str) and Path(reactome_file).is_file():
@@ -657,6 +741,9 @@ class DetailedBeta2Stage:
                                     "release": _source_release(section, "reactome"),
                                 },
                             }
+            reactome_checkpoint = _gpr_checkpoint(
+                work_dir, "reactome", candidates, source_metadata
+            )
             records: list[dict[str, object]] = []
             for reaction_id in sorted(str(item.id) for item in model.reactions):
                 if reaction_id in snapshot_by_reaction:
@@ -693,6 +780,11 @@ class DetailedBeta2Stage:
                     str(item.get("ec", "")),
                 )
             )
+            LOGGER.debug(
+                "collect-gpr-evidence: completed %d records, %d candidates",
+                len(records),
+                len(candidates),
+            )
             output = work_dir / "beta2-gpr-evidence.jsonl"
             output.write_text(
                 "".join(json.dumps(item, sort_keys=True) + "\n" for item in records)
@@ -707,7 +799,12 @@ class DetailedBeta2Stage:
                 encoding="utf-8",
             )
             return StageResult(
-                (("evidence", output),),
+                (
+                    ("evidence", output),
+                    ("fallback-checkpoint", fallback_checkpoint),
+                    ("rhea-checkpoint", rhea_checkpoint),
+                    ("reactome-checkpoint", reactome_checkpoint),
+                ),
                 {"records": len(records), "unique_ec": len(requests)},
             )
         if self.id == "resolve-gprs":
@@ -1008,7 +1105,9 @@ class DetailedBeta2Stage:
                     uniprot_client = UniProtClient(
                         release=_source_release(section, "uniprot")
                     )
-                    annotations = uniprot_client.annotations_for(model_genes)
+                    annotations = uniprot_client.annotations_for(
+                        model_genes, progress=LOGGER.isEnabledFor(logging.DEBUG)
+                    )
                     if uniprot_client.metadata:
                         source_metadata["uniprot"] = dict(uniprot_client.metadata)
                 for annotation in StaticUniProtClient(annotations).annotations_for(
@@ -1029,7 +1128,7 @@ class DetailedBeta2Stage:
                     )
             if mode == "live":
                 from thg_protocol.gpr.location import resolve_locations
-                from thg_protocol.services.ensembl import EnsemblClient
+                from thg_protocol.services.location import LocationClient
 
                 registry = normalize_compartment_registry(
                     section.get("compartments")
@@ -1037,19 +1136,23 @@ class DetailedBeta2Stage:
                     else None
                 )
                 allowed = set(registry.values())
-                model = _model(context, "resolve-gprs")
-                ensembl = EnsemblClient()
-                for reaction in model.reactions:
-                    for gene in sorted(str(item.id) for item in reaction.genes):
-                        if gene in records:
-                            continue
+                location_client = LocationClient()
+                for gene in tqdm(
+                    sorted(set(model_genes) - set(records)),
+                    desc="UniProt legacy locations",
+                    unit="gene",
+                    disable=not LOGGER.isEnabledFor(logging.DEBUG),
+                ):
+                    if gene.startswith("ENS"):
+                        plain = {}
+                    else:
                         try:
                             plain = resolve_locations(
                                 gene,
                                 [gene],
                                 [gene],
                                 allowed_locations=allowed,
-                                ensembl_client=ensembl,
+                                location_client=location_client,
                                 fallback_location=section.get("fallback_location")
                                 if isinstance(section.get("fallback_location"), str)
                                 else None,
@@ -1065,16 +1168,16 @@ class DetailedBeta2Stage:
                                 "warnings": [str(error)],
                                 "evidence_id": f"gene-location:{gene}",
                             }
-                        if gene not in records:
-                            locations = sorted(plain)
-                            records[gene] = {
-                                "raw_locations": locations,
-                                "locations": locations,
-                                "status": "resolved" if locations else "unresolved",
-                                "source": "uniprot",
-                                "confidence": "supporting",
-                                "evidence_id": f"gene-location:{gene}",
-                            }
+                    if gene not in records:
+                        locations = sorted(plain)
+                        records[gene] = {
+                            "raw_locations": locations,
+                            "locations": locations,
+                            "status": "resolved" if locations else "unresolved",
+                            "source": "uniprot",
+                            "confidence": "supporting",
+                            "evidence_id": f"gene-location:{gene}",
+                        }
             return StageResult(
                 (
                     (

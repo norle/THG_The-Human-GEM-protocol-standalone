@@ -50,6 +50,17 @@ def test_empty_static_lookup_is_offline() -> None:
     ) == ([], "", "", "", "")
 
 
+def test_batched_kegg_empty_result_skips_serial_ec_page_fallback() -> None:
+    evidence = get_gpr_evidence(
+        "1.2.3.4",
+        biocyc_client=StaticBioCycClient(),
+        kegg_client=StaticKeggClient(ec_pages={"1.2.3.4": "hsa:1234"}),
+        kegg_genes=[],
+    )
+
+    assert evidence["status"] == "unresolved"
+
+
 def test_parser_ignores_enzyme_tooltip_and_keeps_gene_records() -> None:
     page = (
         Path(__file__).parents[1] / "fixtures/biocyc/ec-enzyme-and-gene.html"

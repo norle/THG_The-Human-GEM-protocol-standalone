@@ -6,6 +6,7 @@ import hashlib
 from collections.abc import Mapping
 from dataclasses import dataclass, field
 from typing import Protocol
+from urllib.parse import quote, urlencode
 
 from ._http import request
 
@@ -67,7 +68,7 @@ def catalyst_candidate_gpr(record: Mapping[str, object]) -> str:
 
 
 class ReactomeClient(StaticReactomeClient):
-    base_url = "https://reactome.org/ContentService/data"
+    base_url = "https://reactome.org/ContentService"
 
     def __init__(
         self,
@@ -82,6 +83,24 @@ class ReactomeClient(StaticReactomeClient):
         self.timeout = timeout
         self.source_release = release
         self.metadata: dict[str, object] = {}
+        self.failed_requests = 0
+
+    def _unavailable(self, error: Exception) -> bool:
+        status_code = getattr(getattr(error, "response", None), "status_code", None)
+        if status_code == 404:
+            return True
+        if status_code in {408, 425, 429} or (
+            isinstance(status_code, int) and status_code >= 500
+        ):
+            self.failed_requests += 1
+            return True
+        if (
+            requests is not None
+            and isinstance(error, requests.RequestException)
+        ) or isinstance(error, ValueError):
+            self.failed_requests += 1
+            return True
+        return False
 
     def _remote(self, path: str) -> object:
         if self.session is None:
@@ -107,14 +126,38 @@ class ReactomeClient(StaticReactomeClient):
         local = super().reactions_for_rhea(rhea_id)
         if local:
             return local
-        payload = self._remote(f"/search/query?query={rhea_id}")
-        return list(payload.get("results", [])) if isinstance(payload, Mapping) else []
+        identifier = str(rhea_id).split(":", 1)[-1]
+        query = urlencode(
+            {"query": f"RHEA:{identifier}", "types": "Reaction"}
+        )
+        try:
+            payload = self._remote(f"/search/query?{query}")
+        except Exception as error:
+            if self._unavailable(error):
+                return []
+            raise
+        if not isinstance(payload, Mapping):
+            return []
+        matches = []
+        for group in payload.get("results", []):
+            if isinstance(group, Mapping) and isinstance(group.get("entries"), list):
+                matches.extend(
+                    item for item in group["entries"] if isinstance(item, Mapping)
+                )
+            elif isinstance(group, Mapping) and group.get("stId"):
+                matches.append(group)
+        return matches
 
     def reaction(self, reactome_id: str) -> Mapping[str, object] | None:
         local = super().reaction(reactome_id)
         if local is not None:
             return local
-        payload = self._remote(f"/query/{reactome_id}")
+        try:
+            payload = self._remote(f"/data/query/{quote(str(reactome_id), safe='')}")
+        except Exception as error:
+            if self._unavailable(error):
+                return None
+            raise
         return payload if isinstance(payload, Mapping) else None
 
 

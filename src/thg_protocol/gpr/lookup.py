@@ -158,6 +158,7 @@ def get_gpr_evidence(
     *,
     biocyc_client: BioCycClientProtocol | None = None,
     kegg_client: KeggClientProtocol | None = None,
+    kegg_genes: list[str] | None = None,
 ) -> dict[str, object]:
     """Resolve an EC number and retain source/fallback provenance."""
     from datetime import datetime, timezone
@@ -190,10 +191,15 @@ def get_gpr_evidence(
     if not symbols:
         kegg_client = kegg_client or KeggClient()
         try:
-            page = kegg_client.get_page(f"https://rest.kegg.jp/link/hsa/ec:{ec_number}")
-            if not page:
-                page = kegg_client.get_ec_html(ec_number)
-            symbols = _kegg_genes(page)
+            if kegg_genes is None:
+                page = kegg_client.get_page(
+                    f"https://rest.kegg.jp/link/hsa/ec:{ec_number}"
+                )
+                if not page:
+                    page = kegg_client.get_ec_html(ec_number)
+                symbols = _kegg_genes(page)
+            else:
+                symbols = sorted(set(kegg_genes))
             identifiers = list(symbols)
             source = "kegg" if symbols else ""
         except Exception as error:

@@ -11,8 +11,69 @@
       "stage_id": "export-beta1",
       "role": "model"
     },
+    "evidence_mode": "live",
+    "gpr_policy": "model-then-ec",
+    "location_policy": "provided-then-evidence",
+    "compartments": {
+      "a": "cell membrane",
+      "c": "cytosol",
+      "ci": "cilium",
+      "ck": "cytoskeleton",
+      "e": "extracellular",
+      "g": "golgi apparatus",
+      "i": "inner mitochondria",
+      "l": "lysosome",
+      "m": "mitochondria",
+      "n": "nucleus",
+      "r": "endoplasmic reticulum",
+      "v": "vesicle",
+      "x": "peroxisome"
+    },
+    "compartment_go_terms": {
+      "a": "GO:0005886",
+      "c": "GO:0005829",
+      "ci": "GO:0005929",
+      "ck": "GO:0005856",
+      "e": "GO:0005615",
+      "g": "GO:0005794",
+      "i": "GO:0005743",
+      "l": "GO:0005764",
+      "m": "GO:0005739",
+      "n": "GO:0005634",
+      "r": "GO:0005783",
+      "v": "GO:0031982",
+      "x": "GO:0005777"
+    },
+    "location_sources": [
+      "goa",
+      "uniprot"
+    ],
+    "reaction_sources": [
+      "rhea",
+      "reactome"
+    ],
+    "go_ontology_url": "https://release.geneontology.org/2026-06-19/ontology/go-basic.obo",
+    "go_ontology_release": "2026-06-19",
+    "source_releases": {
+      "go": {
+        "release": "2026-06-19",
+        "url": "https://release.geneontology.org/2026-06-19/ontology/go-basic.obo"
+      },
+      "goa": {
+        "release": "232"
+      },
+      "uniprot": {
+        "release": "2026_02"
+      },
+      "rhea": {
+        "release": "141"
+      },
+      "reactome": {
+        "release": "97"
+      }
+    },
     "mode": "apply-all",
-    "fallback_location": "cytosol",
+    "fallback_location": null,
     "uncertainty_policy": "report"
   }
 }

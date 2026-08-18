@@ -38,6 +38,14 @@ class KeggClientProtocol(Protocol):
 
     def link_ec_to_ko(self, ec_number: str) -> str: ...
 
+    def link_ecs_to_genes(
+        self,
+        ec_numbers: Iterable[str],
+        *,
+        batch_size: int = 10,
+        requests_per_second: float = 3,
+    ) -> dict[str, list[str]]: ...
+
     def link_ko_to_genes(self, ko_identifiers: list[str]) -> str: ...
 
     def get_reaction_entries(
@@ -55,6 +63,7 @@ class StaticKeggClient:
 
     ec_pages: dict[str, str] = field(default_factory=dict)
     ec_to_ko: dict[str, str] = field(default_factory=dict)
+    ec_to_genes: dict[str, list[str]] = field(default_factory=dict)
     ko_to_genes: dict[tuple[str, ...], str] = field(default_factory=dict)
     reaction_entries: dict[str, str] = field(default_factory=dict)
     pages: dict[str, str] = field(default_factory=dict)
@@ -84,6 +93,20 @@ class StaticKeggClient:
 
     def link_ec_to_ko(self, ec_number: str) -> str:
         return self.ec_to_ko.get(str(ec_number), "")
+
+    def link_ecs_to_genes(
+        self,
+        ec_numbers: Iterable[str],
+        *,
+        batch_size: int = 10,
+        requests_per_second: float = 3,
+    ) -> dict[str, list[str]]:
+        del batch_size, requests_per_second
+        return {
+            str(ec): sorted(set(self.ec_to_genes.get(str(ec), [])))
+            for ec in ec_numbers
+            if str(ec) in self.ec_to_genes
+        }
 
     def link_ko_to_genes(self, ko_identifiers: list[str]) -> str:
         return self.ko_to_genes.get(tuple(ko_identifiers), "")
@@ -144,6 +167,49 @@ class KeggClient:
 
     def link_ec_to_ko(self, ec_number: str) -> str:
         return self._get(f"https://rest.kegg.jp/link/ko/ec:{ec_number}")
+
+    def link_ecs_to_genes(
+        self,
+        ec_numbers: Iterable[str],
+        *,
+        batch_size: int = 10,
+        requests_per_second: float = 3,
+    ) -> dict[str, list[str]]:
+        if batch_size < 1:
+            raise ValueError("batch_size must be positive")
+        if requests_per_second <= 0:
+            raise ValueError("requests_per_second must be positive")
+
+        identifiers = list(dict.fromkeys(str(ec).strip() for ec in ec_numbers))
+        identifiers = [ec for ec in identifiers if ec]
+        results: dict[str, set[str]] = {}
+        last_request_at: float | None = None
+        minimum_delay = 1.0 / requests_per_second
+
+        for start in range(0, len(identifiers), min(batch_size, 10)):
+            batch = identifiers[start : start + min(batch_size, 10)]
+            if last_request_at is not None:
+                remaining = minimum_delay - (time.monotonic() - last_request_at)
+                if remaining > 0:
+                    time.sleep(remaining)
+            query = "+".join(f"ec:{ec}" for ec in batch)
+            try:
+                text = self._get(f"https://rest.kegg.jp/link/hsa/{query}")
+            except KeggError:
+                last_request_at = time.monotonic()
+                continue
+            last_request_at = time.monotonic()
+            for ec in batch:
+                results[ec] = set()
+            for line in text.splitlines():
+                source, separator, target = line.partition("\t")
+                if not separator or not source.startswith("ec:"):
+                    continue
+                ec = source.removeprefix("ec:")
+                gene = target.removeprefix("hsa:").strip()
+                if ec in results and gene:
+                    results[ec].add(gene)
+        return {ec: sorted(genes) for ec, genes in results.items()}
 
     def link_ko_to_genes(self, ko_identifiers: list[str]) -> str:
         return self._get(f"https://rest.kegg.jp/link/genes/{'+'.join(ko_identifiers)}")

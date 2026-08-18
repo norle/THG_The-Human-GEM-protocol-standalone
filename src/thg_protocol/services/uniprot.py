@@ -7,6 +7,12 @@ from collections.abc import Iterable, Mapping
 from dataclasses import dataclass, field
 from typing import Protocol
 
+try:
+    from tqdm import tqdm
+except ImportError:  # pragma: no cover - exercised by clean-wheel checks
+    def tqdm(iterable: Iterable[object], **_kwargs: object) -> Iterable[object]:
+        return iterable
+
 from ._http import request
 
 try:
@@ -29,7 +35,7 @@ class UniProtAnnotation:
 
 class UniProtClientProtocol(Protocol):
     def annotations_for(
-        self, identifiers: Iterable[str]
+        self, identifiers: Iterable[str], *, progress: bool = False
     ) -> list[UniProtAnnotation]: ...
 
 
@@ -39,7 +45,10 @@ class StaticUniProtClient:
         default_factory=list
     )
 
-    def annotations_for(self, identifiers: Iterable[str]) -> list[UniProtAnnotation]:
+    def annotations_for(
+        self, identifiers: Iterable[str], *, progress: bool = False
+    ) -> list[UniProtAnnotation]:
+        del progress
         wanted = {str(item) for item in identifiers}
         result = []
         for raw in self.annotations:
@@ -92,37 +101,78 @@ class UniProtClient(StaticUniProtClient):
         self.source_release = release
         self.metadata: dict[str, object] = {}
 
-    def annotations_for(self, identifiers: Iterable[str]) -> list[UniProtAnnotation]:
-        wanted = [str(item) for item in identifiers]
+    def annotations_for(
+        self, identifiers: Iterable[str], *, progress: bool = False
+    ) -> list[UniProtAnnotation]:
+        wanted = sorted(
+            {str(item).strip() for item in identifiers} - {""}
+        )
         local = super().annotations_for(wanted)
         if local or not wanted:
             return local
         if self.session is None:
             raise RuntimeError("UniProtClient requires the 'requests' dependency")
-        query = "+OR+".join(f"gene:{item}" for item in wanted)
-        response = request(
-            self.session,
-            "get",
-            self.base_url,
-            timeout=self.timeout,
-            retries=2,
-            backoff=0.5,
-            params={"query": query, "format": "json", "size": 500},
-        )
-        payload = response.json()
+        records = []
+        raw_response = hashlib.sha256()
+        for start in tqdm(
+            range(0, len(wanted), 100),
+            desc="UniProt locations",
+            unit="batch",
+            disable=not progress,
+        ):
+            query = " OR ".join(
+                (
+                    f"xref:ensembl-{item}"
+                    if item.startswith("ENS")
+                    else f"gene:{item}"
+                )
+                for item in wanted[start : start + 100]
+            )
+            response = request(
+                self.session,
+                "get",
+                self.base_url,
+                timeout=self.timeout,
+                retries=2,
+                backoff=0.5,
+                params={"query": query, "format": "json", "size": 500},
+            )
+            raw_response.update(response.content)
+            payload = response.json()
+            if isinstance(payload, Mapping):
+                records.extend(payload.get("results", []))
         self.metadata = {
             "source": "UniProt",
             "release": self.source_release,
             "url": self.base_url,
-            "raw_response_sha256": hashlib.sha256(response.content).hexdigest(),
+            "raw_response_sha256": raw_response.hexdigest(),
             "parser_version": "1",
         }
-        records = payload.get("results", []) if isinstance(payload, Mapping) else []
         parsed = []
         for record in records:
             accession = str(record.get("primaryAccession", ""))
             genes = record.get("genes", [])
             names = [item.get("geneName", {}).get("value", "") for item in genes]
+            identifiers = {accession, *names}
+            for reference in record.get("uniProtKBCrossReferences", []):
+                if (
+                    not isinstance(reference, Mapping)
+                    or reference.get("database") != "Ensembl"
+                ):
+                    continue
+                for value in [
+                    reference.get("id", ""),
+                    *(
+                        property_.get("value", "")
+                        for property_ in reference.get("properties", [])
+                        if isinstance(property_, Mapping)
+                    ),
+                ]:
+                    identifier = str(value)
+                    identifiers.update((identifier, identifier.split(".", 1)[0]))
+            gene_ids = sorted(set(wanted) & identifiers) or [
+                names[0] if names else accession
+            ]
             for location in record.get("comments", []):
                 if location.get("commentType") != "SUBCELLULAR LOCATION":
                     continue
@@ -135,28 +185,31 @@ class UniProtClient(StaticUniProtClient):
                         if isinstance(mappings, Mapping)
                         else []
                     )
-                    parsed.extend(
-                        UniProtAnnotation(
-                            names[0] if names else accession,
-                            accession,
-                            str(name),
-                            str(go_id),
-                            source_release=self.source_release,
-                            sl_id=sl_id,
-                        )
-                        for go_id in (mapped if isinstance(mapped, list) else [mapped])
-                    )
-                    if not mapped:
-                        parsed.append(
+                    for gene_id in gene_ids:
+                        parsed.extend(
                             UniProtAnnotation(
-                                names[0] if names else accession,
+                                gene_id,
                                 accession,
                                 str(name),
-                                "",
+                                str(go_id),
                                 source_release=self.source_release,
                                 sl_id=sl_id,
                             )
+                            for go_id in (
+                                mapped if isinstance(mapped, list) else [mapped]
+                            )
                         )
+                        if not mapped:
+                            parsed.append(
+                                UniProtAnnotation(
+                                    gene_id,
+                                    accession,
+                                    str(name),
+                                    "",
+                                    source_release=self.source_release,
+                                    sl_id=sl_id,
+                                )
+                            )
         return parsed
 
 
