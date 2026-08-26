@@ -6,7 +6,7 @@ import copy
 from collections.abc import Mapping
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any
+from typing import Any, Protocol
 
 
 @dataclass(frozen=True)
@@ -414,6 +414,18 @@ class RepairReport:
     changes: tuple[str, ...]
 
 
+class RepairStrategy(Protocol):
+    """Interface for an explicitly selected scientific repair strategy."""
+
+    def inspect(self, model: Any, validation: Mapping[str, object]) -> Any: ...
+
+    def propose(
+        self, model: Any, validation: Mapping[str, object], inspection: Any
+    ) -> Any: ...
+
+    def apply(self, model: Any, decisions: Any) -> tuple[Any, Any]: ...
+
+
 def bounded_repair(
     model: Any,
     *,
@@ -640,6 +652,7 @@ __all__ = [
     "MergeReport",
     "apply_merge_plan",
     "RepairReport",
+    "RepairStrategy",
     "bounded_repair",
     "generate_merge_plan",
     "merge_models",

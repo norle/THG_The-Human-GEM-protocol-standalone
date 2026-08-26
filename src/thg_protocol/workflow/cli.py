@@ -77,6 +77,8 @@ def build_parser() -> argparse.ArgumentParser:
         "reference",
         "validate",
         "compare",
+        "cell-specific",
+        "pathway",
     ):
         workflow_parser = commands.add_parser(
             workflow_id, help=f"start a {workflow_id} registered workflow"
@@ -153,6 +155,8 @@ def main(argv: list[str] | None = None) -> int:
             "reference",
             "validate",
             "compare",
+            "cell-specific",
+            "pathway",
         }:
             from .config import load_workflow_config
 

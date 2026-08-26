@@ -1,6 +1,7 @@
 import json
 
 import cobra
+import pytest
 from cobra.io import save_json_model
 
 from thg_protocol.database_workflow import harvest_snapshot, normalize_records
@@ -14,7 +15,7 @@ from thg_protocol.merge import (
 )
 from thg_protocol.workflow.config import RunSettings, WorkflowConfig
 from thg_protocol.workflow.phase4_stages import FinalTHGStage
-from thg_protocol.workflow.stages import StageContext
+from thg_protocol.workflow.stages import StageContext, StageResult
 
 
 class Adapter:
@@ -233,3 +234,15 @@ def test_bounded_repair_has_explicit_stop_conditions_and_validation():
     assert report.stop_reason == "no-changes"
     validation = validate_merged_model(model, profile="structural-fast")
     assert "validation" in validation
+
+
+def test_final_thg_validation_rejects_failed_nested_report(tmp_path):
+    report = tmp_path / "validation.json"
+    report.write_text("{}", encoding="utf-8")
+    with pytest.raises(ValueError, match="validation failed"):
+        FinalTHGStage("validate-final-thg").validate(
+            StageResult(
+                (("validation", report),),
+                {"validation": {"passed": False}, "tasks": {"passed": True}},
+            )
+        )

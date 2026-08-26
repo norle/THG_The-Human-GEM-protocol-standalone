@@ -42,6 +42,7 @@ WORKFLOW_SECTION_KEYS = {
         "task_suite",
         "validation_profile",
         "max_repair_iterations",
+        "repair_strategy",
     },
     "beta1": {
         "n_jobs",
@@ -120,6 +121,30 @@ WORKFLOW_SECTION_KEYS = {
         "memote_command",
     },
     "compare": {"left", "right", "upstream"},
+    "cell_specific": {
+        "input_model",
+        "expression_file",
+        "gene_identifier_namespace",
+        "sample",
+        "sample_aggregation",
+        "activity_strategy",
+        "reduction_strategy",
+        "threshold",
+        "unknown_gene_policy",
+        "gene_mapping",
+        "mapping_version",
+        "preserved_reactions",
+        "exchange_settings",
+        "task_suite",
+        "validation_profile",
+        "matrix_key",
+    },
+    "pathway": {
+        "input_model",
+        "pathway_definition",
+        "id_database",
+        "validation_profile",
+    },
     "gapfill": {
         "input_model",
         "external_input",
@@ -181,6 +206,12 @@ def _required_string(value: dict[str, Any], key: str, name: str) -> str:
 def _positive_integer(value: object, label: str) -> int:
     if isinstance(value, bool) or not isinstance(value, int) or value < 1:
         raise ConfigError(f"'{label}' must be a positive integer")
+    return value
+
+
+def _nonnegative_integer(value: object, label: str) -> int:
+    if isinstance(value, bool) or not isinstance(value, int) or value < 0:
+        raise ConfigError(f"'{label}' must be a non-negative integer")
     return value
 
 
@@ -285,6 +316,139 @@ def _parse_workflow(
                         MODEL_SUFFIXES,
                     )
                 )
+            if section == "final_thg":
+                value = dict(value)
+                for key in ("beta2_model", "database_model"):
+                    if key in value:
+                        value[key] = str(
+                            _input_path(
+                                _required_string(value, key, "final_thg"),
+                                input_base,
+                                f"final_thg.{key}",
+                                MODEL_SUFFIXES,
+                            )
+                        )
+                iterations = value.get("max_repair_iterations", 0)
+                value["max_repair_iterations"] = _nonnegative_integer(
+                    iterations, "final_thg.max_repair_iterations"
+                )
+                strategy = value.get("repair_strategy")
+                if strategy is not None and (
+                    not isinstance(strategy, str) or not strategy.strip()
+                ):
+                    raise ConfigError(
+                        "'final_thg.repair_strategy' must be a non-empty string"
+                    )
+                if strategy is not None:
+                    raise ConfigError(
+                        "'final_thg.repair_strategy' has no installed implementation"
+                    )
+                if value["max_repair_iterations"]:
+                    raise ConfigError(
+                        "'final_thg.repair_strategy' is required when "
+                        "max_repair_iterations is positive"
+                    )
+            if section == "cell_specific":
+                value = dict(value)
+                for key in ("input_model", "expression_file"):
+                    value[key] = str(
+                        _input_path(
+                            _required_string(value, key, "cell_specific"),
+                            input_base,
+                            f"cell_specific.{key}",
+                            MODEL_SUFFIXES if key == "input_model" else None,
+                        )
+                    )
+                _required_string(value, "gene_identifier_namespace", "cell_specific")
+                strategy = value.get("activity_strategy", "gpr-threshold")
+                if strategy not in {"gpr-threshold", "activity-matrix"}:
+                    raise ConfigError(
+                        "'cell_specific.activity_strategy' must be "
+                        "gpr-threshold or activity-matrix"
+                    )
+                reduction = value.get("reduction_strategy", strategy)
+                if reduction not in {"gpr-threshold", "activity-matrix"}:
+                    raise ConfigError(
+                        "'cell_specific.reduction_strategy' must be "
+                        "gpr-threshold or activity-matrix"
+                    )
+                policy = value.get("unknown_gene_policy", "uncertain-retain")
+                if policy not in {"uncertain-retain", "inactive", "reject"}:
+                    raise ConfigError(
+                        "'cell_specific.unknown_gene_policy' must be "
+                        "uncertain-retain, inactive, or reject"
+                    )
+                profile = value.get("validation_profile", "structural-fast")
+                from thg_protocol.validation import PROFILES
+
+                if profile not in PROFILES:
+                    raise ConfigError(
+                        f"unknown cell-specific validation profile: {profile}"
+                    )
+                threshold = value.get("threshold", 0.0)
+                if isinstance(threshold, bool) or not isinstance(
+                    threshold, (int, float)
+                ):
+                    raise ConfigError("'cell_specific.threshold' must be numeric")
+                if not isinstance(value.get("preserved_reactions", []), list):
+                    raise ConfigError(
+                        "'cell_specific.preserved_reactions' must be a list"
+                    )
+                if "task_suite" in value:
+                    value["task_suite"] = str(
+                        _input_path(
+                            _required_string(value, "task_suite", "cell_specific"),
+                            input_base,
+                        )
+                    )
+                if "gene_mapping" in value and not isinstance(
+                    value["gene_mapping"], dict
+                ):
+                    raise ConfigError("'cell_specific.gene_mapping' must be an object")
+                aggregation = value.get("sample_aggregation", "mean")
+                if aggregation not in {"mean", "median", "max"}:
+                    raise ConfigError(
+                        "'cell_specific.sample_aggregation' must be mean, median, "
+                        "or max"
+                    )
+            if section == "pathway":
+                value = dict(value)
+                for key in ("input_model", "pathway_definition", "id_database"):
+                    value[key] = str(
+                        _input_path(
+                            _required_string(value, key, "pathway"),
+                            input_base,
+                            f"pathway.{key}",
+                            MODEL_SUFFIXES if key == "input_model" else None,
+                        )
+                    )
+                profile = value.get("validation_profile", "structural-fast")
+                from thg_protocol.validation import PROFILES
+
+                if profile not in PROFILES:
+                    raise ConfigError(f"unknown pathway validation profile: {profile}")
+            if section == "human_database":
+                value = dict(value)
+                value["records"] = str(
+                    _input_path(
+                        _required_string(value, "records", "human_database"),
+                        input_base,
+                        "human_database.records",
+                    )
+                )
+                if value.get("mode", "offline") not in {"offline", "live"}:
+                    raise ConfigError("'human_database.mode' must be offline or live")
+            if section == "compare":
+                value = dict(value)
+                for key in ("left", "right"):
+                    value[key] = str(
+                        _input_path(
+                            _required_string(value, key, "compare"),
+                            input_base,
+                            f"compare.{key}",
+                            MODEL_SUFFIXES,
+                        )
+                    )
             if section == "gapfill":
                 value = dict(value)
                 method = value.get("method")
@@ -447,9 +611,7 @@ def _parse_workflow(
                         raise ConfigError(
                             "'beta2.compartment_go_terms' must be an object"
                         )
-                    if compartments is None or not set(go_targets) <= set(
-                        compartments
-                    ):
+                    if compartments is None or not set(go_targets) <= set(compartments):
                         raise ConfigError(
                             "'beta2.compartment_go_terms' keys must exist in "
                             "compartments"
@@ -490,9 +652,10 @@ def _parse_workflow(
                         raise ConfigError("'beta2.source_releases' must be an object")
                     for source_name in {str(item).lower() for item in open_sources}:
                         metadata = source_releases.get(source_name)
-                        if not isinstance(metadata, dict) or not str(
-                            metadata.get("release", "")
-                        ).strip():
+                        if (
+                            not isinstance(metadata, dict)
+                            or not str(metadata.get("release", "")).strip()
+                        ):
                             raise ConfigError(
                                 "live β2 evidence requires a release for "
                                 f"'{source_name}'"

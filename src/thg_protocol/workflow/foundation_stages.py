@@ -561,6 +561,7 @@ def register_builtin_workflows(registry: Any) -> None:
     from .beta2_stages import detailed_beta2_stages
     from .gapfill_stages import Beta2GateStage, gapfill_stages
     from .registry import WorkflowDefinition, WorkflowRegistryError
+    from .scientific_stages import cell_specific_stages, compare_stages, pathway_stages
 
     reference_stages = (
         *detailed_beta1_stages(),
@@ -631,9 +632,21 @@ def register_builtin_workflows(registry: Any) -> None:
         ),
         WorkflowDefinition(
             "compare",
-            _stages("compare"),
+            compare_stages(),
             frozenset({"compare"}),
-            "Comparison foundation fixture",
+            "Semantic comparison of two explicit model inputs",
+        ),
+        WorkflowDefinition(
+            "cell-specific",
+            cell_specific_stages(),
+            frozenset({"cell_specific"}),
+            "Context-specific model reduction from normalized expression evidence",
+        ),
+        WorkflowDefinition(
+            "pathway",
+            pathway_stages(),
+            frozenset({"pathway"}),
+            "First-class pathway model implementation",
         ),
     )
     for definition in definitions:

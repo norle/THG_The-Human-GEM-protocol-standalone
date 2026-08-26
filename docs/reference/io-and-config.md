@@ -12,9 +12,9 @@ version-controlled run specifications belong under `configs/`.
 ## Workflow configuration
 
 Workflow configurations have `workflow`, `run`, and a workflow-specific
-section. Registered workflow IDs include `beta1`, `beta2`,
-`validate`, and `compare`. Generic `start` also accepts `human-database` and
-`final-thg` configurations.
+section. Registered workflow IDs include `beta1`, `beta2`, `gapfill`,
+`reference`, `cell-specific`, `pathway`, `validate`, and `compare`.
+Generic `start` also accepts `human-database` and `final-thg` configurations.
 
 ## Artifacts and provenance
 

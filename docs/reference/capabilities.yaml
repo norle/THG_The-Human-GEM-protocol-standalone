@@ -8,6 +8,7 @@ tiers:
   - rejected
 capabilities:
   - id: workflow-beta1
+    scientific_effect: mutation
     support_tier: release-supported
     owner: thg_protocol.curation.beta1
     entry_point: thg-run beta1 CONFIG
@@ -15,8 +16,12 @@ capabilities:
     implementation_status: verified
     verification: tests/integration/test_beta1_registered_workflow.py
     workflow_coverage: beta1
+    configuration_contract: workflow/config.py
+    provenance_output: manifest.json
+    validation_output: validation.json
     known_limitations: Sanctioned-input and release-gate evidence are required for promotion.
   - id: workflow-beta2
+    scientific_effect: selection
     support_tier: research-supported
     owner: thg_protocol.curation.beta2
     entry_point: thg-run beta2 CONFIG
@@ -24,8 +29,12 @@ capabilities:
     implementation_status: verified
     verification: tests/integration/test_beta2_registered_workflow.py
     workflow_coverage: beta2
+    configuration_contract: workflow/config.py
+    provenance_output: manifest.json
+    validation_output: validation.json
     known_limitations: External β1-equivalent inputs require explicit evidence.
   - id: workflow-human-database
+    scientific_effect: mutation
     support_tier: research-supported
     owner: thg_protocol.database_workflow
     entry_point: thg-run start CONFIG
@@ -33,8 +42,12 @@ capabilities:
     implementation_status: verified
     verification: tests/integration/test_phase4_workflows.py
     workflow_coverage: human-database
+    configuration_contract: workflow/config.py
+    provenance_output: provenance.json
+    validation_output: validation-report.json
     known_limitations: Live collection is injected; credentials and a paper-specific adapter are not implicit.
   - id: workflow-final-thg
+    scientific_effect: mutation
     support_tier: research-supported
     owner: thg_protocol.merge
     entry_point: thg-run start CONFIG
@@ -42,8 +55,12 @@ capabilities:
     implementation_status: verified
     verification: tests/unit/test_phase4_workflows.py
     workflow_coverage: final-thg
+    configuration_contract: workflow/config.py
+    provenance_output: provenance.json
+    validation_output: validation-report.json
     known_limitations: Exact publication-artifact reproduction is not implied.
   - id: workflow-validation
+    scientific_effect: analysis
     support_tier: release-supported
     owner: thg_protocol.validation
     entry_point: thg-run validate CONFIG
@@ -52,3 +69,39 @@ capabilities:
     verification: tests/unit/test_phase3_validation.py
     workflow_coverage: validate
     known_limitations: MEMOTE and solver stages are optional external dependencies.
+  - id: workflow-cell-specific
+    scientific_effect: selection
+    support_tier: research-supported
+    owner: thg_protocol.cell_specific
+    entry_point: thg-run cell-specific CONFIG
+    scientific_status: Reduces an explicit source GEM using versioned expression evidence.
+    implementation_status: verified
+    verification: tests/unit/test_cell_specific_api.py
+    workflow_coverage: cell-specific
+    configuration_contract: workflow/config.py
+    provenance_output: provenance.json
+    validation_output: validation-report.json
+    known_limitations: Initial evidence input is pre-normalized; raw-count normalization is not implicit.
+  - id: workflow-pathway
+    scientific_effect: mutation
+    support_tier: research-supported
+    owner: thg_protocol.pathway.workflow
+    entry_point: thg-run pathway CONFIG
+    scientific_status: Applies an explicit pathway definition to a source GEM.
+    implementation_status: verified
+    verification: tests/unit/test_pathway_api.py
+    workflow_coverage: pathway
+    configuration_contract: workflow/config.py
+    provenance_output: provenance.json
+    validation_output: validation-report.json
+    known_limitations: Pathway definitions and identifier databases are caller-supplied.
+  - id: workflow-compare
+    scientific_effect: analysis
+    support_tier: release-supported
+    owner: thg_protocol.analysis.compare
+    entry_point: thg-run compare CONFIG
+    scientific_status: Produces a semantic comparison of two explicit model inputs.
+    implementation_status: verified
+    verification: tests/unit/test_compare_api.py
+    workflow_coverage: compare
+    known_limitations: Comparison does not mutate either input model.

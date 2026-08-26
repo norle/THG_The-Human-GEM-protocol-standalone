@@ -5,6 +5,10 @@
 The Human Database workflow reconstructs a model from normalized human
 metabolite, reaction, gene, and pathway records. Offline reconstruction is a
 first-class supported path and does not perform network access.
+The registered lineage is `collect-records` → `snapshot-records` →
+`normalize-records` → `human-database-reconstruct` →
+`human-database-validate` → `human-database-export`; replay stages do not make
+network calls.
 
 ## Inputs and modes
 

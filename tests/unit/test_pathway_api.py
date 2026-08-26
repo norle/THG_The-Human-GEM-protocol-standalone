@@ -1,3 +1,8 @@
+import json
+
+import cobra
+from cobra.io import write_sbml_model
+
 import thg_protocol.pathway as pathway
 from thg_protocol.pathway.workflow import implement_pathway
 
@@ -40,6 +45,23 @@ def test_pathway_helpers_preserve_current_pure_behavior():
         "metabolites": ["MAM00027gc"],
         "reactions": ["MAR00002"],
     }
+
+
+def test_pathway_file_workflow_accepts_sbml_model_input(tmp_path):
+    model_path = tmp_path / "model.xml"
+    write_sbml_model(cobra.Model("source"), model_path)
+    config_path = tmp_path / "config.json"
+    config_path.write_text(json.dumps({"compartments": []}), encoding="utf-8")
+    database_path = tmp_path / "database.json"
+    database_path.write_text("{}", encoding="utf-8")
+    output_path = tmp_path / "output.json"
+
+    result = pathway.implement_pathway_files(
+        model_path, config_path, database_path, output_path
+    )
+
+    assert result["status"] == "validated"
+    assert output_path.is_file()
 
 
 def test_find_metabolite_robust_can_copy_formula_match_to_target_compartment():

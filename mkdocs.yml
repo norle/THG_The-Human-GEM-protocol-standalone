@@ -78,6 +78,8 @@ nav:
       - THGβ2 — Expand by GPR and location: workflows/beta2.md
       - Human Database: workflows/human-database.md
       - Final THG — Merge and validate: workflows/final-thg.md
+      - Cell-specific reduction: workflows/cell-specific.md
+      - Pathway implementation: workflows/pathway.md
       - Validation: workflows/validation.md
       - Reproducible and resumable runs: workflows/runs.md
   - Tools:

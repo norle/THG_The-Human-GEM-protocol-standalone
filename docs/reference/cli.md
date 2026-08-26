@@ -7,6 +7,8 @@
 | `thg-run beta2 CONFIG` | Start a registered β2 workflow |
 | `thg-run gapfill CONFIG` | Start a standalone, checksum-tracked gapfill workflow |
 | `thg-run reference CONFIG` | Run the canonical β1 → β2 → gapfilled reference workflow |
+| `thg-run cell-specific CONFIG` | Run context-specific reduction from expression evidence |
+| `thg-run pathway CONFIG` | Run versioned pathway implementation |
 | `thg-run validate CONFIG` | Start a registered validation workflow |
 | `thg-run compare CONFIG` | Start a registered comparison workflow |
 | `thg-run resume RUN_DIR` | Resume valid stages |

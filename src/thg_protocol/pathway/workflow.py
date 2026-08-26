@@ -139,12 +139,17 @@ def implement_pathway_files(
     id_database_path: str | Path,
     output_path: str | Path,
 ) -> dict[str, Any]:
-    """Load JSON inputs, run
+    """Load a JSON or SBML model plus JSON inputs, run
     [`implement_pathway`][thg_protocol.pathway.workflow.implement_pathway], and write
     the result."""
     paths = [Path(model_path), Path(config_path), Path(id_database_path)]
-    with paths[0].open() as handle:
-        model = json.load(handle)
+    if paths[0].suffix.lower() == ".json":
+        with paths[0].open() as handle:
+            model = json.load(handle)
+    else:
+        from cobra.io import model_to_dict, read_sbml_model
+
+        model = model_to_dict(read_sbml_model(str(paths[0])))
     with paths[1].open() as handle:
         config = json.load(handle)
     with paths[2].open() as handle:

@@ -6,9 +6,14 @@ import json
 import re
 from pathlib import Path
 
+from ruamel.yaml import YAML
+
+from thg_protocol.capabilities import validate_capability_registry
+
 ROOT = Path(__file__).parents[2]
 REGISTRY = ROOT / "docs/protocol/capability-evidence.json"
 STATUS = ROOT / "docs/protocol/implementation-status.md"
+REFERENCE_REGISTRY = ROOT / "docs/reference/capabilities.yaml"
 
 IMPLEMENTATIONS = {"Implemented", "External integration", "Archived", "Not implemented"}
 VERIFICATIONS = {
@@ -85,3 +90,8 @@ def test_maintained_docs_do_not_reintroduce_partial_status_admonitions():
         path for path in (ROOT / "docs").rglob("*.md") if "plans" not in path.parts
     ]
     assert not [path for path in documents if prohibited.search(path.read_text())]
+
+
+def test_reference_capability_registry_has_scientific_coverage():
+    payload = YAML(typ="safe").load(REFERENCE_REGISTRY.read_text(encoding="utf-8"))
+    validate_capability_registry(payload["capabilities"])
