@@ -122,19 +122,3 @@ def test_beta2_go_targets_are_validated_at_load_time(tmp_path):
     )
     with pytest.raises(ConfigError, match="must be unique"):
         load_workflow_config(path)
-
-
-def test_final_thg_rejects_uninstalled_repair_strategy(tmp_path):
-    path = tmp_path / "final-thg.json"
-    path.write_text(
-        json.dumps(
-            {
-                "workflow": "final-thg",
-                "run": {"name": "check", "output_dir": str(tmp_path / "run")},
-                "final_thg": {"repair_strategy": "future"},
-            }
-        ),
-        encoding="utf-8",
-    )
-    with pytest.raises(ConfigError, match="no installed implementation"):
-        load_workflow_config(path)

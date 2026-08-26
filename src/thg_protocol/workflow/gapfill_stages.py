@@ -15,16 +15,9 @@ from .stages import (
     StageResult,
     _dependency_path,
     _dependency_records,
+    _dump,
     _load_cobra_model,
 )
-
-
-def _dump(path: Path, value: object) -> Path:
-    path.write_text(
-        json.dumps(value, indent=2, sort_keys=True, default=str) + "\n",
-        encoding="utf-8",
-    )
-    return path
 
 
 def _section(context: StageContext) -> Mapping[str, object]:

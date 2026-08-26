@@ -2,20 +2,16 @@ import json
 
 import cobra
 import pytest
-from cobra.io import save_json_model
 
 from thg_protocol.database_workflow import harvest_snapshot, normalize_records
 from thg_protocol.merge import (
     MergePlan,
     MergePolicy,
     apply_merge_plan,
-    bounded_repair,
     generate_merge_plan,
-    validate_merged_model,
 )
-from thg_protocol.workflow.config import RunSettings, WorkflowConfig
 from thg_protocol.workflow.phase4_stages import FinalTHGStage
-from thg_protocol.workflow.stages import StageContext, StageResult
+from thg_protocol.workflow.stages import StageResult
 
 
 class Adapter:
@@ -125,115 +121,6 @@ def test_merge_policy_reports_conflicts_and_apply_adds_provenance():
     assert merged.reactions.R.gene_reaction_rule == "G1"
     assert merged.metabolites.a_c.formula == "C2"
     assert merged.metabolites.a_c.charge == 1
-
-
-def test_final_thg_fingerprint_includes_direct_input_content(tmp_path):
-    beta2 = tmp_path / "beta2.json"
-    database = tmp_path / "database.json"
-    beta2.write_text("beta2-v1", encoding="utf-8")
-    database.write_text("database-v1", encoding="utf-8")
-    config = WorkflowConfig(
-        workflow="final-thg",
-        run=RunSettings("final", tmp_path / "run"),
-        sections={
-            "final_thg": {
-                "beta2_model": str(beta2),
-                "database_model": str(database),
-            }
-        },
-    )
-    stage = FinalTHGStage("final-thg-load")
-    context = StageContext(config, tmp_path / "run", {"steps": {}})
-
-    first = stage.fingerprint_data(context)
-    beta2.write_text("beta2-v2", encoding="utf-8")
-    second = stage.fingerprint_data(context)
-
-    assert first["inputs"]["beta2_model"] != second["inputs"]["beta2_model"]
-
-
-def test_final_thg_apply_reuses_persisted_merge_plan(tmp_path, monkeypatch):
-    left = cobra.Model("left")
-    a = cobra.Metabolite("a_c", formula="C", charge=0, compartment="c")
-    b = cobra.Metabolite("b_c", formula="C", charge=0, compartment="c")
-    left.add_metabolites([a, b])
-    forward = cobra.Reaction("R_FORWARD")
-    forward.add_metabolites({a: -1, b: 1})
-    reverse = cobra.Reaction("R_REVERSE")
-    reverse.add_metabolites({b: -1, a: 1})
-    left.add_reactions([forward, reverse])
-    right = cobra.Model("right")
-
-    run_dir = tmp_path / "run"
-    load_dir = run_dir / "artifacts" / "final-thg-load" / "attempt-0001"
-    plan_dir = run_dir / "artifacts" / "final-thg-plan" / "attempt-0001"
-    load_dir.mkdir(parents=True)
-    plan_dir.mkdir(parents=True)
-    left_path = load_dir / "beta2.json"
-    right_path = load_dir / "database.json"
-    save_json_model(left, left_path)
-    save_json_model(right, right_path)
-    plan = generate_merge_plan(left, right)
-    plan_path = plan_dir / "merge-plan.json"
-    plan_path.write_text(json.dumps(plan.to_dict()), encoding="utf-8")
-
-    config = WorkflowConfig(
-        workflow="final-thg",
-        run=RunSettings("final", run_dir),
-        sections={"final_thg": {"validation_profile": "structural-fast"}},
-    )
-    context = StageContext(
-        config,
-        run_dir,
-        {
-            "steps": {
-                "final-thg-load": {
-                    "outputs": [
-                        {"role": "beta2", "path": str(left_path.relative_to(run_dir))},
-                        {
-                            "role": "database",
-                            "path": str(right_path.relative_to(run_dir)),
-                        },
-                    ]
-                },
-                "final-thg-plan": {
-                    "outputs": [
-                        {
-                            "role": "merge-plan",
-                            "path": str(plan_path.relative_to(run_dir)),
-                        }
-                    ]
-                },
-            }
-        },
-    )
-    work_dir = tmp_path / "work"
-    work_dir.mkdir()
-
-    def unexpected_plan(*args, **kwargs):
-        raise AssertionError("merge plan should have been reused")
-
-    monkeypatch.setattr("thg_protocol.merge.generate_merge_plan", unexpected_plan)
-    result = FinalTHGStage("final-thg-apply", ("final-thg-plan",)).run(
-        context, work_dir
-    )
-
-    assert (
-        json.loads((work_dir / "merge-plan.json").read_text())["plan"]
-        == plan.to_dict()
-    )
-    assert {role for role, _ in result.outputs} == {"model", "merge-plan"}
-
-
-def test_bounded_repair_has_explicit_stop_conditions_and_validation():
-    model = cobra.Model("repair")
-    repaired, report = bounded_repair(
-        model, max_iterations=2, repair=lambda item: (item, [])
-    )
-    assert repaired is not model
-    assert report.stop_reason == "no-changes"
-    validation = validate_merged_model(model, profile="structural-fast")
-    assert "validation" in validation
 
 
 def test_final_thg_validation_rejects_failed_nested_report(tmp_path):

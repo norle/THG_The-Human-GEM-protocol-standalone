@@ -10,12 +10,13 @@ from typing import Any
 
 from .artifacts import upstream_fingerprint
 from .hashing import sha256_file
-from .stages import StageContext, StageResult, _dependency_path, _load_cobra_model
-
-
-def _dump(path: Path, value: object) -> Path:
-    path.write_text(json.dumps(value, indent=2, sort_keys=True, default=str) + "\n")
-    return path
+from .stages import (
+    StageContext,
+    StageResult,
+    _dependency_path,
+    _dump,
+    _load_cobra_model,
+)
 
 
 def _copy_input(source: Path, destination: Path) -> Path:
@@ -297,12 +298,12 @@ class FinalTHGStage:
         self.id, self.dependencies = stage_id, dependencies
         self.output_role = (
             "model"
-            if stage_id in {"final-thg-merge", "apply-repair", "export-final-thg"}
+            if stage_id in {"final-thg-merge", "export-final-thg"}
             else "artifact"
         )
         self.kind = (
             "mutation"
-            if stage_id in {"final-thg-merge", "apply-repair"}
+            if stage_id == "final-thg-merge"
             else "analysis"
         )
 
@@ -378,156 +379,7 @@ class FinalTHGStage:
         return result
 
     def run(self, context: StageContext, work_dir: Path) -> StageResult:
-        if self.id in {
-            "final-thg-merge-plan",
-            "final-thg-merge",
-            "generate-repair-plan",
-            "apply-repair-decisions",
-            "apply-repair",
-            "validate-final-thg",
-            "export-final-thg",
-        }:
-            return self._run_first_class(context, work_dir)
-        section = context.config.sections.get("final_thg", {})
-        if not isinstance(section, Mapping):
-            raise ValueError("final_thg section is required")
-        if self.id == "final-thg-load":
-            from .artifacts import resolve_artifact
-
-            input_specs = []
-            for name, path_key, upstream_key in (
-                ("beta2", "beta2_model", "beta2_upstream"),
-                ("database", "database_model", "database_upstream"),
-            ):
-                if name == "beta2" and isinstance(
-                    section.get("reference_upstream"), Mapping
-                ):
-                    upstream = section["reference_upstream"]
-                else:
-                    upstream = section.get(upstream_key)
-                if isinstance(upstream, Mapping):
-                    resolved = resolve_artifact(
-                        upstream,
-                        base_dir=(
-                            context.config.source_path.parent
-                            if context.config.source_path
-                            else None
-                        ),
-                    )
-                    if resolved.reference.role not in {"model", "sbml"}:
-                        raise ValueError(
-                            f"{upstream_key} must reference a model artifact"
-                        )
-                    input_specs.append(
-                        (name, resolved.path, resolved.reference.to_dict())
-                    )
-                else:
-                    path = Path(str(section[path_key]))
-                    if not path.is_file():
-                        raise FileNotFoundError(path)
-                    input_specs.append((name, path, None))
-            copied = []
-            input_records = []
-            for name, path, upstream in input_specs:
-                destination = work_dir / f"{name}{path.suffix.lower()}"
-                shutil.copy2(path, destination)
-                copied.append((name, destination))
-                record = {"name": name, "path": str(path), "sha256": sha256_file(path)}
-                if upstream is not None:
-                    record["upstream"] = upstream
-                input_records.append(record)
-            provenance = work_dir / "input-provenance.json"
-            provenance.write_text(
-                json.dumps({"inputs": input_records}, indent=2, sort_keys=True) + "\n",
-                encoding="utf-8",
-            )
-            return StageResult(
-                (*copied, ("provenance", provenance)),
-                {"inputs": input_records},
-            )
-        from thg_protocol.merge import MergePlan, MergePolicy, generate_merge_plan
-
-        if self.id == "final-thg-plan":
-            policy = MergePolicy(
-                source_precedence=str(section.get("source_precedence", "base")),
-                direction=str(section.get("direction", "strict")),
-                proton_water=str(section.get("proton_water", "strict")),
-                formula_charge=str(section.get("formula_charge", "report")),
-                bounds=str(section.get("bounds", "report")),
-                gpr=str(section.get("gpr", "report")),
-            )
-            left = _load_cobra_model(
-                _dependency_path(context, "final-thg-load", "beta2")
-            )
-            right = _load_cobra_model(
-                _dependency_path(context, "final-thg-load", "database")
-            )
-            plan = generate_merge_plan(left, right, policy=policy)
-            output = work_dir / "merge-plan.json"
-            output.write_text(
-                json.dumps(plan.to_dict(), indent=2, sort_keys=True) + "\n",
-                encoding="utf-8",
-            )
-            return StageResult(
-                (("merge-plan", output),), {"decisions": len(plan.decisions)}
-            )
-
-        plan_source = _dependency_path(context, "final-thg-plan", "merge-plan")
-        plan = MergePlan.from_dict(json.loads(plan_source.read_text(encoding="utf-8")))
-        output = work_dir / "merge-plan.json"
-        shutil.copy2(plan_source, output)
-        left = _load_cobra_model(_dependency_path(context, "final-thg-load", "beta2"))
-        right = _load_cobra_model(
-            _dependency_path(context, "final-thg-load", "database")
-        )
-        from thg_protocol.merge import apply_merge_plan
-
-        merged, report = apply_merge_plan(left, right, plan)
-        from thg_protocol.merge import bounded_repair, validate_merged_model
-
-        merged, repair_report = bounded_repair(
-            merged, max_iterations=int(section.get("max_repair_iterations", 0))
-        )
-        from thg_protocol.tasks import TaskSuite
-
-        task_suite = TaskSuite("final-thg-empty", "1", ())
-        if isinstance(section.get("task_suite"), str):
-            from thg_protocol.tasks import load_task_suite
-
-            task_suite = load_task_suite(str(section["task_suite"]))
-        validation = validate_merged_model(
-            merged,
-            profile=str(section.get("validation_profile", "final-standard")),
-            task_suite=task_suite,
-        )
-        model_path = work_dir / "final-thg-candidate.json"
-        from cobra.io import save_json_model
-
-        save_json_model(merged, str(model_path))
-        output.write_text(
-            json.dumps(
-                {
-                    "plan": plan.to_dict(),
-                    "report": report.__dict__,
-                    "repair": repair_report.__dict__,
-                    "validation": validation,
-                },
-                indent=2,
-                sort_keys=True,
-                default=str,
-            )
-            + "\n",
-            encoding="utf-8",
-        )
-        return StageResult(
-            (("model", model_path), ("merge-plan", output)),
-            {
-                "decisions": len(plan.decisions),
-                "reactions": len(merged.reactions),
-                "repair_status": repair_report.status,
-                "validation": validation,
-            },
-        )
+        return self._run_first_class(context, work_dir)
 
     @staticmethod
     def _inputs(context: StageContext) -> tuple[Path, Path, list[dict[str, object]]]:
@@ -642,54 +494,9 @@ class FinalTHGStage:
                 ),
                 {"decisions": len(plan.decisions)},
             )
-        if self.id == "generate-repair-plan":
-            strategy = section.get("repair_strategy")
-            if strategy:
-                raise ValueError(f"repair strategy is not installed: {strategy}")
-            payload = {
-                "schema_version": 1,
-                "status": "not-requested",
-                "strategy": None,
-                "decisions": [],
-            }
-            return StageResult(
-                (("repair-plan", _dump(work_dir / "repair-plan.json", payload)),),
-                payload,
-            )
-        if self.id == "apply-repair-decisions":
-            plan = json.loads(
-                _dependency_path(
-                    context, "generate-repair-plan", "repair-plan"
-                ).read_text()
-            )
-            return StageResult(
-                (
-                    (
-                        "repair-decisions",
-                        _dump(work_dir / "repair-decisions.json", plan["decisions"]),
-                    ),
-                ),
-                {"decisions": len(plan["decisions"])},
-            )
-        if self.id == "apply-repair":
-            source = _dependency_path(context, "final-thg-merge", "model")
-            copied = _copy_input(source, work_dir / "repaired-model.json")
-            report = {
-                "status": "not-requested",
-                "iterations": 0,
-                "stop_reason": "no-repair-configured",
-                "changes": [],
-            }
-            return StageResult(
-                (
-                    ("model", copied),
-                    ("repair-report", _dump(work_dir / "repair-report.json", report)),
-                ),
-                report,
-            )
         if self.id == "validate-final-thg":
             model = _load_cobra_model(
-                _dependency_path(context, "apply-repair", "model")
+                _dependency_path(context, "final-thg-merge", "model")
             )
             task_suite = None
             if isinstance(section.get("task_suite"), str):
@@ -707,7 +514,7 @@ class FinalTHGStage:
                 (("validation", _dump(work_dir / "validation-report.json", report)),),
                 report,
             )
-        model = _load_cobra_model(_dependency_path(context, "apply-repair", "model"))
+        model = _load_cobra_model(_dependency_path(context, "final-thg-merge", "model"))
         from cobra.io import save_json_model, write_sbml_model
 
         json_model, xml_model = (
@@ -720,16 +527,11 @@ class FinalTHGStage:
             _dependency_path(context, "validate-final-thg", "validation"),
             work_dir / "validation-report.json",
         )
-        repair = _copy_input(
-            _dependency_path(context, "apply-repair", "repair-report"),
-            work_dir / "repair-report.json",
-        )
         provenance = _dump(
             work_dir / "provenance.json",
             {
                 "workflow": "final-thg",
                 "inputs": self._inputs(context)[2],
-                "repair": json.loads(repair.read_text()),
                 "software": "thg_protocol",
             },
         )
@@ -738,7 +540,6 @@ class FinalTHGStage:
                 ("model", json_model),
                 ("sbml", xml_model),
                 ("validation", validation),
-                ("repair", repair),
                 ("provenance", provenance),
             ),
             {},
@@ -754,22 +555,6 @@ class FinalTHGStage:
             if isinstance(validation, Mapping) and validation.get("passed") is False:
                 raise ValueError("final THG model validation failed")
             if isinstance(tasks, Mapping) and tasks.get("passed") is False:
-                raise ValueError("final THG metabolic task suite failed")
-        if self.id == "final-thg-apply":
-            validation = result.summary.get("validation")
-            if not isinstance(validation, Mapping):
-                raise ValueError("final THG validation report is missing")
-            validation_report = validation.get("validation")
-            tasks_report = validation.get("tasks")
-            if (
-                isinstance(validation_report, Mapping)
-                and validation_report.get("passed") is False
-            ):
-                raise ValueError("final THG model validation failed")
-            if (
-                isinstance(tasks_report, Mapping)
-                and tasks_report.get("passed") is False
-            ):
                 raise ValueError("final THG metabolic task suite failed")
 
 
@@ -791,9 +576,6 @@ def final_thg_stages() -> tuple[FinalTHGStage, ...]:
     return (
         FinalTHGStage("final-thg-merge-plan"),
         FinalTHGStage("final-thg-merge", ("final-thg-merge-plan",)),
-        FinalTHGStage("generate-repair-plan", ("final-thg-merge",)),
-        FinalTHGStage("apply-repair-decisions", ("generate-repair-plan",)),
-        FinalTHGStage("apply-repair", ("final-thg-merge", "apply-repair-decisions")),
-        FinalTHGStage("validate-final-thg", ("apply-repair",)),
-        FinalTHGStage("export-final-thg", ("apply-repair", "validate-final-thg")),
+        FinalTHGStage("validate-final-thg", ("final-thg-merge",)),
+        FinalTHGStage("export-final-thg", ("final-thg-merge", "validate-final-thg")),
     )

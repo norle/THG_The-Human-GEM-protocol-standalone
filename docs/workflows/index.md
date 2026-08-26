@@ -33,7 +33,7 @@ shows the repository's deterministic offline fixture workflow.
 - Use Human Database for normalized pathway, metabolite, reaction, and gene
   records. Live collection requires an injected adapter and credentials.
 - Use Final THG when both branches are available and you need an explicit merge
-  plan, bounded repair, and validation reports.
+  plan and validation reports.
 - Use Validation or the analysis tools independently for quality checks and
   comparisons.
 

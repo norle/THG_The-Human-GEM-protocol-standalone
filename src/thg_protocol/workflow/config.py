@@ -41,8 +41,6 @@ WORKFLOW_SECTION_KEYS = {
         "gpr",
         "task_suite",
         "validation_profile",
-        "max_repair_iterations",
-        "repair_strategy",
     },
     "beta1": {
         "n_jobs",
@@ -328,26 +326,6 @@ def _parse_workflow(
                                 MODEL_SUFFIXES,
                             )
                         )
-                iterations = value.get("max_repair_iterations", 0)
-                value["max_repair_iterations"] = _nonnegative_integer(
-                    iterations, "final_thg.max_repair_iterations"
-                )
-                strategy = value.get("repair_strategy")
-                if strategy is not None and (
-                    not isinstance(strategy, str) or not strategy.strip()
-                ):
-                    raise ConfigError(
-                        "'final_thg.repair_strategy' must be a non-empty string"
-                    )
-                if strategy is not None:
-                    raise ConfigError(
-                        "'final_thg.repair_strategy' has no installed implementation"
-                    )
-                if value["max_repair_iterations"]:
-                    raise ConfigError(
-                        "'final_thg.repair_strategy' is required when "
-                        "max_repair_iterations is positive"
-                    )
             if section == "cell_specific":
                 value = dict(value)
                 for key in ("input_model", "expression_file"):

@@ -6,7 +6,7 @@ import copy
 from collections.abc import Mapping
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Protocol
+from typing import Any
 
 
 @dataclass(frozen=True)
@@ -406,59 +406,6 @@ def apply_merge_plan(
     return merged, report
 
 
-@dataclass(frozen=True)
-class RepairReport:
-    status: str
-    iterations: int
-    stop_reason: str
-    changes: tuple[str, ...]
-
-
-class RepairStrategy(Protocol):
-    """Interface for an explicitly selected scientific repair strategy."""
-
-    def inspect(self, model: Any, validation: Mapping[str, object]) -> Any: ...
-
-    def propose(
-        self, model: Any, validation: Mapping[str, object], inspection: Any
-    ) -> Any: ...
-
-    def apply(self, model: Any, decisions: Any) -> tuple[Any, Any]: ...
-
-
-def bounded_repair(
-    model: Any,
-    *,
-    repair: Any | None = None,
-    max_iterations: int = 0,
-) -> tuple[Any, RepairReport]:
-    """Run an explicitly bounded repair callback on a copied model.
-
-    No repair is inferred by default.  A callback returns ``(model, changes)``
-    and must be deterministic; empty changes stop the loop.
-    """
-    if max_iterations < 0:
-        raise ValueError("max_iterations must be non-negative")
-    working = model.copy()
-    if repair is None or max_iterations == 0:
-        return working, RepairReport("not-requested", 0, "no-repair-configured", ())
-    changes: list[str] = []
-    for iteration in range(1, max_iterations + 1):
-        result = repair(working)
-        if not isinstance(result, tuple) or len(result) != 2:
-            raise TypeError("repair callback must return (model, changes)")
-        working, iteration_changes = result
-        current = tuple(str(item) for item in iteration_changes)
-        if not current:
-            return working, RepairReport(
-                "converged", iteration, "no-changes", tuple(changes)
-            )
-        changes.extend(current)
-    return working, RepairReport(
-        "stopped", max_iterations, "iteration-limit", tuple(changes)
-    )
-
-
 def validate_merged_model(
     model: Any,
     *,
@@ -651,9 +598,6 @@ __all__ = [
     "MergePlan",
     "MergeReport",
     "apply_merge_plan",
-    "RepairReport",
-    "RepairStrategy",
-    "bounded_repair",
     "generate_merge_plan",
     "merge_models",
     "merge_models_from_paths",

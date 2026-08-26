@@ -21,7 +21,6 @@
     "formula_charge": "report",
     "bounds": "report",
     "gpr": "report",
-    "validation_profile": "final-standard",
-    "max_repair_iterations": 0
+    "validation_profile": "final-standard"
   }
 }

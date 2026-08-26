@@ -20,7 +20,13 @@ except ImportError:  # pragma: no cover - exercised by clean-wheel checks
 from .artifacts import resolve_artifact, upstream_fingerprint
 from .hashing import sha256_file
 from .parallel import parallel_map
-from .stages import StageContext, StageResult, _dependency_path, _load_cobra_model
+from .stages import (
+    StageContext,
+    StageResult,
+    _dependency_path,
+    _dump,
+    _load_cobra_model,
+)
 
 LOGGER = logging.getLogger("thg_protocol.workflow")
 
@@ -41,13 +47,6 @@ DETAILED_BETA2_STAGE_IDS = (
     "validate-beta2",
     "export-beta2",
 )
-
-
-def _dump(path: Path, value: object) -> Path:
-    path.write_text(
-        json.dumps(value, indent=2, sort_keys=True) + "\n", encoding="utf-8"
-    )
-    return path
 
 
 def _gpr_checkpoint(

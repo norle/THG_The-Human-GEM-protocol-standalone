@@ -5,10 +5,9 @@
 Provide a verified β2/reference branch and an independently reconstructed Human
 Database branch as COBRA JSON or SBML. Preserve both inputs and their checksums.
 
-## Merge and repair
+## Merge and validation
 
 The registered workflow runs `final-thg-merge-plan` → `final-thg-merge` →
-`generate-repair-plan` → `apply-repair-decisions` → `apply-repair` →
 `validate-final-thg` → `export-final-thg`. `generate_merge_plan` creates a
 reviewable semantic plan. Matching requires
 compatible identifiers and compartments; ambiguous or conflicting matches stay
@@ -38,10 +37,7 @@ interfaces and their boundaries.
 
 Final THG currently uses `thg-run start` with `workflow: "final-thg"`; there is
 no separate `thg-run final-thg` command. The configuration selects input
-artifacts, merge policy, repair bounds, validation profile, and output directory.
-No scientific repair strategy is currently installed, so
-`max_repair_iterations: 0` is explicit; a positive value without an installed
-strategy is rejected.
+artifacts, merge policy, validation profile, and output directory.
 Use `thg-run start configs/final-thg.json` for the resumable route; it resolves
 the β2 and Human Database inputs through their recorded run artifact references.
 

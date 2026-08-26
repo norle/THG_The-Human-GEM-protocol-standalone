@@ -17,7 +17,13 @@ from .proposals import (
     read_proposals,
     write_proposals,
 )
-from .stages import StageContext, StageResult, _dependency_path, _load_cobra_model
+from .stages import (
+    StageContext,
+    StageResult,
+    _dependency_path,
+    _dump,
+    _load_cobra_model,
+)
 
 DETAILED_BETA1_STAGE_IDS = (
     "beta1-input",
@@ -37,13 +43,6 @@ DETAILED_BETA1_STAGE_IDS = (
     "validate-beta1",
     "export-beta1",
 )
-
-
-def _dump(path: Path, value: object) -> Path:
-    path.write_text(
-        json.dumps(value, indent=2, sort_keys=True) + "\n", encoding="utf-8"
-    )
-    return path
 
 
 def _evidence_record(

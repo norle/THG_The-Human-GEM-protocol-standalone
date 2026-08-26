@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 from collections.abc import Mapping
 from dataclasses import dataclass
 from pathlib import Path
@@ -36,6 +37,14 @@ class Stage(Protocol):
     def run(self, context: StageContext, work_dir: Path) -> StageResult: ...
 
     def validate(self, result: StageResult) -> None: ...
+
+
+def _dump(path: Path, value: object) -> Path:
+    path.write_text(
+        json.dumps(value, indent=2, sort_keys=True, default=str) + "\n",
+        encoding="utf-8",
+    )
+    return path
 
 
 def _load_cobra_model(path: str | Path) -> Any:

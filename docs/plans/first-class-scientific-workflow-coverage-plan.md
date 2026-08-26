@@ -23,44 +23,9 @@ strict configuration
 
 ## 1. Final-THG repair
 
-The current Final-THG configuration exposes repair iterations without wiring a real repair strategy into the registered workflow.
-
-Do **not** choose the scientific repair method in this plan.
-
-Instead, establish the correct interface.
-
-Target stages:
-
-```text
-final-thg-merge-plan
-→ final-thg-merge
-→ generate-repair-plan
-→ apply-repair-decisions
-→ apply-repair
-→ validate-final-thg
-→ export-final-thg
-```
-
-Define a repair strategy protocol whose implementation can be selected later.
-
-Conceptually:
-
-```text
-RepairStrategy
-  inspect(model, validation)
-  propose(...)
-  apply(...)
-```
-
-Until a real strategy is configured:
-
-```text
-repair = not-requested
-```
-
-must be explicit.
-
-`max_repair_iterations > 0` without an actual repair strategy should become a configuration error rather than silently doing nothing.
+Final-THG currently stops at merge and validation. Do not add repair stages or
+configuration until a real scientific repair strategy exists; then add the
+smallest explicit, bounded workflow around that strategy.
 
 ## 2. Cell-specific model workflow
 
@@ -283,8 +248,6 @@ with approximately:
 ```text
 load-model
 → load-pathway-definition
-→ resolve-pathway-identifiers
-→ generate-pathway-plan
 → apply-pathway
 → validate-pathway-model
 → export

@@ -13,12 +13,13 @@ from statistics import mean, median
 from typing import Any
 
 from .hashing import sha256_file
-from .stages import StageContext, StageResult, _dependency_path, _load_cobra_model
-
-
-def _dump(path: Path, value: object) -> Path:
-    path.write_text(json.dumps(value, indent=2, sort_keys=True, default=str) + "\n")
-    return path
+from .stages import (
+    StageContext,
+    StageResult,
+    _dependency_path,
+    _dump,
+    _load_cobra_model,
+)
 
 
 def _jsonl(path: Path, rows: list[Mapping[str, object]]) -> Path:
@@ -759,31 +760,6 @@ class PathwayStage:
                 shutil.copy2(source, output)
                 outputs.append((role, output))
             return StageResult(tuple(outputs), {})
-        if self.id == "resolve-pathway-identifiers":
-            definition = _dependency_path(context, "load-pathway-definition", "pathway")
-            payload = json.loads(definition.read_text())
-            return StageResult(
-                (("definition", _dump(work_dir / "resolved-pathway.json", payload)),),
-                {"resolved": True},
-            )
-        if self.id == "generate-pathway-plan":
-            config = json.loads(
-                _dependency_path(
-                    context, "resolve-pathway-identifiers", "definition"
-                ).read_text()
-            )
-            return StageResult(
-                (
-                    (
-                        "plan",
-                        _dump(
-                            work_dir / "pathway-plan.json",
-                            {"schema_version": 1, "configuration": config},
-                        ),
-                    ),
-                ),
-                {},
-            )
         if self.id == "apply-pathway":
             from cobra.io import model_to_dict
 
@@ -795,8 +771,10 @@ class PathwayStage:
                 )
             )
             config = json.loads(
-                _dependency_path(context, "generate-pathway-plan", "plan").read_text()
-            )["configuration"]
+                _dependency_path(
+                    context, "load-pathway-definition", "pathway"
+                ).read_text()
+            )
             database = json.loads(
                 _dependency_path(
                     context, "load-pathway-definition", "id-database"
@@ -875,11 +853,9 @@ def pathway_stages() -> tuple[PathwayStage, ...]:
     ids = (
         ("load-model", ()),
         ("load-pathway-definition", ()),
-        ("resolve-pathway-identifiers", ("load-pathway-definition",)),
-        ("generate-pathway-plan", ("resolve-pathway-identifiers",)),
         (
             "apply-pathway",
-            ("load-model", "load-pathway-definition", "generate-pathway-plan"),
+            ("load-model", "load-pathway-definition"),
         ),
         ("validate-pathway-model", ("apply-pathway",)),
         ("export-pathway", ("apply-pathway", "validate-pathway-model")),
@@ -934,11 +910,7 @@ class CompareStage:
                 (("comparison", _dump(work_dir / "comparison.json", report)),),
                 report,
             )
-        source = _dependency_path(context, "compare-models", "comparison")
-        return StageResult(
-            (("comparison", _copy(source, work_dir / "comparison.json")),),
-            {},
-        )
+        raise ValueError(f"unknown compare stage: {self.id}")
 
     def validate(self, result: StageResult) -> None:
         if not result.outputs or any(not path.is_file() for _, path in result.outputs):
@@ -954,7 +926,6 @@ def compare_stages() -> tuple[CompareStage, ...]:
     return (
         CompareStage("load-compare-inputs"),
         CompareStage("compare-models", ("load-compare-inputs",)),
-        CompareStage("export-comparison", ("compare-models",)),
     )
 
 
