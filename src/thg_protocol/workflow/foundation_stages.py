@@ -557,8 +557,17 @@ def _stages(prefix: str) -> tuple[FoundationStage, ...]:
 
 def register_builtin_workflows(registry: Any) -> None:
     """Register the Phase 0 executable fixture DAGs exactly once."""
+    from .beta1_stages import detailed_beta1_stages
+    from .beta2_stages import detailed_beta2_stages
+    from .gapfill_stages import Beta2GateStage, gapfill_stages
     from .registry import WorkflowDefinition, WorkflowRegistryError
 
+    reference_stages = (
+        *detailed_beta1_stages(),
+        *detailed_beta2_stages(),
+        Beta2GateStage(),
+        *gapfill_stages(reference=True),
+    )
     definitions = (
         WorkflowDefinition(
             "human-database",
@@ -596,6 +605,18 @@ def register_builtin_workflows(registry: Any) -> None:
                 "thg_protocol.workflow.beta2_stages",
                 fromlist=["detailed_beta2_stages"],
             ).detailed_beta2_stages(),
+        ),
+        WorkflowDefinition(
+            "gapfill",
+            gapfill_stages(),
+            frozenset({"gapfill"}),
+            "First-class standalone THG gapfill",
+        ),
+        WorkflowDefinition(
+            "reference",
+            reference_stages,
+            frozenset({"beta1", "beta2", "gapfill"}),
+            "Canonical β1 → β2 → gapfilled reference pipeline",
         ),
         WorkflowDefinition(
             "validate",

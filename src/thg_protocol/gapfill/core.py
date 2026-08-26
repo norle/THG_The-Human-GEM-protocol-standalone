@@ -6,6 +6,7 @@ import csv
 import json
 import re
 from abc import ABC, abstractmethod
+from collections.abc import Mapping
 from copy import deepcopy
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -23,6 +24,9 @@ __all__ = [
     "DeterministicGapfillStrategy",
     "run_gapfill",
     "gapfill_model",
+    "generate_gapfill_plan",
+    "validate_gapfill_plan",
+    "apply_gapfill_plan",
 ]
 
 
@@ -849,71 +853,76 @@ def _run_milp(model: Any, parameters: dict[str, Any]) -> GapfillResult:
         if universal_path.suffix.lower() == ".json"
         else read_sbml_model(str(universal_path))
     )
+    original_objective = working.objective
     working.objective = parameters["objective"]
-    before = _metrics(working)
-    filler = GapFiller(
-        working,
-        universal=universal,
-        lower_bound=parameters["minimum_flux"],
-        penalties=parameters["penalties"],
-        demand_reactions=False,
-        exchange_reactions=False,
-    )
-    additions = filler.fill(iterations=1)[0]
-    if len(additions) > parameters["max_additions"]:
+    try:
+        before = _metrics(working)
+        filler = GapFiller(
+            working,
+            universal=universal,
+            lower_bound=parameters["minimum_flux"],
+            penalties=parameters["penalties"],
+            demand_reactions=False,
+            exchange_reactions=False,
+        )
+        additions = filler.fill(iterations=1)[0]
+        if len(additions) > parameters["max_additions"]:
+            return GapfillResult(
+                working,
+                [],
+                {},
+                "failed",
+                "max_additions exceeded",
+                {"strategy": "milp"},
+                "milp",
+                parameters,
+                before,
+                before,
+                "max-additions",
+            )
+        existing = {reaction.id for reaction in working.reactions}
+        if any(reaction.id in existing for reaction in additions):
+            return GapfillResult(
+                working,
+                [],
+                {},
+                "failed",
+                "reaction-ID collision",
+                {"strategy": "milp"},
+                "milp",
+                parameters,
+                before,
+                before,
+                "reaction-id-collision",
+            )
+        working.add_reactions([reaction.copy() for reaction in additions])
+        solution = working.optimize()
+        status = (
+            "solved"
+            if solution.status == "optimal"
+            and abs(solution.fluxes[parameters["objective"]])
+            >= parameters["minimum_flux"]
+            else "failed"
+        )
         return GapfillResult(
             working,
-            [],
-            {},
-            "failed",
-            "max_additions exceeded",
-            {"strategy": "milp"},
+            [reaction.id for reaction in additions],
+            {reaction.id: "selected" for reaction in additions},
+            status,
+            None if status == "solved" else "configured objective is infeasible",
+            {
+                "strategy": "milp",
+                "solver": str(working.solver),
+                "cobra_version": cobra.__version__,
+            },
             "milp",
             parameters,
             before,
-            before,
-            "max-additions",
+            _metrics(working),
+            "objective-feasible" if status == "solved" else "objective-infeasible",
         )
-    existing = {reaction.id for reaction in working.reactions}
-    if any(reaction.id in existing for reaction in additions):
-        return GapfillResult(
-            working,
-            [],
-            {},
-            "failed",
-            "reaction-ID collision",
-            {"strategy": "milp"},
-            "milp",
-            parameters,
-            before,
-            before,
-            "reaction-id-collision",
-        )
-    working.add_reactions([reaction.copy() for reaction in additions])
-    solution = working.optimize()
-    status = (
-        "solved"
-        if solution.status == "optimal"
-        and abs(solution.fluxes[parameters["objective"]]) >= parameters["minimum_flux"]
-        else "failed"
-    )
-    return GapfillResult(
-        working,
-        [reaction.id for reaction in additions],
-        {reaction.id: "selected" for reaction in additions},
-        status,
-        None if status == "solved" else "configured objective is infeasible",
-        {
-            "strategy": "milp",
-            "solver": str(working.solver),
-            "cobra_version": cobra.__version__,
-        },
-        "milp",
-        parameters,
-        before,
-        _metrics(working),
-        "objective-feasible" if status == "solved" else "objective-infeasible",
-    )
+    finally:
+        working.objective = original_objective
 
 
 def gapfill_model(
@@ -939,3 +948,252 @@ def gapfill_model(
             dict(parameters or {}),
             stop_reason="validation-or-execution-error",
         )
+
+
+def _json_parameters(value: Any) -> Any:
+    """Normalize tuples and other small configuration values for JSON output."""
+    if isinstance(value, dict):
+        return {str(key): _json_parameters(item) for key, item in value.items()}
+    if isinstance(value, (list, tuple)):
+        return [_json_parameters(item) for item in value]
+    return value
+
+
+def _reaction_payload(reaction: Any) -> dict[str, Any]:
+    metabolites = getattr(reaction, "metabolites", None)
+    if metabolites is None:
+        metabolites = reaction.get("metabolites", {})
+        lower = reaction.get("lower_bound", 0.0)
+        upper = reaction.get("upper_bound", 1000.0)
+        annotation = reaction.get("annotation", {})
+        name = reaction.get("name", "")
+    else:
+        metabolites = {
+            str(metabolite.id): float(coefficient)
+            for metabolite, coefficient in metabolites.items()
+        }
+        lower = reaction.lower_bound
+        upper = reaction.upper_bound
+        annotation = dict(getattr(reaction, "annotation", {}) or {})
+        name = getattr(reaction, "name", "") or ""
+    reaction_id = reaction.id if hasattr(reaction, "id") else reaction["id"]
+    return {
+        "reaction_id": str(reaction_id),
+        "metabolites": {str(key): float(value) for key, value in metabolites.items()},
+        "bounds": {"lower": float(lower), "upper": float(upper)},
+        "annotation": _json_parameters(annotation),
+        "name": str(name),
+    }
+
+
+def generate_gapfill_plan(
+    model: Any,
+    *,
+    method: str,
+    parameters: dict[str, Any] | None = None,
+    source_model_checksum: str | None = None,
+) -> dict[str, Any]:
+    """Generate an auditable proposal without mutating ``model``."""
+    result = gapfill_model(model, method=method, parameters=parameters)
+    selected = set(result.selected)
+    result_reactions = {
+        str(reaction.id if hasattr(reaction, "id") else reaction["id"]): reaction
+        for reaction in (
+            result.model.reactions
+            if hasattr(result.model, "reactions")
+            else result.model.get("reactions", [])
+        )
+    }
+    source_reactions = {
+        str(reaction.id if hasattr(reaction, "id") else reaction["id"])
+        for reaction in (
+            model.reactions
+            if hasattr(model, "reactions")
+            else model.get("reactions", [])
+        )
+    }
+    source_metabolites = {
+        str(item.id if hasattr(item, "id") else item["id"]): item
+        for item in (
+            model.metabolites
+            if hasattr(model, "metabolites")
+            else model.get("metabolites", [])
+        )
+    }
+    proposals = []
+    for reaction_id in sorted(selected):
+        reaction = result_reactions[reaction_id]
+        payload = _reaction_payload(reaction)
+        annotation = payload.pop("annotation", {})
+        candidate_type = (
+            annotation.get("type") if isinstance(annotation, dict) else None
+        )
+        proposal = {
+            "schema_version": 1,
+            "proposal_id": f"gapfill:{method}:{reaction_id}",
+            "reaction_id": reaction_id,
+            "method": method,
+            "source": annotation.get("source", "thg_protocol.gapfill")
+            if isinstance(annotation, dict)
+            else "thg_protocol.gapfill",
+            "metabolites": payload["metabolites"],
+            "bounds": payload["bounds"],
+            "candidate_type": candidate_type,
+            "reason": result.stop_reason or "selected by configured method",
+            "cost": None,
+            "coverage_or_improvement": {
+                "coverage": result.candidate_coverage.get(reaction_id)
+            },
+            "solver_evidence": dict(result.solver),
+            "name": payload["name"],
+            "source_reaction_id": reaction_id
+            if reaction_id in source_reactions
+            else None,
+        }
+        if method in _TRANSPORT_METHODS:
+            proposal["transport"] = {
+                "source_metabolites": sorted(payload["metabolites"]),
+                "source_compartments": {
+                    metabolite_id: str(
+                        getattr(source_metabolites[metabolite_id], "compartment", "")
+                        if hasattr(source_metabolites[metabolite_id], "compartment")
+                        else source_metabolites[metabolite_id].get("compartment", "")
+                    )
+                    for metabolite_id in sorted(payload["metabolites"])
+                },
+                "connection_rule": _json_parameters(
+                    result.parameters.get("allowed_connections", [])
+                ),
+                "candidate_generation_algorithm": (
+                    "same-base cross-compartment transport"
+                ),
+            }
+        proposals.append(proposal)
+    return {
+        "header": {
+            "schema_version": 1,
+            "source_model_checksum": source_model_checksum,
+            "method": method,
+            "parameters": _json_parameters(result.parameters),
+            "implementation_version": 1,
+            "proposal_count": len(proposals),
+            "status": result.status,
+            "failure": result.failure,
+            "solver": _json_parameters(result.solver),
+        },
+        "proposals": proposals,
+        "result": _json_parameters(result.as_dict()),
+    }
+
+
+def _plan_proposals(plan: Mapping[str, Any]) -> list[Mapping[str, Any]]:
+    proposals = plan.get("proposals", [])
+    if not isinstance(proposals, list) or any(
+        not isinstance(item, Mapping) for item in proposals
+    ):
+        raise ValueError("gapfill plan proposals must be a list of objects")
+    return proposals
+
+
+def validate_gapfill_plan(
+    plan: Mapping[str, Any], model: Any, *, source_model_checksum: str | None = None
+) -> tuple[Mapping[str, Any], ...]:
+    """Validate proposal identity and the deliberately narrow mutation policy."""
+    header = plan.get("header")
+    if not isinstance(header, Mapping):
+        raise ValueError("gapfill plan header is required")
+    expected = header.get("source_model_checksum")
+    if source_model_checksum is not None and expected != source_model_checksum:
+        raise ValueError("gapfill plan source checksum does not match model")
+    existing = {
+        str(reaction.id if hasattr(reaction, "id") else reaction["id"])
+        for reaction in (
+            model.reactions
+            if hasattr(model, "reactions")
+            else model.get("reactions", [])
+        )
+    }
+    metabolites = (
+        {str(item.id) for item in model.metabolites}
+        if hasattr(model, "metabolites")
+        else {str(item["id"]) for item in model.get("metabolites", [])}
+    )
+    proposals = _plan_proposals(plan)
+    ids: set[str] = set()
+    reaction_ids: set[str] = set()
+    for proposal in proposals:
+        proposal_id = proposal.get("proposal_id")
+        reaction_id = proposal.get("reaction_id")
+        if not isinstance(proposal_id, str) or not proposal_id or proposal_id in ids:
+            raise ValueError("gapfill plan proposal IDs must be unique and non-empty")
+        if not isinstance(reaction_id, str) or not reaction_id:
+            raise ValueError("gapfill plan reaction_id is required")
+        if reaction_id in existing or reaction_id in reaction_ids:
+            raise ValueError(f"reaction-ID collision: {reaction_id}")
+        ids.add(proposal_id)
+        reaction_ids.add(reaction_id)
+        stoich = proposal.get("metabolites")
+        if not isinstance(stoich, Mapping) or not stoich:
+            raise ValueError(f"proposal {proposal_id} has no metabolites")
+        missing = sorted(set(map(str, stoich)) - metabolites)
+        if missing:
+            raise ValueError(
+                f"proposal {proposal_id} references unknown metabolites: {missing}"
+            )
+        if (
+            proposal.get("gene_reaction_rule")
+            or proposal.get("genes")
+            or proposal.get("compartments")
+        ):
+            raise ValueError(
+                f"proposal {proposal_id} introduces unsupported model objects"
+            )
+        bounds = proposal.get("bounds")
+        if not isinstance(bounds, Mapping) or set(bounds) != {"lower", "upper"}:
+            raise ValueError(f"proposal {proposal_id} has unsupported bounds")
+        try:
+            lower, upper = float(bounds["lower"]), float(bounds["upper"])
+        except (TypeError, ValueError) as error:
+            raise ValueError(
+                f"proposal {proposal_id} has unsupported bounds"
+            ) from error
+        if not (-float("inf") < lower <= upper < float("inf")):
+            raise ValueError(f"proposal {proposal_id} has unsupported bounds")
+    return tuple(proposals)
+
+
+def apply_gapfill_plan(
+    model: Any, plan: Mapping[str, Any], *, source_model_checksum: str | None = None
+) -> tuple[Any, list[dict[str, Any]]]:
+    """Apply every validated proposal to a private copy and return a ledger."""
+    proposals = validate_gapfill_plan(
+        plan, model, source_model_checksum=source_model_checksum
+    )
+    result = _candidate_model_copy(model)
+    ledger: list[dict[str, Any]] = []
+    for proposal in proposals:
+        bounds = proposal["bounds"]
+        candidate = GapfillCandidate(
+            str(proposal["reaction_id"]),
+            {str(key): float(value) for key, value in proposal["metabolites"].items()},
+            float(bounds["lower"]),
+            float(bounds["upper"]),
+            source=str(proposal.get("source", "gapfill-plan")),
+            annotation={
+                "gapfill_proposal_id": str(proposal["proposal_id"]),
+                "gapfill_method": str(proposal.get("method", "unknown")),
+                "gapfill_source_checksum": source_model_checksum,
+            },
+        )
+        _add_candidate(result, candidate)
+        ledger.append(
+            {
+                "schema_version": 1,
+                "proposal_id": proposal["proposal_id"],
+                "reaction_id": candidate.id,
+                "operation": "add-reaction",
+                "status": "applied",
+                "source_model_checksum": source_model_checksum,
+            }
+        )
+    return result, ledger

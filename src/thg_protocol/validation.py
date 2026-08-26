@@ -19,6 +19,7 @@ PROFILES: dict[str, dict[str, object]] = {
     "structural-fast": {"solver": False, "release_blocking": True},
     "beta1-standard": {"solver": True, "release_blocking": True},
     "beta2-standard": {"solver": True, "release_blocking": True},
+    "post-gapfill": {"solver": True, "release_blocking": True},
     "final-standard": {"solver": True, "release_blocking": True},
     "release-full": {"solver": True, "release_blocking": True},
 }

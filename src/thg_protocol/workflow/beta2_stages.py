@@ -215,6 +215,28 @@ def _model(context: StageContext, stage: str, role: str = "model") -> Any:
     return _load_cobra_model(_dependency_path(context, stage, role))
 
 
+def _reference_beta1_upstream(context: StageContext) -> dict[str, object] | None:
+    if context.config.workflow != "reference":
+        return None
+    steps = context.manifest.get("steps")
+    if not isinstance(steps, Mapping):
+        return None
+    outputs = steps.get("export-beta1", {}).get("outputs", [])
+    models = [
+        item
+        for item in outputs
+        if isinstance(item, Mapping) and item.get("role") == "model"
+    ]
+    if len(models) != 1:
+        return None
+    return {
+        "run_dir": str(context.run_dir),
+        "stage_id": "export-beta1",
+        "role": "model",
+        "sha256": models[0].get("sha256"),
+    }
+
+
 class DetailedBeta2Stage:
     implementation_version = 2
     kind = "scientific"
@@ -254,6 +276,8 @@ class DetailedBeta2Stage:
             },
         }
         upstream = section.get("upstream")
+        if upstream is None:
+            upstream = _reference_beta1_upstream(context)
         if isinstance(upstream, Mapping):
             try:
                 result["upstream"] = upstream_fingerprint(
@@ -286,7 +310,11 @@ class DetailedBeta2Stage:
         if self.id == "load-beta1":
             source: Path
             external = bool(section.get("external_beta1_equivalent", False))
-            if isinstance(section.get("input_model"), str):
+            implicit_upstream = _reference_beta1_upstream(context)
+            if implicit_upstream is not None:
+                reference = resolve_artifact(implicit_upstream)
+                source = reference.path
+            elif isinstance(section.get("input_model"), str):
                 if not external:
                     raise ValueError(
                         "beta2.input_model requires explicit "
@@ -2322,7 +2350,8 @@ class DetailedBeta2Stage:
                     "input_sha256": sha256_file(
                         _dependency_path(context, "load-beta1", "model")
                     ),
-                    "upstream": section.get("upstream"),
+                    "upstream": section.get("upstream")
+                    or _reference_beta1_upstream(context),
                     "external_beta1_equivalent": bool(
                         section.get("external_beta1_equivalent", False)
                     ),

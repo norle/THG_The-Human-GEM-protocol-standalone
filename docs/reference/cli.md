@@ -5,6 +5,8 @@
 | `thg-run start CONFIG` | Start a generic configured workflow, including Human Database and final THG |
 | `thg-run beta1 CONFIG` | Start a registered β1 workflow |
 | `thg-run beta2 CONFIG` | Start a registered β2 workflow |
+| `thg-run gapfill CONFIG` | Start a standalone, checksum-tracked gapfill workflow |
+| `thg-run reference CONFIG` | Run the canonical β1 → β2 → gapfilled reference workflow |
 | `thg-run validate CONFIG` | Start a registered validation workflow |
 | `thg-run compare CONFIG` | Start a registered comparison workflow |
 | `thg-run resume RUN_DIR` | Resume valid stages |

@@ -28,6 +28,7 @@ WORKFLOW_SECTION_KEYS = {
     },
     "final_thg": {
         "beta2_model",
+        "reference_upstream",
         "database_model",
         "beta2_upstream",
         "database_upstream",
@@ -119,6 +120,21 @@ WORKFLOW_SECTION_KEYS = {
         "memote_command",
     },
     "compare": {"left", "right", "upstream"},
+    "gapfill": {
+        "input_model",
+        "external_input",
+        "method",
+        "max_additions",
+        "allowed_connections",
+        "candidate_types",
+        "candidate_universe",
+        "universal_model",
+        "objective",
+        "minimum_flux",
+        "penalties",
+        "validation_profile",
+        "task_suite",
+    },
 }
 
 
@@ -227,6 +243,10 @@ def _parse_workflow(
             f"configuration key(s) do not apply to workflow '{workflow}': "
             f"{', '.join(unknown)}"
         )
+    if workflow == "reference" and not {"beta1", "beta2", "gapfill"} <= set(payload):
+        raise ConfigError(
+            "reference workflow requires beta1, beta2, and gapfill sections"
+        )
     run = _object(payload.get("run"), "run")
     _keys(run, {"name", "output_dir"}, "run")
     name = _required_string(run, "name", "run")
@@ -265,6 +285,135 @@ def _parse_workflow(
                         MODEL_SUFFIXES,
                     )
                 )
+            if section == "gapfill":
+                value = dict(value)
+                method = value.get("method")
+                if method not in {"greedy", "deadends", "milp"}:
+                    raise ConfigError(
+                        "'gapfill.method' must be greedy, deadends, or milp"
+                    )
+                profile = value.get("validation_profile")
+                if not isinstance(profile, str) or not profile.strip():
+                    raise ConfigError(
+                        "'gapfill.validation_profile' must be a non-empty string"
+                    )
+                from thg_protocol.validation import PROFILES
+
+                if profile not in PROFILES:
+                    raise ConfigError(f"unknown gapfill validation profile: {profile}")
+                if "max_additions" not in value:
+                    raise ConfigError("'gapfill.max_additions' is required")
+                value["max_additions"] = _positive_integer(
+                    value["max_additions"], "gapfill.max_additions"
+                )
+                standalone = workflow == "gapfill"
+                if standalone:
+                    if value.get("external_input") is not True:
+                        raise ConfigError(
+                            "standalone gapfill requires external_input: true"
+                        )
+                    if "input_model" not in value:
+                        raise ConfigError("standalone gapfill requires input_model")
+                elif "input_model" in value or "external_input" in value:
+                    raise ConfigError(
+                        "reference gapfill must use the in-run β2 handoff"
+                    )
+                if "input_model" in value:
+                    value["input_model"] = str(
+                        _input_path(
+                            _required_string(value, "input_model", "gapfill"),
+                            input_base,
+                            "gapfill.input_model",
+                            MODEL_SUFFIXES,
+                        )
+                    )
+                transport = {"greedy", "deadends"}
+                if method in transport:
+                    for key in ("allowed_connections", "candidate_types"):
+                        if key not in value:
+                            raise ConfigError(
+                                f"'gapfill.{key}' is required for {method}"
+                            )
+                    connections = value["allowed_connections"]
+                    if not isinstance(connections, list) or any(
+                        not isinstance(pair, list)
+                        or len(pair) != 2
+                        or not all(
+                            isinstance(item, str) and item.strip() for item in pair
+                        )
+                        for pair in connections
+                    ):
+                        raise ConfigError(
+                            "'gapfill.allowed_connections' must contain "
+                            "compartment pairs"
+                        )
+                    types = value["candidate_types"]
+                    if (
+                        not isinstance(types, list)
+                        or not types
+                        or set(types) - {"A", "B", "C"}
+                    ):
+                        raise ConfigError(
+                            "'gapfill.candidate_types' must contain only A, B, or C"
+                        )
+                    incompatible = {
+                        "universal_model",
+                        "objective",
+                        "minimum_flux",
+                        "penalties",
+                    }
+                    if incompatible & set(value):
+                        raise ConfigError(
+                            f"gapfill {method} does not accept: "
+                            + ", ".join(sorted(incompatible & set(value)))
+                        )
+                else:
+                    for key in (
+                        "universal_model",
+                        "objective",
+                        "minimum_flux",
+                        "penalties",
+                    ):
+                        if key not in value:
+                            raise ConfigError(f"'gapfill.{key}' is required for milp")
+                    value["universal_model"] = str(
+                        _input_path(
+                            _required_string(value, "universal_model", "gapfill"),
+                            input_base,
+                            "gapfill.universal_model",
+                            MODEL_SUFFIXES,
+                        )
+                    )
+                    if (
+                        not isinstance(value["objective"], str)
+                        or not value["objective"].strip()
+                    ):
+                        raise ConfigError(
+                            "'gapfill.objective' must be a non-empty string"
+                        )
+                    if (
+                        isinstance(value["minimum_flux"], bool)
+                        or not isinstance(value["minimum_flux"], (int, float))
+                        or value["minimum_flux"] <= 0
+                    ):
+                        raise ConfigError("'gapfill.minimum_flux' must be positive")
+                    if not isinstance(value["penalties"], dict):
+                        raise ConfigError("'gapfill.penalties' must be an object")
+                    incompatible = {"allowed_connections", "candidate_types"}
+                    if incompatible & set(value):
+                        raise ConfigError(
+                            "gapfill milp does not accept: "
+                            + ", ".join(sorted(incompatible & set(value)))
+                        )
+                for file_key in ("candidate_universe", "task_suite"):
+                    if file_key in value:
+                        value[file_key] = str(
+                            _input_path(
+                                _required_string(value, file_key, "gapfill"),
+                                input_base,
+                                f"gapfill.{file_key}",
+                            )
+                        )
             if section == "beta2":
                 evidence_mode = value.get("evidence_mode", "provided")
                 if evidence_mode not in {"provided", "snapshot", "live"}:

@@ -209,6 +209,18 @@ class FinalTHGStage:
                         input_hashes[upstream_key] = {
                             "error": f"{type(error).__name__}: {error}"
                         }
+            if isinstance(section.get("reference_upstream"), Mapping):
+                try:
+                    input_hashes["reference_upstream"] = upstream_fingerprint(
+                        [section["reference_upstream"]],
+                        base_dir=context.config.source_path.parent
+                        if context.config.source_path is not None
+                        else None,
+                    )
+                except Exception as error:
+                    input_hashes["reference_upstream"] = {
+                        "error": f"{type(error).__name__}: {error}"
+                    }
             task_suite = section.get("task_suite")
             if isinstance(task_suite, str):
                 result["task_suite_sha256"] = (
@@ -229,7 +241,12 @@ class FinalTHGStage:
                 ("beta2", "beta2_model", "beta2_upstream"),
                 ("database", "database_model", "database_upstream"),
             ):
-                upstream = section.get(upstream_key)
+                if name == "beta2" and isinstance(
+                    section.get("reference_upstream"), Mapping
+                ):
+                    upstream = section["reference_upstream"]
+                else:
+                    upstream = section.get(upstream_key)
                 if isinstance(upstream, Mapping):
                     resolved = resolve_artifact(
                         upstream,

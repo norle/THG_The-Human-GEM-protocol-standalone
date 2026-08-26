@@ -65,7 +65,11 @@ validation, semantic β1-to-β2 diff, unresolved records, provenance, and a
 summary. Resume reuses valid attempts; forcing a stage invalidates that stage
 and its descendants while preserving previous attempt directories.
 
-## Optional post-β2 gapfill
+## Optional lower-level post-β2 gapfill
+
+For the reproducible scientific pipeline, use the first-class `reference` or
+`gapfill` workflow. The direct command below remains useful for ad-hoc
+algorithm work and does not select the downstream model automatically.
 
 Gap filling is a separate, optional operation after a β2 release candidate;
 it is not a β2 stage or release-gate input. For example:

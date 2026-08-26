@@ -70,7 +70,14 @@ def build_parser() -> argparse.ArgumentParser:
     unlock_parser.add_argument("--force", action="store_true")
 
     # Public names make the maintained workflow entry points discoverable.
-    for workflow_id in ("beta1", "beta2", "validate", "compare"):
+    for workflow_id in (
+        "beta1",
+        "beta2",
+        "gapfill",
+        "reference",
+        "validate",
+        "compare",
+    ):
         workflow_parser = commands.add_parser(
             workflow_id, help=f"start a {workflow_id} registered workflow"
         )
@@ -90,6 +97,48 @@ def _print_human_status(manifest: dict[str, object]) -> None:
                 print(f"{stage}: {entry['status']} (attempt {entry['attempt']})")
 
 
+def _print_final_report(run_dir: Path) -> None:
+    manifest = get_status(run_dir)
+    steps = manifest.get("steps", {})
+    final = (
+        steps.get("export-gapfilled-reference", {}) if isinstance(steps, dict) else {}
+    )
+    records = final.get("outputs", []) if isinstance(final, dict) else []
+    report = next(
+        (
+            run_dir / str(item["path"])
+            for item in records
+            if isinstance(item, dict) and item.get("role") == "validation"
+        ),
+        None,
+    )
+    if report is None:
+        gate = steps.get("gate-gapfill", {}) if isinstance(steps, dict) else {}
+        records = gate.get("outputs", []) if isinstance(gate, dict) else []
+        report = next(
+            (
+                run_dir / str(item["path"])
+                for item in records
+                if isinstance(item, dict) and item.get("role") == "gate"
+            ),
+            None,
+        )
+    gate_path = next(
+        (
+            run_dir / str(item["path"])
+            for item in records
+            if isinstance(item, dict) and item.get("role") in {"gate", "gapfill-gate"}
+        ),
+        None,
+    )
+    status = manifest["overall_status"]
+    if gate_path is not None and gate_path.is_file():
+        status = json.loads(gate_path.read_text(encoding="utf-8")).get(
+            "status", status
+        )
+    print(f"final report: {report or run_dir}; status: {status}")
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
@@ -97,7 +146,14 @@ def main(argv: list[str] | None = None) -> int:
     try:
         if args.command == "start":
             print(f"run started/resumed: {start(args.config)}")
-        elif args.command in {"beta1", "beta2", "validate", "compare"}:
+        elif args.command in {
+            "beta1",
+            "beta2",
+            "gapfill",
+            "reference",
+            "validate",
+            "compare",
+        }:
             from .config import load_workflow_config
 
             config = load_workflow_config(args.config)
@@ -106,7 +162,10 @@ def main(argv: list[str] | None = None) -> int:
                     f"configuration selects workflow '{config.workflow}', "
                     f"not '{args.command}'"
                 )
-            print(f"run started/resumed: {start(args.config)}")
+            run = start(args.config)
+            print(f"run started/resumed: {run}")
+            if args.command in {"gapfill", "reference"}:
+                _print_final_report(run)
         elif args.command == "resume":
             print(f"run resumed: {resume(args.run_dir, force_step=args.force_step)}")
         elif args.command == "status":

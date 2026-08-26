@@ -131,6 +131,8 @@ def _resume_config_key(config: WorkflowConfig) -> dict[str, object]:
         payload[config.workflow] = {
             key: value for key, value in section.items() if key != "n_jobs"
         }
+    if config.workflow in {"gapfill", "reference"}:
+        payload.pop("gapfill", None)
     return payload
 
 
@@ -336,7 +338,7 @@ def start_registered(config_path: str | Path) -> Path:
     run_dir = config.run.output_dir
     section_key = "validation" if config.workflow == "validate" else config.workflow
     scientific = (
-        config.workflow in {"beta1", "beta2", "validate"}
+        config.workflow in {"beta1", "beta2", "validate", "reference", "gapfill"}
         and isinstance(config.sections.get(section_key), Mapping)
         and (
             isinstance(config.sections[section_key].get("input_model"), str)

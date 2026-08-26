@@ -10,13 +10,16 @@ from .core import (
     GapfillCandidate,
     GapfillResult,
     GapfillStrategy,
+    apply_gapfill_plan,
     gapfill_model,
     generate_candidates,
+    generate_gapfill_plan,
     run_gapfill,
     run_phase1,
     run_phase2,
     run_phase3,
     run_pipeline,
+    validate_gapfill_plan,
 )
 
 __all__ = [
@@ -31,4 +34,7 @@ __all__ = [
     "GapfillStrategy",
     "DeterministicGapfillStrategy",
     "run_gapfill",
+    "generate_gapfill_plan",
+    "validate_gapfill_plan",
+    "apply_gapfill_plan",
 ]
