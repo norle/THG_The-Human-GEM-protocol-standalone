@@ -13,5 +13,5 @@ database, cell-specific, and figures tests isolated by their markers.
 
 Before release, run the full test suite, build a distribution, verify the
 installed wheel and console scripts, and record dependency versions. Documentation
-changes should update canonical links and compatibility routes deliberately;
+changes should update canonical links deliberately;
 plans and historical evidence are excluded from the published site.

@@ -51,7 +51,5 @@ requires a declared artifact comparison using a semantic model signature and
 documented counts. An ordinary maintained-package test, even when it consumes
 an old fixture, does not satisfy either definition.
 
-The [legacy API inventory](../legacy-api-inventory.md), [API contracts](../api-contracts.md),
-and operation-specific parity contracts will provide the detailed migration
-context as the parity harness is added. Until then, rows marked `Not assessed`
-or `Intentional difference` must not be promoted to historical equivalence.
+Rows marked `Not assessed` or `Intentional difference` must not be promoted to
+historical equivalence without additional evidence.

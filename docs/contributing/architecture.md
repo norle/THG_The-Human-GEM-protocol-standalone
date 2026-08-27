@@ -7,9 +7,11 @@ inputs.
 
 Scientific domain packages own algorithms and transformations. The
 `thg_protocol.workflow` namespace owns configuration-to-stage adaptation and
-DAG composition, while `thg_protocol.runtime` owns generic resumable execution
-(manifests, locks, fingerprints, artifacts, and stage iteration). Runtime never
-discovers built-in workflows. Shared JSON/SBML model dispatch lives in
+DAG composition. Its workflow definitions live in `workflow/beta1/`,
+`workflow/beta2/`, and the sibling modules for the other workflows. The
+`thg_protocol.runtime` namespace owns generic resumable execution (manifests,
+locks, fingerprints, artifacts, and stage iteration). Runtime never discovers
+built-in workflows. Shared JSON/SBML model dispatch lives in
 `thg_protocol.io.models`.
 
 Service protocols and static clients keep network access, credentials, caching,

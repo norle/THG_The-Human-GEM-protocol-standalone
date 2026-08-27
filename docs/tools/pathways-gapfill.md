@@ -40,7 +40,4 @@ chooses whether downstream work uses the original or gap-filled model.
 Canonical APIs: [`implement_pathway_files`][thg_protocol.pathway.workflow.implement_pathway_files],
 [`implement_pathway`][thg_protocol.pathway.workflow.implement_pathway],
 [`gapfill_model`][thg_protocol.gapfill.core.gapfill_model], and
-[`GapfillResult`][thg_protocol.gapfill.core.GapfillResult]. Legacy
-[`generate_candidates`][thg_protocol.gapfill.core.generate_candidates] and
-[`run_pipeline`][thg_protocol.gapfill.core.run_pipeline] remain available for
-compatibility.
+[`GapfillResult`][thg_protocol.gapfill.core.GapfillResult].

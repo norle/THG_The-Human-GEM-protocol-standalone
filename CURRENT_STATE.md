@@ -2,7 +2,7 @@
 
 Last reviewed: 2026-08-10
 
-The package migration and legacy-directory cleanup are complete. Supported code
+The package structure cleanup is complete. Supported code
 lives under `src/thg_protocol`; tests use package APIs; preserved artifacts have
 canonical locations. Historical implementation details remain in Git history.
 
@@ -28,7 +28,7 @@ publication-artifact reproduction remains unverified.
 ## Latest validation
 
 The latest local default offline gate passed under Python 3.12 with `1843
-passed, 2 skipped`. Ruff, bytecode compilation, legacy-closure policy tests, and
+passed, 2 skipped`. Ruff, bytecode compilation, artifact integrity checks, and
 all four installed CLI help checks also passed.
 
 An isolated source/wheel build installed outside the checkout and passed package

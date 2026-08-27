@@ -13,8 +13,9 @@ Common contracts:
   and docstrings call out exceptions and ownership for transformation APIs.
 - Solver, MEMOTE, plotting, and historical pickle support are optional extras.
 
-See the [workflow guides](../usage.md) for end-to-end context and the
-[architecture page](../architecture.md) for data flow and service ownership.
+See the [workflow guides](../workflows/index.md) for end-to-end context and the
+[architecture page](../contributing/architecture.md) for data flow and service
+ownership.
 
 ## Coverage matrix
 
@@ -24,7 +25,7 @@ See the [workflow guides](../usage.md) for end-to-end context and the
 | Construction | [Construction](construction.md) | `database`, `database_parsing`, `model_build` |
 | Annotation and GPR | [Annotation](annotation.md) | `annotation`, `gpr` |
 | Services | [Services](services.md) | BioCyc, KEGG, Ensembl, PubChem, Location |
-| Workflows | [Workflows](workflows.md) | gapfill, pathway, merge, cell-specific, resumable run |
+| Workflows | [Workflows](workflows.md) | workflow, runtime, gapfill, pathway, merge, cell-specific |
 | Analysis | [Analysis](analysis.md) | consistency, comparison, compaction, network |
 | Figures | [Figures](figures.md) | comparison and model reports |
 | Commands | [CLI commands](cli.md) | `thg-gapfill`, `thg-pathway`, `thg-compare`, `thg-run` |

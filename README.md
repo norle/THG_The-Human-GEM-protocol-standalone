@@ -33,12 +33,15 @@ For a core-only installation, use `python -m pip install -e .`. See the
 - [Workflow overview](docs/workflows/index.md): choose and configure a workflow.
 - [API reference](docs/api/index.md): use the Python and CLI interfaces.
 
-## Workspace
+## Repository layout
 
 ```text
-inputs/    Read-only source models, records, and evidence.
-configs/   Version-controlled workflow configurations.
-runs/      Generated resumable runs and artifacts.
+src/thg_protocol/  Package code.
+docs/              User and contributor documentation.
+tests/             Tests and deterministic fixtures.
+inputs/            Read-only source models, records, and evidence.
+configs/           Version-controlled workflow configurations.
+runs/              Generated resumable runs and artifacts.
 ```
 
 Start a configured workflow with, for example:

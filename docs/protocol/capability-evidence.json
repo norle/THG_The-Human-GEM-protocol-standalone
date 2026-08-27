@@ -32,8 +32,7 @@
       "current_sources": ["src/thg_protocol/annotation/reactions.py"],
       "tests": [
         "tests/unit/test_reaction_annotation_api.py",
-        "tests/characterization/test_reaction_identification_current.py",
-        "tests/parity/test_reference_reaction_identification.py"
+        "tests/characterization/test_reaction_identification_current.py"
       ],
       "known_differences": [
         "One basic identify_reaction fixture is compared; Jaccard, duplicate, and full-file cases remain unverified"
@@ -52,8 +51,7 @@
       "legacy_sources": ["functions/function_metabolite_identification.py"],
       "current_sources": ["src/thg_protocol/annotation/metabolites.py"],
       "tests": [
-        "tests/unit/test_metabolite_annotation_api.py",
-        "tests/parity/test_reference_metabolite_identification.py"
+        "tests/unit/test_metabolite_annotation_api.py"
       ],
       "known_differences": [
         "One formula-valid hit fixture is compared; misses, service failures, synonym ties, and batch behavior remain unverified"
@@ -89,7 +87,7 @@
       "published_reproduction": "Not yet verified",
       "legacy_sources": ["functions/equations_bm_gdb.py"],
       "current_sources": ["src/thg_protocol/model_build/mass_balance.py"],
-      "tests": ["tests/unit/test_mass_balance_api.py", "tests/parity/test_mass_balance_atom10.py"],
+      "tests": ["tests/unit/test_mass_balance_api.py"],
       "known_differences": ["One atom10 vector fixture is compared; legacy substring handling for overlapping element symbols and broader equation/mass-balance behavior remain unverified"],
       "evidence_commit": "0c91fdec325df12f25ef13819525e830a4cec1e8"
     },
@@ -109,8 +107,7 @@
       "current_sources": ["src/thg_protocol/gpr/lookup.py", "src/thg_protocol/gpr/ast_gpr.py"],
       "tests": [
         "tests/unit/test_gpr_lookup_api.py",
-        "tests/unit/test_gpr_wrapper.py",
-        "tests/parity/test_gpr_page_parser.py"
+        "tests/unit/test_gpr_wrapper.py"
       ],
       "known_differences": [
         "One deterministic page-parser fixture is compared; full get_gpr source precedence, complexes, transferred ECs, and stoichiometric parity remain unverified"
@@ -128,7 +125,7 @@
       "published_reproduction": "Not yet verified",
       "legacy_sources": ["functions/gpr/get_location_def.py"],
       "current_sources": ["src/thg_protocol/gpr/location.py"],
-      "tests": ["tests/unit/test_gpr_location_api.py", "tests/parity/test_location_resolution.py"],
+      "tests": ["tests/unit/test_gpr_location_api.py"],
       "known_differences": ["One basic Mitochondria branch is compared; the compatibility tuple intentionally keys its maintained gene map by the supplied identifier, while legacy rewrites that key to Ensembl; complex-rule preservation, unresolved-location semantics, and fallback behavior remain unverified"],
       "evidence_commit": "0c91fdec325df12f25ef13819525e830a4cec1e8"
     },
@@ -172,7 +169,7 @@
       "legacy_relationship": "Intentional difference",
       "published_reproduction": "Not yet verified",
       "legacy_sources": ["generate_data-base/generate_db.py"],
-      "current_sources": ["src/thg_protocol/database_workflow.py", "src/thg_protocol/workflow/phase4_stages.py"],
+      "current_sources": ["src/thg_protocol/database_workflow.py", "src/thg_protocol/workflow/_phase4.py"],
       "tests": ["tests/unit/test_phase4_workflows.py"],
       "known_differences": ["A paper-specific pathway-list adapter is not bundled; live access is injected and credential-owned"],
       "evidence_commit": "0c91fdec325df12f25ef13819525e830a4cec1e8"
@@ -250,7 +247,7 @@
       "legacy_relationship": "No legacy target",
       "published_reproduction": "N/A",
       "legacy_sources": [],
-      "current_sources": ["src/thg_protocol/workflow/runner.py", "src/thg_protocol/workflow/stages.py"],
+      "current_sources": ["src/thg_protocol/workflow/runner.py", "src/thg_protocol/runtime/stage.py"],
       "tests": [
         "tests/integration/test_phase0_registered_workflow.py",
         "tests/unit/test_workflow_cli.py",
@@ -269,7 +266,7 @@
       "legacy_relationship": "No legacy target",
       "published_reproduction": "N/A",
       "legacy_sources": [],
-      "current_sources": ["src/thg_protocol/memote.py", "src/thg_protocol/workflow/foundation_stages.py"],
+      "current_sources": ["src/thg_protocol/memote.py", "src/thg_protocol/workflow/_foundation.py"],
       "tests": ["tests/unit/test_phase3_validation.py"],
       "known_differences": ["The executable and report semantics belong to the separately installed MEMOTE tool"],
       "evidence_commit": "0c91fdec325df12f25ef13819525e830a4cec1e8"
@@ -299,7 +296,7 @@
       "legacy_relationship": "Not assessed",
       "published_reproduction": "Not yet verified",
       "legacy_sources": ["build_model/build_model.py"],
-      "current_sources": ["src/thg_protocol/curation/beta1.py", "src/thg_protocol/workflow/foundation_stages.py"],
+      "current_sources": ["src/thg_protocol/curation/beta1.py", "src/thg_protocol/workflow/_foundation.py"],
       "tests": ["tests/unit/test_beta1_curation.py", "tests/integration/test_beta1_registered_workflow.py"],
       "known_differences": ["The maintained release is fixture-sanctioned and policy-scoped; it is not a claim of reproducing the 2023 publication artifact"],
       "evidence_commit": "0c91fdec325df12f25ef13819525e830a4cec1e8"

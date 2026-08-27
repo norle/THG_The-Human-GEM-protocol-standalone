@@ -9,11 +9,8 @@ exclude_docs: |
   workflow-overview.md
   usage.md
   protocol/**
-  parity/**
-  legacy-api-inventory.md
   legacy-workflows.md
   service-boundary-audit.md
-  api-contracts.md
   api/index.md
 theme:
   name: material
