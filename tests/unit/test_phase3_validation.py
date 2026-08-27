@@ -18,7 +18,7 @@ from thg_protocol.validation import (
     stoichiometric_consistency,
     validate_model,
 )
-from thg_protocol.workflow.registered_runner import start_registered
+from thg_protocol.workflow.runner import start
 
 
 def model():
@@ -120,7 +120,7 @@ def test_registered_validation_workflow_writes_check_and_memote_artifacts(tmp_pa
         ),
         encoding="utf-8",
     )
-    run = start_registered(config)
+    run = start(config)
     manifest = json.loads((run / "manifest.json").read_text())
     assert set(manifest["steps"]) == {
         "validate-input",

@@ -9,21 +9,25 @@ from collections.abc import Mapping
 from pathlib import Path
 from typing import Any
 
+from thg_protocol.io.models import load_model as _load_cobra_model
 from thg_protocol.runtime.concurrency import parallel_map
 from thg_protocol.runtime.hashing import sha256_file, sha256_json
+from thg_protocol.runtime.stage import (
+    StageContext,
+    StageResult,
+)
+from thg_protocol.runtime.stage import (
+    dependency_path as _dependency_path,
+)
+from thg_protocol.runtime.stage import (
+    dump_json as _dump,
+)
 
 from ..proposals import (
     decisions_fingerprint,
     read_decisions,
     read_proposals,
     write_proposals,
-)
-from ..stages import (
-    StageContext,
-    StageResult,
-    _dependency_path,
-    _dump,
-    _load_cobra_model,
 )
 
 DETAILED_BETA1_STAGE_IDS = (

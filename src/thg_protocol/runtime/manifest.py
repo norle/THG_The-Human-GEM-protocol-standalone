@@ -152,17 +152,11 @@ def load_manifest(run_dir: str | Path) -> dict[str, object]:
     return manifest
 
 
-load_workflow_manifest = load_manifest
-validate_workflow_manifest = validate_manifest
-
-
 __all__ = [
     "ManifestError",
     "load_manifest",
-    "load_workflow_manifest",
     "new_manifest",
     "validate_manifest",
-    "validate_workflow_manifest",
     "write_manifest_atomic",
     "utc_now",
 ]

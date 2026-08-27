@@ -5,7 +5,7 @@ import json
 
 import pytest
 
-from thg_protocol.workflow.artifacts import (
+from thg_protocol.runtime.artifacts import (
     ArtifactReferenceError,
     resolve_artifact,
 )

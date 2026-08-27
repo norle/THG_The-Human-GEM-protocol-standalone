@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from thg_protocol.workflow.hashing import (
+from thg_protocol.runtime.hashing import (
     artifact_record,
     sha256_file,
     sha256_json,

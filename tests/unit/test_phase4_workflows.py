@@ -10,8 +10,8 @@ from thg_protocol.merge import (
     apply_merge_plan,
     generate_merge_plan,
 )
-from thg_protocol.workflow.phase4_stages import FinalTHGStage
-from thg_protocol.workflow.stages import StageResult
+from thg_protocol.runtime.stage import StageResult
+from thg_protocol.workflow.final_thg import FinalTHGStage
 
 
 class Adapter:

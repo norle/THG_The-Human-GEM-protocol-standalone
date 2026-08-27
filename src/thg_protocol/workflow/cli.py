@@ -11,7 +11,6 @@ from thg_protocol.runtime.locking import RunLockedError, unlock_run
 from thg_protocol.runtime.manifest import ManifestError
 
 from .config import ConfigError
-from .registered_runner import RegisteredWorkflowError
 from .runner import WorkflowError, get_status, resume, start
 
 
@@ -188,7 +187,6 @@ def main(argv: list[str] | None = None) -> int:
         ManifestError,
         RunLockedError,
         WorkflowError,
-        RegisteredWorkflowError,
     ) as error:
         print(f"error: {error}", file=__import__("sys").stderr)
         if isinstance(error, RunLockedError):

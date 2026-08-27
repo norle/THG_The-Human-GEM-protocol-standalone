@@ -8,15 +8,18 @@ from collections.abc import Mapping
 from pathlib import Path
 from typing import Any
 
+from thg_protocol.io.models import load_model as _load_cobra_model
 from thg_protocol.runtime.artifacts import upstream_fingerprint
 from thg_protocol.runtime.hashing import sha256_file
-
-from .stages import (
+from thg_protocol.runtime.stage import (
     StageContext,
     StageResult,
-    _dependency_path,
-    _dump,
-    _load_cobra_model,
+)
+from thg_protocol.runtime.stage import (
+    dependency_path as _dependency_path,
+)
+from thg_protocol.runtime.stage import (
+    dump_json as _dump,
 )
 
 

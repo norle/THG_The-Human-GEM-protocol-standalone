@@ -13,11 +13,18 @@ from collections.abc import Mapping
 from pathlib import Path
 from typing import Any
 
+from thg_protocol.io.models import load_model as _load_cobra_model
 from thg_protocol.runtime.artifacts import ArtifactReference, upstream_fingerprint
 from thg_protocol.runtime.hashing import sha256_file, sha256_json
+from thg_protocol.runtime.stage import (
+    StageContext,
+    StageResult,
+)
+from thg_protocol.runtime.stage import (
+    dependency_path as _dependency_path,
+)
 
 from .config import WorkflowConfig
-from .stages import StageContext, StageResult, _dependency_path
 
 
 def _scientific_beta1_section(config: WorkflowConfig) -> Mapping[str, object] | None:
@@ -84,8 +91,6 @@ class Beta1ScientificStage:
 
     @staticmethod
     def _load(path: Path) -> Any:
-        from .stages import _load_cobra_model
-
         return _load_cobra_model(path)
 
     @staticmethod
@@ -464,8 +469,6 @@ class ValidationScientificStage:
         }
 
     def run(self, context: StageContext, work_dir: Path) -> StageResult:
-        from .stages import _load_cobra_model
-
         section = context.config.sections.get("validation", {})
         if not isinstance(section, Mapping):
             section = {}

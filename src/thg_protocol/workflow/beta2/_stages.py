@@ -17,16 +17,19 @@ except ImportError:  # pragma: no cover - exercised by clean-wheel checks
     def tqdm(iterable: object, **_kwargs: object) -> object:
         return iterable
 
+from thg_protocol.io.models import load_model as _load_cobra_model
 from thg_protocol.runtime.artifacts import resolve_artifact, upstream_fingerprint
 from thg_protocol.runtime.concurrency import parallel_map
 from thg_protocol.runtime.hashing import sha256_file
-
-from ..stages import (
+from thg_protocol.runtime.stage import (
     StageContext,
     StageResult,
-    _dependency_path,
-    _dump,
-    _load_cobra_model,
+)
+from thg_protocol.runtime.stage import (
+    dependency_path as _dependency_path,
+)
+from thg_protocol.runtime.stage import (
+    dump_json as _dump,
 )
 
 LOGGER = logging.getLogger("thg_protocol.workflow")

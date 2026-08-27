@@ -4,10 +4,9 @@ import json
 
 import pytest
 
+from thg_protocol.runtime.manifest import load_manifest
 from thg_protocol.workflow.config import ConfigError
-from thg_protocol.workflow.manifest import load_workflow_manifest
-from thg_protocol.workflow.registered_runner import RegisteredWorkflowError
-from thg_protocol.workflow.runner import get_status, resume, start
+from thg_protocol.workflow.runner import WorkflowError, get_status, resume, start
 
 
 def _config(path, workflow, output, section=None):
@@ -23,7 +22,7 @@ def _config(path, workflow, output, section=None):
 
 def test_registered_dags_resume_force_and_upstream_chaining(tmp_path):
     beta1 = start(_config(tmp_path / "beta1.json", "beta1", tmp_path / "beta1-run"))
-    beta1_manifest = load_workflow_manifest(beta1)
+    beta1_manifest = load_manifest(beta1)
     beta1_export = beta1_manifest["steps"]["beta1-export"]["outputs"][0]
     beta2 = start(
         _config(
@@ -68,7 +67,7 @@ def test_registered_dags_resume_force_and_upstream_chaining(tmp_path):
 
     beta1_export_path = beta1 / beta1_export["path"]
     beta1_export_path.write_text("corrupted\n", encoding="utf-8")
-    with pytest.raises(RegisteredWorkflowError, match="changed"):
+    with pytest.raises(WorkflowError, match="changed"):
         start(
             _config(
                 tmp_path / "beta2-corrupt.json",
@@ -92,7 +91,7 @@ def test_registered_config_snapshot_is_self_contained_and_cli_aliases_exist(tmp_
     run = start(config)
     config.unlink()
     assert resume(run) == run
-    assert load_workflow_manifest(run)["workflow"] == "beta1"
+    assert load_manifest(run)["workflow"] == "beta1"
 
     wrong = _config(tmp_path / "wrong.json", "beta2", tmp_path / "wrong-run")
     from thg_protocol.workflow.cli import main
@@ -166,7 +165,7 @@ def test_registered_resume_invalidates_changed_upstream_artifact(tmp_path):
     before = get_status(beta2)
     (beta1 / beta1_export["path"]).write_text("changed\n", encoding="utf-8")
 
-    with pytest.raises(RegisteredWorkflowError, match="stage 'beta2-input' failed"):
+    with pytest.raises(WorkflowError, match="stage 'beta2-input' failed"):
         resume(beta2)
 
     after = get_status(beta2)

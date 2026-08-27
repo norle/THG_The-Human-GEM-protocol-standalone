@@ -1,12 +1,5 @@
 """Restartable composition of maintained THG workflow APIs."""
 
-from .artifacts import (
-    ArtifactReference,
-    ArtifactReferenceError,
-    ResolvedArtifact,
-    resolve_artifact,
-    upstream_fingerprint,
-)
 from .config import (
     ConfigError,
     WorkflowConfig,
@@ -47,11 +40,6 @@ __all__ = [
     "resume",
     "start",
     "write_workflow_snapshot",
-    "ArtifactReference",
-    "ArtifactReferenceError",
-    "ResolvedArtifact",
-    "resolve_artifact",
-    "upstream_fingerprint",
     "EvidenceError",
     "EvidenceRecord",
     "EvidenceStore",

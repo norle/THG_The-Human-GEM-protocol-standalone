@@ -1,5 +1,0 @@
-{
-  "case_id": "reference.gpr.page-parser.basic-gene-pairs",
-  "page": "<b>Gene:</b> GENE1 ENSG000001<br>\n<b>Gene:</b> GENE2 ENSG000002<br>\n",
-  "expected": [["GENE1", "ENSG000001"], ["GENE2", "ENSG000002"]]
-}

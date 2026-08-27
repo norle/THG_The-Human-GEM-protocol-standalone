@@ -5,7 +5,7 @@ import socket
 
 import pytest
 
-from thg_protocol.workflow.lock import (
+from thg_protocol.runtime.locking import (
     RunLockedError,
     acquire_run_lock,
     unlock_run,
@@ -43,7 +43,7 @@ def test_unlock_removes_a_lock_after_owner_is_proven_dead(tmp_path, monkeypatch)
         del pid, signal
         raise ProcessLookupError
 
-    monkeypatch.setattr("thg_protocol.workflow.lock.os.kill", dead_process)
+    monkeypatch.setattr("thg_protocol.runtime.locking.os.kill", dead_process)
     unlock_run(run_dir)
 
     assert not lock_path.exists()

@@ -1,9 +1,0 @@
-{
-  "case_id": "reference-reaction-identification.basic-filtered-row",
-  "reaction": "<reaction metaid=\"R_TEST\" reversible=\"true\"><annotation><rdf:li rdf:resource=\"/R123\"/><rdf:li rdf:resource=\"MAR42\"/><rdf:li rdf:resource=\"/ec-code/1.2.3.4\"/></annotation><listOfReactants><speciesReference species=\"M_a_c\" stoichiometry=\"2\"/><speciesReference species=\"M_h_c\" stoichiometry=\"1\"/></listOfReactants><listOfProducts><speciesReference species=\"M_b_c\" stoichiometry=\"1\"/></listOfProducts><geneProductAssociation><geneProductRef geneProduct=\"G1\"/></geneProductAssociation></reaction>",
-  "row_number": 7,
-  "metabolite_pattern": "M_[A-Za-z0-9_]+",
-  "hydrogen_ids": ["h"],
-  "water_ids": ["h2o"],
-  "expected": "7 R123 ac,bc,hc a,b,h true Mac,Mhc Mbc 2,1,1 2,1,1 1.2.3.4 G1 MAR42\n"
-}

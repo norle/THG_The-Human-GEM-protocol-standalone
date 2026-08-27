@@ -7,7 +7,7 @@ from cobra import Metabolite, Model, Reaction
 from cobra.io import save_json_model
 
 from thg_protocol.curation.beta1 import beta1_release_gate, release_beta1
-from thg_protocol.workflow.manifest import load_workflow_manifest
+from thg_protocol.runtime.manifest import load_manifest
 from thg_protocol.workflow.registry import REGISTRY
 from thg_protocol.workflow.runner import get_status, resume, start
 
@@ -66,7 +66,7 @@ def test_configured_beta1_workflow_produces_candidate_and_resumes(tmp_path):
         get_status(run_dir)["steps"]["generate-curation-proposals"]["attempt"]
         == attempts
     )
-    assert load_workflow_manifest(run_dir)["workflow"] == "beta1"
+    assert load_manifest(run_dir)["workflow"] == "beta1"
 
 
 def test_reaction_identity_stage_uses_resolved_metabolite_identities(tmp_path):
@@ -109,7 +109,7 @@ def test_reaction_identity_stage_uses_resolved_metabolite_identities(tmp_path):
     )
 
     start(config)
-    manifest = load_workflow_manifest(run_dir)
+    manifest = load_manifest(run_dir)
     output = manifest["steps"]["resolve-reaction-identities"]["outputs"][0]
     payload = json.loads((run_dir / output["path"]).read_text(encoding="utf-8"))
 
@@ -156,7 +156,7 @@ def test_reaction_identity_stage_accepts_reaction_identities_configuration(tmp_p
     )
 
     start(config)
-    manifest = load_workflow_manifest(run_dir)
+    manifest = load_manifest(run_dir)
     output = manifest["steps"]["resolve-reaction-identities"]["outputs"][0]
     payload = json.loads((run_dir / output["path"]).read_text(encoding="utf-8"))
 
@@ -238,7 +238,7 @@ def test_sanctioned_fixture_passes_candidate_release_gate(tmp_path):
         encoding="utf-8",
     )
     start(config)
-    manifest = load_workflow_manifest(run_dir)
+    manifest = load_manifest(run_dir)
     export = manifest["steps"]["export-beta1"]
     bundle = run_dir / Path(export["outputs"][0]["path"]).parent
     gate = beta1_release_gate(bundle)

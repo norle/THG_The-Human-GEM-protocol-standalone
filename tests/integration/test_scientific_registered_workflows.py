@@ -6,8 +6,7 @@ import cobra
 import pytest
 from cobra.io import save_json_model, write_sbml_model
 
-from thg_protocol.workflow.registered_runner import RegisteredWorkflowError
-from thg_protocol.workflow.runner import start
+from thg_protocol.workflow.runner import WorkflowError, start
 
 
 def _model(path, reactions=1):
@@ -85,5 +84,5 @@ def test_human_database_live_mode_requires_an_adapter(tmp_path):
     path = tmp_path / "config.json"
     path.write_text(json.dumps(config), encoding="utf-8")
 
-    with pytest.raises(RegisteredWorkflowError, match="requires an injected"):
+    with pytest.raises(WorkflowError, match="requires an injected"):
         start(path)
