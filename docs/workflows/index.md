@@ -8,11 +8,11 @@ independently, while β2 normally consumes a released β1 artifact.
 | --- | --- | --- |
 | [THGβ1](beta1.md) | Curating an existing reference GEM | `thg-run beta1 configs/beta1.json` |
 | [THGβ2](beta2.md) | Expanding GPR and localization branches | `thg-run beta2 configs/beta2.json` |
-| Gapfill | Create a validated reference from an explicit model | `thg-run gapfill CONFIG` |
-| Reference | Run β1 → β2 → gapfill as one lineage | `thg-run reference CONFIG` |
-| Cell-specific | Reduce an explicit GEM from normalized expression evidence | `thg-run cell-specific CONFIG` |
-| Pathway | Apply a versioned pathway definition to a GEM | `thg-run pathway CONFIG` |
-| Compare | Produce a semantic comparison of two model inputs | `thg-run compare CONFIG` |
+| [Gapfill](gapfill.md) | Create a validated reference from an explicit model | `thg-run gapfill CONFIG` |
+| [Reference](gapfill.md) | Run β1 → β2 → gapfill as one lineage | `thg-run reference CONFIG` |
+| [Cell-specific](cell-specific.md) | Reduce an explicit GEM from normalized expression evidence | `thg-run cell-specific CONFIG` |
+| [Pathway](pathway.md) | Apply a versioned pathway definition to a GEM | `thg-run pathway CONFIG` |
+| [Compare](../tools/analysis.md) | Produce a semantic comparison of two model inputs | `thg-run compare CONFIG` |
 | [Human Database](human-database.md) | Reconstructing from normalized records | `thg-run start configs/human-database.json` |
 | [Final THG](final-thg.md) | Merging branches and validating a candidate | `thg-run start configs/final-thg.json` |
 | [Validation](validation.md) | Running reusable checks or MEMOTE | `thg-run validate configs/validation.json` |

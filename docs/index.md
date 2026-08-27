@@ -8,12 +8,18 @@ software behavior and publication-artifact reproduction as separate claims.
 
 [Installation](installation.md) · [Quickstart](quickstart.md) · [Workflow overview](workflows/index.md)
 
+Key routes: [gapfill and reference workflows](workflows/gapfill.md) and
+[cell-specific reduction](workflows/cell-specific.md).
+
 ```mermaid
 flowchart LR
     A[Reference GEM] --> B[THGβ1]
     B --> C[THGβ2]
     C --> E[Final THG]
+    C -. optional .-> G[Gapfill]
+    G -.-> E
     D[Human Database] --> E
+    A --> S[Cell-specific]
     E --> F[Validation]
 ```
 

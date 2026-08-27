@@ -73,6 +73,7 @@ nav:
   - THG workflows:
       - THGβ1 — Curate a reference GEM: workflows/beta1.md
       - THGβ2 — Expand by GPR and location: workflows/beta2.md
+      - Gapfill and reference workflows: workflows/gapfill.md
       - Human Database: workflows/human-database.md
       - Final THG — Merge and validate: workflows/final-thg.md
       - Cell-specific reduction: workflows/cell-specific.md
