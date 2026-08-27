@@ -123,13 +123,9 @@ def _activity_matrix(activity: Any, *, matrix_key: str) -> Any:
 
 
 def _write_model(model: Any, output_path: Path) -> None:
-    from cobra.io import save_json_model, write_sbml_model
+    from thg_protocol.io.models import save_model
 
-    output_path.parent.mkdir(parents=True, exist_ok=True)
-    if output_path.suffix.lower() == ".json":
-        save_json_model(model, str(output_path))
-    else:
-        write_sbml_model(model, str(output_path))
+    save_model(model, output_path)
 
 
 def reduce_model_by_activity(

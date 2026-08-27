@@ -123,9 +123,44 @@ def validate_workflow_dependencies(workflow_id: str) -> None:
     get_workflow(workflow_id).validate()
 
 
-# Built-in fixture workflows are imported lazily after the registry exists.
-from .foundation_stages import (  # noqa: E402
-    register_builtin_workflows as _register_builtin_workflows,
-)
+def register_builtin_workflows() -> None:
+    """Register the built-in definitions from their owning workflow modules."""
+    from .beta1.definition import BETA1_WORKFLOW
+    from .beta2.definition import BETA2_WORKFLOW
+    from .cell_specific import CELL_SPECIFIC_WORKFLOW
+    from .compare import COMPARE_WORKFLOW
+    from .final_thg import FINAL_THG_WORKFLOW
+    from .foundation import fixture_stages
+    from .gapfill import GAPFILL_WORKFLOW
+    from .human_database import HUMAN_DATABASE_WORKFLOW
+    from .pathway import PATHWAY_WORKFLOW
+    from .reference import REFERENCE_WORKFLOW
+    from .validation import validation_stages
 
-_register_builtin_workflows(REGISTRY)
+    definitions = (
+        HUMAN_DATABASE_WORKFLOW,
+        FINAL_THG_WORKFLOW,
+        BETA1_WORKFLOW,
+        BETA2_WORKFLOW,
+        GAPFILL_WORKFLOW,
+        REFERENCE_WORKFLOW,
+        WorkflowDefinition(
+            "validate",
+            fixture_stages("validate"),
+            frozenset({"validation"}),
+            "Validation foundation fixture",
+            scientific_stages=validation_stages(),
+        ),
+        COMPARE_WORKFLOW,
+        CELL_SPECIFIC_WORKFLOW,
+        PATHWAY_WORKFLOW,
+    )
+    for definition in definitions:
+        try:
+            REGISTRY.register(definition)
+        except WorkflowRegistryError as error:
+            if "duplicate workflow ID" not in str(error):
+                raise
+
+
+register_builtin_workflows()

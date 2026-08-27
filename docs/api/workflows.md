@@ -14,6 +14,18 @@ for complete user-facing operations. Use [`start`][thg_protocol.workflow.runner.
 and [`resume`][thg_protocol.workflow.runner.resume] for the documented
 restartable engineering DAG.
 
+Shared model files use [`load_model`][thg_protocol.io.models.load_model],
+[`save_model`][thg_protocol.io.models.save_model], and the explicit JSON/SBML
+writers below.
+
+::: thg_protocol.io.models
+    options:
+      members:
+        - load_model
+        - save_model
+        - save_json
+        - save_sbml
+
 ## Validation, tasks, and MEMOTE
 
 ::: thg_protocol.validation
@@ -108,7 +120,7 @@ restartable engineering DAG.
         - write_workflow_snapshot
         - load_snapshot
 
-::: thg_protocol.workflow.hashing
+::: thg_protocol.runtime.hashing
     options:
       members:
         - sha256_file
@@ -116,14 +128,14 @@ restartable engineering DAG.
         - artifact_record
         - verify_artifact
 
-::: thg_protocol.workflow.manifest
+::: thg_protocol.runtime.manifest
     options:
       members:
         - ManifestError
         - utc_now
-        - new_workflow_manifest
-        - validate_workflow_manifest
-        - load_workflow_manifest
+        - new_manifest
+        - validate_manifest
+        - load_manifest
         - write_manifest_atomic
 
 ::: thg_protocol.workflow.runner
@@ -134,14 +146,14 @@ restartable engineering DAG.
         - resume
         - get_status
 
-::: thg_protocol.workflow.stages
+::: thg_protocol.runtime.stage
     options:
       members:
         - StageContext
         - StageResult
         - Stage
 
-::: thg_protocol.workflow.lock
+::: thg_protocol.runtime.locking
     options:
       members:
         - RunLockedError

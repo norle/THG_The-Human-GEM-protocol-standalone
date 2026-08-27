@@ -166,7 +166,7 @@ def run_metabolite_reaction_identification(
     without network access. COBRA is imported only when this function is
     called.
     """
-    from cobra.io import read_sbml_model
+    from thg_protocol.io.models import load_model
 
     model_path = Path(model_path).expanduser()
     database_path = Path(database_path).expanduser()
@@ -180,7 +180,7 @@ def run_metabolite_reaction_identification(
     annotation_path = output_dir / "met_annotation.tsv"
     failure_path = output_dir / "met_annotation_failures.tsv"
 
-    cobra_model = read_sbml_model(str(model_path))
+    cobra_model = load_model(model_path)
     client = pubchem_client or PubChemClient()
     metabolites = gather_metabolites(cobra_model)
     annotated, unannotated = generate_met_annotation(

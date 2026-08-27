@@ -838,7 +838,8 @@ def _run_transport(
 def _run_milp(model: Any, parameters: dict[str, Any]) -> GapfillResult:
     import cobra
     from cobra.flux_analysis.gapfilling import GapFiller
-    from cobra.io import load_json_model, read_sbml_model
+
+    from thg_protocol.io.models import load_model
 
     universal_path = Path(parameters["universal_model"])
     if not universal_path.is_file():
@@ -848,11 +849,7 @@ def _run_milp(model: Any, parameters: dict[str, Any]) -> GapfillResult:
         raise ValueError("milp requires a COBRApy model")
     if parameters["objective"] not in working.reactions:
         raise ValueError(f"objective not found: {parameters['objective']}")
-    universal = (
-        load_json_model(str(universal_path))
-        if universal_path.suffix.lower() == ".json"
-        else read_sbml_model(str(universal_path))
-    )
+    universal = load_model(universal_path)
     original_objective = working.objective
     working.objective = parameters["objective"]
     try:

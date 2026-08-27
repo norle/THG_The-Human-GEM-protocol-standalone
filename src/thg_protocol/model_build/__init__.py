@@ -75,7 +75,7 @@ def build_model(
     clients are instantiated lazily only when a matching annotation exists,
     which keeps empty/toy models fully offline and testable.
     """
-    from cobra import io
+    from thg_protocol.io.models import load_model, save_model
 
     source = Path(input_path)
     destination = Path(output_path)
@@ -88,11 +88,7 @@ def build_model(
     if error_file is not None:
         error_file.parent.mkdir(parents=True, exist_ok=True)
 
-    model = (
-        io.read_sbml_model(str(source))
-        if source.suffix.lower() != ".json"
-        else io.load_json_model(str(source))
-    )
+    model = load_model(source)
     report = ModelBuildReport(source, destination, cache_root)
 
     kegg_cache_path = cache_root / "kegg_reaction_entries.json"
@@ -193,10 +189,7 @@ def build_model(
             report.ensembl_genes += 1
     _save_json_cache(ensembl_cache_path, ensembl_cache)
 
-    if destination.suffix.lower() == ".json":
-        io.save_json_model(model, str(destination))
-    else:
-        io.write_sbml_model(model, str(destination))
+    save_model(model, destination)
     if error_file is not None:
         error_file.write_text(
             json.dumps(report.errors, indent=2) + "\n", encoding="utf-8"

@@ -18,7 +18,7 @@ from typing import Any
 from cobra import Metabolite, Reaction
 
 from thg_protocol.curation.beta1 import classify_reaction
-from thg_protocol.workflow.hashing import sha256_file
+from thg_protocol.runtime.hashing import sha256_file
 from thg_protocol.workflow.ids import DeterministicIdRegistry
 from thg_protocol.workflow.proposals import proposal_id
 
@@ -823,7 +823,7 @@ def beta2_release_gate(bundle_dir: str | Path) -> dict[str, object]:
     else:
         try:
             from thg_protocol.curation.beta1 import beta1_release_gate
-            from thg_protocol.workflow.artifacts import resolve_artifact
+            from thg_protocol.runtime.artifacts import resolve_artifact
 
             resolved = resolve_artifact(upstream)
             if isinstance(provenance.get("input_sha256"), str) and sha256_file(

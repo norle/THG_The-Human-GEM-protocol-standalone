@@ -6,7 +6,7 @@ import json
 import re
 from pathlib import Path
 
-from .hashing import sha256_json
+from thg_protocol.runtime.hashing import sha256_json
 
 
 class IdRegistryError(ValueError):

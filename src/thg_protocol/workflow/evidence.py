@@ -10,7 +10,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from .hashing import sha256_json
+from thg_protocol.runtime.hashing import sha256_json
 
 
 class EvidenceError(ValueError):

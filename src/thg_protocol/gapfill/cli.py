@@ -57,21 +57,17 @@ def _parameters(args: argparse.Namespace) -> dict[str, Any]:
 
 
 def _load_model(path: Path) -> Any:
-    from cobra.io import load_json_model, read_sbml_model
+    from thg_protocol.io.models import load_model
 
-    return (
-        load_json_model(str(path))
-        if path.suffix.lower() == ".json"
-        else read_sbml_model(str(path))
-    )
+    return load_model(path)
 
 
 def _write_outputs(result: Any, destination: Path, checksum: str) -> None:
-    from cobra.io import save_json_model, write_sbml_model
+    from thg_protocol.io.models import save_json, save_sbml
 
     destination.mkdir(parents=True, exist_ok=True)
-    save_json_model(result.model, str(destination / "gapfilled-model.json"))
-    write_sbml_model(result.model, str(destination / "gapfilled-model.xml"))
+    save_json(result.model, destination / "gapfilled-model.json")
+    save_sbml(result.model, destination / "gapfilled-model.xml")
     report = result.as_dict() | {"input_checksum": checksum}
     (destination / "gapfill-report.json").write_text(
         json.dumps(report, indent=2, sort_keys=True) + "\n"

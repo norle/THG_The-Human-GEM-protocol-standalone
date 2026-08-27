@@ -254,11 +254,9 @@ def compare_semantic_models(model_a: Any, model_b: Any) -> dict[str, Any]:
 
 
 def _load_model(path: Path) -> Any:
-    from cobra.io import load_json_model, read_sbml_model
+    from thg_protocol.io.models import load_model
 
-    if path.suffix.lower() == ".json":
-        return load_json_model(path)
-    return read_sbml_model(path)
+    return load_model(path)
 
 
 def compare_model_files_semantically(
@@ -342,14 +340,10 @@ def compare_models_from_files(
     include_blocked: bool = True,
 ) -> dict[str, dict[str, Any]]:
     """Load two JSON/SBML models and optionally write comparison CSV reports."""
-    from cobra.io import load_json_model, read_sbml_model
-
     def load(path: Path) -> Any:
-        return (
-            load_json_model(path)
-            if path.suffix.lower() == ".json"
-            else read_sbml_model(path)
-        )
+        from thg_protocol.io.models import load_model
+
+        return load_model(path)
 
     model_a = load(Path(model_a_path))
     model_b = load(Path(model_b_path))

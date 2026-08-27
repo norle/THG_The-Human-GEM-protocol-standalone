@@ -21,8 +21,8 @@ from typing import Any
 from thg_protocol.analysis.consistency import reaction_balance
 from thg_protocol.analysis.model_signature import model_signature
 from thg_protocol.model_build.mass_balance import formula_atoms
-from thg_protocol.workflow.hashing import sha256_file
-from thg_protocol.workflow.parallel import parallel_map
+from thg_protocol.runtime.concurrency import parallel_map
+from thg_protocol.runtime.hashing import sha256_file
 from thg_protocol.workflow.proposals import (
     Decision,
     Proposal,
@@ -2141,13 +2141,9 @@ def apply_cleanup_proposals(
 
 
 def _load_model(path: Path) -> Any:
-    from cobra.io import load_json_model, read_sbml_model
+    from thg_protocol.io.models import load_model
 
-    return (
-        load_json_model(str(path))
-        if path.suffix.lower() == ".json"
-        else read_sbml_model(str(path))
-    )
+    return load_model(path)
 
 
 def _semantic_ledger_entries(
@@ -2458,11 +2454,11 @@ def run_beta1(
         encoding="utf-8",
     )
     json_path = destination / "thg-beta1-candidate.json"
-    from cobra.io import save_json_model, write_sbml_model
+    from thg_protocol.io.models import save_json, save_sbml
 
-    save_json_model(curated, str(json_path))
+    save_json(curated, json_path)
     sbml_path = destination / "thg-beta1-candidate.xml"
-    write_sbml_model(curated, str(sbml_path))
+    save_sbml(curated, sbml_path)
     # Export/reload is part of the β1 validation boundary, not just an output
     # convenience: serialization failures must stop the run before release.
     _load_model(json_path)

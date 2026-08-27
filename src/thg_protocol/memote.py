@@ -7,7 +7,7 @@ import subprocess
 from collections.abc import Sequence
 from pathlib import Path
 
-from .workflow.hashing import sha256_file
+from .runtime.hashing import sha256_file
 
 
 def run_memote(

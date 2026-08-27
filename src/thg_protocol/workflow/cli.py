@@ -7,9 +7,10 @@ import json
 import logging
 from pathlib import Path
 
+from thg_protocol.runtime.locking import RunLockedError, unlock_run
+from thg_protocol.runtime.manifest import ManifestError
+
 from .config import ConfigError
-from .lock import RunLockedError, unlock_run
-from .manifest import ManifestError
 from .registered_runner import RegisteredWorkflowError
 from .runner import WorkflowError, get_status, resume, start
 

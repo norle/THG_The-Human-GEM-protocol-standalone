@@ -434,13 +434,9 @@ def _merge_annotation(target: Any, source: Any) -> None:
 
 
 def _write_model(model: Any, output_path: Path) -> None:
-    from cobra.io import save_json_model, write_sbml_model
+    from thg_protocol.io.models import save_model
 
-    output_path.parent.mkdir(parents=True, exist_ok=True)
-    if output_path.suffix.lower() == ".json":
-        save_json_model(model, str(output_path))
-    else:
-        write_sbml_model(model, str(output_path))
+    save_model(model, output_path)
 
 
 def merge_models(
@@ -575,14 +571,10 @@ def merge_models_from_paths(
     remove_isolated_metabolites: bool = False,
 ) -> tuple[Any, MergeReport]:
     """Load two SBML/JSON models and merge them to an explicit output path."""
-    from cobra.io import load_json_model, read_sbml_model
+    from thg_protocol.io.models import load_model
 
     def load(path: Path) -> Any:
-        return (
-            load_json_model(str(path))
-            if path.suffix.lower() == ".json"
-            else read_sbml_model(str(path))
-        )
+        return load_model(path)
 
     return merge_models(
         load(Path(base_path)),

@@ -32,7 +32,7 @@ def annotate_cobra_model(
     their parent directories are created explicitly. The second file retains
     the legacy identifier normalization used by THG model consumers.
     """
-    from cobra.io import write_sbml_model
+    from thg_protocol.io.models import save_sbml
 
     first_path = Path(out_file1).expanduser().resolve()
     second_path = Path(out_file2).expanduser().resolve()
@@ -50,7 +50,7 @@ def annotate_cobra_model(
             )
 
         LOGGER.info("Writing SBML model to %s...", first_path)
-        write_sbml_model(model, str(first_path))
+        save_sbml(model, first_path)
 
     replacements = (
         ('fbc:label="G_', 'fbc:label="'),

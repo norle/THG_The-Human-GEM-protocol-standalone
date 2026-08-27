@@ -134,7 +134,8 @@ def reconstruct_model(
     outside this function.
     """
     from cobra import Metabolite, Model, Reaction
-    from cobra.io import save_json_model, write_sbml_model
+
+    from thg_protocol.io.models import save_json, save_sbml
 
     model = Model(model_id, model_name or model_id)
     metabolite_by_id: dict[str, Any] = {}
@@ -223,9 +224,9 @@ def reconstruct_model(
         path = Path(output_path)
         path.parent.mkdir(parents=True, exist_ok=True)
         if path.suffix.lower() == ".json":
-            save_json_model(model, str(path))
+            save_json(model, path)
         else:
-            write_sbml_model(model, str(path))
+            save_sbml(model, path)
     return model
 
 

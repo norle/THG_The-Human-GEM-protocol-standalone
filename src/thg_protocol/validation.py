@@ -260,14 +260,9 @@ def minimal_inconsistent_sets(
 
 def load_model(path: str | Path) -> Any:
     """Load JSON or SBML and verify that the model can be traversed."""
-    from cobra.io import load_json_model, read_sbml_model
+    from thg_protocol.io.models import load_model as load_cobra_model
 
-    source = Path(path)
-    model = (
-        load_json_model(str(source))
-        if source.suffix.lower() == ".json"
-        else read_sbml_model(str(source))
-    )
+    model = load_cobra_model(path)
     if not getattr(model, "id", None):
         raise ValueError("model has no identifier")
     return model
