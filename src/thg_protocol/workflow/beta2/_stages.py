@@ -189,7 +189,10 @@ def _resolve_location_payload(
 
     reaction_id, gpr, location_items, raw_location_items, fallback, record = payload
     locations = dict(location_items)
-    result = resolve_gpr_locations(gpr, locations, fallback_location=fallback)
+    effective_gpr = str(record.get("candidate_sgpr") or gpr)
+    result = resolve_gpr_locations(
+        effective_gpr, locations, fallback_location=fallback
+    )
     evidence = [{"reaction_id": reaction_id, **item} for item in result.evidence]
     genes = record.get("genes", [])
     for gene, value in raw_location_items:
@@ -446,12 +449,15 @@ class DetailedBeta2Stage:
             ).get("records", {})
             mode = str(section.get("evidence_mode", "provided"))
             snapshot = _snapshot_records(section) if mode == "snapshot" else []
-            snapshot_by_reaction = {
-                str(item.get("reaction_id")): item
-                for item in snapshot
-                if _record_kind(item) in {"gpr", "gpr-evidence"}
-                and item.get("reaction_id")
-            }
+            snapshot_by_reaction: dict[str, list[dict[str, object]]] = {}
+            for item in snapshot:
+                if (
+                    _record_kind(item) in {"gpr", "gpr-evidence"}
+                    and item.get("reaction_id")
+                ):
+                    snapshot_by_reaction.setdefault(
+                        str(item["reaction_id"]), []
+                    ).append(item)
             requests: dict[str, list[str]] = {}
             for reaction in model.reactions:
                 valid, _ = _usable_gpr(reaction.gene_reaction_rule)
@@ -464,6 +470,7 @@ class DetailedBeta2Stage:
                 for ec in ecs:
                     requests.setdefault(ec, []).append(str(reaction.id))
             candidates: dict[str, dict[str, object]] = {}
+            source_candidates: dict[str, list[dict[str, object]]] = {}
             source_metadata: dict[str, object] = {}
             LOGGER.debug(
                 "collect-gpr-evidence: %d reactions, %d unique ECs, mode=%s",
@@ -512,7 +519,7 @@ class DetailedBeta2Stage:
                     unit="EC",
                     disable=not LOGGER.isEnabledFor(logging.DEBUG),
                 ):
-                    candidates[ec] = get_gpr_evidence(
+                    candidate = get_gpr_evidence(
                         ec,
                         biocyc_client=biocyc_client,
                         kegg_client=kegg_client,
@@ -520,6 +527,8 @@ class DetailedBeta2Stage:
                         if not biocyc_enabled
                         else None,
                     )
+                    candidates[ec] = candidate
+                    source_candidates.setdefault(ec, []).append(candidate)
                     if getattr(biocyc_client, "metadata", None):
                         source_metadata["biocyc"] = dict(biocyc_client.metadata)
             elif mode == "snapshot":
@@ -528,7 +537,9 @@ class DetailedBeta2Stage:
                         continue
                     ec = str(item.get("ec", "")).strip()
                     if ec:
-                        candidates[ec] = dict(item)
+                        candidate = dict(item)
+                        candidates[ec] = candidate
+                        source_candidates.setdefault(ec, []).append(candidate)
             fallback_checkpoint = _gpr_checkpoint(
                 work_dir, "fallback", candidates, source_metadata
             )
@@ -542,6 +553,7 @@ class DetailedBeta2Stage:
                 "collect-gpr-evidence: reaction sources=%s",
                 ", ".join(sorted(reaction_sources)) or "none",
             )
+            rhea_candidates: dict[str, dict[str, object]] = {}
             if "rhea" in reaction_sources:
                 from thg_protocol.services.rhea import RheaClient, StaticRheaClient
 
@@ -577,11 +589,9 @@ class DetailedBeta2Stage:
                     unit="EC",
                     disable=not LOGGER.isEnabledFor(logging.DEBUG),
                 ):
-                    if ec in candidates:
-                        continue
                     reaction_matches = rhea.reactions_for_ec(ec)
                     if len(reaction_matches) != 1:
-                        candidates[ec] = {
+                        candidate = {
                             "ec": ec,
                             "candidate_gpr": "",
                             "gene_symbols": [],
@@ -592,7 +602,14 @@ class DetailedBeta2Stage:
                             "warnings": ["ambiguous-rhea-reaction"]
                             if reaction_matches
                             else ["no-rhea-reaction"],
+                            "candidate_sgpr": "",
+                            "sgpr_structure": None,
+                            "sgpr_status": "unresolved",
+                            "sgpr_sources": ["rhea"],
                         }
+                        rhea_candidates[ec] = candidate
+                        source_candidates.setdefault(ec, []).append(candidate)
+                        candidates.setdefault(ec, candidate)
                         continue
                     match = reaction_matches[0]
                     rhea_id = str(match.get("rhea_id", match.get("id", "")))
@@ -620,7 +637,20 @@ class DetailedBeta2Stage:
                         if gene:
                             genes.append(gene)
                     genes = sorted(set(genes))
-                    candidates[ec] = {
+                    from thg_protocol.gpr.stoichiometry import (
+                        GeneNode,
+                        OrNode,
+                        sgpr_to_dict,
+                        to_sgpr,
+                    )
+
+                    sgpr = OrNode(
+                        tuple(
+                            GeneNode(gene, None, "unknown", "rhea", (rhea_id,))
+                            for gene in genes
+                        )
+                    ) if genes else None
+                    candidate = {
                         "ec": ec,
                         "rhea_id": rhea_id,
                         "candidate_gpr": " or ".join(f"({gene})" for gene in genes),
@@ -640,10 +670,34 @@ class DetailedBeta2Stage:
                         "status": "candidate" if genes else "unresolved",
                         "confidence": "reaction-matched",
                         "warnings": [],
+                        "candidate_sgpr": to_sgpr(sgpr) if sgpr else "",
+                        "sgpr_structure": sgpr_to_dict(sgpr) if sgpr else None,
+                        "sgpr_status": "candidate" if sgpr else "unresolved",
+                        "sgpr_sources": ["rhea"],
                     }
+                    rhea_candidates[ec] = candidate
+                    source_candidates.setdefault(ec, []).append(candidate)
+                    if candidates.get(ec, {}).get("source") in {"kegg", "none"}:
+                        candidates[ec] = candidate
+                    else:
+                        candidates.setdefault(ec, candidate)
+                    if "uniprot" in reaction_sources:
+                        from thg_protocol.gpr.sources.uniprot import (
+                            uniprot_sgpr_evidence,
+                        )
+
+                        source_candidates.setdefault(ec, []).append(
+                            uniprot_sgpr_evidence(ec, proteins=proteins).to_dict()
+                        )
                 if getattr(rhea, "metadata", None):
                     source_metadata["rhea"] = dict(rhea.metadata)
             if "rhea" in reaction_sources:
+                from thg_protocol.gpr.stoichiometry import (
+                    GeneNode,
+                    OrNode,
+                    sgpr_to_dict,
+                    to_sgpr,
+                )
                 rhea_file = section.get("rhea_snapshot")
                 rhea_payload = {}
                 if isinstance(rhea_file, str) and Path(rhea_file).is_file():
@@ -686,6 +740,12 @@ class DetailedBeta2Stage:
                             and item.get("gene", item.get("gene_symbol"))
                         }
                     )
+                    sgpr = OrNode(
+                        tuple(
+                            GeneNode(gene, None, "unknown", "rhea", (rhea_id,))
+                            for gene in genes
+                        )
+                    ) if genes else None
                     candidates.setdefault(
                         f"direct:{reaction_id}",
                         {
@@ -701,6 +761,10 @@ class DetailedBeta2Stage:
                             "identity": dict(reaction)
                             if isinstance(reaction, Mapping)
                             else {},
+                            "candidate_sgpr": to_sgpr(sgpr) if sgpr else "",
+                            "sgpr_structure": sgpr_to_dict(sgpr) if sgpr else None,
+                            "sgpr_status": "candidate" if sgpr else "unresolved",
+                            "sgpr_sources": ["rhea"],
                         },
                     )
             rhea_checkpoint = _gpr_checkpoint(
@@ -710,13 +774,14 @@ class DetailedBeta2Stage:
                 from thg_protocol.services.reactome import (
                     ReactomeClient,
                     catalyst_candidate_gpr,
+                    catalyst_sgpr,
                 )
 
                 reactome = ReactomeClient(
                     release=_source_release(section, "reactome")
                 )
                 for _ec, candidate in tqdm(
-                    candidates.items(),
+                    rhea_candidates.items(),
                     desc="Reactome",
                     unit="candidate",
                     disable=not LOGGER.isEnabledFor(logging.DEBUG),
@@ -729,11 +794,17 @@ class DetailedBeta2Stage:
                         continue
                     candidate_gpr = catalyst_candidate_gpr(matches[0])
                     if candidate_gpr:
-                        candidate["candidate_gpr"] = candidate_gpr
-                        candidate["source"] = "reactome"
-                        candidate["confidence"] = "strong"
-                        candidate["status"] = "resolved"
-                        candidate["source_metadata"] = dict(reactome.metadata)
+                        reactome_evidence = catalyst_sgpr(matches[0], ec=str(_ec))
+                        reactome_candidate = {
+                            **reactome_evidence.to_dict(),
+                            "rhea_id": candidate.get("rhea_id", ""),
+                            "source_metadata": dict(reactome.metadata),
+                            "sgpr_status": reactome_evidence.status,
+                            "sgpr_sources": ["reactome"],
+                        }
+                        source_candidates.setdefault(str(_ec), []).append(
+                            reactome_candidate
+                        )
                 if reactome.metadata:
                     source_metadata["reactome"] = dict(reactome.metadata)
                 if reactome.failed_requests:
@@ -757,13 +828,20 @@ class DetailedBeta2Stage:
                         ec = str(item["ec"])
                         from thg_protocol.services.reactome import (
                             catalyst_candidate_gpr,
+                            catalyst_sgpr,
                         )
 
                         candidate_gpr = catalyst_candidate_gpr(item)
-                        if ec not in candidates and candidate_gpr:
-                            candidates[ec] = {
+                        if candidate_gpr:
+                            reactome_evidence = catalyst_sgpr(item, ec=ec)
+                            reactome_dict = reactome_evidence.to_dict()
+                            candidate = {
                                 **dict(item),
                                 "candidate_gpr": candidate_gpr,
+                                "candidate_sgpr": reactome_dict["candidate_sgpr"],
+                                "sgpr_structure": reactome_dict["sgpr_structure"],
+                                "sgpr_status": reactome_evidence.status,
+                                "sgpr_sources": ["reactome"],
                                 "source": "reactome",
                                 "status": "resolved",
                                 "confidence": "strong",
@@ -772,13 +850,17 @@ class DetailedBeta2Stage:
                                     "release": _source_release(section, "reactome"),
                                 },
                             }
+                            source_candidates.setdefault(ec, []).append(candidate)
+                            candidates.setdefault(ec, candidate)
             reactome_checkpoint = _gpr_checkpoint(
                 work_dir, "reactome", candidates, source_metadata
             )
             records: list[dict[str, object]] = []
             for reaction_id in sorted(str(item.id) for item in model.reactions):
                 if reaction_id in snapshot_by_reaction:
-                    records.append(dict(snapshot_by_reaction[reaction_id]))
+                    records.extend(
+                        dict(item) for item in snapshot_by_reaction[reaction_id]
+                    )
                     continue
                 direct = candidates.get(f"direct:{reaction_id}")
                 if direct is not None:
@@ -788,27 +870,32 @@ class DetailedBeta2Stage:
                 for ec in _ec_numbers(
                     record.get("ec", []) if isinstance(record, Mapping) else []
                 ):
-                    candidate = dict(
-                        candidates.get(
-                            ec,
-                            {
-                                "ec": ec,
-                                "candidate_gpr": "",
-                                "gene_symbols": [],
-                                "gene_identifiers": [],
-                                "source": "none",
-                                "status": "unresolved",
-                                "warnings": ["evidence-mode-provided"],
-                            },
-                        )
-                    )
-                    candidate["reaction_id"] = reaction_id
-                    candidate.setdefault("ec", ec)
-                    records.append(candidate)
+                    for candidate in source_candidates.get(
+                        ec,
+                        [
+                            candidates.get(
+                                ec,
+                                {
+                                    "ec": ec,
+                                    "candidate_gpr": "",
+                                    "gene_symbols": [],
+                                    "gene_identifiers": [],
+                                    "source": "none",
+                                    "status": "unresolved",
+                                    "warnings": ["evidence-mode-provided"],
+                                },
+                            )
+                        ],
+                    ):
+                        record = dict(candidate)
+                        record["reaction_id"] = reaction_id
+                        record.setdefault("ec", ec)
+                        records.append(record)
             records.sort(
                 key=lambda item: (
                     str(item.get("reaction_id", "")),
                     str(item.get("ec", "")),
+                    str(item.get("source", "")),
                 )
             )
             LOGGER.debug(
@@ -872,15 +959,30 @@ class DetailedBeta2Stage:
                 ]
                 selected = model_gpr
                 selected_genes = model_genes or list(genes)
+                selected_external: Mapping[str, object] | None = None
                 conflicts = []
-                if not selected and accepted:
-                    selected, selected_genes, _ = accepted[0]
+                sgpr_resolution = None
+                if candidates:
+                    from thg_protocol.gpr.merge import merge_sgpr_evidence
+                    from thg_protocol.gpr.stoichiometry import genes_in_sgpr, to_gpr
+
+                    sgpr_resolution = merge_sgpr_evidence(
+                        item[2] for item in candidates
+                    )
+                    if sgpr_resolution.status == "conflict":
+                        conflicts.extend(item[2] for item in candidates)
+                if not selected and sgpr_resolution and sgpr_resolution.sgpr:
+                    selected = to_gpr(sgpr_resolution.sgpr)
+                    selected_genes = list(genes_in_sgpr(sgpr_resolution.sgpr))
+                    selected_external = {}
+                elif not selected and accepted:
+                    selected, selected_genes, selected_external = accepted[0]
                 elif selected:
-                    conflicts = [
+                    conflicts.extend(
                         item
                         for candidate, _, item in candidates
                         if candidate != selected
-                    ]
+                    )
                 records[reaction_id] = {
                     "gpr": selected,
                     "original_gpr": raw,
@@ -901,6 +1003,47 @@ class DetailedBeta2Stage:
                     if conflicts
                     else ("resolved" if selected else "unresolved"),
                 }
+                if sgpr_resolution is not None and sgpr_resolution.sgpr is not None:
+                    resolution_dict = sgpr_resolution.to_dict()
+                    records[reaction_id].update(
+                        {
+                            "candidate_sgpr": resolution_dict["sgpr"],
+                            "sgpr_structure": resolution_dict["sgpr_structure"],
+                            "sgpr_status": sgpr_resolution.status,
+                            "sgpr_sources": resolution_dict["sources"],
+                            "sgpr_warnings": resolution_dict["warnings"],
+                        }
+                    )
+                    if not reaction_stoich:
+                        from thg_protocol.gpr.stoichiometry import (
+                            unambiguous_stoichiometry,
+                        )
+
+                        derived = unambiguous_stoichiometry(sgpr_resolution.sgpr)
+                        if derived is not None:
+                            records[reaction_id]["subunit_stoichiometry"] = derived
+                if selected and selected_external is None:
+                    try:
+                        from thg_protocol.gpr.stoichiometry import (
+                            parse_sgpr,
+                            sgpr_to_dict,
+                            to_sgpr,
+                        )
+
+                        selected_node = parse_sgpr(selected)
+                        records[reaction_id].update(
+                            {
+                                "candidate_sgpr": to_sgpr(selected_node),
+                                "sgpr_structure": sgpr_to_dict(selected_node),
+                                "sgpr_status": "candidate",
+                                "sgpr_sources": ["model"],
+                                "sgpr_warnings": [],
+                            }
+                        )
+                    except ValueError:
+                        records[reaction_id]["sgpr_warnings"] = [
+                            "model-gpr-not-representable-as-sgpr"
+                        ]
                 reaction = model.reactions.get_by_id(reaction_id)
                 if selected and selected != str(raw).strip():
                     reaction.gene_reaction_rule = selected

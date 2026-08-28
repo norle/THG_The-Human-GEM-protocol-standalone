@@ -225,10 +225,68 @@ def test_live_smoke_snapshot_replay_is_semantically_identical(tmp_path, monkeypa
     ):
         assert _jsonl(_artifact(snapshot_run, role)) == _jsonl(
             _artifact(live_run, role)
-    )
+        )
     for role in ("compartment-resolution-evidence", "id-registry"):
         assert _semantic(
             json.loads(_artifact(snapshot_run, role).read_text())
         ) == _semantic(
             json.loads(_artifact(live_run, role).read_text())
         )
+
+
+def test_snapshot_keeps_each_source_and_prefers_reactome_structure(tmp_path):
+    model = Model("beta2-sgpr-sources")
+    left = Metabolite("left_c", formula="C", compartment="c")
+    right = Metabolite("right_c", formula="C", compartment="c")
+    reaction = Reaction("R_SGPR")
+    reaction.add_metabolites({left: -1, right: 1})
+    reaction.annotation["ec-code"] = ["1.1.1.1"]
+    model.add_reactions([reaction])
+    source = tmp_path / "beta1.json"
+    save_json_model(model, source)
+    evidence = tmp_path / "evidence.jsonl"
+    evidence.write_text(
+        "\n".join(
+            json.dumps(item)
+            for item in (
+                {
+                    "record_type": "gpr-evidence",
+                    "reaction_id": "R_SGPR",
+                    "ec": "1.1.1.1",
+                    "source": "rhea",
+                    "candidate_gpr": "A or B",
+                    "status": "candidate",
+                },
+                {
+                    "record_type": "gpr-evidence",
+                    "reaction_id": "R_SGPR",
+                    "ec": "1.1.1.1",
+                    "source": "reactome",
+                    "candidate_gpr": "A and B",
+                    "status": "resolved",
+                },
+            )
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    config = tmp_path / "beta2.json"
+    run = tmp_path / "run"
+    _config(
+        config,
+        run,
+        source,
+        evidence_mode="snapshot",
+        evidence_file=str(evidence),
+    )
+
+    start(config)
+
+    records = [
+        item
+        for item in _jsonl(_artifact(run, "gpr-evidence"))
+        if item.get("reaction_id") == "R_SGPR"
+    ]
+    assert [item["source"] for item in records] == ["reactome", "rhea"]
+    resolutions = json.loads(_stage_artifact(run, "resolve-gprs", "gprs").read_text())
+    assert resolutions["records"]["R_SGPR"]["gpr"] == "A and B"

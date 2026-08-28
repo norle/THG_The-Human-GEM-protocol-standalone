@@ -19,7 +19,32 @@ def __getattr__(name: str):
     return getattr(ast_gpr, name)
 
 
-from .lookup import get_gpr, parse_gene_pairs  # noqa: E402
+from .evidence import SgprEvidence  # noqa: E402
+from .lookup import (  # noqa: E402
+    get_gpr,
+    get_gpr_evidence,
+    get_sgpr_evidence,
+    parse_gene_pairs,
+    resolve_sgpr,
+)
+from .merge import SgprResolution, merge_sgpr_evidence  # noqa: E402
+from .stoichiometry import (  # noqa: E402
+    AndNode,
+    GeneNode,
+    OrNode,
+    default_sgpr_coefficients,
+    genes_in_sgpr,
+    normalize_sgpr,
+    parse_sgpr,
+    sgpr_from_dict,
+    sgpr_to_dict,
+    strip_stoichiometry,
+    to_gpr,
+    to_legacy_sgpr,
+    to_sgpr,
+    unambiguous_stoichiometry,
+    validate_sgpr,
+)
 
 __all__ = [
     "compare_ast",
@@ -28,5 +53,26 @@ __all__ = [
     "reduce_gpr",
     "sanitize_gpr",
     "get_gpr",
+    "get_gpr_evidence",
+    "get_sgpr_evidence",
     "parse_gene_pairs",
+    "resolve_sgpr",
+    "AndNode",
+    "default_sgpr_coefficients",
+    "GeneNode",
+    "OrNode",
+    "SgprEvidence",
+    "SgprResolution",
+    "genes_in_sgpr",
+    "merge_sgpr_evidence",
+    "normalize_sgpr",
+    "parse_sgpr",
+    "sgpr_from_dict",
+    "sgpr_to_dict",
+    "strip_stoichiometry",
+    "to_gpr",
+    "to_legacy_sgpr",
+    "to_sgpr",
+    "unambiguous_stoichiometry",
+    "validate_sgpr",
 ]

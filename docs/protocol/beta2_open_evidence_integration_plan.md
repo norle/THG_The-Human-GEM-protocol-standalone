@@ -93,6 +93,11 @@ The remaining operational gate is recorded-service/online verification for
 external providers. It is intentionally not conflated with the offline
 workflow tests.
 
+Open reaction sources also expose canonical stoichiometric-GPR evidence through
+the shared sGPR AST. Structural evidence is merged separately from ordinary
+GPR compatibility strings; unknown coefficients are not asserted as observed
+`*1` values. See [Stoichiometric GPR evidence](sgpr_evidence.md).
+
 This document describes both the current stage layout and the remaining
 acceptance work. A checked item in the final section means that the behavior
 is implemented and covered by the stated evidence; provider plumbing that

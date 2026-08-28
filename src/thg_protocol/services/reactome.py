@@ -8,6 +8,15 @@ from dataclasses import dataclass, field
 from typing import Protocol
 from urllib.parse import quote, urlencode
 
+from thg_protocol.gpr.evidence import SgprEvidence
+from thg_protocol.gpr.stoichiometry import (
+    AndNode,
+    GeneNode,
+    OrNode,
+    SgprNode,
+    normalize_sgpr,
+)
+
 from ._http import request
 
 try:
@@ -35,36 +44,123 @@ class StaticReactomeClient:
 
 def catalyst_candidate_gpr(record: Mapping[str, object]) -> str:
     """Render explicit Reactome catalyst structure without inventing ANDs."""
-    catalyst = record.get("catalyst", record.get("catalyst_activity", {}))
-    if not isinstance(catalyst, Mapping):
+    evidence = catalyst_sgpr(record)
+    if evidence.sgpr is None:
         return ""
-    members = catalyst.get("members", catalyst.get("proteins", []))
-    if not isinstance(members, list):
-        return ""
-    genes = sorted(
-        {
-            str(item.get("gene", item.get("gene_symbol", item.get("symbol", ""))))
-            for item in members
-            if isinstance(item, Mapping)
-            and item.get("gene", item.get("gene_symbol", item.get("symbol")))
-        }
+
+    def render(node: SgprNode) -> str:
+        if isinstance(node, GeneNode):
+            return f"({node.gene})"
+        operator = " and " if isinstance(node, AndNode) else " or "
+        return operator.join(render(child) for child in node.children)
+
+    return render(evidence.sgpr)
+
+
+def _member_node(value: object, source: str = "reactome") -> SgprNode | None:
+    if not isinstance(value, Mapping):
+        return None
+    gene = value.get("gene", value.get("gene_symbol", value.get("symbol")))
+    nested = value.get("catalyst", value.get("catalyst_activity"))
+    if nested is None and value.get("type"):
+        nested = value
+    if isinstance(nested, Mapping):
+        node = _catalyst_node(nested, source)
+        if node is not None:
+            return node
+    if not gene:
+        return None
+    coefficient = value.get(
+        "coefficient", value.get("stoichiometry", value.get("count"))
     )
-    if not genes:
-        return ""
-    catalyst_type = str(catalyst.get("type", "")).lower()
+    if coefficient is not None:
+        try:
+            coefficient = int(coefficient)
+        except (TypeError, ValueError):
+            coefficient = None
+    return GeneNode(
+        str(gene),
+        coefficient,
+        "observed" if coefficient is not None else "unknown",
+        source,
+        tuple(str(item) for item in value.get("evidence", ()) or ()),
+    )
+
+
+def _catalyst_node(
+    catalyst: Mapping[str, object], source: str = "reactome"
+) -> SgprNode | None:
+    catalyst_type = (
+        str(catalyst.get("type", catalyst.get("class", ""))).lower().replace("_", "-")
+    )
     if catalyst_type in {"complex", "protein-complex"}:
-        operator = " and "
+        cls = AndNode
     elif catalyst_type in {
         "entity-set",
         "entity set",
         "alternative",
         "alternatives",
         "isoenzyme",
+        "isoenzymes",
     }:
-        operator = " or "
+        cls = OrNode
     else:
-        return ""
-    return operator.join(f"({gene})" for gene in genes)
+        return None
+    members = catalyst.get(
+        "members",
+        catalyst.get(
+            "proteins", catalyst.get("components", catalyst.get("children", []))
+        ),
+    )
+    if not isinstance(members, (list, tuple)):
+        return None
+    children = tuple(
+        node for item in members if (node := _member_node(item, source)) is not None
+    )
+    if cls is AndNode:
+        repeated: dict[str, list[GeneNode]] = {}
+        for child in children:
+            if isinstance(child, GeneNode) and child.coefficient is None:
+                repeated.setdefault(child.gene, []).append(child)
+        replacements = {
+            gene: GeneNode(
+                gene,
+                len(values),
+                "inferred",
+                source,
+                tuple(item for value in values for item in value.evidence),
+            )
+            for gene, values in repeated.items()
+            if len(values) > 1
+        }
+        emitted: set[str] = set()
+        collapsed = []
+        for child in children:
+            if isinstance(child, GeneNode) and child.gene in replacements:
+                if child.gene in emitted:
+                    continue
+                emitted.add(child.gene)
+                collapsed.append(replacements[child.gene])
+            else:
+                collapsed.append(child)
+        children = tuple(collapsed)
+    return normalize_sgpr(cls(children)) if children else None
+
+
+def catalyst_sgpr(record: Mapping[str, object], *, ec: str = "") -> SgprEvidence:
+    """Convert a Reactome catalyst record to canonical structural evidence."""
+    catalyst = record.get("catalyst", record.get("catalyst_activity", record))
+    node = _catalyst_node(catalyst) if isinstance(catalyst, Mapping) else None
+    identifier = record.get("reactome_id", record.get("stId", record.get("id", "")))
+    return SgprEvidence(
+        source="reactome",
+        ec=ec or str(record.get("ec", "")),
+        sgpr=node,
+        confidence="strong" if node is not None else "weak",
+        status="resolved" if node is not None else "unresolved",
+        provenance=(str(identifier),) if identifier else (),
+        warnings=() if node is not None else ("unknown-reactome-catalyst-structure",),
+    )
 
 
 class ReactomeClient(StaticReactomeClient):
@@ -95,8 +191,7 @@ class ReactomeClient(StaticReactomeClient):
             self.failed_requests += 1
             return True
         if (
-            requests is not None
-            and isinstance(error, requests.RequestException)
+            requests is not None and isinstance(error, requests.RequestException)
         ) or isinstance(error, ValueError):
             self.failed_requests += 1
             return True
@@ -127,9 +222,7 @@ class ReactomeClient(StaticReactomeClient):
         if local:
             return local
         identifier = str(rhea_id).split(":", 1)[-1]
-        query = urlencode(
-            {"query": f"RHEA:{identifier}", "types": "Reaction"}
-        )
+        query = urlencode({"query": f"RHEA:{identifier}", "types": "Reaction"})
         try:
             payload = self._remote(f"/search/query?{query}")
         except Exception as error:
@@ -165,5 +258,6 @@ __all__ = [
     "ReactomeClient",
     "ReactomeClientProtocol",
     "StaticReactomeClient",
+    "catalyst_sgpr",
     "catalyst_candidate_gpr",
 ]
