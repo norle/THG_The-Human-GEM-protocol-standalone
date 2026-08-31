@@ -6,12 +6,14 @@
     relationship, and reproduction of the 2023 protocol paper's artifact
     independently.
 
-The maintained evidence baseline is commit `0c91fdec325df12f25ef13819525e830a4cec1e8`
-on branch `refactoring-cleanup`. The legacy source commit is recorded in the
-registry but lives in an adjacent dirty checkout, so no parity is claimed until
-isolated cases run. A frozen artifact from the 2023 protocol paper is not
-present. The registry is authoritative for the controlled vocabulary and
-source/test paths behind each row.
+The maintained evidence baseline was recorded at commit
+`0c91fdec325df12f25ef13819525e830a4cec1e8`; the current reviewed head is
+`601b9d9` (see [`CURRENT_STATE.md`](../../CURRENT_STATE.md)). Newer changes are
+not treated as verified evidence until their relevant checks are rerun. The
+legacy source commit is recorded in the registry but lives in an adjacent dirty
+checkout, so no parity is claimed until isolated cases run. A frozen artifact
+from the 2023 protocol paper is not present. The registry is authoritative for
+the controlled vocabulary and source/test paths behind each row.
 
 | Registry ID | 2023 protocol paper concept | Implementation | Verification | Workflow coverage | Legacy relationship | Paper-artifact reproduction | Known difference or evidence boundary |
 | --- | --- | --- | --- | --- | --- | --- | --- |

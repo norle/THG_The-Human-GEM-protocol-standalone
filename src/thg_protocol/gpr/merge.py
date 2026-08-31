@@ -6,7 +6,16 @@ from collections.abc import Iterable, Mapping
 from dataclasses import dataclass
 
 from .evidence import SgprEvidence
-from .stoichiometry import SgprNode, normalize_sgpr, sgpr_to_dict, to_gpr, to_sgpr
+from .stoichiometry import (
+    AndNode,
+    GeneNode,
+    OrNode,
+    SgprNode,
+    normalize_sgpr,
+    sgpr_to_dict,
+    to_gpr,
+    to_sgpr,
+)
 
 DEFAULT_SOURCE_PRECEDENCE = {
     "reactome": 50,
@@ -72,6 +81,31 @@ def _flatten(value: object) -> object:
     return value
 
 
+def _conservative_score(node: SgprNode) -> tuple[int, int, int]:
+    """Rank structures from most to least restrictive.
+
+    More required genes, fewer alternatives, and larger known coefficients
+    make a rule more conservative.  Structurally incomparable rules fall
+    through to the deterministic serialized-expression tie-breaker below.
+    """
+    if isinstance(node, GeneNode):
+        return (1, 0, node.coefficient or 1)
+    child_scores = [_conservative_score(child) for child in node.children]
+    if isinstance(node, AndNode):
+        return (
+            sum(score[0] for score in child_scores),
+            sum(score[1] for score in child_scores),
+            sum(score[2] for score in child_scores),
+        )
+    if isinstance(node, OrNode):
+        return (
+            max(score[0] for score in child_scores),
+            sum(score[1] for score in child_scores) + len(node.children) - 1,
+            max(score[2] for score in child_scores),
+        )
+    raise TypeError(f"unsupported sGPR node: {type(node).__name__}")
+
+
 def merge_sgpr_evidence(
     evidence: Iterable[SgprEvidence | Mapping[str, object]],
     *,
@@ -118,7 +152,15 @@ def merge_sgpr_evidence(
                 item.warnings,
             )
         )
-    best = next(iter(groups.values()))
+    best = min(
+        groups.values(),
+        key=lambda group: (
+            -_conservative_score(group[0].sgpr)[0],
+            _conservative_score(group[0].sgpr)[1],
+            -_conservative_score(group[0].sgpr)[2],
+            to_sgpr(group[0].sgpr),
+        ),
+    )
     selected = best[0].sgpr
     confidence = max(
         (item.confidence for item in comparable),

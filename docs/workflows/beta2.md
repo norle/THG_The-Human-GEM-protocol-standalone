@@ -43,7 +43,10 @@ For a maintained run, reference the β1 export:
 
 `A or B` is localized by union and `A and B` by intersection. Unsupported
 complex branches are retained in the evidence report rather than assigned to
-an implicit cytosol. `fallback_location` and `uncertainty_policy` are explicit
+an implicit cytosol. When same-precedence sources disagree about sGPR
+structure, all candidates are retained and the more conservative structure is
+selected while the conflict is reported. An existing model GPR remains
+preferred. `fallback_location` and `uncertainty_policy` are explicit
 configuration choices. Exchange, demand, sink, biomass, pseudo, spontaneous,
 transport, and multi-compartment reactions are reported and excluded from
 generic cloning. Set `n_jobs` above 1 to parallelize GPR and localization
@@ -52,8 +55,10 @@ resolution; expansion application and solver work remain serial.
 The resumable DAG is:
 
 ```text
-load-beta1 → collect-catalysis-evidence → resolve-gprs
-  → collect-location-evidence → normalize-compartments
+load-beta1 → collect-catalysis-evidence → collect-gpr-evidence → resolve-gprs
+  → normalize-compartments
+  → collect-location-evidence → collect-reaction-location-evidence
+  → resolve-compartment-evidence
   → infer-complex-and-isoenzyme-locations → generate-expansion-plan
   → apply-expansion-decisions → apply-expansion
   → consolidate-expanded-model → validate-beta2 → export-beta2

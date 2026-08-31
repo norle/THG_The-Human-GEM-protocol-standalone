@@ -33,7 +33,10 @@ Evidence is merged by complete structure, not by unioning gene lists. The
 highest-precedence structural sources resolve deterministically and retain all
 provenance; lower-structure Rhea, KEGG, and UniProt candidates are supporting
 evidence. Different top-precedence structures or coefficients produce
-`conflict` status rather than being silently averaged.
+`conflict` status rather than being silently averaged. When a conflict must
+produce a candidate rule, the structurally more conservative rule is selected:
+more required members, fewer alternatives, and larger known coefficients take
+precedence. All conflicting candidates remain in the evidence report.
 
 The legacy `get_gpr(...)` five-field tuple remains available. New callers can
 use `get_sgpr_evidence(...)`, `resolve_sgpr(...)`, or the AST and merge APIs in
