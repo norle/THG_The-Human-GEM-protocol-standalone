@@ -11,8 +11,6 @@ The current pressure points are:
   handling, resolution, mutation, and serialization in one module.
 - `src/thg_protocol/curation/beta1.py` — curation rules and supporting helpers
   in one large module.
-- `src/thg_protocol/workflow/_foundation.py` — older stage wrappers that may be
-  compatibility scaffolding rather than active registry dependencies.
 
 ## Constraints
 
@@ -25,16 +23,17 @@ The current pressure points are:
 
 ### Option A — targeted extraction (recommended)
 
-Extract only the actively changing β2 GPR path:
+Simplify only the actively changing β2 GPR path:
 
-1. Move `_accepted_external_gpr`, GPR payload resolution, and sGPR selection
-   into a small `workflow/beta2/gpr_resolution.py` module.
-2. Keep `DetailedBeta2Stage` as the orchestration boundary.
-3. Add focused tests for conservative conflict selection and evidence output.
+1. Delete the unused `_resolve_gpr_payload` helper.
+2. Keep GPR selection in `DetailedBeta2Stage`, using the existing
+   `thg_protocol.gpr` APIs.
+3. Extract one pure selection helper only when the next GPR change needs
+   independent tests or would otherwise add another branch to the stage.
 4. Repeat for location resolution only if its code becomes difficult to change.
 
-Benefits: smallest diff, low regression risk, and immediate relief in the area
-currently receiving feature work.
+Benefits: smallest diff, low regression risk, and no new module before it is
+needed.
 
 Cost: `_stages.py` remains large and will still contain unrelated operations.
 
@@ -54,24 +53,19 @@ Benefits: clearer ownership and smaller test surfaces.
 Cost: more file movement, more import/API churn, and a larger regression
 surface. Use only if Option A does not make the next changes simpler.
 
-### Option C — delete compatibility scaffolding first
+### β1 curation
 
-Trace the wrappers in `_foundation.py` and related exports. If no registry,
-public API, or test uses them, delete them and their tests; otherwise mark the
-remaining compatibility boundary explicitly.
-
-Benefits: immediate deletion and less misleading architecture.
-
-Cost: removal is unsafe until every caller is checked, especially downstream
-users importing historical names.
+Do not split `curation/beta1.py` on size alone. When a change there becomes
+hard to isolate, extract only the helper required by that change and add a
+focused regression test.
 
 ## Recommended sequence
 
-1. Run a repository-wide reference search for the `_foundation.py` classes and
-   exports.
-2. If unused, remove only the dead wrappers and update the architecture docs.
-3. Extract the β2 GPR path using Option A.
-4. Run the full offline test suite and strict docs build.
+1. Delete `_resolve_gpr_payload` and run the affected β2 tests.
+2. Keep the β2 GPR path in place unless the next change meets Option A's
+   extraction trigger.
+3. Apply the same rule to β1 curation when it next changes.
+4. Run the full offline test suite and strict docs build for any extraction.
 5. Reassess whether the remaining large modules still slow down real work.
 
 ## Do not do yet
@@ -84,5 +78,5 @@ users importing historical names.
 
 - No public import or registered workflow changes unexpectedly.
 - The β2 stage registry remains readable and behaviorally identical.
-- Focused tests cover each extracted responsibility.
+- Focused regression tests cover each changed responsibility.
 - Full tests, Ruff, package build, and strict docs build pass.
