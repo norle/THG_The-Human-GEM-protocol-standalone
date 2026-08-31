@@ -1,16 +1,25 @@
 # Repository and data management
 
-The repository is organized as follows:
+## Maintained software and workspace
 
-- `src/thg_protocol/` contains the package code.
-- `src/thg_protocol/runtime/` contains generic resumable execution.
-- `src/thg_protocol/workflow/` contains workflow configuration, registry,
-  runners, and workflow adapters. β1 and β2 stage wiring lives in their own
-  subpackages.
-- `tests/` contains tests and deterministic fixtures.
+- `src/` contains the installable package.
+- `tests/` contains unit, integration, characterization, and documentation
+  tests.
 - `docs/` contains user and contributor documentation.
-- `configs/`, `inputs/`, and `runs/` contain workflow configurations, source
-  inputs, and generated run artifacts.
+- `configs/` contains version-controlled workflow configurations.
+- `inputs/` contains caller-owned, read-only workflow inputs.
+- `runs/` contains generated resumable workflow runs.
+
+## Preserved research and reference corpus
+
+- `models/` contains canonical and historical model artifacts.
+- `files/` contains retained research inputs and intermediate artifacts.
+- `supplementary_material/` contains publication and supporting research
+  material.
+
+These two groups have different ownership and lifecycle expectations. The
+package structure itself should not be reorganized to make the repository root
+look smaller.
 
 Run outputs, caches, manifests, and generated reports belong in explicit
 run/output directories rather than in source control.
