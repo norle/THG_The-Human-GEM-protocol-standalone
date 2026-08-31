@@ -28,6 +28,7 @@ from .lookup import (  # noqa: E402
     resolve_sgpr,
 )
 from .merge import SgprResolution, merge_sgpr_evidence  # noqa: E402
+from .selection import GprSelection, select_reaction_gpr, usable_gpr  # noqa: E402
 from .stoichiometry import (  # noqa: E402
     AndNode,
     GeneNode,
@@ -63,6 +64,7 @@ __all__ = [
     "OrNode",
     "SgprEvidence",
     "SgprResolution",
+    "GprSelection",
     "genes_in_sgpr",
     "merge_sgpr_evidence",
     "normalize_sgpr",
@@ -73,6 +75,8 @@ __all__ = [
     "to_gpr",
     "to_legacy_sgpr",
     "to_sgpr",
+    "select_reaction_gpr",
     "unambiguous_stoichiometry",
+    "usable_gpr",
     "validate_sgpr",
 ]

@@ -14,6 +14,11 @@ locks, fingerprints, artifacts, and stage iteration). Runtime never discovers
 built-in workflows. Shared JSON/SBML model dispatch lives in
 `thg_protocol.io.models`.
 
+The reusable model-versus-evidence GPR selection policy lives in
+`thg_protocol.gpr.selection`. β2 stages load evidence, call that pure policy,
+apply the selected rule, and retain ownership of workflow artifacts,
+checkpoints, and provenance.
+
 Service protocols and static clients keep network access, credentials, caching,
 and failure behavior injectable. Validation, task suites, MEMOTE, and
 solver-backed checks remain separate boundaries so their results cannot be

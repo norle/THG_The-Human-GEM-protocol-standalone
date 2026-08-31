@@ -116,65 +116,6 @@ def _ec_numbers(value: object) -> list[str]:
     )
 
 
-def _usable_gpr(raw: object) -> tuple[str, list[str]]:
-    from thg_protocol.curation.beta1 import canonicalize_gpr, serialize_gpr
-
-    text = str(raw or "").strip()
-    if not text:
-        return "", []
-    try:
-        canonical = serialize_gpr(canonicalize_gpr(text))
-    except (SyntaxError, ValueError):
-        return "", []
-    node = canonicalize_gpr(text)
-    genes = (
-        {str(node.value)}
-        if node.kind == "gene"
-        else {gene for child in node.children for gene in _gpr_expression_genes(child)}
-    )
-    return canonical, sorted(genes)
-
-
-def _gpr_expression_genes(node: object) -> set[str]:
-    if getattr(node, "kind", "") == "gene":
-        return {str(getattr(node, "value", ""))}
-    return {
-        gene
-        for child in getattr(node, "children", ())
-        for gene in _gpr_expression_genes(child)
-    }
-
-
-def _accepted_external_gpr(record: Mapping[str, object]) -> bool:
-    status = str(record.get("status", "")).lower()
-    confidence = str(record.get("confidence", "")).lower()
-    if status in {"unresolved", "ambiguous", "conflict", "candidate"} and (
-        confidence != "reaction-matched"
-    ):
-        return False
-    return confidence in {"authoritative", "strong", "reaction-matched"}
-
-
-def _resolve_gpr_payload(
-    payload: tuple[str, str, Mapping[str, object], tuple[str, ...]],
-):
-    from thg_protocol.curation.beta1 import canonicalize_gpr, serialize_gpr
-
-    reaction_id, raw, stoich, genes = payload
-    try:
-        canonical = serialize_gpr(canonicalize_gpr(raw)) if raw else ""
-        valid = True
-    except (SyntaxError, ValueError):
-        canonical, valid = raw, False
-    return reaction_id, {
-        "gpr": canonical,
-        "original_gpr": raw,
-        "genes": list(genes),
-        "subunit_stoichiometry": dict(stoich),
-        "valid": valid,
-    }
-
-
 def _resolve_location_payload(
     payload: tuple[
         str,
@@ -311,6 +252,7 @@ class DetailedBeta2Stage:
             normalize_location,
             validate_beta2,
         )
+        from thg_protocol.gpr.selection import select_reaction_gpr, usable_gpr
 
         section = _section(context)
         if self.id == "load-beta1":
@@ -460,7 +402,7 @@ class DetailedBeta2Stage:
                     ).append(item)
             requests: dict[str, list[str]] = {}
             for reaction in model.reactions:
-                valid, _ = _usable_gpr(reaction.gene_reaction_rule)
+                valid, _ = usable_gpr(reaction.gene_reaction_rule)
                 if valid and mode != "live":
                     continue
                 record = catalysis.get(str(reaction.id), {})
@@ -948,45 +890,15 @@ class DetailedBeta2Stage:
                 external.setdefault(str(item.get("reaction_id")), []).append(item)
             records = {}
             for reaction_id, raw, reaction_stoich, genes in tasks:
-                model_gpr, model_genes = _usable_gpr(raw)
-                candidates = []
-                for item in external.get(reaction_id, []):
-                    candidate, candidate_genes = _usable_gpr(item.get("candidate_gpr"))
-                    if candidate:
-                        candidates.append((candidate, candidate_genes, item))
-                accepted = [
-                    item for item in candidates if _accepted_external_gpr(item[2])
-                ]
-                selected = model_gpr
-                selected_genes = model_genes or list(genes)
-                selected_external: Mapping[str, object] | None = None
-                conflicts = []
-                sgpr_resolution = None
-                if candidates:
-                    from thg_protocol.gpr.merge import merge_sgpr_evidence
-                    from thg_protocol.gpr.stoichiometry import genes_in_sgpr, to_gpr
-
-                    sgpr_resolution = merge_sgpr_evidence(
-                        item[2] for item in candidates
-                    )
-                    if sgpr_resolution.status == "conflict":
-                        conflicts.extend(item[2] for item in candidates)
-                if not selected and sgpr_resolution and sgpr_resolution.sgpr:
-                    selected = to_gpr(sgpr_resolution.sgpr)
-                    selected_genes = list(genes_in_sgpr(sgpr_resolution.sgpr))
-                    selected_external = {}
-                elif not selected and accepted:
-                    selected, selected_genes, selected_external = accepted[0]
-                elif selected:
-                    conflicts.extend(
-                        item
-                        for candidate, _, item in candidates
-                        if candidate != selected
-                    )
+                selection = select_reaction_gpr(
+                    model_gpr=raw,
+                    model_genes=genes,
+                    evidence=external.get(reaction_id, []),
+                    configured_stoichiometry=reaction_stoich,
+                )
                 records[reaction_id] = {
-                    "gpr": selected,
+                    **selection.to_record(),
                     "original_gpr": raw,
-                    "genes": selected_genes,
                     "gene_identifiers": sorted(
                         {
                             str(gene)
@@ -994,59 +906,12 @@ class DetailedBeta2Stage:
                             for gene in item.get("gene_identifiers", [])
                         }
                     ),
-                    "subunit_stoichiometry": dict(reaction_stoich),
-                    "valid": bool(selected),
                     "policy": str(section.get("gpr_policy", "model-then-ec")),
                     "evidence": external.get(reaction_id, []),
-                    "conflicts": conflicts,
-                    "status": "conflict"
-                    if conflicts
-                    else ("resolved" if selected else "unresolved"),
                 }
-                if sgpr_resolution is not None and sgpr_resolution.sgpr is not None:
-                    resolution_dict = sgpr_resolution.to_dict()
-                    records[reaction_id].update(
-                        {
-                            "candidate_sgpr": resolution_dict["sgpr"],
-                            "sgpr_structure": resolution_dict["sgpr_structure"],
-                            "sgpr_status": sgpr_resolution.status,
-                            "sgpr_sources": resolution_dict["sources"],
-                            "sgpr_warnings": resolution_dict["warnings"],
-                        }
-                    )
-                    if not reaction_stoich:
-                        from thg_protocol.gpr.stoichiometry import (
-                            unambiguous_stoichiometry,
-                        )
-
-                        derived = unambiguous_stoichiometry(sgpr_resolution.sgpr)
-                        if derived is not None:
-                            records[reaction_id]["subunit_stoichiometry"] = derived
-                if selected and selected_external is None:
-                    try:
-                        from thg_protocol.gpr.stoichiometry import (
-                            parse_sgpr,
-                            sgpr_to_dict,
-                            to_sgpr,
-                        )
-
-                        selected_node = parse_sgpr(selected)
-                        records[reaction_id].update(
-                            {
-                                "candidate_sgpr": to_sgpr(selected_node),
-                                "sgpr_structure": sgpr_to_dict(selected_node),
-                                "sgpr_status": "candidate",
-                                "sgpr_sources": ["model"],
-                                "sgpr_warnings": [],
-                            }
-                        )
-                    except ValueError:
-                        records[reaction_id]["sgpr_warnings"] = [
-                            "model-gpr-not-representable-as-sgpr"
-                        ]
                 reaction = model.reactions.get_by_id(reaction_id)
-                if selected and selected != str(raw).strip():
-                    reaction.gene_reaction_rule = selected
+                if selection.gpr and selection.gpr != str(raw).strip():
+                    reaction.gene_reaction_rule = selection.gpr
             from thg_protocol.io.models import save_json
 
             model_path = work_dir / "beta2-resolved-gprs-model.json"
