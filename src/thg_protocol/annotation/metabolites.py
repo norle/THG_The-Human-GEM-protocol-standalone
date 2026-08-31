@@ -1,10 +1,5 @@
 """Metabolite identification helpers."""
 
-# The legacy annotation implementation is still being split into smaller
-# helpers. Keep its historical lint exceptions localized until that move is
-# complete; new service-boundary code is linted normally.
-# ruff: noqa
-
 from __future__ import annotations
 
 import difflib
@@ -12,21 +7,18 @@ import hashlib
 import json
 import logging
 import os
-import pickle
 import re
 import time
 from collections import defaultdict
 from pathlib import Path
-from typing import TYPE_CHECKING, Dict, List, Optional, Tuple
+from typing import TYPE_CHECKING
 
-import numpy as np
 import pandas as pd
 
 if TYPE_CHECKING:
     import cobra
 
 from thg_protocol.services.pubchem import PubChemClient, PubChemClientProtocol
-
 
 project_root = Path(__file__).resolve().parents[3]
 
@@ -39,75 +31,13 @@ __all__ = [
     "identify_metabolite",
     "process_annotation",
     "remove_null_value",
-    "setup_proxy",
     "PubChemClient",
     "PubChemClientProtocol",
 ]
 
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-)
-
 LOGGER = logging.getLogger(__name__)
 H_PATTERN = re.compile(r"H[0-9]+")
 CHARGE_PATTERN = re.compile(r"[-\+][0-9]+")
-
-def setup_proxy():
-    """
-    Setup proxy for PubChem requests to avoid IP rate limiting.
-
-    Options:
-    1. Set HTTP_PROXY and HTTPS_PROXY environment variables
-    2. Use a proxy service (requires subscription)
-    3. Disable VPN and use home internet
-    4. Set DISABLE_PROXY=1 to disable proxy usage
-
-    To use a proxy, set environment variables before running:
-        export HTTP_PROXY="http://proxy-server:port"
-        export HTTPS_PROXY="http://proxy-server:port"
-
-    To disable proxy:
-        export DISABLE_PROXY=1
-
-    Or uncomment and configure the proxy dict below.
-    """
-    # Check if proxy is disabled
-    if os.environ.get("DISABLE_PROXY") == "1":
-        print("Proxy disabled by DISABLE_PROXY environment variable")
-        LOGGER.info("Proxy disabled by environment variable")
-        return None
-
-    proxy = None
-
-    # Option 1: Read from environment variables
-    http_proxy = os.environ.get("HTTP_PROXY") or os.environ.get("http_proxy")
-    https_proxy = os.environ.get("HTTPS_PROXY") or os.environ.get("https_proxy")
-
-    if http_proxy or https_proxy:
-        proxy = {}
-        if http_proxy:
-            proxy["http"] = http_proxy
-        if https_proxy:
-            proxy["https"] = https_proxy
-        print(f"Using proxy configuration: {proxy}")
-        LOGGER.info(f"Using proxy: {proxy}")
-
-    # Option 2: Manually configure proxy (DISABLED by default - proxy is broken)
-    # Uncomment and update the proxy below if you have a working proxy
-    # if not proxy:
-    #     proxy = {
-    #         "http": "http://your-proxy-server:port",
-    #         "https": "http://your-proxy-server:port",
-    #     }
-    #     print(f"Using hardcoded proxy: {proxy}")
-    #     LOGGER.info(f"Using hardcoded proxy: {proxy}")
-
-    if not proxy:
-        print("No proxy configured - using direct connection")
-        LOGGER.info("No proxy configured - using direct connection")
-
-    return proxy
 
 
 def global_met_annotation_file():
@@ -125,7 +55,7 @@ def global_met_annotation_file():
     )
 
 
-def gather_metabolites(model: cobra.Model) -> List[Tuple[str, str, str, str]]:
+def gather_metabolites(model: cobra.Model) -> list[tuple[str, str, str, str]]:
     """Gather metabolites info from a `model`, filtering out from `identifiers`."""
     met_list = []
     seen: set[str] = set()
@@ -161,7 +91,7 @@ def identify_metabolite(
     max_retries: int = 3,
     use_proxy: bool = False,
     client: PubChemClientProtocol | None = None,
-) -> Optional[str]:
+) -> str | None:
     """Try to match metabolite info to a pubchem compound to get the annotation.
 
     Parameters
@@ -243,13 +173,13 @@ def identify_metabolite(
 
 
 def generate_met_annotation(
-    met_list: List[Tuple[str, str, str, str]],
+    met_list: list[tuple[str, str, str, str]],
     out: str | Path,
     delay_between_requests: float = 1.0,
     checkpoint_interval: int = 10,
     resume: bool = True,
     client: PubChemClientProtocol | None = None,
-) -> Tuple[List, List]:
+) -> tuple[list, list]:
     """Identify and write metabolite annotations to file (Tab-separated).
 
     Parameters
@@ -426,7 +356,7 @@ def generate_met_annotation(
     api_failures = state["api_failures"]
 
     print(f"\n{'=' * 70}")
-    print(f"ANNOTATION COMPLETE")
+    print("ANNOTATION COMPLETE")
     print(f"{'=' * 70}")
     print(f"Total metabolites:          {total}")
 
@@ -434,13 +364,17 @@ def generate_met_annotation(
         return (count / total) * 100 if total else 0.0
 
     print(
-        f"Successfully annotated:     {len(annotated)} ({percentage(len(annotated)):.1f}%)"
+        "Successfully annotated:     "
+        f"{len(annotated)} ({percentage(len(annotated)):.1f}%)"
     )
     print(
-        f"Failed (likely not in DB):  {len(unnanotated) - len(api_failures)} ({percentage(len(unnanotated) - len(api_failures)):.1f}%)"
+        "Failed (likely not in DB):  "
+        f"{len(unnanotated) - len(api_failures)} "
+        f"({percentage(len(unnanotated) - len(api_failures)):.1f}%)"
     )
     print(
-        f"Failed (API/temp errors):   {len(api_failures)} ({percentage(len(api_failures)):.1f}%)"
+        "Failed (API/temp errors):   "
+        f"{len(api_failures)} ({percentage(len(api_failures)):.1f}%)"
     )
     print(f"\nResults saved to:      {output_path}")
     print(f"Failures saved to:     {failure_path}")
@@ -457,7 +391,7 @@ def remove_null_value(d):
     }
 
 
-def process_annotation(annotation_file: str | Path) -> Dict:
+def process_annotation(annotation_file: str | Path) -> dict:
     """Generate metabolite annotation file.
 
     Parameters
@@ -479,7 +413,7 @@ def process_annotation(annotation_file: str | Path) -> Dict:
             9: "inchi",
         }
     )
-    variableFile = variableFile.fillna(str())
+    variableFile = variableFile.fillna("")
 
     annotation = defaultdict(dict)
 
@@ -504,11 +438,11 @@ def atom(Formula):
         else:
             H = []
         if "O" in Formula:
-            O = re.findall(r"(O[0-9]+)", Formula)
-            if not O:
-                O = ["O1"]
+            oxygen = re.findall(r"(O[0-9]+)", Formula)
+            if not oxygen:
+                oxygen = ["O1"]
         else:
-            O = []
+            oxygen = []
         if "N" in Formula:
             N = re.findall(r"(N[0-9]+)", Formula)
             if not N:
@@ -528,11 +462,11 @@ def atom(Formula):
         else:
             S = []
         if "I" in Formula:
-            I = re.findall(r"(I[0-9]+)", Formula)
-            if not I:
-                I = ["I1"]
+            iodine = re.findall(r"(I[0-9]+)", Formula)
+            if not iodine:
+                iodine = ["I1"]
         else:
-            I = []
+            iodine = []
         if "F" in Formula:
             F = re.findall(r"(Fe*[0-9]+)", Formula)
             if not F:
@@ -545,6 +479,6 @@ def atom(Formula):
                 R = ["R1"]
         else:
             R = []
-        return "".join(str(i) for i in C + H + O + N + P + S + I + F + R)
+        return "".join(str(i) for i in C + H + oxygen + N + P + S + iodine + F + R)
     except Exception as e:
         print(e)

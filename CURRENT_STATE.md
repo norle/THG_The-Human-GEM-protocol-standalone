@@ -20,6 +20,10 @@ construction, merge, network analysis, figures, cell-specific helpers, model
 I/O, validation, and resumable workflows. External lookups use injectable
 clients and offline test adapters.
 
+The completed workflow, gapfill, first-class workflow, sGPR, and structural
+cleanup plans were consolidated into this state record; Git history retains the
+implementation detail.
+
 Implementation and verification claims are tracked in
 [`docs/protocol/capability-evidence.json`](docs/protocol/capability-evidence.json)
 and its [status matrix](docs/protocol/implementation-status.md). Exact

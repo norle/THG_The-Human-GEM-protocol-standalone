@@ -23,7 +23,6 @@ and [`get_gpr`][thg_protocol.gpr.lookup.get_gpr].
         - identify_metabolite
         - process_annotation
         - remove_null_value
-        - setup_proxy
 
 ::: thg_protocol.annotation.reactions
     options:

@@ -13,11 +13,12 @@ import time
 from collections.abc import Iterable, Mapping
 from dataclasses import asdict, dataclass
 from pathlib import Path
-from typing import Any, Protocol
+from typing import Any
 
 from .database import GeneRecord, MetaboliteRecord, ReactionRecord, reconstruct_model
 
 SCHEMA_VERSION = 1
+SourceAdapter = Any
 
 
 @dataclass(frozen=True)
@@ -49,14 +50,6 @@ class NormalizedRecords:
                 key: list(value) for key, value in sorted(self.pathways.items())
             },
         }
-
-
-class SourceAdapter(Protocol):
-    """One source adapter; implementations must not hide network access."""
-
-    release: str
-
-    def fetch(self, key: str) -> Mapping[str, Any]: ...
 
 
 def normalize_records(payload: Mapping[str, Any]) -> NormalizedRecords:
@@ -94,7 +87,7 @@ def records_checksum(records: NormalizedRecords) -> str:
 
 def harvest_snapshot(
     keys: Iterable[str],
-    adapter: SourceAdapter,
+    adapter: Any,
     cache_dir: str | Path,
     *,
     retries: int = 2,
