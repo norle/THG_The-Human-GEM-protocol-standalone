@@ -14,8 +14,18 @@ from .config import ConfigError
 from .runner import WorkflowError, get_status, resume, start
 
 
+class _CompactProgressFilter(logging.Filter):
+    def filter(self, record: logging.LogRecord) -> bool:
+        return record.levelno >= logging.WARNING or bool(
+            getattr(record, "thg_compact", False)
+        )
+
+
 def _add_verbosity_argument(
-    parser: argparse.ArgumentParser, *, default: int | str = 0
+    parser: argparse.ArgumentParser,
+    *,
+    default: int | str = 0,
+    quiet_default: bool | str = False,
 ) -> None:
     parser.add_argument(
         "-v",
@@ -24,22 +34,32 @@ def _add_verbosity_argument(
         default=default,
         help="show stage progress; repeat (-vv) for fingerprints and outputs",
     )
+    parser.add_argument(
+        "-q",
+        "--quiet",
+        action="store_true",
+        default=quiet_default,
+        help="show only warnings and errors",
+    )
 
 
-def _configure_logging(verbosity: int) -> None:
+def _configure_logging(verbosity: int, *, quiet: bool = False) -> None:
     logger = logging.getLogger("thg_protocol.workflow")
     for existing in tuple(logger.handlers):
         if getattr(existing, "_thg_cli_handler", False):
             logger.removeHandler(existing)
-    if verbosity < 1:
-        logger.setLevel(logging.NOTSET)
-        logger.propagate = True
-        return
     logger.setLevel(logging.DEBUG if verbosity > 1 else logging.INFO)
+    logger.propagate = False
     handler = logging.StreamHandler()
     handler._thg_cli_handler = True  # type: ignore[attr-defined]
     handler.setFormatter(
         logging.Formatter("%(asctime)s %(levelname)s %(message)s", "%H:%M:%S")
+    )
+    if verbosity == 0 and not quiet:
+        handler.addFilter(_CompactProgressFilter())
+        handler.setFormatter(logging.Formatter("%(message)s"))
+    handler.setLevel(
+        logging.WARNING if quiet else logging.DEBUG if verbosity > 1 else logging.INFO
     )
     logger.addHandler(handler)
     logger.propagate = False
@@ -52,12 +72,20 @@ def build_parser() -> argparse.ArgumentParser:
 
     start_parser = commands.add_parser("start", help="start or resume a run")
     start_parser.add_argument("config", type=Path, help="JSON run configuration")
-    _add_verbosity_argument(start_parser, default=argparse.SUPPRESS)
+    _add_verbosity_argument(
+        start_parser,
+        default=argparse.SUPPRESS,
+        quiet_default=argparse.SUPPRESS,
+    )
 
     resume_parser = commands.add_parser("resume", help="resume an existing run")
     resume_parser.add_argument("run_dir", type=Path)
     resume_parser.add_argument("--force-step", choices=None, metavar="STAGE")
-    _add_verbosity_argument(resume_parser, default=argparse.SUPPRESS)
+    _add_verbosity_argument(
+        resume_parser,
+        default=argparse.SUPPRESS,
+        quiet_default=argparse.SUPPRESS,
+    )
 
     status_parser = commands.add_parser("status", help="show validated run state")
     status_parser.add_argument("run_dir", type=Path)
@@ -86,7 +114,11 @@ def build_parser() -> argparse.ArgumentParser:
         workflow_parser.add_argument(
             "config", type=Path, help="workflow configuration"
         )
-        _add_verbosity_argument(workflow_parser, default=argparse.SUPPRESS)
+        _add_verbosity_argument(
+            workflow_parser,
+            default=argparse.SUPPRESS,
+            quiet_default=argparse.SUPPRESS,
+        )
     return parser
 
 
@@ -144,7 +176,9 @@ def _print_final_report(run_dir: Path) -> None:
 def main(argv: list[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
-    _configure_logging(getattr(args, "verbose", 0))
+    _configure_logging(
+        getattr(args, "verbose", 0), quiet=getattr(args, "quiet", False)
+    )
     try:
         if args.command == "start":
             print(f"run started/resumed: {start(args.config)}")

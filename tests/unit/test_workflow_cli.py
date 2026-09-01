@@ -19,6 +19,7 @@ def test_cli_parser_exposes_all_commands_and_help(capsys):
     assert parser.parse_args(["beta1", "config.json", "-v"]).verbose == 1
     assert parser.parse_args(["-v", "beta1", "config.json"]).verbose == 1
     assert parser.parse_args(["resume", "run", "-vv"]).verbose == 2
+    assert parser.parse_args(["beta1", "config.json", "-q"]).quiet
 
     with pytest.raises(SystemExit) as error:
         main(["--help"])
@@ -47,6 +48,47 @@ def test_verbose_cli_reports_registered_stage_progress(tmp_path, capsys):
     assert "beta1 workflow" in log
     assert "starting attempt 1" in log
     assert "workflow completed" in log
+
+
+def test_default_cli_reports_compact_progress_and_keeps_stage_details_in_log(
+    tmp_path, capsys
+):
+    config = tmp_path / "config.json"
+    config.write_text(
+        json.dumps(
+            {
+                "workflow": "beta1",
+                "run": {"name": "compact", "output_dir": str(tmp_path / "run")},
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    assert main(["beta1", str(config)]) == 0
+    captured = capsys.readouterr()
+    assert "completed in" in captured.err
+    assert "starting attempt" not in captured.err
+    assert "fingerprint" not in captured.err
+    log = (tmp_path / "run" / "logs" / "run.log").read_text(encoding="utf-8")
+    assert "starting attempt" in log
+
+
+def test_quiet_cli_suppresses_progress(tmp_path, capsys):
+    config = tmp_path / "config.json"
+    config.write_text(
+        json.dumps(
+            {
+                "workflow": "beta1",
+                "run": {"name": "quiet", "output_dir": str(tmp_path / "run")},
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    assert main(["beta1", str(config), "--quiet"]) == 0
+    captured = capsys.readouterr()
+    assert captured.err == ""
+    assert "run started/resumed:" in captured.out
 
 
 def test_status_json_is_read_only_and_parseable(tmp_path, capsys):

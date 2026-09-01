@@ -18,11 +18,12 @@
 | `thg-gapfill --model MODEL --method {milp,greedy,deadends} --output-dir DIR` | Run standalone gap filling; optional `--parameters`, `--max-additions`, and repeated `--allowed-connection c:e` |
 | `thg-pathway ...` | Apply a pathway configuration |
 
-Add `-v`/`--verbose` to a starting or resume command to see live stage-level
-progress. Repeat it as `-vv` for fingerprints, result summaries, and artifact
-paths. For example: `thg-run beta1 configs/beta1.json -v` or
-`thg-run resume runs/beta1 -vv`. Progress is written to stderr so stdout remains
-available for the final result.
+Runs show compact one-line stage progress by default. Add `-v`/`--verbose` to
+see timestamped stage starts and completions. Repeat it as `-vv` for
+fingerprints, result summaries, and artifact paths. Use `-q`/`--quiet` for
+warnings and errors only. For example: `thg-run beta1 configs/beta1.json -v`
+or `thg-run resume runs/beta1 -vv`. Progress is written to stderr so stdout
+remains available for the final result.
 
 `thg-run human-database` and `thg-run final-thg` are not named commands;
 those workflows currently use `thg-run start` with a corresponding `workflow`

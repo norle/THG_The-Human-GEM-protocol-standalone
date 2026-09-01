@@ -123,7 +123,11 @@ def execute(
         if force_step is not None:
             if force_step not in {stage.id for stage in stages}:
                 raise ExecutionError(f"unknown stage: {force_step}")
-            LOGGER.info("invalidating stage %s and its descendants", force_step)
+            LOGGER.info(
+                "invalidating stage %s and its descendants",
+                force_step,
+                extra={"thg_compact": True},
+            )
             _invalidate(manifest, stages, force_step)
         for stage in stages:
             entry = _entry(manifest, stage.id)
@@ -141,6 +145,7 @@ def execute(
             workflow_id,
             len(stages),
             run_dir,
+            extra={"thg_compact": True},
         )
         for index, stage in enumerate(stages, start=1):
             entry = _entry(manifest, stage.id)
@@ -156,7 +161,11 @@ def execute(
                 )
                 _write(run_dir, manifest)
                 LOGGER.info(
-                    "[%s/%s] %s: skipped (disabled)", index, len(stages), stage.id
+                    "[%s/%s] %s: skipped (disabled)",
+                    index,
+                    len(stages),
+                    stage.id,
+                    extra={"thg_compact": True},
                 )
                 continue
             context = StageContext(config, run_dir, manifest)
@@ -167,7 +176,11 @@ def execute(
                 and _artifacts_valid(entry, run_dir)
             ):
                 LOGGER.info(
-                    "[%s/%s] %s: reused valid artifacts", index, len(stages), stage.id
+                    "[%s/%s] %s: reused valid artifacts",
+                    index,
+                    len(stages),
+                    stage.id,
+                    extra={"thg_compact": True},
                 )
                 LOGGER.debug("%s fingerprint: %s", stage.id, fingerprint)
                 continue
@@ -240,6 +253,7 @@ def execute(
                     len(stages),
                     stage.id,
                     time.monotonic() - started,
+                    extra={"thg_compact": True},
                 )
                 LOGGER.debug("%s summary: %r", stage.id, dict(result.summary))
                 for record in outputs:
@@ -287,7 +301,7 @@ def execute(
                 ) from error
         manifest["overall_status"] = "completed"
         _write(run_dir, manifest)
-        LOGGER.info("workflow completed: %s", run_dir)
+        LOGGER.info("workflow completed: %s", run_dir, extra={"thg_compact": True})
         return run_dir
     finally:
         logger = logging.getLogger("thg_protocol.workflow")
