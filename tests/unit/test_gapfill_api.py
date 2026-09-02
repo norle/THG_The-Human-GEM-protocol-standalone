@@ -1,11 +1,6 @@
-import json
-
 from thg_protocol.gapfill import (
-    DeterministicGapfillStrategy,
     gapfill_model,
-    generate_candidates,
     run_gapfill,
-    run_pipeline,
 )
 from thg_protocol.gapfill.cli import main
 
@@ -26,13 +21,16 @@ def toy_model():
     }
 
 
-def test_gapfill_candidates_and_pipeline_write_explicit_outputs(tmp_path):
-    model_path = tmp_path / "model.json"
-    model_path.write_text(json.dumps(toy_model()))
-    result = run_pipeline(model_path, tmp_path / "out", max_additions=1)
-    assert result["model"].exists()
-    assert (tmp_path / "out" / "candidates_all.csv").exists()
-    assert generate_candidates(toy_model())
+def test_gapfill_model_is_non_mutating():
+    model = toy_model()
+    result = gapfill_model(
+        model,
+        method="greedy",
+        parameters={"max_additions": 1, "allowed_connections": [["c", "e"]]},
+    )
+    assert result.status == "partial"
+    assert result.selected
+    assert len(model["reactions"]) == 2
 
 
 def test_gapfill_cli_help_is_import_safe(capsys):
@@ -43,7 +41,7 @@ def test_gapfill_cli_help_is_import_safe(capsys):
     assert "THG JSON gapfill" in capsys.readouterr().out
 
 
-def test_strategy_contract_is_non_mutating_and_records_coverage():
+def test_gapfill_is_non_mutating_and_records_coverage():
     model = toy_model()
     candidates = [
         {
@@ -51,7 +49,7 @@ def test_strategy_contract_is_non_mutating_and_records_coverage():
             "metabolites": {"MAM00001c": -1, "MAM00001e": 1},
         }
     ]
-    result = run_gapfill(model, candidates, strategy=DeterministicGapfillStrategy())
+    result = run_gapfill(model, candidates)
     assert result.status == "solved"
     assert result.selected == ["TG1"]
     assert result.candidate_coverage == {"TG1": "selected"}

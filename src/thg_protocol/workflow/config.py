@@ -207,12 +207,6 @@ def _positive_integer(value: object, label: str) -> int:
     return value
 
 
-def _nonnegative_integer(value: object, label: str) -> int:
-    if isinstance(value, bool) or not isinstance(value, int) or value < 0:
-        raise ConfigError(f"'{label}' must be a non-negative integer")
-    return value
-
-
 def _input_path(
     value: str, base: Path, label: str, suffixes: set[str] | None = None
 ) -> Path:

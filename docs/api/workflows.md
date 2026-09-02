@@ -163,15 +163,10 @@ writers below.
 ## Gapfill
 
 ::: thg_protocol.gapfill.core
-    options:
-      members:
-        - generate_candidates
+      options:
+        members:
         - gapfill_model
         - GapfillResult
-        - run_phase1
-        - run_phase2
-        - run_phase3
-        - run_pipeline
 
 ## Pathway
 

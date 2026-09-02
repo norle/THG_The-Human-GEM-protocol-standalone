@@ -39,7 +39,7 @@
     {"module": "thg_protocol.services.kegg", "page": "api/services.md", "symbols": ["KeggError", "KeggClientProtocol", "StaticKeggClient", "KeggClient"]},
     {"module": "thg_protocol.services.location", "page": "api/services.md", "symbols": ["LocationError", "LocationClientProtocol", "StaticLocationClient", "LocationClient"]},
     {"module": "thg_protocol.services.pubchem", "page": "api/services.md", "symbols": ["PubChemError", "PubChemCompound", "PubChemClientProtocol", "StaticPubChemClient", "PubChemClient"]},
-    {"module": "thg_protocol.gapfill.core", "page": "api/workflows.md", "symbols": ["gapfill_model", "GapfillResult", "generate_candidates", "run_phase1", "run_phase2", "run_phase3", "run_pipeline"]},
+    {"module": "thg_protocol.gapfill.core", "page": "api/workflows.md", "symbols": ["gapfill_model", "GapfillResult"]},
     {"module": "thg_protocol.pathway.core", "page": "api/workflows.md", "symbols": ["add_compartment", "build_reaction_from_config", "check_pathway_exists", "create_compartment_metabolites", "create_compartment_reactions", "create_metabolite_in_new_compartment", "find_metabolite_by_annotation", "find_metabolite_by_formula_in_model", "find_metabolite_robust", "get_metabolite_id_base", "get_next_metabolite_id", "get_next_reaction_id", "parse_reaction_equation", "parse_universal_reaction", "select_pathway_metabolites", "substitute_compartment_abbreviations"]},
     {"module": "thg_protocol.pathway.workflow", "page": "api/workflows.md", "symbols": ["implement_pathway", "implement_pathway_files"]},
     {"module": "thg_protocol.pathway.kegg_listing", "page": "api/workflows.md", "symbols": ["list_pathway_reactions"]},

@@ -18,7 +18,7 @@ from thg_protocol.database import (
     reconstruct_model_from_pickle,
 )
 from thg_protocol.figures.models import model_component_summary
-from thg_protocol.gapfill import run_pipeline
+from thg_protocol.gapfill import gapfill_model
 from thg_protocol.gpr import get_gpr
 from thg_protocol.merge import merge_models
 from thg_protocol.model_build import build_model, build_model_batch
@@ -62,10 +62,12 @@ def test_documented_construction_and_workflow_examples_are_offline(tmp_path):
     )
     assert single.output_path.exists() and batch.output_path.exists()
 
-    gapfill = run_pipeline(
-        FIXTURES / "quickstart_model.json", tmp_path / "gapfill", max_additions=1
+    gapfill = gapfill_model(
+        json.loads((FIXTURES / "quickstart_model.json").read_text()),
+        method="greedy",
+        parameters={"max_additions": 1, "allowed_connections": [["c", "e"]]},
     )
-    assert gapfill["model"].exists()
+    assert gapfill.status == "partial"
 
     pathway = implement_pathway_files(
         FIXTURES / "quickstart_model.json",

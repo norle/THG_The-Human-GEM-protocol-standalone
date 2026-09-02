@@ -125,10 +125,6 @@ def _kegg_genes(page: str) -> list[str]:
     return sorted(set(re.findall(r"(?:hsa:)?(\d{3,})", page)))
 
 
-def _safe_gpr(symbols: list[str]) -> str:
-    return " or ".join(f"({symbol})" for symbol in symbols)
-
-
 def _gpr_for_node(node: GeneNode | OrNode | object) -> str:
     if isinstance(node, GeneNode):
         return f"({node.gene})"

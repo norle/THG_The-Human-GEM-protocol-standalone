@@ -81,22 +81,6 @@ def _model_metrics(model: Any, *, profile: str) -> dict[str, object]:
     }
 
 
-def _render_report(
-    report: Mapping[str, object], json_path: Path, html_path: Path, md_path: Path
-) -> None:
-    body = json.dumps(report, indent=2, sort_keys=True, default=str)
-    json_path.write_text(body + "\n")
-    html_path.write_text(
-        "<html><body><pre>" + html.escape(body) + "</pre></body></html>\n"
-    )
-    md_path.write_text(
-        "# THG validation report\n\n"
-        f"- status: `{report.get('status', 'unknown')}`\n"
-        f"- source reactions: `{report.get('source_reaction_count', 0)}`\n"
-        f"- retained reactions: `{report.get('retained_reaction_count', 0)}`\n"
-    )
-
-
 class CellSpecificStage:
     implementation_version = 1
 
