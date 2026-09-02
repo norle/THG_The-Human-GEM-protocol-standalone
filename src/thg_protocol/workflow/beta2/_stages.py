@@ -633,6 +633,11 @@ class DetailedBeta2Stage:
                         )
                 if getattr(rhea, "metadata", None):
                     source_metadata["rhea"] = dict(rhea.metadata)
+                if getattr(rhea, "failed_requests", 0):
+                    LOGGER.warning(
+                        "collect-gpr-evidence: skipped %d unavailable Rhea requests",
+                        rhea.failed_requests,
+                    )
             if "rhea" in reaction_sources:
                 from thg_protocol.gpr.stoichiometry import (
                     GeneNode,

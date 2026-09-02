@@ -7,7 +7,7 @@ from collections.abc import Mapping
 from dataclasses import dataclass, field
 from typing import Protocol
 
-from ._http import request
+from ._http import _UnavailableRequestMixin, request
 
 try:
     import requests
@@ -38,7 +38,7 @@ class StaticRheaClient:
         return list(self.proteins.get(str(rhea_id), ()))
 
 
-class RheaClient(StaticRheaClient):
+class RheaClient(_UnavailableRequestMixin, StaticRheaClient):
     """Small JSON adapter; a supplied snapshot remains the preferred input."""
 
     base_url = "https://www.rhea-db.org"
@@ -56,6 +56,7 @@ class RheaClient(StaticRheaClient):
         self.timeout = timeout
         self.source_release = release
         self.metadata: dict[str, object] = {}
+        self.failed_requests = 0
 
     def _remote(self, path: str) -> object:
         if self.session is None:
@@ -81,7 +82,12 @@ class RheaClient(StaticRheaClient):
         local = super().reactions_for_ec(ec_number)
         if local:
             return local
-        payload = self._remote(f"/rhea/?query=ec:{ec_number}&format=json")
+        try:
+            payload = self._remote(f"/rhea/?query=ec:{ec_number}&format=json")
+        except Exception as error:
+            if self._unavailable(error):
+                return []
+            raise
         return (
             list(payload)
             if isinstance(payload, list)
@@ -94,7 +100,12 @@ class RheaClient(StaticRheaClient):
         local = super().reaction(rhea_id)
         if local is not None:
             return local
-        payload = self._remote(f"/rhea/{rhea_id}?format=json")
+        try:
+            payload = self._remote(f"/rhea/{rhea_id}?format=json")
+        except Exception as error:
+            if self._unavailable(error):
+                return None
+            raise
         return payload if isinstance(payload, Mapping) else None
 
     def proteins_for_reaction(self, rhea_id: str) -> list[Mapping[str, object]]:

@@ -17,7 +17,7 @@ from thg_protocol.gpr.stoichiometry import (
     normalize_sgpr,
 )
 
-from ._http import request
+from ._http import _UnavailableRequestMixin, request
 
 try:
     import requests
@@ -163,7 +163,7 @@ def catalyst_sgpr(record: Mapping[str, object], *, ec: str = "") -> SgprEvidence
     )
 
 
-class ReactomeClient(StaticReactomeClient):
+class ReactomeClient(_UnavailableRequestMixin, StaticReactomeClient):
     base_url = "https://reactome.org/ContentService"
 
     def __init__(
@@ -180,22 +180,6 @@ class ReactomeClient(StaticReactomeClient):
         self.source_release = release
         self.metadata: dict[str, object] = {}
         self.failed_requests = 0
-
-    def _unavailable(self, error: Exception) -> bool:
-        status_code = getattr(getattr(error, "response", None), "status_code", None)
-        if status_code == 404:
-            return True
-        if status_code in {408, 425, 429} or (
-            isinstance(status_code, int) and status_code >= 500
-        ):
-            self.failed_requests += 1
-            return True
-        if (
-            requests is not None and isinstance(error, requests.RequestException)
-        ) or isinstance(error, ValueError):
-            self.failed_requests += 1
-            return True
-        return False
 
     def _remote(self, path: str) -> object:
         if self.session is None:

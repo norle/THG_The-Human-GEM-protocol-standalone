@@ -168,6 +168,17 @@ def test_reactome_search_skips_unavailable_requests(monkeypatch):
     assert client.failed_requests == 1
 
 
+def test_rhea_search_skips_invalid_json(monkeypatch):
+    def fake_request(_session, _method, _url, **_kwargs):
+        raise ValueError("empty response")
+
+    monkeypatch.setattr(rhea, "request", fake_request)
+
+    client = rhea.RheaClient(session=object())
+    assert client.reactions_for_ec("1.1.1.1") == []
+    assert client.failed_requests == 1
+
+
 def test_uniprot_search_deduplicates_and_batches_identifiers(monkeypatch):
     calls = []
 

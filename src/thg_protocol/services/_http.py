@@ -9,6 +9,24 @@ except ImportError:  # pragma: no cover - covered by subprocess smoke test
     requests = None  # type: ignore[assignment]
 
 
+class _UnavailableRequestMixin:
+    def _unavailable(self, error: Exception) -> bool:
+        status_code = getattr(getattr(error, "response", None), "status_code", None)
+        if status_code == 404:
+            return True
+        if status_code in {408, 425, 429} or (
+            isinstance(status_code, int) and status_code >= 500
+        ):
+            self.failed_requests += 1
+            return True
+        if (
+            requests is not None and isinstance(error, requests.RequestException)
+        ) or isinstance(error, ValueError):
+            self.failed_requests += 1
+            return True
+        return False
+
+
 def request(
     session: Any,
     method: str,

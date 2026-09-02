@@ -1,24 +1,17 @@
-# Practical quickstart
+# Quickstart
 
-This offline example demonstrates a small but realistic direct-API workflow: load a
-normalized record bundle, inspect annotations, apply a deterministic pathway
-configuration, check connectivity and formula balance, and compare the result.
-It intentionally uses the tracked documentation fixtures in
-[`docs/examples/`](examples/README.md), rather than caller-owned workspace
-inputs. The model is deliberately tiny and does not reproduce a research-quality
-human GEM or create a resumable `thg-run` manifest.
+Build and inspect a tiny model using the included example data. This runs
+offline and does not need credentials or a solver.
 
 ## Prerequisites
 
-From a fresh checkout, use Python 3.10–3.12 and install the core package:
+From the repository root, using Python 3.10–3.12:
 
 ```bash
 python -m pip install -e .
 ```
 
-No network, credentials, solver, or optional extra is required.
-
-## Run the workflow
+## Run it
 
 ```python
 from pathlib import Path
@@ -35,17 +28,14 @@ examples = Path("docs/examples")
 run_dir = Path("runs/practical-quickstart")
 run_dir.mkdir(parents=True, exist_ok=True)
 
-# 1. Load normalized records and write a generated run artifact.
 reference_path = run_dir / "reference-model.json"
 model = reconstruct_model_from_json(
     examples / "records.json", output_path=reference_path
 )
 print(model.id, len(model.metabolites), len(model.reactions))
 
-# 2. Inspect identifier coverage before changing model content.
 print(analyze_model_annotations(reference_path))
 
-# 3. Apply a deterministic, local pathway configuration.
 enriched_path = run_dir / "enriched-model.json"
 pathway_result = implement_pathway_files(
     examples / "quickstart_model.json",
@@ -55,25 +45,20 @@ pathway_result = implement_pathway_files(
 )
 print(pathway_result["compartments_added"])
 
-# 4. Check connectivity and formula balance on the enriched model.
 enriched_model = load_json_model(enriched_path)
 component_result = find_network_components(enriched_model)
 write_component_report(component_result, run_dir / "components.json")
 print(component_result["is_fully_connected"])
 print(unbalanced_reactions(enriched_model))
 
-# 5. Compare the enriched model with a second prepared model.
 comparison = compare_models_from_files(
     enriched_path, examples / "comparison_model.json", run_dir / "comparison"
 )
 print(comparison["raw"]["_summary"])
 ```
 
-Expected stable checkpoints are `docs-toy 4 1`, an annotation mapping
-containing `chebi`, one added compartment, and a written JSON component report.
-The exact comparison summary is data-dependent; inspect
-`runs/practical-quickstart/comparison/` rather than treating it as a
-scientific quality score.
+You should see `docs-toy 2 1`, an annotation mapping containing `chebi`, one
+added compartment, and a comparison summary.
 
 ## Files after execution
 
@@ -87,5 +72,5 @@ runs/practical-quickstart/
     └── compartments_comparison_no_blocked.csv
 ```
 
-For full model workflows, resumable runs, and external-service boundaries, see
-the [workflow overview](workflows/index.md).
+These are demonstration fixtures, not a research-quality human GEM. Next,
+[choose a workflow](workflows/index.md) for your own model or evidence.

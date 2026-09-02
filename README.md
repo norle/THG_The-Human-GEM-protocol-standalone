@@ -4,10 +4,8 @@
 [![Documentation](https://github.com/norle/THG_The-Human-GEM-protocol-standalone/actions/workflows/docs.yml/badge.svg)](https://github.com/norle/THG_The-Human-GEM-protocol-standalone/actions/workflows/docs.yml)
 [![Hosted documentation](https://img.shields.io/badge/docs-GitHub%20Pages-blue?logo=github)](https://norle.github.io/THG_The-Human-GEM-protocol-standalone/)
 
-THG Protocol is a Python package and command-line toolset for constructing,
-curating, expanding, and validating human genome-scale metabolic models. It
-supports reference-model curation and reconstruction from normalized biological
-records, then merges and validates the resulting branches.
+THG Protocol is a Python package and command-line toolkit for building and
+validating human genome-scale metabolic models.
 
 The repository is independently maintained from its source repositories,
 [MarindeMasLab/THG_The-Human-GEM-protocol](https://github.com/MarindeMasLab/THG_The-Human-GEM-protocol)
@@ -29,9 +27,9 @@ For a core-only installation, use `python -m pip install -e .`. See the
 
 ## Start here
 
-- [Quickstart](docs/quickstart.md): run a small deterministic offline example.
-- [Workflow overview](docs/workflows/index.md): choose and configure a workflow.
-- [API reference](docs/api/index.md): use the Python and CLI interfaces.
+- [Quickstart](docs/quickstart.md): run the included offline example.
+- [Workflow overview](docs/workflows/index.md): choose a workflow for your data.
+- [CLI reference](docs/reference/cli.md): see the available commands.
 
 ## Repository layout
 
