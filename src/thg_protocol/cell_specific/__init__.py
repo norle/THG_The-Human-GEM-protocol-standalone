@@ -113,7 +113,9 @@ def _labeled_csv_activity(path: Path, reaction_ids: list[str]):
             return None
         value_columns = [key for key in reader.fieldnames if key != "reaction_id"]
         if not value_columns:
-            raise ValueError("labeled activity matrix requires at least one sample column")
+            raise ValueError(
+                "labeled activity matrix requires at least one sample column"
+            )
         rows = list(reader)
     ids = [str(row["reaction_id"]) for row in rows]
     if len(ids) != len(set(ids)) or set(ids) != set(reaction_ids):
