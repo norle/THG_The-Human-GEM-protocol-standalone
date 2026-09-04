@@ -70,22 +70,25 @@ validation, semantic β1-to-β2 diff, unresolved records, provenance, and a
 summary. Resume reuses valid attempts; forcing a stage invalidates that stage
 and its descendants while preserving previous attempt directories.
 
-## Optional lower-level post-β2 gapfill
+## Required canonical gapfill and standalone use
 
 For the reproducible scientific pipeline, use the first-class `reference` or
 `gapfill` workflow. The direct command below remains useful for ad-hoc
 algorithm work and does not select the downstream model automatically.
 
-Gap filling is a separate, optional operation after a β2 release candidate;
-it is not a β2 stage or release-gate input. For example:
+Gap filling is separate from the β2 stage, but it is the required next
+model-construction step in the canonical THG pipeline. Optional Human Database
+integration occurs before it. The lower-level command can also be used
+independently for ad-hoc work. For example:
 
 ```bash
 thg-gapfill --model runs/beta2/artifacts/export-beta2/attempt-0001/thg-beta2-candidate.json --method greedy --output-dir runs/beta2-gapfill
 ```
 
-The same command accepts external JSON or SBML models. A caller, not the β2
-workflow, chooses whether downstream work consumes its original model or the
-standalone gap-filled output.
+The same command accepts external JSON or SBML models. In standalone use, the
+caller chooses whether downstream work consumes its original model or the
+gapfilled output; canonical construction always continues with the gapfilled
+output.
 
 Python release API:
 

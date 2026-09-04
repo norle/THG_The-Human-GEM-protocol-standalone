@@ -18,13 +18,21 @@ human genome-scale metabolic models (GEMs).
 flowchart LR
     A[Reference GEM] --> B[THGβ1]
     B --> C[THGβ2]
-    C --> E[Final THG]
-    C -. optional .-> G[Gapfill]
-    G -.-> E
-    D[Human Database] --> E
-    A --> S[Cell-specific]
-    E --> F[Validation]
+    C --> G[Required gapfill]
+    C -. optional enrichment .-> I[Human Database integration]
+    D[Human Database reconstruction] -.-> I
+    I --> G
+    G --> T[THG candidate]
+    T --> V[Final validation / release gate]
+    V --> E[Final THG]
+    E --> S[Cell-specific models]
 ```
+
+This is the canonical THG construction pipeline: gapfill is required, Human
+Database integration is optional, and only a candidate that passes the final
+validation/release gate is a Final THG. Human Database reconstruction,
+standalone gapfill, standalone validation, and cell-specific reduction can
+also be run independently; those uses do not change the canonical ordering.
 
 THG implements the workflow described in the [2023 protocol
 paper](https://doi.org/10.3390/bioengineering10050576). Reproducing a published

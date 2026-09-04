@@ -2,6 +2,12 @@
 
 Validation has three related interfaces.
 
+Validation inside β1, β2, Human Database reconstruction, gapfill, or
+cell-specific reduction is stage-level validation. It checks that stage and
+records evidence but does not name a model Final THG. The final
+validation/release gate evaluates the post-gapfill **THG candidate** under its
+configured release profile; only a passing candidate is **Final THG**.
+
 ## Registered validation workflow
 
 Save the configuration as `configs/validation.json` and run
@@ -30,7 +36,8 @@ results are likewise reported separately where configured.
 `thg_protocol.memote.run_memote` is a maintained subprocess wrapper. Install
 the optional `memote` extra, record the command and version, and retain the
 JSON result, HTML report, and run metadata. A MEMOTE score does not replace
-package structural checks or prove publication-artifact reproduction.
+package structural checks, determine the THG release gate, or prove
+publication-artifact reproduction.
 
 See the [I/O and configuration reference](../reference/io-and-config.md) and
 [generated API reference](../api/workflows.md).

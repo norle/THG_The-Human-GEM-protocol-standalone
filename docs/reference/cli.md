@@ -6,8 +6,8 @@
 | `thg-run beta1 CONFIG` | Start a registered β1 workflow |
 | `thg-run beta2 CONFIG` | Start a registered β2 workflow |
 | `thg-run gapfill CONFIG` | Start a standalone, checksum-tracked gapfill workflow |
-| `thg-run reference CONFIG` | Run the canonical β1 → β2 → gapfilled reference workflow |
-| `thg-run cell-specific CONFIG` | Run context-specific reduction from expression evidence |
+| `thg-run reference CONFIG` | Run the core β1 → β2 → required-gapfill path |
+| `thg-run cell-specific CONFIG` | Reduce a validated Final THG or declared external GEM from expression evidence |
 | `thg-run pathway CONFIG` | Run versioned pathway implementation |
 | `thg-run validate CONFIG` | Start a registered validation workflow |
 | `thg-run compare CONFIG` | Start a registered comparison workflow |
@@ -30,5 +30,10 @@ those workflows currently use `thg-run start` with a corresponding `workflow`
 value. CLI failures return non-zero status and preserve the run error/provenance
 where a run directory exists. Use the [workflow guides](../workflows/index.md)
 for task context and examples.
+
+`reference` does not currently include optional Human Database integration;
+compose that enrichment explicitly between β2 and the required gapfill stage.
+The gapfill, validation, Human Database reconstruction, and cell-specific
+commands also remain independently usable outside the canonical pipeline.
 
 The generated parser API remains available on the [CLI API page](../api/cli.md).

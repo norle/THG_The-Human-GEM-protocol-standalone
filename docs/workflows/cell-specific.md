@@ -1,8 +1,13 @@
 # Cell-specific workflow
 
-`cell-specific` is an independent workflow. It accepts a versioned source GEM
-and pre-normalized expression evidence; it does not implicitly consume β1, β2,
-gapfill, or Final THG.
+In the canonical pipeline, run `cell-specific` after the final release gate and
+use the validated **Final THG** as its parent model. The workflow accepts an
+explicitly versioned source GEM rather than implicitly discovering an upstream
+artifact.
+
+It may also run independently from an explicitly declared external GEM. That
+standalone mode must preserve the external model's identity, checksum, and
+provenance and must not imply that the parent is a Final THG.
 
 The run records expression evidence, identifier mapping, GPR activity,
 proposal-first reduction decisions, exchange settings, validation, and JSON/XML
@@ -14,7 +19,7 @@ model exports. Missing genes default to `uncertain-retain`; use `inactive` or
   "workflow": "cell-specific",
   "run": {"name": "cell", "output_dir": "../runs/cell"},
   "cell_specific": {
-    "input_model": "../inputs/models/model.json",
+    "input_model": "../inputs/models/final-thg.json",
     "expression_file": "../inputs/expression.jsonl",
     "gene_identifier_namespace": "Ensembl",
     "activity_strategy": "gpr-threshold",

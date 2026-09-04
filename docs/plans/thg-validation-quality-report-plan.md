@@ -39,7 +39,7 @@ All workflows use the same schema:
 β2
 post-gapfill
 Human Database
-Final THG
+THG candidate / Final THG release gate
 cell-specific models
 standalone validation
 ```
@@ -310,8 +310,8 @@ Examples:
 
 ```text
 β1 → β2
-β2 → gapfilled reference
-reference branches → Final THG
+β2 → gapfilled THG candidate
+THG candidate → release-gated Final THG
 generic GEM → cell-specific GEM
 ```
 
@@ -457,7 +457,7 @@ Stages may be skipped according to profile, but skipped states must remain visib
 
 Scientific workflows should call the same validation/report stages or shared implementation.
 
-Do not maintain one validation interpretation in β2, another in gapfill and another in Final THG.
+Do not maintain one validation interpretation in β2, another in gapfill and another at the Final THG release gate.
 
 The same metric name must mean the same calculation everywhere.
 

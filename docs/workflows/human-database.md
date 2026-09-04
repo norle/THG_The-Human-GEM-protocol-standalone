@@ -10,6 +10,11 @@ The registered lineage is `collect-records` → `snapshot-records` →
 `human-database-validate` → `human-database-export`; replay stages do not make
 network calls.
 
+This independent reconstruction workflow is distinct from **Human Database
+integration**. In the canonical THG pipeline, integration is an optional
+enrichment step that merges a reviewed Human Database model into THGβ2 before
+the required gapfill stage. Skipping integration does not skip gapfill.
+
 ## Inputs and modes
 
 Use a JSON record bundle with `metabolites` and `reactions`; `genes`,
@@ -46,7 +51,9 @@ thg-run start configs/human-database.json
 Keep the normalized input, reconstructed JSON/SBML model, pathway membership,
 source/cache manifest, unresolved records, provenance, and validation report.
 Run structural, formula-balance, connectivity, and comparison checks before
-using the model as a merge input. Historical pickle input is compatibility
+using the model as an optional integration input. These stage-level checks
+qualify the branch for integration; they do not create a Final THG or replace
+the final validation/release gate. Historical pickle input is compatibility
 support, not evidence of a live harvesting pipeline.
 
 See the [construction tool guide](../tools/model-construction.md) and
