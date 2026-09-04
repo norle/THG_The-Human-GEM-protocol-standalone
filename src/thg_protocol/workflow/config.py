@@ -3,11 +3,14 @@
 from __future__ import annotations
 
 import json
+import math
 import re
 from collections.abc import Mapping
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
+
+from thg_protocol.runtime.hashing import sha256_file
 
 
 class ConfigError(ValueError):
@@ -136,6 +139,12 @@ WORKFLOW_SECTION_KEYS = {
         "task_suite",
         "validation_profile",
         "matrix_key",
+        "legacy_row_order",
+        "model_signature",
+        "gpr",
+        "gimme",
+        "consensus",
+        "allow_internal_bound_override",
     },
     "pathway": {
         "input_model",
@@ -333,24 +342,52 @@ def _parse_workflow(
                     )
                 _required_string(value, "gene_identifier_namespace", "cell_specific")
                 strategy = value.get("activity_strategy", "gpr-threshold")
-                if strategy not in {"gpr-threshold", "activity-matrix"}:
+                if strategy not in {"gpr-threshold", "activity-matrix", "gimme"}:
                     raise ConfigError(
                         "'cell_specific.activity_strategy' must be "
-                        "gpr-threshold or activity-matrix"
+                        "gpr-threshold, activity-matrix, or gimme"
                     )
                 reduction = value.get("reduction_strategy", strategy)
-                if reduction not in {"gpr-threshold", "activity-matrix"}:
+                if reduction not in {"gpr-threshold", "activity-matrix", "gimme"}:
                     raise ConfigError(
                         "'cell_specific.reduction_strategy' must be "
-                        "gpr-threshold or activity-matrix"
+                        "gpr-threshold, activity-matrix, or gimme"
                     )
+                value["reduction_strategy"] = reduction
+                if reduction == "activity-matrix":
+                    expression = Path(value["expression_file"])
+                    labeled = False
+                    if expression.suffix.lower() == ".csv":
+                        with expression.open(encoding="utf-8") as handle:
+                            labeled = (
+                                handle.readline().strip().split(",", 1)[0]
+                                == "reaction_id"
+                            )
+                    if not labeled:
+                        if value.get("legacy_row_order") is not True:
+                            raise ConfigError(
+                                "unlabeled activity matrices require "
+                                "legacy_row_order=true"
+                            )
+                        if value.get("model_signature") != sha256_file(
+                            value["input_model"]
+                        ):
+                            raise ConfigError(
+                                "unlabeled activity matrix model_signature must "
+                                "match the input model checksum"
+                            )
                 policy = value.get("unknown_gene_policy", "uncertain-retain")
                 if policy not in {"uncertain-retain", "inactive", "reject"}:
                     raise ConfigError(
                         "'cell_specific.unknown_gene_policy' must be "
                         "uncertain-retain, inactive, or reject"
                     )
-                profile = value.get("validation_profile", "structural-fast")
+                profile = value.get(
+                    "validation_profile",
+                    "cell-specific-standard"
+                    if reduction == "gimme"
+                    else "structural-fast",
+                )
                 from thg_protocol.validation import PROFILES
 
                 if profile not in PROFILES:
@@ -378,11 +415,114 @@ def _parse_workflow(
                 ):
                     raise ConfigError("'cell_specific.gene_mapping' must be an object")
                 aggregation = value.get("sample_aggregation", "mean")
-                if aggregation not in {"mean", "median", "max"}:
+                if aggregation not in {"none", "mean", "median", "max"}:
                     raise ConfigError(
-                        "'cell_specific.sample_aggregation' must be mean, median, "
-                        "or max"
+                        "'cell_specific.sample_aggregation' must be none, mean, "
+                        "median, or max"
                     )
+                if reduction == "gimme":
+                    gpr = value.get("gpr", {})
+                    if not isinstance(gpr, dict) or any(
+                        gpr.get(key, expected) != expected
+                        for key, expected in {
+                            "and_rule": "min",
+                            "or_rule": "max",
+                            "unknown_policy": "unpenalized",
+                        }.items()
+                    ):
+                        raise ConfigError(
+                            "cell_specific.gpr supports and_rule=min, or_rule=max, "
+                            "and unknown_policy=unpenalized"
+                        )
+                    gimme = value.get("gimme")
+                    if not isinstance(gimme, dict):
+                        raise ConfigError("'cell_specific.gimme' is required for gimme")
+                    numeric = gimme.get("expression_threshold")
+                    if (
+                        isinstance(numeric, bool)
+                        or not isinstance(numeric, (int, float))
+                        or not math.isfinite(numeric)
+                    ):
+                        raise ConfigError(
+                            "'cell_specific.gimme.expression_threshold' must be finite"
+                        )
+                    tolerance = gimme.get("flux_activity_tolerance", 1e-7)
+                    if (
+                        isinstance(tolerance, bool)
+                        or not isinstance(tolerance, (int, float))
+                        or not math.isfinite(tolerance)
+                        or tolerance <= 0
+                    ):
+                        raise ConfigError(
+                            "cell_specific.gimme.flux_activity_tolerance "
+                            "must be positive"
+                        )
+                    fraction = gimme.get("minimum_successful_sample_fraction", 1.0)
+                    if (
+                        isinstance(fraction, bool)
+                        or not isinstance(fraction, (int, float))
+                        or not 0 <= fraction <= 1
+                    ):
+                        raise ConfigError(
+                            "cell_specific.gimme.minimum_successful_sample_fraction "
+                            "must be in [0, 1]"
+                        )
+                    objectives = gimme.get("objectives")
+                    if not isinstance(objectives, list) or not objectives:
+                        raise ConfigError(
+                            "'cell_specific.gimme.objectives' must be non-empty"
+                        )
+                    from thg_protocol.io.models import load_model as _load_model
+
+                    input_model = _load_model(value["input_model"])
+                    for item in objectives:
+                        if not isinstance(item, dict) or not isinstance(
+                            item.get("id"), str
+                        ):
+                            raise ConfigError("each GIMME objective requires an id")
+                        coefficients = item.get("coefficients")
+                        objective_fraction = item.get("minimum_fraction_of_optimum")
+                        if not isinstance(coefficients, dict) or not coefficients:
+                            raise ConfigError(
+                                "each GIMME objective requires coefficients"
+                            )
+                        if (
+                            isinstance(objective_fraction, bool)
+                            or not isinstance(objective_fraction, (int, float))
+                            or not 0 < objective_fraction <= 1
+                        ):
+                            raise ConfigError(
+                                "GIMME objective fraction must be in (0, 1]"
+                            )
+                        for reaction_id, coefficient in coefficients.items():
+                            if (
+                                not isinstance(coefficient, (int, float))
+                                or isinstance(coefficient, bool)
+                                or not math.isfinite(coefficient)
+                            ):
+                                raise ConfigError(
+                                    "GIMME objective coefficients must be finite"
+                                )
+                            if not input_model.reactions.has_id(str(reaction_id)):
+                                raise ConfigError(
+                                    "GIMME objective reaction does not exist: "
+                                    f"{reaction_id}"
+                                )
+                    consensus = value.get("consensus", {})
+                    threshold = (
+                        consensus.get("presence_threshold", 0.0)
+                        if isinstance(consensus, dict)
+                        else None
+                    )
+                    if (
+                        isinstance(threshold, bool)
+                        or not isinstance(threshold, (int, float))
+                        or not 0 <= threshold <= 1
+                    ):
+                        raise ConfigError(
+                            "cell_specific.consensus.presence_threshold "
+                            "must be in [0, 1]"
+                        )
             if section == "pathway":
                 value = dict(value)
                 for key in ("input_model", "pathway_definition", "id_database"):

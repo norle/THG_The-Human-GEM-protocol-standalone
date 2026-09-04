@@ -21,6 +21,7 @@ PROFILES: dict[str, dict[str, object]] = {
     "beta2-standard": {"solver": True, "release_blocking": True},
     "post-gapfill": {"solver": True, "release_blocking": True},
     "final-standard": {"solver": True, "release_blocking": True},
+    "cell-specific-standard": {"solver": True, "release_blocking": True},
     "release-full": {"solver": True, "release_blocking": True},
 }
 
@@ -53,9 +54,7 @@ def _check(
         passed = (
             value["passed"]
             if isinstance(value, Mapping) and isinstance(value.get("passed"), bool)
-            else bool(value)
-            if isinstance(value, bool)
-            else True
+            else bool(value) if isinstance(value, bool) else True
         )
         return CheckResult(
             check_id,
@@ -300,9 +299,7 @@ def validate_model(
 
     def _not_produced() -> list[str]:
         return list(
-            _cached(
-                "not-produced", lambda: consistency.metabolites_not_produced(model)
-            )
+            _cached("not-produced", lambda: consistency.metabolites_not_produced(model))
         )
 
     def _not_consumed() -> list[str]:
@@ -409,7 +406,7 @@ def validate_model(
                 ),
             ]
         )
-    passed = all(item.passed is not False for item in checks if item.release_blocking)
+    passed = all(item.passed is True for item in checks if item.release_blocking)
     solver_configuration = None
     if solver:
         try:

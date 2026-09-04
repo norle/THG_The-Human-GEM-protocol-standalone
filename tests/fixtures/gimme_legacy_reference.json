@@ -1,0 +1,10 @@
+{
+  "description": "Frozen small GIMME compatibility target; Troppo is not a test dependency.",
+  "expression": {"H": 10.0, "L": 0.0},
+  "expression_threshold": 1.0,
+  "objective": {"id": "out", "coefficients": {"out": 1.0}, "minimum_fraction_of_optimum": 0.5},
+  "objective_maximum": 10.0,
+  "objective_requirement": 5.0,
+  "inconsistency_score": 0.0,
+  "active_reactions": ["high", "in", "out", "out_required"]
+}

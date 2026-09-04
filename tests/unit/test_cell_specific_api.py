@@ -2,6 +2,7 @@ from types import SimpleNamespace
 
 import cobra
 import numpy as np
+import pytest
 from scipy.io import savemat
 
 from thg_protocol.cell_specific import (
@@ -77,10 +78,20 @@ def test_reduce_model_by_activity_loads_single_sample_csv_and_mat(tmp_path):
     savemat(mat_path, {"all_Solutions_matrix5": activity})
 
     for path in (csv_path, mat_path):
-        tailored, report = reduce_model_by_activity(model, path)
+        tailored, report = reduce_model_by_activity(
+            model,
+            path,
+            legacy_row_order=True,
+            model_signature="test-fixture",
+        )
         assert tailored.reactions.has_id("R1")
         assert not tailored.reactions.has_id("R2")
         assert report.removed_reactions == 1
+
+    labeled = tmp_path / "empty-labeled.csv"
+    labeled.write_text("reaction_id\nR1\nR2\n", encoding="utf-8")
+    with pytest.raises(ValueError, match="at least one sample column"):
+        reduce_model_by_activity(model, labeled)
 
 
 def test_transcriptomics_helpers_transform_model_annotations(tmp_path):

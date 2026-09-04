@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import re
 from collections.abc import Sequence
 from dataclasses import dataclass
 from pathlib import Path
@@ -12,7 +11,8 @@ from typing import Any
 @dataclass(frozen=True)
 class ActivityReductionReport:
     """Summary returned by
-    [`reduce_model_by_activity`][thg_protocol.cell_specific.reduce_model_by_activity]."""
+    [`reduce_model_by_activity`][thg_protocol.cell_specific.reduce_model_by_activity].
+    """
 
     total_reactions: int
     retained_reactions: int
@@ -38,35 +38,14 @@ def evaluate_gpr_activity(
     rule: str, activity: dict[str, float], *, threshold: float = 0.0
 ) -> tuple[bool, tuple[str, ...]]:
     """Evaluate a boolean GPR and report genes absent from the activity map."""
-    if not rule.strip():
-        return True, ()
-    unknown = tuple(
-        sorted(
-            {
-                token
-                for token in re.findall(r"[A-Za-z_][A-Za-z0-9_.-]*", rule)
-                if token.lower() not in {"and", "or", "not"} and token not in activity
-            }
-        )
+    from .gpr import reaction_expression_evidence
+
+    evidence = reaction_expression_evidence("activity", rule, activity)
+    return (
+        not rule.strip()
+        or bool(evidence.score is not None and evidence.score > threshold),
+        evidence.missing_genes,
     )
-    expression = rule
-    for token in sorted(
-        set(re.findall(r"[A-Za-z_][A-Za-z0-9_.-]*", rule)), key=len, reverse=True
-    ):
-        if token.lower() in {"and", "or", "not"}:
-            continue
-        expression = re.sub(
-            rf"(?<![\w.-]){re.escape(token)}(?![\w.-])",
-            str(float(activity.get(token, 0.0)) > threshold),
-            expression,
-        )
-    expression = re.sub(r"\band\b", " and ", expression, flags=re.I)
-    expression = re.sub(r"\bor\b", " or ", expression, flags=re.I)
-    expression = re.sub(r"\bnot\b", " not ", expression, flags=re.I)
-    try:
-        return bool(eval(expression, {"__builtins__": {}}, {})), unknown  # noqa: S307 - tokens are replaced with booleans
-    except (SyntaxError, ValueError, TypeError):
-        return False, unknown
 
 
 def build_cell_specific_model(
@@ -122,6 +101,69 @@ def _activity_matrix(activity: Any, *, matrix_key: str) -> Any:
     return np.asarray(activity)
 
 
+def _labeled_csv_activity(path: Path, reaction_ids: list[str]):
+    """Read a ``reaction_id`` activity CSV and align it to model order."""
+    import csv
+
+    import numpy as np
+
+    with path.open(newline="", encoding="utf-8") as handle:
+        reader = csv.DictReader(handle)
+        if not reader.fieldnames or "reaction_id" not in reader.fieldnames:
+            return None
+        value_columns = [key for key in reader.fieldnames if key != "reaction_id"]
+        if not value_columns:
+            raise ValueError("labeled activity matrix requires at least one sample column")
+        rows = list(reader)
+    ids = [str(row["reaction_id"]) for row in rows]
+    if len(ids) != len(set(ids)) or set(ids) != set(reaction_ids):
+        raise ValueError("labeled activity matrix reaction IDs must equal model IDs")
+    values = {
+        row["reaction_id"]: [float(row[key]) for key in value_columns] for row in rows
+    }
+    return np.asarray([values[reaction_id] for reaction_id in reaction_ids])
+
+
+def load_activity_matrix(
+    model: Any,
+    activity: Any,
+    *,
+    matrix_key: str = "all_Solutions_matrix5",
+    legacy_row_order: bool = False,
+    model_signature: str | None = None,
+):
+    """Load an activity matrix, aligning labeled CSV rows by reaction ID.
+
+    Unlabeled file inputs require an explicit legacy row-order acknowledgement
+    and a model signature supplied by the calling workflow.
+    """
+    import numpy as np
+
+    reaction_ids = [reaction.id for reaction in model.reactions]
+    matrix = (
+        _labeled_csv_activity(Path(activity), reaction_ids)
+        if isinstance(activity, (str, Path)) and Path(activity).suffix.lower() == ".csv"
+        else None
+    )
+    if isinstance(activity, (str, Path)) and matrix is None:
+        if not legacy_row_order or not model_signature:
+            raise ValueError(
+                "unlabeled activity files require legacy_row_order=true and "
+                "a model_signature"
+            )
+    matrix = np.atleast_2d(
+        matrix
+        if matrix is not None
+        else _activity_matrix(activity, matrix_key=matrix_key)
+    )
+    if matrix.shape[0] != len(reaction_ids):
+        raise ValueError(
+            "activity rows must match model reactions: "
+            f"{matrix.shape[0]} != {len(reaction_ids)}"
+        )
+    return matrix
+
+
 def _write_model(model: Any, output_path: Path) -> None:
     from thg_protocol.io.models import save_model
 
@@ -135,6 +177,8 @@ def reduce_model_by_activity(
     presence_threshold: float = 0.0,
     preserve_reactions: Sequence[str] = (),
     matrix_key: str = "all_Solutions_matrix5",
+    legacy_row_order: bool = False,
+    model_signature: str | None = None,
     output_path: str | Path | None = None,
 ) -> tuple[Any, ActivityReductionReport]:
     """Tailor a model using the mean non-zero activity per reaction.
@@ -149,13 +193,14 @@ def reduce_model_by_activity(
 
     import numpy as np
 
-    matrix = np.atleast_2d(_activity_matrix(activity, matrix_key=matrix_key))
     reaction_ids = [reaction.id for reaction in model.reactions]
-    if matrix.shape[0] != len(reaction_ids):
-        raise ValueError(
-            "activity rows must match model reactions: "
-            f"{matrix.shape[0]} != {len(reaction_ids)}"
-        )
+    matrix = load_activity_matrix(
+        model,
+        activity,
+        matrix_key=matrix_key,
+        legacy_row_order=legacy_row_order,
+        model_signature=model_signature,
+    )
     presence = np.mean(matrix != 0, axis=1)
     preserve = set(preserve_reactions)
     remove_ids = {
@@ -189,7 +234,19 @@ def reduce_model_by_activity(
     )
 
 
+from .consensus import ConsensusResult, consensus_from_gimme  # noqa: E402
 from .exchange import match_exchange_reactions  # noqa: E402
+from .gimme import (  # noqa: E402
+    GimmeObjectiveRequirement,
+    GimmeResult,
+    expression_penalties,
+    run_gimme,
+)
+from .gpr import (  # noqa: E402
+    ReactionExpressionEvidence,
+    reaction_expression_evidence,
+    reaction_expression_for_model,
+)
 from .transcriptomics import (  # noqa: E402
     extract_ensembl_ids,
     extract_gene_annotation_pairs,
@@ -201,10 +258,20 @@ from .transcriptomics import (  # noqa: E402
 __all__ = [
     "ActivityReductionReport",
     "reduce_model_by_activity",
+    "load_activity_matrix",
     "CellSpecificReport",
     "evaluate_gpr_activity",
     "build_cell_specific_model",
     "match_exchange_reactions",
+    "ConsensusResult",
+    "consensus_from_gimme",
+    "GimmeObjectiveRequirement",
+    "GimmeResult",
+    "expression_penalties",
+    "run_gimme",
+    "ReactionExpressionEvidence",
+    "reaction_expression_evidence",
+    "reaction_expression_for_model",
     "extract_ensembl_ids",
     "extract_gene_annotation_pairs",
     "extract_sgpr_rules",
