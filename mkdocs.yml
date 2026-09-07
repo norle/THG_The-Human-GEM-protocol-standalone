@@ -71,15 +71,16 @@ nav:
       - Quickstart: quickstart.md
       - Workflow overview: workflows/index.md
   - THG workflows:
-      - THGβ1 — Curate a reference GEM: workflows/beta1.md
-      - THGβ2 — Expand by GPR and location: workflows/beta2.md
-      - Gapfill and reference workflows: workflows/gapfill.md
-      - Human Database: workflows/human-database.md
-      - Final THG — Merge and validate: workflows/final-thg.md
-      - Cell-specific reduction: workflows/cell-specific.md
-      - Pathway implementation: workflows/pathway.md
-      - Validation: workflows/validation.md
-      - Reproducible and resumable runs: workflows/runs.md
+      - THG reference model and release boundary: workflows/final-thg.md
+      - Cell-specific model: workflows/cell-specific.md
+      - Construction and supporting workflows:
+          - THGβ1 — Curate a reference GEM: workflows/beta1.md
+          - THGβ2 — Expand by GPR and location: workflows/beta2.md
+          - Gapfill and reference workflows: workflows/gapfill.md
+          - Human Database: workflows/human-database.md
+          - Pathway implementation: workflows/pathway.md
+          - Validation: workflows/validation.md
+          - Reproducible and resumable runs: workflows/runs.md
   - Tools:
       - Model construction and enrichment: tools/model-construction.md
       - Annotation and GPRs: tools/annotation.md

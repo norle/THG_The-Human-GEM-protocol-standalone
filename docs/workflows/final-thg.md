@@ -1,4 +1,4 @@
-# Final THG — Candidate validation and release
+# THG reference model (`final-thg`) — validation and release
 
 ## Inputs
 
@@ -8,8 +8,8 @@ integration evidence when used, and all checksums.
 
 ## Merge and validation
 
-The registered `final-thg` workflow currently combines a two-branch merge and
-final acceptance. It runs `final-thg-merge-plan` → `final-thg-merge` →
+The registered `final-thg` workflow currently combines a two-branch merge,
+final validation, and export. It runs `final-thg-merge-plan` → `final-thg-merge` →
 `validate-final-thg` → `export-final-thg`. Because that command merges
 immediately before validation, using it with separate β2 and Human Database
 inputs is a standalone combined workflow, not the canonical ordering. In the
@@ -33,22 +33,37 @@ print(report)
 
 ## Validation and acceptance
 
-The merged or non-integrated, gapfilled model is a **THG candidate** until the
-final validation/release gate passes. Stage-level validation at β1, β2,
+In canonical construction, the post-gapfill model is a **THG candidate** until
+the final validation gate passes. Stage-level validation at β1, β2,
 Human Database reconstruction, and gapfill supplies evidence to this gate but
-does not itself confer the Final THG name.
+does not itself confer THG reference-model status.
 
 Review collisions, retained stoichiometry, isolated-metabolite policy,
 connectivity, formula/charge balance, configured solver checks, and optional
 MEMOTE output. Task results are recorded separately from structural and MEMOTE
 results. The configured THG gate status, not a MEMOTE score, determines
 acceptance. Use the [Validation workflow](validation.md) for the three
-validation interfaces and their boundaries. Only after this release gate
-passes may the promoted artifact be called **Final THG**.
+validation interfaces and their boundaries. Only after this validation gate
+passes, the model is **validated**. A registered promotion and export handoff is
+still required before that post-gapfill candidate can be called **released**.
+The existing `export-final-thg` stage belongs to the standalone compatibility
+route described below and does not provide that handoff.
 
-## CLI and configuration
+## Handoffs and current boundary
 
-Final THG currently uses `thg-run start` with `workflow: "final-thg"`; there is
+`thg-run reference CONFIG` supplies the supported β1 → β2 → gapfill handoff
+and exports a post-gapfill THG candidate. `thg-run validate CONFIG` can run a
+final profile against that candidate and records its validation report, but it
+does not promote or export a THG reference model. The registered `final-thg`
+workflow accepts β2 and Human Database artifacts for its own merge immediately
+before validation, so it is not a post-gapfill-candidate entry point. A
+registered handoff from `reference` to final validation and release is an
+implementation gap; this documentation does not imply one exists.
+
+## Standalone compatibility workflow
+
+The registered `final-thg` workflow uses `thg-run start` with
+`workflow: "final-thg"`; there is
 no separate `thg-run final-thg` command. The configuration selects input
 artifacts, merge policy, validation profile, and output directory.
 Use `thg-run start configs/final-thg.json` for the resumable route; it resolves
@@ -57,9 +72,10 @@ references. This bundled merge route remains independently usable, but the
 canonical sequence performs optional integration before required gapfill and
 then applies the final gate to the resulting candidate.
 
-Before acceptance the output is a THG candidate. After the documented release
-criteria pass, it is a Final THG; neither name proves exact
-publication-artifact reconstruction without separate evidence.
+Because this route merges immediately before validation and does not perform
+required gapfill, its export is not the canonical released THG reference model.
+Neither its name nor its validation result proves exact publication-artifact
+reconstruction without separate evidence.
 
 Canonical APIs: [`generate_merge_plan`][thg_protocol.merge.generate_merge_plan],
 [`apply_merge_plan`][thg_protocol.merge.apply_merge_plan],

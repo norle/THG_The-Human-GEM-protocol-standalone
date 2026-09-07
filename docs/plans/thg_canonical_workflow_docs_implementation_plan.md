@@ -1,5 +1,8 @@
 # THG Canonical Workflow Documentation Update Plan
 
+> Historical terminology note: this superseded plan intentionally uses “Final
+> THG,” the public artifact name at the time it was written.
+
 ## Goal
 
 Update the THG documentation so the canonical model-construction flow is:

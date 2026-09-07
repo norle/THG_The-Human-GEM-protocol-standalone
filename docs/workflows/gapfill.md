@@ -17,5 +17,6 @@ The canonical pipeline always runs gapfill before producing a **THG candidate**.
 The final gapfill stage writes `thg-reference-gapfilled.json` and `.xml` only after
 `gapfill-gate.json` is `passed` or a non-blocking `warning`. Plans, ledgers,
 validation reports, semantic diffs, and provenance are exported alongside the
-model. This stage-level gate does not replace the final validation/release gate.
+model. This stage-level gate does not replace the final validation gate and
+release export.
 Incomplete or failed attempts remain under the run's `failed` directory.

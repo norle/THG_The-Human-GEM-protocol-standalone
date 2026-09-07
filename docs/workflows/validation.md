@@ -4,9 +4,11 @@ Validation has three related interfaces.
 
 Validation inside β1, β2, Human Database reconstruction, gapfill, or
 cell-specific reduction is stage-level validation. It checks that stage and
-records evidence but does not name a model Final THG. The final
-validation/release gate evaluates the post-gapfill **THG candidate** under its
-configured release profile; only a passing candidate is **Final THG**.
+records evidence but does not confer THG reference-model status. The final
+validation gate evaluates the post-gapfill **THG candidate** under its
+configured release profile. A passing candidate is **validated**; no registered
+workflow currently promotes and exports it as the released **THG reference
+model**.
 
 ## Registered validation workflow
 
@@ -28,7 +30,7 @@ model-test failures.
 `thg_protocol.tasks` is a versioned, non-mutating API. Task suites may copy a
 model, add temporary reactions, execute configured solver checks, and classify
 results. `thg-run validate` does not execute an arbitrary task suite unless its
-configuration explicitly enables the supported task stage. Final-THG task
+configuration explicitly enables the supported task stage. `final-thg` task
 results are likewise reported separately where configured.
 
 ## MEMOTE integration

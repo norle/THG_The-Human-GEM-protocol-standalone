@@ -27,7 +27,9 @@ artifact records, checksums, validation reports, and provenance. Candidate
 artifacts are not promoted artifacts: stage release gates and `release_beta1`
 or `release_beta2` create their promoted stage names. After required gapfill,
 the model remains a **THG candidate** until it passes the final
-validation/release gate; only the accepted artifact is **Final THG**. Final-THG
+validation gate; a passing candidate is validated. No registered workflow
+currently promotes and exports that post-gapfill candidate as the released
+**THG reference model**. This
 acceptance is a scientific review boundary, not an automatic publication
 claim.
 

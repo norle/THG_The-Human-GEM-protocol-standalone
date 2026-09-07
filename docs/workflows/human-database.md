@@ -52,8 +52,8 @@ Keep the normalized input, reconstructed JSON/SBML model, pathway membership,
 source/cache manifest, unresolved records, provenance, and validation report.
 Run structural, formula-balance, connectivity, and comparison checks before
 using the model as an optional integration input. These stage-level checks
-qualify the branch for integration; they do not create a Final THG or replace
-the final validation/release gate. Historical pickle input is compatibility
+qualify the branch for integration; they do not create a THG reference model or
+replace the final validation gate and release export. Historical pickle input is compatibility
 support, not evidence of a live harvesting pipeline.
 
 See the [construction tool guide](../tools/model-construction.md) and

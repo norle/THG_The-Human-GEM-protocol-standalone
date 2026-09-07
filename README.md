@@ -28,7 +28,8 @@ For a core-only installation, use `python -m pip install -e .`. See the
 ## Start here
 
 - [Quickstart](docs/quickstart.md): run the included offline example.
-- [Workflow overview](docs/workflows/index.md): choose a workflow for your data.
+- [Workflow overview](docs/workflows/index.md): build a THG reference model,
+  then a cell-specific model.
 - [CLI reference](docs/reference/cli.md): see the available commands.
 
 ## Repository layout

@@ -2,12 +2,12 @@
 
 | Command | Purpose |
 | --- | --- |
-| `thg-run start CONFIG` | Start a generic configured workflow, including Human Database and final THG |
+| `thg-run start CONFIG` | Start a generic configured workflow, including Human Database and the `final-thg` workflow |
 | `thg-run beta1 CONFIG` | Start a registered β1 workflow |
 | `thg-run beta2 CONFIG` | Start a registered β2 workflow |
 | `thg-run gapfill CONFIG` | Start a standalone, checksum-tracked gapfill workflow |
 | `thg-run reference CONFIG` | Run the core β1 → β2 → required-gapfill path |
-| `thg-run cell-specific CONFIG` | Reduce a validated Final THG or declared external GEM from expression evidence |
+| `thg-run cell-specific CONFIG` | Derive a cell-specific model from a released THG reference model or declared external GEM |
 | `thg-run pathway CONFIG` | Run versioned pathway implementation |
 | `thg-run validate CONFIG` | Start a registered validation workflow |
 | `thg-run compare CONFIG` | Start a registered comparison workflow |

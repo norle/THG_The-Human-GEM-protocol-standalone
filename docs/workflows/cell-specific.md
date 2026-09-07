@@ -1,13 +1,13 @@
 # Cell-specific workflow
 
 In the canonical pipeline, run `cell-specific` after the final release gate and
-use the validated **Final THG** as its parent model. The workflow accepts an
+use the released **THG reference model** as its parent model. The workflow accepts an
 explicitly versioned source GEM rather than implicitly discovering an upstream
 artifact.
 
 It may also run independently from an explicitly declared external GEM. That
 standalone mode must preserve the external model's identity, checksum, and
-provenance and must not imply that the parent is a Final THG.
+provenance and must not imply that the parent is a THG reference model.
 
 The run records expression evidence, identifier mapping, GPR activity,
 proposal-first reduction decisions, exchange settings, validation, and JSON/XML

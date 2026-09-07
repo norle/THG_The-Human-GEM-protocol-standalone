@@ -25,10 +25,12 @@ thg-run validate configs/validation.json
 ```
 
 `beta1` and `human-database` consume caller-owned files from `inputs/`.
-`beta2` consumes the `beta1-export` model artifact, and `final-thg` consumes
+`beta2` consumes the `beta1-export` model artifact, and the `final-thg` workflow consumes
 the `beta2-export` and `human-database-reconstruct` model artifacts. Those
 upstream runs must exist and be complete before their downstream configs are
-started. The validation template points at an exported model file in
+started. The `final-thg` workflow merges, validates, and exports those inputs as
+a standalone compatibility route; it does not release the canonical,
+post-gapfill THG reference model. The validation template points at an exported model file in
 `inputs/models/`; populate that caller-owned path with the model you want to
 validate before starting the validation run.
 

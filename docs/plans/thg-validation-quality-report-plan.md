@@ -1,5 +1,8 @@
 # THG Model Validation and Quality Report Plan
 
+> Historical terminology note: this earlier plan intentionally uses “Final
+> THG,” the public artifact name at the time it was written.
+
 **Proposed repository file:** `docs/protocol/thg-validation-quality-report-plan.md`
 
 ## Goal

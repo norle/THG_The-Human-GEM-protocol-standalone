@@ -1,10 +1,11 @@
 # Cell-specific models
 
-Cell-specific reduction follows validated Final THG in the canonical pipeline.
+Cell-specific reduction follows the released THG reference model in the
+canonical pipeline.
 Use transcript or activity evidence to reduce that parent model, preserve it,
 and record exchange matching and gene-rule transformations. The tool also
 accepts an explicitly declared external GEM in standalone use; that does not
-turn a generic reduction into a Final-THG-derived or publication-specific cell
+turn a generic reduction into a THG-reference-model-derived or publication-specific cell
 model automatically.
 
 See the [workflow API](../api/workflows.md) for
