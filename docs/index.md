@@ -2,7 +2,7 @@
 
 THG is a Python package and command-line toolkit that turns a general human
 genome-scale metabolic model (GEM) into a curated reference model, then derives
-cell-specific models from gene-expression or activity evidence. Each workflow
+cell-specific models by integrating transcriptomics data. Each workflow
 records validation results, checksums, and provenance so the model's lineage can
 be inspected and reproduced.
 
@@ -21,28 +21,31 @@ be inspected and reproduced.
 flowchart TB
     subgraph reference[Build the THG reference model]
         direction LR
-        A[Human reference GEM] --> B[Curate reactions and annotations<br/>THGβ1]
+        A([Human reference GEM]) --> B[Curate reactions and annotations<br/>THGβ1]
         B --> C[Expand gene rules and locations<br/>THGβ2]
-        C --> F[Fill metabolic gaps]
+        C --> F[Gapfill]
         C -. optional .-> D[Integrate Human Database evidence]
-        E[Human Database reconstruction] --> D
+        E([Human Database model]) --> D
         D --> F
-        F --> G[Validate and release]
-        G --> H[THG reference model]
+        F --> G[Validate]
+        G --> H([Validated THG reference model])
     end
 
     subgraph context[Build a cell-specific model]
         direction LR
-        H --> I[Apply expression or activity evidence]
-        I --> J[Reduce, validate, and export]
-        J --> K[Cell-specific model]
+        H --> I[Integrate transcriptomics data]
+        I --> J[Reduce and validate]
+        J --> K([Validated cell-specific model])
     end
 ```
 
+Rounded nodes are models; rectangular nodes are workflow stages.
+
 The reference workflow curates model content, expands biological evidence,
 optionally integrates the Human Database, fills network gaps, and applies the
-final validation boundary. The cell-specific workflow preserves that parent
-model while selecting the reactions supported by a tissue or cell's evidence.
+final validation boundary. The cell-specific workflow integrates transcriptomics
+data while preserving the parent model and selecting the reactions supported by
+a tissue or cell's evidence.
 
 See the [workflow overview](workflows/index.md) for the available commands and
 the current release-handoff boundary, or go directly to the

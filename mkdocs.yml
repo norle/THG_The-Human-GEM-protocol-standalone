@@ -71,12 +71,13 @@ nav:
       - Quickstart: quickstart.md
       - Workflow overview: workflows/index.md
   - THG workflows:
-      - THG reference model and release boundary: workflows/final-thg.md
+      - THG reference construction: workflows/reference.md
       - Cell-specific model: workflows/cell-specific.md
       - Construction and supporting workflows:
           - THGβ1 — Curate a reference GEM: workflows/beta1.md
           - THGβ2 — Expand by GPR and location: workflows/beta2.md
           - Gapfill and reference workflows: workflows/gapfill.md
+          - Final THG compatibility workflow: workflows/final-thg.md
           - Human Database: workflows/human-database.md
           - Pathway implementation: workflows/pathway.md
           - Validation: workflows/validation.md

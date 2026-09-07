@@ -15,7 +15,7 @@ Workflow configurations have `workflow`, `run`, and a workflow-specific
 section. Registered workflow IDs include `beta1`, `beta2`, `gapfill`,
 `reference`, `cell-specific`, `pathway`, `validate`, and `compare`.
 Generic `start` also accepts `human-database` and `final-thg` configurations.
-The `reference` configuration covers the core β1 → β2 → required-gapfill
+The `reference` configuration covers β1 → β2 → optional Human Database integration → required gapfill
 path; it does not currently configure optional Human Database integration.
 Human Database reconstruction, standalone gapfill and validation, and
 cell-specific reduction retain their independent configurations.

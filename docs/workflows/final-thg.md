@@ -1,4 +1,4 @@
-# THG reference model (`final-thg`) — validation and release
+# Compatibility Human Database merge (`final-thg`)
 
 ## Inputs
 
@@ -8,7 +8,7 @@ integration evidence when used, and all checksums.
 
 ## Merge and validation
 
-The registered `final-thg` workflow currently combines a two-branch merge,
+The registered `final-thg` workflow is a compatibility path that combines a two-branch merge,
 final validation, and export. It runs `final-thg-merge-plan` → `final-thg-merge` →
 `validate-final-thg` → `export-final-thg`. Because that command merges
 immediately before validation, using it with separate β2 and Human Database
@@ -51,7 +51,7 @@ route described below and does not provide that handoff.
 
 ## Handoffs and current boundary
 
-`thg-run reference CONFIG` supplies the supported β1 → β2 → gapfill handoff
+`thg-run reference CONFIG` supplies the canonical β1 → β2 → optional Human Database → gapfill → export handoff
 and exports a post-gapfill THG candidate. `thg-run validate CONFIG` can run a
 final profile against that candidate and records its validation report, but it
 does not promote or export a THG reference model. The registered `final-thg`

@@ -11,20 +11,21 @@ configs/beta1.json
 configs/beta2.json
 configs/human-database.json
 configs/final-thg.json
+configs/reference.json
 configs/validation.json
 ```
 
 The generated templates can be run in this order:
 
 ```bash
-thg-run beta1 configs/beta1.json
-thg-run beta2 configs/beta2.json
-thg-run start configs/human-database.json
-thg-run start configs/final-thg.json
+thg-run reference configs/reference.json
 thg-run validate configs/validation.json
 ```
 
-`beta1` and `human-database` consume caller-owned files from `inputs/`.
+`reference` is the canonical construction command. It consumes caller-owned
+β1 inputs, runs β2, optionally reconstructs and merges Human Database records,
+then gapfills and exports the final bundle. `final-thg` is retained only for
+compatibility. `beta1` and `human-database` also consume caller-owned files from `inputs/`.
 `beta2` consumes the `beta1-export` model artifact, and the `final-thg` workflow consumes
 the `beta2-export` and `human-database-reconstruct` model artifacts. Those
 upstream runs must exist and be complete before their downstream configs are

@@ -6,7 +6,7 @@
 | `thg-run beta1 CONFIG` | Start a registered β1 workflow |
 | `thg-run beta2 CONFIG` | Start a registered β2 workflow |
 | `thg-run gapfill CONFIG` | Start a standalone, checksum-tracked gapfill workflow |
-| `thg-run reference CONFIG` | Run the core β1 → β2 → required-gapfill path |
+| `thg-run reference CONFIG` | Construct β1 → β2 → optional Human Database → gapfill and export a reference bundle |
 | `thg-run cell-specific CONFIG` | Derive a cell-specific model from a released THG reference model or declared external GEM |
 | `thg-run pathway CONFIG` | Run versioned pathway implementation |
 | `thg-run validate CONFIG` | Start a registered validation workflow |
@@ -31,9 +31,8 @@ value. CLI failures return non-zero status and preserve the run error/provenance
 where a run directory exists. Use the [workflow guides](../workflows/index.md)
 for task context and examples.
 
-`reference` does not currently include optional Human Database integration;
-compose that enrichment explicitly between β2 and the required gapfill stage.
-The gapfill, validation, Human Database reconstruction, and cell-specific
-commands also remain independently usable outside the canonical pipeline.
+`reference` optionally reconstructs and integrates the Human Database when its
+section is present, then always gapfills the immediately preceding model.
+Validation and cell-specific workflows remain independently usable.
 
 The generated parser API remains available on the [CLI API page](../api/cli.md).
