@@ -83,7 +83,8 @@ def validate_manifest(manifest: Mapping[str, object]) -> None:
     if not isinstance(manifest["workflow"], str) or not manifest["workflow"]:
         raise ManifestError("workflow manifest workflow must be non-empty text")
     if "workflow_version" in manifest and (
-        not isinstance(manifest["workflow_version"], int) or manifest["workflow_version"] < 1
+        not isinstance(manifest["workflow_version"], int)
+        or manifest["workflow_version"] < 1
     ):
         raise ManifestError("invalid workflow_version")
     if manifest["overall_status"] not in OVERALL_STATUSES:

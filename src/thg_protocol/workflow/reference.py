@@ -13,11 +13,23 @@ REFERENCE_STAGES = (
     *detailed_beta2_stages(),
     Beta2GateStage(),
     *human_database_stages(),
-    HumanDatabaseIntegrationStage("plan-human-database-integration", ("export-beta2", "human-database-reconstruct")),
-    HumanDatabaseIntegrationStage("integrate-human-database", ("plan-human-database-integration", "export-beta2", "human-database-reconstruct")),
+    HumanDatabaseIntegrationStage(
+        "plan-human-database-integration",
+        ("export-beta2", "human-database-reconstruct"),
+    ),
+    HumanDatabaseIntegrationStage(
+        "integrate-human-database",
+        (
+            "plan-human-database-integration",
+            "export-beta2",
+            "human-database-reconstruct",
+        ),
+    ),
     *gapfill_stages(reference=True),
     ReferenceReportStage("summarize-reference", ("export-gapfilled-reference",)),
-    ReferenceReportStage("export-reference", ("summarize-reference", "export-gapfilled-reference")),
+    ReferenceReportStage(
+        "export-reference", ("summarize-reference", "export-gapfilled-reference")
+    ),
 )
 REFERENCE_WORKFLOW = WorkflowDefinition(
     "reference",

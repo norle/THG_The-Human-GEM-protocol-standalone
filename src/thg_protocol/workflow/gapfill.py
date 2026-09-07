@@ -66,9 +66,12 @@ def _dependency_hashes(
 ) -> dict[str, list[str]]:
     steps = context.manifest.get("steps", {})
     return {
-        stage_id: [str(item.get("sha256")) for item in _dependency_records(context, stage_id)]
-        if isinstance(steps, Mapping) and steps.get(stage_id, {}).get("status") == "completed"
-        else []
+        stage_id: (
+            [str(item.get("sha256")) for item in _dependency_records(context, stage_id)]
+            if isinstance(steps, Mapping)
+            and steps.get(stage_id, {}).get("status") == "completed"
+            else []
+        )
         for stage_id in dependencies
     }
 
@@ -240,9 +243,11 @@ class GapfillStage:
         data: dict[str, object] = {
             "stage": self.id,
             "implementation_version": self.implementation_version,
-            "dependencies": _dependency_hashes(context, self.dependencies)
-            if self.dependencies
-            else {},
+            "dependencies": (
+                _dependency_hashes(context, self.dependencies)
+                if self.dependencies
+                else {}
+            ),
         }
         if self.id == "load-gapfill-source":
             data["workflow"] = context.config.workflow
@@ -281,7 +286,10 @@ class GapfillStage:
                     raise ValueError("β2 gate did not pass")
                 source_stage = "integrate-human-database"
                 integrated = context.manifest.get("steps", {}).get(source_stage, {})
-                if not isinstance(integrated, Mapping) or integrated.get("status") != "completed":
+                if (
+                    not isinstance(integrated, Mapping)
+                    or integrated.get("status") != "completed"
+                ):
                     source_stage = "export-beta2"
                 source = _dependency_path(context, source_stage, "model")
                 upstream = {
@@ -780,7 +788,10 @@ class GapfillStage:
 
 def gapfill_stages(*, reference: bool = False) -> tuple[GapfillStage, ...]:
     return (
-        GapfillStage("load-gapfill-source", ("gate-beta2", "integrate-human-database") if reference else ()),
+        GapfillStage(
+            "load-gapfill-source",
+            ("gate-beta2", "integrate-human-database") if reference else (),
+        ),
         GapfillStage("characterize-gapfill-baseline", ("load-gapfill-source",)),
         GapfillStage(
             "generate-gapfill-plan",
@@ -807,6 +818,7 @@ def gapfill_stages(*, reference: bool = False) -> tuple[GapfillStage, ...]:
         ),
     )
 
+
 GAPFILL_WORKFLOW = WorkflowDefinition(
     "gapfill",
     gapfill_stages(),
@@ -814,6 +826,4 @@ GAPFILL_WORKFLOW = WorkflowDefinition(
     "First-class standalone THG gapfill",
 )
 
-__all__ = [
-    "Beta2GateStage", "GapfillStage", "GAPFILL_WORKFLOW", "gapfill_stages"
-]
+__all__ = ["Beta2GateStage", "GapfillStage", "GAPFILL_WORKFLOW", "gapfill_stages"]
