@@ -36,11 +36,13 @@ def new_manifest(
     run_id: str,
     config_sha256: str,
     stages: Sequence[object],
+    workflow_version: int = 1,
 ) -> dict[str, object]:
     now = utc_now()
     return {
         "format_version": 2,
         "workflow": workflow_id,
+        "workflow_version": workflow_version,
         "run_id": run_id,
         "created_at": now,
         "updated_at": now,
@@ -80,6 +82,10 @@ def validate_manifest(manifest: Mapping[str, object]) -> None:
             raise ManifestError(f"workflow manifest missing '{key}'")
     if not isinstance(manifest["workflow"], str) or not manifest["workflow"]:
         raise ManifestError("workflow manifest workflow must be non-empty text")
+    if "workflow_version" in manifest and (
+        not isinstance(manifest["workflow_version"], int) or manifest["workflow_version"] < 1
+    ):
+        raise ManifestError("invalid workflow_version")
     if manifest["overall_status"] not in OVERALL_STATUSES:
         raise ManifestError("invalid overall_status")
     steps = manifest["steps"]

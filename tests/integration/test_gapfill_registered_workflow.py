@@ -164,3 +164,74 @@ def test_forcing_validation_reuses_gapfill_plan_and_model(tmp_path):
         after["validate-gapfill"]["attempt"]
         == before["validate-gapfill"]["attempt"] + 1
     )
+
+
+def test_reference_gapfill_uses_human_database_integration(tmp_path):
+    fixture = (
+        Path(__file__).parents[1]
+        / "fixtures"
+        / "beta1"
+        / "sanctioned_human_reference.json"
+    )
+    records = tmp_path / "records.json"
+    records.write_text(
+        json.dumps({"schema_version": 1, "metabolites": [], "reactions": []}),
+        encoding="utf-8",
+    )
+    config = tmp_path / "reference.json"
+    config.write_text(
+        json.dumps(
+            {
+                "workflow": "reference",
+                "run": {"name": "reference", "output_dir": str(tmp_path / "run")},
+                "beta1": {
+                    "input_model": str(fixture.resolve()),
+                    "sanctioned_model": True,
+                },
+                "beta2": {"compartments": {"c": "cytosol", "m": "mitochondria"}},
+                "human_database": {"records": str(records)},
+                "reference": {
+                    "human_database_integration": {"source_precedence": "base"}
+                },
+                "gapfill": {
+                    "method": "greedy",
+                    "max_additions": 1,
+                    "allowed_connections": [],
+                    "candidate_types": ["A", "B", "C"],
+                    "validation_profile": "structural-fast",
+                },
+            }
+        ),
+        encoding="utf-8",
+    )
+    status = get_status(start(config))
+    integrated = next(
+        item
+        for item in status["steps"]["integrate-human-database"]["outputs"]
+        if item["role"] == "model"
+    )
+    source = next(
+        item
+        for item in status["steps"]["load-gapfill-source"]["outputs"]
+        if item["role"] == "model"
+    )
+    assert source["sha256"] == integrated["sha256"]
+    exported = status["steps"]["export-reference"]["outputs"]
+    names = {Path(item["path"]).name for item in exported}
+    assert {
+        "beta1-semantic-diff.json",
+        "beta2-semantic-diff.json",
+        "human-database-semantic-diff.json",
+        "gapfill-semantic-diff.json",
+        "input-to-reference-semantic-diff.json",
+    } <= names
+    checksums = json.loads(
+        (
+            tmp_path
+            / "run"
+            / next(item for item in exported if item["role"] == "checksums")["path"]
+        ).read_text()
+    )
+    assert {
+        item["sha256"] for item in exported if item["role"] in {"model", "sbml"}
+    } <= set(checksums["export-reference"])

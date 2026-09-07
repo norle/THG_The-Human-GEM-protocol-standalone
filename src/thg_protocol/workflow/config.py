@@ -167,6 +167,7 @@ WORKFLOW_SECTION_KEYS = {
         "validation_profile",
         "task_suite",
     },
+    "reference": {"human_database_integration"},
 }
 
 
@@ -279,6 +280,8 @@ def _parse_workflow(
         raise ConfigError(
             "reference workflow requires beta1, beta2, and gapfill sections"
         )
+    if workflow == "reference" and "reference" in payload and "human_database" not in payload:
+        raise ConfigError("reference.human_database_integration requires human_database")
     run = _object(payload.get("run"), "run")
     _keys(run, {"name", "output_dir"}, "run")
     name = _required_string(run, "name", "run")
@@ -550,6 +553,19 @@ def _parse_workflow(
                 )
                 if value.get("mode", "offline") not in {"offline", "live"}:
                     raise ConfigError("'human_database.mode' must be offline or live")
+            if section == "reference":
+                value = dict(value)
+                integration = value.get("human_database_integration", {})
+                if not isinstance(integration, dict):
+                    raise ConfigError("'reference.human_database_integration' must be an object")
+                remove_isolated = integration.get("remove_isolated_metabolites", False)
+                if not isinstance(remove_isolated, bool):
+                    raise ConfigError("'reference.human_database_integration.remove_isolated_metabolites' must be boolean")
+                try:
+                    from thg_protocol.merge import MergePolicy
+                    MergePolicy(**{key: item for key, item in integration.items() if key != "remove_isolated_metabolites"})
+                except (TypeError, ValueError) as error:
+                    raise ConfigError(f"invalid reference Human Database merge policy: {error}") from error
             if section == "compare":
                 value = dict(value)
                 for key in ("left", "right"):

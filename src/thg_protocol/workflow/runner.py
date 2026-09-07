@@ -119,6 +119,7 @@ def start(config_path: str | Path) -> Path:
             run_id=config.run.name,
             config_sha256=sha256_json(workflow_config_to_dict(config)),
             stages=stages,
+            workflow_version=definition.version,
         )
         _write(run_dir, manifest)
         return _execute(config, run_dir, manifest, stages)
@@ -138,6 +139,10 @@ def resume(
         config = saved_config
         definition = _definition(config)
         manifest = load_manifest(directory)
+        if manifest.get("workflow_version", 1) != definition.version:
+            raise WorkflowError(
+                "incompatible workflow version; choose a new output directory"
+            )
         if manifest.get("config_sha256") != sha256_json(
             workflow_config_to_dict(saved_config)
         ):

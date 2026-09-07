@@ -18,6 +18,7 @@ class WorkflowDefinition:
     allowed_sections: frozenset[str] = frozenset()
     description: str = ""
     scientific_stages: tuple[Any, ...] = ()
+    version: int = 1
 
     @property
     def stage_ids(self) -> tuple[str, ...]:

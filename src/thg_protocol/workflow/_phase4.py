@@ -37,8 +37,7 @@ class HumanDatabaseStage:
         self.kind = "mutation" if stage_id.endswith("reconstruct") else "collection"
 
     def enabled(self, config: Any) -> bool:
-        del config
-        return True
+        return "human_database" in config.sections
 
     def fingerprint_data(self, context: StageContext) -> Mapping[str, object]:
         section = context.config.sections.get("human_database", {})

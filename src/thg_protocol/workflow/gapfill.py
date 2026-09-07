@@ -64,10 +64,11 @@ def _hash(path: object) -> str | None:
 def _dependency_hashes(
     context: StageContext, dependencies: tuple[str, ...]
 ) -> dict[str, list[str]]:
+    steps = context.manifest.get("steps", {})
     return {
-        stage_id: [
-            str(item.get("sha256")) for item in _dependency_records(context, stage_id)
-        ]
+        stage_id: [str(item.get("sha256")) for item in _dependency_records(context, stage_id)]
+        if isinstance(steps, Mapping) and steps.get(stage_id, {}).get("status") == "completed"
+        else []
         for stage_id in dependencies
     }
 
@@ -278,14 +279,18 @@ class GapfillStage:
                 )
                 if gate.get("status") not in {"passed", "warning"}:
                     raise ValueError("β2 gate did not pass")
-                source = _dependency_path(context, "export-beta2", "model")
+                source_stage = "integrate-human-database"
+                integrated = context.manifest.get("steps", {}).get(source_stage, {})
+                if not isinstance(integrated, Mapping) or integrated.get("status") != "completed":
+                    source_stage = "export-beta2"
+                source = _dependency_path(context, source_stage, "model")
                 upstream = {
                     "workflow": "beta2",
                     "run": context.config.run.name,
-                    "stage": "export-beta2",
+                    "stage": source_stage,
                     "role": "model",
                     "run_dir": str(context.run_dir),
-                    "stage_id": "export-beta2",
+                    "stage_id": source_stage,
                     "artifact_checksum": sha256_file(source),
                     "beta2_gate": gate,
                 }
@@ -775,7 +780,7 @@ class GapfillStage:
 
 def gapfill_stages(*, reference: bool = False) -> tuple[GapfillStage, ...]:
     return (
-        GapfillStage("load-gapfill-source", ("gate-beta2",) if reference else ()),
+        GapfillStage("load-gapfill-source", ("gate-beta2", "integrate-human-database") if reference else ()),
         GapfillStage("characterize-gapfill-baseline", ("load-gapfill-source",)),
         GapfillStage(
             "generate-gapfill-plan",

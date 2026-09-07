@@ -1,0 +1,24 @@
+{
+  "workflow": "reference",
+  "run": {
+    "name": "thg-reference",
+    "output_dir": "../runs/thg-reference"
+  },
+  "beta1": {
+    "input_model": "../inputs/models/Human2.xml",
+    "mode": "apply-all",
+    "balance_strategy": "proton-water"
+  },
+  "beta2": {
+    "mode": "apply-all",
+    "compartments": {"c": "cytosol"},
+    "uncertainty_policy": "report"
+  },
+  "gapfill": {
+    "method": "greedy",
+    "max_additions": 100,
+    "allowed_connections": [],
+    "candidate_types": ["A", "B", "C"],
+    "validation_profile": "structural-fast"
+  }
+}
