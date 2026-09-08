@@ -266,7 +266,7 @@
       "legacy_relationship": "No legacy target",
       "published_reproduction": "N/A",
       "legacy_sources": [],
-      "current_sources": ["src/thg_protocol/memote.py", "src/thg_protocol/workflow/_foundation.py"],
+      "current_sources": ["src/thg_protocol/memote.py", "src/thg_protocol/workflow/validation.py"],
       "tests": ["tests/unit/test_phase3_validation.py"],
       "known_differences": ["The executable and report semantics belong to the separately installed MEMOTE tool"],
       "evidence_commit": "0c91fdec325df12f25ef13819525e830a4cec1e8"
@@ -296,7 +296,7 @@
       "legacy_relationship": "Not assessed",
       "published_reproduction": "Not yet verified",
       "legacy_sources": ["build_model/build_model.py"],
-      "current_sources": ["src/thg_protocol/curation/beta1.py", "src/thg_protocol/workflow/_foundation.py"],
+      "current_sources": ["src/thg_protocol/curation/beta1.py", "src/thg_protocol/workflow/beta1/_stages.py"],
       "tests": ["tests/unit/test_beta1_curation.py", "tests/integration/test_beta1_registered_workflow.py"],
       "known_differences": ["The maintained release is fixture-sanctioned and policy-scoped; it is not a claim of reproducing the 2023 publication artifact"],
       "evidence_commit": "0c91fdec325df12f25ef13819525e830a4cec1e8"

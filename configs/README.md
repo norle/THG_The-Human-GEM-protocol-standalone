@@ -26,8 +26,8 @@ thg-run validate configs/validation.json
 β1 inputs, runs β2, optionally reconstructs and merges Human Database records,
 then gapfills and exports the final bundle. `final-thg` is retained only for
 compatibility. `beta1` and `human-database` also consume caller-owned files from `inputs/`.
-`beta2` consumes the `beta1-export` model artifact, and the `final-thg` workflow consumes
-the `beta2-export` and `human-database-reconstruct` model artifacts. Those
+`beta2` consumes the `export-beta1` model artifact, and the `final-thg` workflow consumes
+the `export-beta2` and `human-database-reconstruct` model artifacts. Those
 upstream runs must exist and be complete before their downstream configs are
 started. The `final-thg` workflow merges, validates, and exports those inputs as
 a standalone compatibility route; it does not release the canonical,

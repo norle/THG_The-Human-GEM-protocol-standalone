@@ -30,10 +30,8 @@ database = [
   "dill",
 ]
 dev = [
-  "black",
   "build",
   "pytest",
-  "pytest-cov",
   "ruff",
 ]
 docs = [
@@ -78,10 +76,6 @@ markers = [
   "artifact_reproduction: compares a frozen full-stage or final artifact",
   "recorded_service: uses checksum-pinned recorded service responses",
 ]
-
-[tool.black]
-line-length = 88
-target-version = ["py310"]
 
 [tool.ruff]
 line-length = 88
