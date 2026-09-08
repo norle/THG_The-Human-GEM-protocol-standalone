@@ -311,7 +311,11 @@ class DetailedBeta1Stage:
         }:
             result["identity_policy_version"] = 3
         decisions = section.get("decisions_file")
-        if isinstance(decisions, str):
+        if self.id in {
+            "apply-curation",
+            "apply-balance-proposals",
+            "deduplicate-and-clean",
+        } and isinstance(decisions, str):
             result["decisions_sha256"] = decisions_fingerprint(decisions)
         return result
 

@@ -28,7 +28,6 @@ from thg_protocol.workflow.proposals import (
     Proposal,
     apply_proposals,
     proposal_id,
-    write_proposals,
 )
 
 SANCTIONED_BETA1_INPUT_SHA256 = (
@@ -2140,40 +2139,6 @@ def apply_cleanup_proposals(
     return state[0], ledger, report
 
 
-def _load_model(path: Path) -> Any:
-    from thg_protocol.io.models import load_model
-
-    return load_model(path)
-
-
-def _semantic_ledger_entries(
-    before: Any,
-    after: Any,
-    existing: Iterable[Mapping[str, object]],
-) -> tuple[dict[str, object], ...]:
-    """Record cleanup changes that are not represented by proposals."""
-    from thg_protocol.analysis.model_signature import diff_model_signatures
-
-    diff = diff_model_signatures(model_signature(before), model_signature(after))
-    known = {str(item.get("object_id")) for item in existing}
-    entries: list[dict[str, object]] = []
-    for collection in ("metabolites", "reactions", "genes", "groups", "objective"):
-        identifiers = list(diff["added"].get(collection, []))
-        identifiers.extend(diff["removed"].get(collection, []))
-        identifiers.extend(item["id"] for item in diff["changed"].get(collection, []))
-        for identifier in sorted({str(item) for item in identifiers} - known):
-            entries.append(
-                {
-                    "operation": "semantic-diff",
-                    "object_type": collection,
-                    "object_id": identifier,
-                    "status": "applied",
-                    "reason": "derived object change from deterministic cleanup",
-                }
-            )
-    return tuple(entries)
-
-
 def run_beta1(
     input_model: str | Path,
     output_dir: str | Path,
@@ -2194,361 +2159,117 @@ def run_beta1(
     run_solver_checks: bool = False,
     run_flux_consistency: bool = False,
 ) -> dict[str, object]:
-    """Run the complete offline β1 curation core and write its artifact bundle."""
+    """Run the registered β1 workflow and return its candidate bundle."""
+    import shutil
+    import tempfile
+
+    from thg_protocol.io.models import load_model
+    from thg_protocol.runtime.manifest import load_manifest
+    from thg_protocol.workflow.runner import start
+
     source = Path(input_model).resolve()
     destination = Path(output_dir).resolve()
-    destination.mkdir(parents=True, exist_ok=True)
     decision_items = tuple(decisions)
-    model = _load_model(source).copy()
-    inventory = inventory_model(model, input_path=source)
-    proposals = list(
-        generate_curation_proposals(
-            model,
-            metabolite_identities=metabolite_identities,
-            gene_mapping=gene_mapping,
-            reaction_identities=reaction_identities,
-            subunit_stoichiometry=subunit_stoichiometry,
-        )
-    )
-    proposals.extend(
-        generate_balance_proposals(
-            model,
-            corrections=corrections,
-            formula_corrections=formula_corrections,
-            charge_corrections=charge_corrections,
-            strategy=balance_strategy,
-        )
-    )
-    proposals = tuple(proposals)
-    base_proposals = proposals
-    prospective, _ = apply_model_proposals(
-        model,
-        proposals,
-        mode=mode,
-        decisions=decision_items,
-    )
-    cleanup_proposals, _ = generate_cleanup_proposals(
-        prospective,
-        remove_isolated=remove_isolated,
-        gene_mapping=gene_mapping,
-    )
-    proposals = proposals + cleanup_proposals
-    proposal_path = destination / "beta1-proposals.jsonl"
-    write_proposals(proposal_path, proposals)
-    applied_model, ledger = apply_model_proposals(
-        model,
-        base_proposals,
-        mode=mode,
-        decisions=decision_items,
-    )
-    cleanup_items = tuple(
-        item for item in proposals if item.operation == "consolidate-model"
-    )
-    curated, cleanup_ledger, cleanup = apply_cleanup_proposals(
-        applied_model,
-        cleanup_items,
-        mode=mode,
-        decisions=decision_items,
-    )
-    ledger = tuple(ledger) + tuple(cleanup_ledger)
-    ledger = tuple(ledger) + _semantic_ledger_entries(model, curated, ledger)
-    ledger_path = destination / "beta1-change-ledger.jsonl"
-    ledger_path.write_text(
-        "\n".join(json.dumps(item, sort_keys=True) for item in ledger)
-        + ("\n" if ledger else ""),
-        encoding="utf-8",
-    )
-    decisions_path = destination / "beta1-decisions.jsonl"
-    decisions_path.write_text(
-        "\n".join(json.dumps(item.to_dict(), sort_keys=True) for item in decision_items)
-        + ("\n" if decision_items else ""),
-        encoding="utf-8",
-    )
-    audits = audit_model(curated, formula_policy=formula_policy)
-    valid_gprs: list[str] = []
-    invalid_gprs: list[dict[str, str]] = []
-    for reaction in curated.reactions:
-        if not reaction.gene_reaction_rule:
-            continue
-        try:
-            parse_gpr(reaction.gene_reaction_rule)
-        except ValueError as error:
-            invalid_gprs.append({"reaction_id": str(reaction.id), "error": str(error)})
-        else:
-            valid_gprs.append(str(reaction.id))
-    validation = {
-        "schema_version": 1,
-        "model_id": str(curated.id),
-        "all_ids_unique": len({m.id for m in curated.metabolites})
-        == len(curated.metabolites)
-        and len({r.id for r in curated.reactions}) == len(curated.reactions),
-        "valid_references": all(
-            metabolite in curated.metabolites
-            for reaction in curated.reactions
-            for metabolite in reaction.metabolites
-        ),
-        "valid_gene_references": all(
-            gene in curated.genes
-            for reaction in curated.reactions
-            for gene in reaction.genes
-        ),
-        "valid_gprs": valid_gprs,
-        "invalid_gprs": invalid_gprs,
-        "audits": [item.to_dict() for item in audits],
-        "unresolved": [
-            item.to_dict() for item in audits if is_unresolved_balance(item)
-        ],
-        "ledger_entries": len(ledger),
-        "proposal_count": len(proposals),
-    }
-    from thg_protocol.analysis.model_signature import diff_model_signatures
-
-    semantic_diff = diff_model_signatures(
-        model_signature(model), model_signature(curated)
-    )
-    ledger_ids = {str(item.get("object_id")) for item in ledger}
-    semantic_ids: set[str] = set()
-    for collection in ("metabolites", "reactions", "genes", "groups", "objective"):
-        semantic_ids.update(
-            str(item) for item in semantic_diff["added"].get(collection, [])
-        )
-        semantic_ids.update(
-            str(item) for item in semantic_diff["removed"].get(collection, [])
-        )
-        semantic_ids.update(
-            str(item["id"]) for item in semantic_diff["changed"].get(collection, [])
-        )
-    validation.update(
-        {
-            "unique_ids": all(
-                len(values) == len(set(values))
-                for values in (
-                    [str(item.id) for item in curated.metabolites],
-                    [str(item.id) for item in curated.reactions],
-                    [str(item.id) for item in curated.genes],
-                    [str(item.id) for item in getattr(curated, "groups", ())],
-                )
-            ),
-            "valid_groups": all(
-                all(
-                    member in curated.metabolites
-                    or member in curated.reactions
-                    or member in curated.genes
-                    for member in group.members
-                )
-                for group in getattr(curated, "groups", ())
-            ),
-            "objective_valid": all(
-                str(item["reaction"]) in {str(r.id) for r in curated.reactions}
-                for item in model_signature(curated).get("objective", [])
-            ),
-            "compartment_count": len(getattr(curated, "compartments", {})),
-            "no_systematic_compartment_expansion": set(
-                getattr(curated, "compartments", {})
+    with tempfile.TemporaryDirectory(prefix="thg-beta1-") as temporary:
+        config_dir = Path(temporary)
+        decisions_path = config_dir / "decisions.jsonl"
+        decisions_path.write_text(
+            "\n".join(
+                json.dumps(item.to_dict(), sort_keys=True) for item in decision_items
             )
-            <= set(getattr(model, "compartments", {})),
-            "ledger_agrees_with_semantic_diff": semantic_ids <= ledger_ids,
-            "semantic_diff": semantic_diff,
-            "unresolved_identity_conflicts": [
-                {"object_id": object_id, **dict(result)}
-                for object_id, result in metabolite_identities.items()
-                if result.get("status") != "matched"
-            ]
-            + [
-                {"object_id": object_id, **dict(result)}
-                for object_id, result in reaction_identities.items()
-                if result.get("status") not in {"exact", "equivalent-reversed"}
-            ],
+            + ("\n" if decision_items else ""),
+            encoding="utf-8",
+        )
+        section: dict[str, object] = {
+            "input_model": str(source),
+            "mode": mode,
+            "balance_strategy": balance_strategy,
+            "corrections": corrections,
+            "formula_corrections": formula_corrections,
+            "charge_corrections": charge_corrections,
+            "decisions_file": str(decisions_path),
+            "remove_isolated": remove_isolated,
+            "sanctioned_model": sanctioned_model,
+            "metabolite_identities": metabolite_identities,
+            "gene_mapping": gene_mapping,
+            "reaction_identities": reaction_identities,
+            "subunit_stoichiometry": subunit_stoichiometry,
+            "run_solver_checks": run_solver_checks,
+            "run_flux_consistency": run_flux_consistency,
         }
-    )
-    if run_solver_checks:
-        try:
-            solution = curated.optimize()
-            validation["solver"] = {
-                "status": str(solution.status),
-                "objective_value": float(solution.objective_value)
-                if solution.objective_value is not None
-                else None,
-            }
-        except Exception as error:  # pragma: no cover - solver-specific
-            validation["solver"] = {
-                "status": "error",
-                "error": f"{type(error).__name__}: {error}",
-            }
-    if run_flux_consistency:
-        try:
-            from cobra.flux_analysis import find_blocked_reactions
-
-            blocked = sorted(find_blocked_reactions(curated))
-            validation["flux_consistency"] = {
-                "method": "cobra.flux_analysis.find_blocked_reactions",
-                "blocked_reactions": blocked,
-                "consistent": not blocked,
-            }
-        except Exception as error:  # pragma: no cover - solver-specific
-            validation["flux_consistency"] = {
-                "status": "error",
-                "error": f"{type(error).__name__}: {error}",
-            }
-    validation_path = destination / "beta1-validation.json"
-    validation_path.write_text(
-        json.dumps(validation, indent=2, sort_keys=True) + "\n", encoding="utf-8"
-    )
-    evidence_dir = destination / "evidence"
-    mappings_dir = destination / "mappings"
-    evidence_dir.mkdir(exist_ok=True)
-    mappings_dir.mkdir(exist_ok=True)
-    (evidence_dir / "manifest.json").write_text(
-        json.dumps(
-            {
-                "schema_version": 1,
-                "mode": "offline-normalized",
-                "input_sha256": sha256_file(source),
-                "records": [],
-                "errors": [],
-                "warnings": [],
-            },
-            indent=2,
-            sort_keys=True,
-        )
-        + "\n",
-        encoding="utf-8",
-    )
-    (mappings_dir / "identity-mappings.json").write_text(
-        json.dumps(
-            {
-                "schema_version": 1,
-                "metabolites": {
-                    object_id: resolution.get("selected")
-                    for object_id, resolution in metabolite_identities.items()
-                    if resolution.get("status") == "matched"
+        if formula_policy is not None:
+            section["formula_policy"] = formula_policy
+        config_path = config_dir / "config.json"
+        config_path.write_text(
+            json.dumps(
+                {
+                    "workflow": "beta1",
+                    "run": {"name": destination.name, "output_dir": str(destination)},
+                    "beta1": section,
                 },
-                "reactions": {
-                    object_id: dict(resolution)
-                    for object_id, resolution in reaction_identities.items()
-                    if resolution.get("status") in {"exact", "equivalent-reversed"}
-                },
-                "genes": dict(
-                    sorted(
-                        (str(key), str(value)) for key, value in gene_mapping.items()
-                    )
-                ),
-                "unresolved": [
-                    {
-                        "object_id": object_id,
-                        "status": resolution.get("status"),
-                    }
-                    for object_id, resolution in metabolite_identities.items()
-                    if resolution.get("status") != "matched"
-                ]
-                + [
-                    {"object_id": object_id, "status": resolution.get("status")}
-                    for object_id, resolution in reaction_identities.items()
-                    if resolution.get("status") not in {"exact", "equivalent-reversed"}
-                ],
-            },
-            indent=2,
-            sort_keys=True,
+                sort_keys=True,
+            ),
+            encoding="utf-8",
         )
-        + "\n",
-        encoding="utf-8",
-    )
-    json_path = destination / "thg-beta1-candidate.json"
-    from thg_protocol.io.models import save_json, save_sbml
+        run_dir = start(config_path)
 
-    save_json(curated, json_path)
-    sbml_path = destination / "thg-beta1-candidate.xml"
-    save_sbml(curated, sbml_path)
-    # Export/reload is part of the β1 validation boundary, not just an output
-    # convenience: serialization failures must stop the run before release.
-    _load_model(json_path)
-    _load_model(sbml_path)
-    signature = model_signature(curated)
-    signature_path = destination / "beta1-signature.json"
-    signature_path.write_text(
-        json.dumps(signature, indent=2, sort_keys=True) + "\n", encoding="utf-8"
-    )
-    unresolved_path = destination / "beta1-unresolved.tsv"
-    unresolved_path.write_text(
-        "reaction_id\tmass_status\tcharge_status\n"
-        + "\n".join(
-            f"{item.reaction_id}\t{item.mass_status}\t{item.charge_status}"
-            for item in audits
-            if item.mass_status == "unbalanced"
-        )
-        + "\n",
-        encoding="utf-8",
-    )
-    inventory_path = destination / "beta1-inventory.json"
-    inventory_path.write_text(
-        json.dumps(inventory.to_dict(), indent=2, sort_keys=True) + "\n",
-        encoding="utf-8",
-    )
-    summary_path = destination / "beta1-summary.md"
-    summary = (
-        "# β1 curation summary\n\n"
-        f"- Input SHA-256: `{sha256_file(source)}`\n"
-        f"- Metabolites: {len(curated.metabolites)}\n"
-        f"- Reactions: {len(curated.reactions)}\n"
-        f"- Genes: {len(curated.genes)}\n"
-        f"- Proposals: {len(proposals)}\n"
-        f"- Unresolved mass-balance reactions: {len(validation['unresolved'])}\n"
-    )
-    summary_path.write_text(
-        summary,
-        encoding="utf-8",
-    )
-    provenance_path = destination / "beta1-provenance.json"
-    output_paths = {
-        "json": json_path,
-        "sbml": sbml_path,
-        "signature": signature_path,
-        "proposals": proposal_path,
-        "ledger": ledger_path,
-        "decisions": decisions_path,
-        "validation": validation_path,
-        "unresolved": unresolved_path,
-        "inventory": inventory_path,
-        "summary": summary_path,
-        "evidence": evidence_dir / "manifest.json",
-        "mappings": mappings_dir / "identity-mappings.json",
+    manifest = load_manifest(run_dir)
+    steps = manifest["steps"]
+
+    def output_path(stage_id: str, role: str) -> Path:
+        records = steps[stage_id]["outputs"]
+        for record in records:
+            if record["role"] == role:
+                return run_dir / record["path"]
+        raise RuntimeError(f"stage '{stage_id}' has no '{role}' output")
+
+    export_dir = output_path("export-beta1", "model").parent
+    output_names = {
+        "json": "thg-beta1-candidate.json",
+        "sbml": "thg-beta1-candidate.xml",
+        "signature": "beta1-signature.json",
+        "proposals": "beta1-proposals.jsonl",
+        "ledger": "beta1-change-ledger.jsonl",
+        "decisions": "beta1-decisions.jsonl",
+        "validation": "beta1-validation.json",
+        "unresolved": "beta1-unresolved.tsv",
+        "inventory": "beta1-inventory.json",
+        "summary": "beta1-summary.md",
+        "provenance": "beta1-provenance.json",
     }
-    effective_formula_policy = (
-        DEFAULT_FORMULA_POLICY if formula_policy is None else formula_policy
-    )
-    provenance_path.write_text(
-        json.dumps(
-            {
-                "schema_version": 1,
-                "input": {"path": str(source), "sha256": sha256_file(source)},
-                "sanctioned_model": sanctioned_model,
-                "configuration": {
-                    "mode": mode,
-                    "balance_strategy": balance_strategy,
-                    "formula_policy": dict(effective_formula_policy),
-                    "subunit_stoichiometry": dict(subunit_stoichiometry),
-                    "remove_isolated": remove_isolated,
-                    "sanctioned_model": sanctioned_model,
-                },
-                "software": _software_versions(),
-                "outputs": {
-                    name: {"path": str(path), "sha256": sha256_file(path)}
-                    for name, path in output_paths.items()
-                },
-            },
-            indent=2,
-            sort_keys=True,
+    destination.mkdir(parents=True, exist_ok=True)
+    for filename in output_names.values():
+        shutil.copy2(export_dir / filename, destination / filename)
+    for directory in ("evidence", "mappings"):
+        shutil.copytree(
+            export_dir / directory,
+            destination / directory,
+            dirs_exist_ok=True,
         )
-        + "\n",
-        encoding="utf-8",
+
+    cleanup = json.loads(
+        output_path("deduplicate-and-clean", "cleanup").read_text(encoding="utf-8")
     )
-    output_paths["provenance"] = provenance_path
+    inventory = json.loads(
+        (destination / output_names["inventory"]).read_text(encoding="utf-8")
+    )
+    validation = json.loads(
+        (destination / output_names["validation"]).read_text(encoding="utf-8")
+    )
+    model = load_model(destination / output_names["json"])
     return {
-        "model": curated,
-        "inventory": inventory.to_dict(),
+        "model": model,
+        "inventory": inventory,
         "cleanup": cleanup,
         "validation": validation,
-        "outputs": {name: str(path) for name, path in output_paths.items()},
+        "outputs": {
+            **{
+                name: str(destination / filename)
+                for name, filename in output_names.items()
+            },
+            "evidence": str(destination / "evidence"),
+            "mappings": str(destination / "mappings"),
+        },
     }
 
 
