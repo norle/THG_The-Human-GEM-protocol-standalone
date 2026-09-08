@@ -56,17 +56,8 @@ def _definition(config: WorkflowConfig):
 
 
 def _resolved_stages(config: WorkflowConfig, definition: object):
-    section_key = "validation" if config.workflow == "validate" else config.workflow
-    section = config.sections.get(section_key)
-    scientific = (
-        config.workflow in {"beta1", "beta2", "validate", "reference", "gapfill"}
-        and isinstance(section, Mapping)
-        and (
-            isinstance(section.get("input_model"), str)
-            or isinstance(section.get("upstream"), Mapping)
-        )
-    )
-    return definition.stages_for(scientific=scientific)
+    del config
+    return definition.stages
 
 
 def _execute(
@@ -163,14 +154,11 @@ def resume(
         if not isinstance(steps, Mapping):
             raise WorkflowError("manifest has no workflow steps")
         stage_ids = {str(stage_id) for stage_id in steps}
-        if stage_ids == set(definition.scientific_stage_ids):
-            stages = definition.scientific_stages
-        elif stage_ids == set(definition.stage_ids):
-            stages = definition.stages
-        else:
+        if stage_ids != set(definition.stage_ids):
             raise WorkflowError(
                 f"manifest stages do not match workflow '{config.workflow}'"
             )
+        stages = definition.stages
         return _execute(config, directory, manifest, stages, force_step=force_step)
 
 

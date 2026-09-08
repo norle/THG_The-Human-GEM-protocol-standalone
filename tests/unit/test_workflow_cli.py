@@ -1,10 +1,16 @@
 from __future__ import annotations
 
 import json
+from pathlib import Path
 
 import pytest
 
 from thg_protocol.workflow.cli import build_parser, main
+
+MODEL = (
+    Path(__file__).resolve().parents[1]
+    / "fixtures/beta1/sanctioned_human_reference.json"
+)
 
 
 def test_cli_parser_exposes_all_commands_and_help(capsys):
@@ -34,6 +40,7 @@ def test_verbose_cli_reports_registered_stage_progress(tmp_path, capsys):
             {
                 "workflow": "beta1",
                 "run": {"name": "verbose", "output_dir": str(tmp_path / "run")},
+                "beta1": {"input_model": str(MODEL)},
             }
         ),
         encoding="utf-8",
@@ -59,6 +66,7 @@ def test_default_cli_reports_compact_progress_and_keeps_stage_details_in_log(
             {
                 "workflow": "beta1",
                 "run": {"name": "compact", "output_dir": str(tmp_path / "run")},
+                "beta1": {"input_model": str(MODEL)},
             }
         ),
         encoding="utf-8",
@@ -80,6 +88,7 @@ def test_quiet_cli_suppresses_progress(tmp_path, capsys):
             {
                 "workflow": "beta1",
                 "run": {"name": "quiet", "output_dir": str(tmp_path / "run")},
+                "beta1": {"input_model": str(MODEL)},
             }
         ),
         encoding="utf-8",

@@ -17,51 +17,31 @@ class WorkflowDefinition:
     stages: tuple[Any, ...]
     allowed_sections: frozenset[str] = frozenset()
     description: str = ""
-    scientific_stages: tuple[Any, ...] = ()
     version: int = 1
 
     @property
     def stage_ids(self) -> tuple[str, ...]:
         return tuple(stage.id for stage in self.stages)
 
-    @property
-    def scientific_stage_ids(self) -> tuple[str, ...]:
-        return tuple(stage.id for stage in self.scientific_stages)
-
-    def stages_for(self, *, scientific: bool = False) -> tuple[Any, ...]:
-        """Select the detailed DAG only for a configured scientific run."""
-        return (
-            self.scientific_stages
-            if scientific and self.scientific_stages
-            else self.stages
-        )
-
     def validate(self) -> None:
-        for stages, label in (
-            (self.stages, "fixture"),
-            (self.scientific_stages, "scientific"),
-        ):
-            if not stages:
-                continue
-            ids = [stage.id for stage in stages]
-            if not ids or len(ids) != len(set(ids)):
-                raise WorkflowRegistryError(
-                    f"workflow '{self.id}' {label} stages must have unique "
-                    "non-empty IDs"
-                )
-            positions = {stage_id: index for index, stage_id in enumerate(ids)}
-            for stage in stages:
-                for dependency in tuple(getattr(stage, "dependencies", ())):
-                    if dependency not in positions:
-                        raise WorkflowRegistryError(
-                            f"workflow '{self.id}' stage '{stage.id}' depends on "
-                            f"unknown stage '{dependency}'"
-                        )
-                    if positions[dependency] >= positions[stage.id]:
-                        raise WorkflowRegistryError(
-                            f"workflow '{self.id}' dependency order is invalid: "
-                            f"{dependency} -> {stage.id}"
-                        )
+        ids = [stage.id for stage in self.stages]
+        if not ids or len(ids) != len(set(ids)):
+            raise WorkflowRegistryError(
+                f"workflow '{self.id}' stages must have unique non-empty IDs"
+            )
+        positions = {stage_id: index for index, stage_id in enumerate(ids)}
+        for stage in self.stages:
+            for dependency in tuple(getattr(stage, "dependencies", ())):
+                if dependency not in positions:
+                    raise WorkflowRegistryError(
+                        f"workflow '{self.id}' stage '{stage.id}' depends on "
+                        f"unknown stage '{dependency}'"
+                    )
+                if positions[dependency] >= positions[stage.id]:
+                    raise WorkflowRegistryError(
+                        f"workflow '{self.id}' dependency order is invalid: "
+                        f"{dependency} -> {stage.id}"
+                    )
 
 
 class WorkflowRegistry:
@@ -131,7 +111,6 @@ def register_builtin_workflows() -> None:
     from .cell_specific import CELL_SPECIFIC_WORKFLOW
     from .compare import COMPARE_WORKFLOW
     from .final_thg import FINAL_THG_WORKFLOW
-    from .foundation import fixture_stages
     from .gapfill import GAPFILL_WORKFLOW
     from .human_database import HUMAN_DATABASE_WORKFLOW
     from .pathway import PATHWAY_WORKFLOW
@@ -147,10 +126,9 @@ def register_builtin_workflows() -> None:
         REFERENCE_WORKFLOW,
         WorkflowDefinition(
             "validate",
-            fixture_stages("validate"),
+            validation_stages(),
             frozenset({"validation"}),
-            "Validation foundation fixture",
-            scientific_stages=validation_stages(),
+            "Model validation and optional MEMOTE checks",
         ),
         COMPARE_WORKFLOW,
         CELL_SPECIFIC_WORKFLOW,

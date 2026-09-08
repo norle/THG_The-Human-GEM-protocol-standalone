@@ -76,9 +76,10 @@ def test_beta1_config_accepts_positive_n_jobs_and_rejects_invalid_values(tmp_pat
 def test_builtin_workflows_have_independently_validated_dags():
     assert {"beta1", "beta2", "validate", "compare"}.issubset(list_workflows())
     REGISTRY.validate_all()
-    for workflow_id in ("beta1", "beta2"):
+    expected_stage_counts = {"beta1": 16, "beta2": 15}
+    for workflow_id, expected_count in expected_stage_counts.items():
         definition = REGISTRY.get(workflow_id)
-        assert len(definition.stage_ids) == 6
+        assert len(definition.stage_ids) == expected_count
         assert definition.stage_ids
 
 

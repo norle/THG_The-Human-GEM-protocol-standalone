@@ -45,7 +45,7 @@ def test_configured_beta1_workflow_produces_candidate_and_resumes(tmp_path):
     status = get_status(run_dir)
     assert status["overall_status"] == "completed"
     assert len(status["steps"]) == 16
-    assert REGISTRY.get("beta1").scientific_stage_ids[-1] == "export-beta1"
+    assert REGISTRY.get("beta1").stage_ids[-1] == "export-beta1"
     export = status["steps"]["export-beta1"]["outputs"]
     assert export[0]["role"] == "model"
     assert (run_dir / export[0]["path"]).is_file()
