@@ -11,7 +11,21 @@
   },
   "beta2": {
     "mode": "apply-all",
-    "compartments": {"c": "cytosol"},
+    "compartments": {
+      "a": "cell membrane",
+      "c": "cytosol",
+      "ci": "cilium",
+      "ck": "cytoskeleton",
+      "e": "extracellular",
+      "g": "golgi apparatus",
+      "i": "inner mitochondria",
+      "l": "lysosome",
+      "m": "mitochondria",
+      "n": "nucleus",
+      "r": "endoplasmic reticulum",
+      "v": "vesicle",
+      "x": "peroxisome"
+    },
     "uncertainty_policy": "report"
   },
   "gapfill": {

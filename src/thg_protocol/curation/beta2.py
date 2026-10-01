@@ -772,7 +772,9 @@ RELEASE_CANDIDATE_FILES = (
 )
 
 
-def beta2_release_gate(bundle_dir: str | Path) -> dict[str, object]:
+def beta2_release_gate(
+    bundle_dir: str | Path, *, require_beta1_release: bool = True
+) -> dict[str, object]:
     """Check the β2 artifact gate without assigning the public β2 label."""
     root = Path(bundle_dir)
     reasons: list[str] = []
@@ -839,10 +841,11 @@ def beta2_release_gate(bundle_dir: str | Path) -> dict[str, object]:
                 for item in manifest["steps"][str(upstream.get("stage_id"))]["outputs"]
                 if item.get("role") == upstream.get("role")
             )
-            upstream_bundle = upstream_root / str(record["path"])
-            upstream_gate = beta1_release_gate(upstream_bundle.parent)
-            if upstream_gate.get("ready") is not True:
-                reasons.append("β1 upstream release gate did not pass")
+            if require_beta1_release:
+                upstream_bundle = upstream_root / str(record["path"])
+                upstream_gate = beta1_release_gate(upstream_bundle.parent)
+                if upstream_gate.get("ready") is not True:
+                    reasons.append("β1 upstream release gate did not pass")
         except Exception as error:
             reasons.append(f"β1 upstream gate unavailable: {type(error).__name__}")
     return {

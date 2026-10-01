@@ -148,6 +148,34 @@ def test_reference_workflow_hands_off_beta2_and_keeps_it_unchanged(tmp_path):
     assert status["steps"]["export-gapfilled-reference"]["status"] == "completed"
 
 
+def test_reference_workflow_accepts_an_intermediate_beta1_candidate(tmp_path):
+    source = tmp_path / "model.json"
+    _model(source)
+    config = tmp_path / "reference.json"
+    config.write_text(
+        json.dumps(
+            {
+                "workflow": "reference",
+                "run": {"name": "reference", "output_dir": str(tmp_path / "run")},
+                "beta1": {"input_model": str(source.resolve())},
+                "beta2": {"compartments": {"c": "cytosol", "e": "extracellular"}},
+                "gapfill": {
+                    "method": "greedy",
+                    "max_additions": 1,
+                    "allowed_connections": [],
+                    "candidate_types": ["A", "B", "C"],
+                    "validation_profile": "structural-fast",
+                },
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    status = get_status(start(config))
+
+    assert status["steps"]["gate-beta2"]["summary"]["status"] == "passed"
+
+
 def test_forcing_validation_reuses_gapfill_plan_and_model(tmp_path):
     source = tmp_path / "model.json"
     _model(source)

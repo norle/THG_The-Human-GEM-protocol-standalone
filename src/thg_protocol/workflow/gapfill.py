@@ -172,7 +172,7 @@ def _model_diff_is_clean(diff: Mapping[str, object]) -> bool:
 
 
 class Beta2GateStage:
-    implementation_version = 1
+    implementation_version = 2
     id = "gate-beta2"
     dependencies = ("export-beta2",)
 
@@ -199,7 +199,12 @@ class Beta2GateStage:
         if not verify_artifact(record, context.run_dir):
             raise ValueError("export-beta2 model artifact checksum verification failed")
         model_path = context.run_dir / str(record["path"])
-        gate = beta2_release_gate(model_path.parent)
+        gate = beta2_release_gate(
+            model_path.parent,
+            # Reference construction passes a β1 candidate internally; the
+            # public β1 release gate belongs at the promotion boundary.
+            require_beta1_release=context.config.workflow != "reference",
+        )
         result = {
             "schema_version": 1,
             "status": "passed" if gate.get("passed") else "blocked",
