@@ -8,6 +8,13 @@ accepts an explicitly declared external GEM in standalone use; that does not
 turn a generic reduction into a THG-reference-model-derived or publication-specific cell
 model automatically.
 
+Save the configuration shown in the [cell-specific workflow
+guide](../workflows/cell-specific.md) as `configs/cell-specific.json`, then run:
+
+```bash
+thg-run cell-specific configs/cell-specific.json
+```
+
 See the [workflow API](../api/workflows.md) for
 `reduce_model_by_activity`, exchange matching, and transcriptomics helpers.
 

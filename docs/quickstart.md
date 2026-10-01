@@ -1,7 +1,7 @@
 # Quickstart
 
-Build and inspect a tiny model using the included example data. This runs
-offline and does not need credentials or a solver.
+Run the included example data through the installed command-line tools. This
+is an offline smoke test and does not need credentials or a solver.
 
 ## Prerequisites
 
@@ -13,64 +13,71 @@ python -m pip install -e .
 
 ## Run it
 
-```python
-from pathlib import Path
+Create a directory for the generated files, then apply the fixture pathway:
 
-from cobra.io import load_json_model
-from thg_protocol.analysis import find_network_components, write_component_report
-from thg_protocol.analysis.compare import compare_models_from_files
-from thg_protocol.analysis.consistency import unbalanced_reactions
-from thg_protocol.annotation import analyze_model_annotations
-from thg_protocol.database import reconstruct_model_from_json
-from thg_protocol.pathway import implement_pathway_files
+```bash
+mkdir -p runs/practical-quickstart
 
-examples = Path("docs/examples")
-run_dir = Path("runs/practical-quickstart")
-run_dir.mkdir(parents=True, exist_ok=True)
-
-reference_path = run_dir / "reference-model.json"
-model = reconstruct_model_from_json(
-    examples / "records.json", output_path=reference_path
-)
-print(model.id, len(model.metabolites), len(model.reactions))
-
-print(analyze_model_annotations(reference_path))
-
-enriched_path = run_dir / "enriched-model.json"
-pathway_result = implement_pathway_files(
-    examples / "quickstart_model.json",
-    examples / "pathway_config.json",
-    examples / "metabolite_ids.json",
-    enriched_path,
-)
-print(pathway_result["compartments_added"])
-
-enriched_model = load_json_model(enriched_path)
-component_result = find_network_components(enriched_model)
-write_component_report(component_result, run_dir / "components.json")
-print(component_result["is_fully_connected"])
-print(unbalanced_reactions(enriched_model))
-
-comparison = compare_models_from_files(
-    enriched_path, examples / "comparison_model.json", run_dir / "comparison"
-)
-print(comparison["raw"]["_summary"])
+thg-pathway \
+  --model docs/examples/quickstart_model.json \
+  --config docs/examples/pathway_config.json \
+  --database docs/examples/metabolite_ids.json \
+  --output runs/practical-quickstart/enriched-model.json
 ```
 
-You should see `docs-toy 2 1`, an annotation mapping containing `chebi`, one
-added compartment, and a comparison summary.
+Run a regular and semantic model comparison:
+
+```bash
+thg-compare \
+  runs/practical-quickstart/enriched-model.json \
+  docs/examples/comparison_model.json \
+  --output-dir runs/practical-quickstart/comparison
+
+thg-compare \
+  runs/practical-quickstart/enriched-model.json \
+  docs/examples/comparison_model.json \
+  --semantic \
+  --output-dir runs/practical-quickstart/semantic
+```
+
+Finally, run the standalone offline gapfill example:
+
+```bash
+thg-gapfill \
+  --model docs/examples/quickstart_model.json \
+  --method greedy \
+  --max-additions 1 \
+  --allowed-connection c:e \
+  --output-dir runs/practical-quickstart/gapfill
+```
+
+The commands print a short summary and leave the source fixtures unchanged.
+The gapfill fixture reports `partial`; that is expected for this intentionally
+small model.
 
 ## Files after execution
 
 ```text
 runs/practical-quickstart/
-├── reference-model.json
 ├── enriched-model.json
-├── components.json
-└── comparison/
-    ├── compartments_comparison_raw.csv
-    └── compartments_comparison_no_blocked.csv
+├── gapfill/
+│   ├── gapfill-report.json
+│   ├── gapfill-selected-reactions.jsonl
+│   ├── gapfilled-model.json
+│   └── gapfilled-model.xml
+├── comparison/
+│   ├── compartments_comparison_raw.csv
+│   └── compartments_comparison_no_blocked.csv
+└── semantic/
+    └── semantic-comparison.json
 ```
 
 These are demonstration fixtures, not a research-quality human GEM. Next,
 [choose a workflow](workflows/index.md) for your own model or evidence.
+
+## Python API
+
+For library usage—such as database reconstruction, direct analysis, or release
+gates—see the [construction](api/construction.md), [analysis](api/analysis.md),
+and [workflow API](api/workflows.md) references. The quickstart uses the CLI so
+that the normal user path does not require writing Python code.

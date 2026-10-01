@@ -6,6 +6,15 @@ The canonical input is the required gapfill output, optionally enriched through
 Human Database integration between β2 and gapfill. Preserve the input model,
 integration evidence when used, and all checksums.
 
+## Run with the CLI
+
+This compatibility workflow uses the generic runner and a configuration that
+selects the β2 and Human Database upstream artifacts:
+
+```bash
+thg-run start configs/final-thg.json
+```
+
 ## Merge and validation
 
 The registered `final-thg` workflow is a compatibility path that combines a two-branch merge,
@@ -21,15 +30,8 @@ unresolved. `apply_merge_plan` applies approved decisions to a private copy.
 The retained-base merge policy preserves base stoichiometry and bounds while
 allowing non-empty annotations and missing GPRs to enrich it.
 
-```python
-from thg_protocol.merge import apply_merge_plan, generate_merge_plan
-
-plan = generate_merge_plan(
-    "inputs/models/beta2.json", "inputs/models/human-database.json"
-)
-merged, report = apply_merge_plan(plan, output_path="runs/final-thg/candidate.json")
-print(report)
-```
+The merge-plan and application functions are available in the [workflow API
+reference](../api/workflows.md) for Python callers.
 
 ## Validation and acceptance
 
@@ -66,7 +68,7 @@ The registered `final-thg` workflow uses `thg-run start` with
 `workflow: "final-thg"`; there is
 no separate `thg-run final-thg` command. The configuration selects input
 artifacts, merge policy, validation profile, and output directory.
-Use `thg-run start configs/final-thg.json` for the resumable route; it resolves
+That command is the resumable route; it resolves
 the base and Human Database inputs through their recorded run artifact
 references. This bundled merge route remains independently usable, but the
 canonical sequence performs optional integration before required gapfill and

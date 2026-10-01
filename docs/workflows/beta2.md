@@ -31,6 +31,12 @@ For a direct external input, the configuration must include:
 }
 ```
 
+Save the configuration as `configs/beta2.json` and run:
+
+```bash
+thg-run beta2 configs/beta2.json
+```
+
 For a maintained run, reference the β1 export:
 
 ```json
@@ -90,21 +96,13 @@ caller chooses whether downstream work consumes its original model or the
 gapfilled output; canonical construction always continues with the gapfilled
 output.
 
-Python release API:
-
-- [`thg_protocol.curation.beta2.resolve_gpr_locations`](../api/workflows.md#thg_protocol.curation.beta2.resolve_gpr_locations)
-- [`thg_protocol.curation.beta2.generate_expansion_plan`](../api/workflows.md#thg_protocol.curation.beta2.generate_expansion_plan)
-- [`thg_protocol.curation.beta2.apply_expansion_plan`](../api/workflows.md#thg_protocol.curation.beta2.apply_expansion_plan)
-- [`thg_protocol.curation.beta2.beta2_release_gate`](../api/workflows.md#thg_protocol.curation.beta2.beta2_release_gate)
-- [`thg_protocol.curation.beta2.release_beta2`](../api/workflows.md#thg_protocol.curation.beta2.release_beta2)
-
-```python
-from thg_protocol.curation.beta2 import beta2_release_gate, release_beta2
-
-gate = beta2_release_gate("runs/example-beta2/artifacts/export-beta2/attempt-0001")
-if gate["passed"]:
-    release_beta2("runs/example-beta2/artifacts/export-beta2/attempt-0001")
-```
+Python callers can use the release-gate and promotion helpers documented in the
+[workflow API reference](../api/workflows.md), including
+[`resolve_gpr_locations`][thg_protocol.curation.beta2.resolve_gpr_locations],
+[`generate_expansion_plan`][thg_protocol.curation.beta2.generate_expansion_plan],
+[`apply_expansion_plan`][thg_protocol.curation.beta2.apply_expansion_plan],
+[`beta2_release_gate`][thg_protocol.curation.beta2.beta2_release_gate] and
+[`release_beta2`][thg_protocol.curation.beta2.release_beta2].
 
 ## Candidate and release-gate lifecycle
 

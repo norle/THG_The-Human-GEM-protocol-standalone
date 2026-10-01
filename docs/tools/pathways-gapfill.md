@@ -2,9 +2,16 @@
 
 ## Pathway implementation
 
-Use `thg-pathway` or `implement_pathway_files` to apply an explicit pathway
-configuration to a model. Keep source configuration and output paths under
-caller control.
+Use the standalone command to apply an explicit pathway configuration to a
+model. Keep source configuration and output paths under caller control.
+
+```bash
+thg-pathway \
+  --model model.json \
+  --config pathway-config.json \
+  --database metabolite-ids.json \
+  --output runs/pathway/enriched-model.json
+```
 
 ## Standalone gapfill
 
@@ -41,6 +48,8 @@ already-present routes, and `solved`, `partial`, or `failed` status. A
 standalone caller chooses whether downstream work uses the original or
 gapfilled model; the canonical pipeline uses the gapfilled model as its THG
 candidate input.
+
+The corresponding Python APIs are documented under [workflow APIs](../api/workflows.md).
 
 Canonical APIs: [`implement_pathway_files`][thg_protocol.pathway.workflow.implement_pathway_files],
 [`implement_pathway`][thg_protocol.pathway.workflow.implement_pathway],

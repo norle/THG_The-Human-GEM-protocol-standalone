@@ -8,57 +8,10 @@ identities and GPRs supplied by the caller, audits formula and charge balance,
 applies only configured corrections, consolidates exact duplicates, and
 writes a reproducible artifact bundle.
 
-## Run with Python
+## Run with the CLI
 
-```python
-from thg_protocol.curation.beta1 import run_beta1
-
-result = run_beta1(
-    "input-model.json",
-    "runs/example-beta1",
-    mode="report-only",
-)
-print(result["outputs"]["validation"])
-```
-
-`apply-all` is the default. `report-only` leaves the copied model unchanged,
-and `user-approved-only` applies only proposals referenced by a decisions
-JSONL file when using the workflow runner. Explicit corrections are supplied
-as mappings, for example:
-
-```python
-run_beta1(
-    "input-model.json",
-    "runs/example-beta1",
-    corrections={"RXN": {"h_c": 1.0}},
-    formula_corrections={"met_c": "C6H12O6"},
-    charge_corrections={"met_c": 0},
-)
-```
-
-- Complex subunit evidence is stored under `thg_s_gpr` without changing Boolean GPRs.
-- Ambiguous identities and unresolved balance cases remain in reports.
-- Cross-database metabolite references are preserved together; one canonical
-  reference is selected for reporting, while conflicting IDs within the same
-  namespace remain unresolved.
-- Generic groups, glycans, polymers, R-groups, and X-groups default to an
-  excluded mass-balance policy because their formulas are not inferable.
-- Reaction conflicts and reversed matches create annotation-only proposals.
-- Without service evidence, the workflow uses existing model annotations.
-- `run_flux_consistency: true` adds a diagnostic blocked-reaction report.
-
-API details: [`run_beta1`][thg_protocol.curation.beta1.run_beta1],
-[`inventory_model`][thg_protocol.curation.beta1.inventory_model],
-[`audit_model`][thg_protocol.curation.beta1.audit_model], and
-[`generate_balance_proposals`][thg_protocol.curation.beta1.generate_balance_proposals].
-S-GPR metadata uses
-[`serialize_s_gpr`][thg_protocol.curation.beta1.serialize_s_gpr].
-
-After a sanctioned run passes the gate, use
-[`release_beta1`][thg_protocol.curation.beta1.release_beta1] to promote the
-candidate files to `thg-beta1.json` and `thg-beta1.xml`.
-
-## Configuration and CLI
+Save this as `configs/beta1.json` and update `input_model` to your
+caller-owned model:
 
 ```json
 {
@@ -73,8 +26,27 @@ candidate files to `thg-beta1.json` and `thg-beta1.xml`.
 }
 ```
 
-Save it as `configs/beta1.json` and run it with `thg-run beta1
-configs/beta1.json`. A configured model run executes the
+Run the resumable workflow:
+
+```bash
+thg-run beta1 configs/beta1.json
+```
+
+Use `-v` for stage progress and `-vv` for fingerprints and artifact paths.
+The input path is never overwritten.
+
+- Complex subunit evidence is stored under `thg_s_gpr` without changing Boolean GPRs.
+- Ambiguous identities and unresolved balance cases remain in reports.
+- Cross-database metabolite references are preserved together; one canonical
+  reference is selected for reporting, while conflicting IDs within the same
+  namespace remain unresolved.
+- Generic groups, glycans, polymers, R-groups, and X-groups default to an
+  excluded mass-balance policy because their formulas are not inferable.
+- Reaction conflicts and reversed matches create annotation-only proposals.
+- Without service evidence, the workflow uses existing model annotations.
+- `run_flux_consistency: true` adds a diagnostic blocked-reaction report.
+
+A configured model run executes the
 explicit 16-stage scientific DAG, keeping evidence, proposals, application,
 cleanup, and validation as separate resumable stages. A beta1 run exports
 JSON/SBML candidates, a semantic signature, validation, ledger, and inventory
@@ -85,6 +57,16 @@ residual is fully verified; otherwise the reaction remains unresolved. Set
 `n_jobs` above 1 to parallelize the
 CPU-bound per-metabolite and per-reaction analysis; mutation and solver work
 remains serial. The input path is never overwritten.
+
+Python callers can use [`run_beta1`][thg_protocol.curation.beta1.run_beta1],
+[`inventory_model`][thg_protocol.curation.beta1.inventory_model],
+[`audit_model`][thg_protocol.curation.beta1.audit_model],
+[`generate_balance_proposals`][thg_protocol.curation.beta1.generate_balance_proposals],
+and [`serialize_s_gpr`][thg_protocol.curation.beta1.serialize_s_gpr] from the
+[workflow API reference](../api/workflows.md).
+After a sanctioned run passes the gate, use
+[`release_beta1`][thg_protocol.curation.beta1.release_beta1] to promote the
+candidate files to `thg-beta1.json` and `thg-beta1.xml`.
 
 ## Candidate and release-gate lifecycle
 

@@ -32,3 +32,11 @@ activity.
 
 Expression units and threshold selection are scientific protocol choices; they
 are intentionally not hidden defaults.
+
+Add these settings to the configuration shown in the [cell-specific workflow
+guide](../workflows/cell-specific.md), save it as `configs/cell-specific.json`,
+then run:
+
+```bash
+thg-run cell-specific configs/cell-specific.json
+```

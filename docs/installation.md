@@ -8,16 +8,16 @@ cd THG_The-Human-GEM-protocol-standalone
 python -m venv .venv
 source .venv/bin/activate
 python -m pip install --upgrade pip
-python -m pip install -e '.[full]'
+python -m pip install -e .
 ```
 
-This installs the core workflows, all optional runtime capabilities, and the
-four THG commands.
+This installs the core workflows, including the β1 → β2 → gapfill reference
+construction path, and the four THG commands.
 
-## Installation profiles
+## Optional capabilities
 
-The `full` profile above is the simplest choice for a general-purpose
-installation. It includes:
+The base install is enough for the reference workflow and offline examples.
+Install extras only when you need these capabilities:
 
 | Extra | Use it for |
 | --- | --- |
@@ -26,8 +26,7 @@ installation. It includes:
 | `memote` | MEMOTE and task analysis |
 | `figures` | Rendering figures |
 
-For a smaller environment, install only the core package and add capabilities
-as needed:
+For example, add figure rendering with:
 
 ```bash
 python -m pip install -e .
@@ -60,7 +59,7 @@ BIOCYC_PASSWORD=your-password
 
 ## Verify your installation
 
-Check the installed entry points:
+Check the installed CLI entry points:
 
 ```bash
 thg-run --help
@@ -69,12 +68,8 @@ thg-gapfill --help
 thg-pathway --help
 ```
 
-An API-level smoke test is also useful:
-
-```bash
-python -c "import thg_protocol; print(thg_protocol.__name__)"
-```
-
-Installing `full` makes the optional tools available; it does not run MEMOTE,
-contact external services, or enable a workflow stage automatically. See the
-[CLI reference](reference/cli.md) and [I/O and configuration reference](reference/io-and-config.md).
+The `full` extra remains available as a convenience bundle for all optional
+capabilities. Optional extras do not run MEMOTE, contact external services, or
+enable a workflow stage automatically. See the
+[CLI reference](reference/cli.md), [I/O and configuration reference](reference/io-and-config.md),
+and [Python API reference](api/core.md).

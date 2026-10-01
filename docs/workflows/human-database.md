@@ -15,26 +15,11 @@ integration**. In the canonical THG pipeline, integration is an optional
 enrichment step that merges a reviewed Human Database model into THGβ2 before
 the required gapfill stage. Skipping integration does not skip gapfill.
 
-## Inputs and modes
-
-Use a JSON record bundle with `metabolites` and `reactions`; `genes`,
-`pathways`, and `model_name` are optional. Live or adapted collection is
-performed through an injected adapter such as `harvest_snapshot`. Credentials,
-network access, rate limits, and caches are caller-owned. A paper-specific
-pathway-list adapter is not implied by workflow verification.
-
-```python
-from thg_protocol.database import reconstruct_model_from_json
-
-model = reconstruct_model_from_json(
-    "inputs/database/records.json",
-    output_path="runs/human-database/network.json",
-)
-```
-
 ## Run with the CLI
 
-The generic runner is intentional:
+Use a JSON record bundle with `metabolites` and `reactions`; `genes`,
+`pathways`, and `model_name` are optional. Save a configuration such as
+`configs/human-database.json`. The generic runner is intentional:
 
 ```json
 {"workflow": "human-database",
@@ -45,6 +30,11 @@ The generic runner is intentional:
 ```bash
 thg-run start configs/human-database.json
 ```
+
+Live or adapted collection is performed through an injected adapter such as
+`harvest_snapshot`. Credentials, network access, rate limits, and caches are
+caller-owned. A paper-specific pathway-list adapter is not implied by workflow
+verification.
 
 ## Outputs and validation
 

@@ -48,3 +48,9 @@ missing-expression semantics.
   }
 }
 ```
+
+Save the configuration as `configs/cell-specific.json` and run:
+
+```bash
+thg-run cell-specific configs/cell-specific.json
+```

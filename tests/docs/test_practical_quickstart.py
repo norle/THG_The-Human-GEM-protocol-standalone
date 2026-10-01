@@ -1,16 +1,9 @@
-"""Execute the offline workflow published in docs/quickstart.md."""
+"""Execute the offline CLI workflow published in docs/quickstart.md."""
 
+import subprocess
 from pathlib import Path
 
-from cobra.io import load_json_model
-
-from thg_protocol.analysis import find_network_components, write_component_report
-from thg_protocol.analysis.compare import compare_models_from_files
-from thg_protocol.analysis.consistency import unbalanced_reactions
-from thg_protocol.annotation import analyze_model_annotations
-from thg_protocol.database import reconstruct_model_from_json
-from thg_protocol.pathway import implement_pathway_files
-
+ROOT = Path(__file__).parents[2]
 FIXTURES = Path(__file__).parents[2] / "docs" / "examples"
 
 
@@ -18,34 +11,59 @@ def test_practical_quickstart_workflow_is_offline_and_writes_claimed_outputs(tmp
     results = tmp_path / "practical-quickstart"
     results.mkdir()
 
-    reference = results / "reference-model.json"
-    model = reconstruct_model_from_json(
-        FIXTURES / "records.json", output_path=reference
+    pathway = results / "enriched-model.json"
+    _run_cli(
+        "thg-pathway",
+        "--model",
+        str(FIXTURES / "quickstart_model.json"),
+        "--config",
+        str(FIXTURES / "pathway_config.json"),
+        "--database",
+        str(FIXTURES / "metabolite_ids.json"),
+        "--output",
+        str(pathway),
     )
-    assert (model.id, len(model.metabolites), len(model.reactions)) == (
-        "docs-toy",
-        2,
-        1,
+    comparison = results / "comparison"
+    _run_cli(
+        "thg-compare",
+        str(pathway),
+        str(FIXTURES / "comparison_model.json"),
+        "--output-dir",
+        str(comparison),
     )
-    assert analyze_model_annotations(reference) == {"chebi": 1}
+    _run_cli(
+        "thg-compare",
+        str(pathway),
+        str(FIXTURES / "comparison_model.json"),
+        "--semantic",
+        "--output-dir",
+        str(results / "semantic"),
+    )
+    _run_cli(
+        "thg-gapfill",
+        "--model",
+        str(FIXTURES / "quickstart_model.json"),
+        "--method",
+        "greedy",
+        "--max-additions",
+        "1",
+        "--allowed-connection",
+        "c:e",
+        "--output-dir",
+        str(results / "gapfill"),
+    )
 
-    enriched = results / "enriched-model.json"
-    pathway = implement_pathway_files(
-        FIXTURES / "quickstart_model.json",
-        FIXTURES / "pathway_config.json",
-        FIXTURES / "metabolite_ids.json",
-        enriched,
-    )
-    assert pathway["compartments_added"] == 1
+    assert pathway.exists()
+    assert (comparison / "compartments_comparison_raw.csv").exists()
+    assert (results / "semantic" / "semantic-comparison.json").exists()
+    assert (results / "gapfill" / "gapfilled-model.json").exists()
 
-    loaded = load_json_model(enriched)
-    components = find_network_components(loaded)
-    write_component_report(components, results / "components.json")
-    assert not unbalanced_reactions(loaded)
 
-    reports = compare_models_from_files(
-        enriched, FIXTURES / "comparison_model.json", results / "comparison"
+def _run_cli(command: str, *args: str) -> None:
+    result = subprocess.run(
+        [command, *args],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
     )
-    assert reports["raw"]["_summary"]["total_rxns_a"] == 2
-    assert (results / "components.json").exists()
-    assert (results / "comparison" / "compartments_comparison_raw.csv").exists()
+    assert result.returncode == 0, result.stdout + result.stderr

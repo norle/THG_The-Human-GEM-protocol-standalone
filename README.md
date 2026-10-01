@@ -19,11 +19,12 @@ THG Protocol supports Python 3.10–3.12:
 ```bash
 python -m venv .venv
 source .venv/bin/activate
-python -m pip install -e '.[full]'
+python -m pip install -e .
 ```
 
-For a core-only installation, use `python -m pip install -e .`. See the
-[installation guide](docs/installation.md) for optional capabilities.
+This installs the core workflows and CLI, including the configured reference
+construction workflow. See the [installation guide](docs/installation.md) for
+optional capabilities.
 
 ## Start here
 
