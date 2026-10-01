@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import csv
-import html
 import json
 import shutil
 from collections import defaultdict
@@ -134,6 +133,8 @@ class CellSpecificStage:
 
     def __init__(self, stage_id: str, dependencies: tuple[str, ...] = ()) -> None:
         self.id, self.dependencies = stage_id, dependencies
+        if stage_id in {"validate-cell-specific", "export-cell-specific"}:
+            self.implementation_version = 3
         self.kind = (
             "mutation"
             if self.id in {"apply-reduction", "configure-context-exchanges"}
@@ -628,7 +629,9 @@ class CellSpecificStage:
                             else (
                                 "evidence-supports-activity"
                                 if active
-                                else "evidence-unknown" if unknown else "inactive-gpr"
+                                else "evidence-unknown"
+                                if unknown
+                                else "inactive-gpr"
                             )
                         ),
                         "uncertainty": list(unknown),
@@ -910,10 +913,10 @@ class CellSpecificStage:
             )
             output_map["model-diff"] = _dump(work_dir / "model-diff.json", diff)
             output_map["validation-html"] = work_dir / "validation-report.html"
+            from thg_protocol.validation_report import render_validation_html
+
             output_map["validation-html"].write_text(
-                "<html><body><pre>"
-                + html.escape(json.dumps(validation, indent=2, sort_keys=True))
-                + "</pre></body></html>\n"
+                render_validation_html(validation), encoding="utf-8"
             )
             output_map["uncertainty"] = work_dir / "uncertainty.tsv"
             output_map["uncertainty"].write_text(
@@ -1078,6 +1081,8 @@ class PathwayStage:
 
     def __init__(self, stage_id: str, dependencies: tuple[str, ...] = ()) -> None:
         self.id, self.dependencies = stage_id, dependencies
+        if stage_id == "validate-pathway-model":
+            self.implementation_version = 2
 
     def enabled(self, config: Any) -> bool:
         del config

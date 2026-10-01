@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import platform
 import shutil
 from collections.abc import Mapping
 from pathlib import Path
@@ -17,7 +18,7 @@ from thg_protocol.runtime.stage import dependency_path as _dependency_path
 class ValidationScientificStage:
     """Run structural validation and optional MEMOTE checks."""
 
-    implementation_version = 1
+    implementation_version = 3
 
     def __init__(self, stage_id: str, dependencies: tuple[str, ...] = ()) -> None:
         self.id, self.dependencies = stage_id, dependencies
@@ -48,7 +49,8 @@ class ValidationScientificStage:
             return StageResult(
                 (("model", destination),), {"input_sha256": sha256_file(source)}
             )
-        model = _load_cobra_model(_dependency_path(context, "validate-input", "model"))
+        model_path = _dependency_path(context, "validate-input", "model")
+        model = _load_cobra_model(model_path)
         if self.id == "validate-checks":
             from thg_protocol.validation import validate_model
 
@@ -62,6 +64,65 @@ class ValidationScientificStage:
                 json.dumps(report, indent=2, sort_keys=True) + "\n", encoding="utf-8"
             )
             return StageResult((("validation", output),), report)
+        if self.id == "assemble-validation-report":
+            from thg_protocol.validation_report import (
+                render_validation_html,
+                render_validation_summary,
+            )
+
+            validation = json.loads(
+                _dependency_path(context, "validate-checks", "validation").read_text(
+                    encoding="utf-8"
+                )
+            )
+            memote = json.loads(
+                _dependency_path(context, "validate-memote", "memote").read_text(
+                    encoding="utf-8"
+                )
+            )
+            payload = {
+                "schema": "thg.validation.report/v1",
+                "schema_version": 1,
+                "model_id": model.id,
+                "model_checksum": sha256_file(model_path),
+                "validation_profile": validation["profile"],
+                "validation_profile_version": 1,
+                "software": {"python": platform.python_version()},
+                "after": {
+                    "reactions": len(model.reactions),
+                    "metabolites": len(model.metabolites),
+                    "genes": len(model.genes),
+                    "compartments": len(model.compartments),
+                },
+                "validation": validation,
+                "solver": validation.get("solver", {}),
+                "tasks": {"status": "not-requested", "tasks": [], "passed": None},
+                "memote": memote,
+                "warnings": sorted(
+                    str(item["id"])
+                    for item in validation.get("checks", [])
+                    if item.get("passed") is not True
+                    and not item.get("release_blocking")
+                ),
+            }
+            report = work_dir / "validation-report.json"
+            report.write_text(
+                json.dumps(payload, indent=2, sort_keys=True) + "\n",
+                encoding="utf-8",
+            )
+            html = work_dir / "validation-report.html"
+            html.write_text(render_validation_html(payload), encoding="utf-8")
+            summary = work_dir / "validation-summary.md"
+            summary.write_text(render_validation_summary(payload), encoding="utf-8")
+            return StageResult(
+                (
+                    ("validation", report),
+                    ("validation-html", html),
+                    ("validation-summary", summary),
+                ),
+                {"passed": validation.get("passed")},
+            )
+
         from thg_protocol.memote import run_memote
 
         if bool(section.get("run_memote", False)):
@@ -89,6 +150,7 @@ def validation_stages() -> tuple[ValidationScientificStage, ...]:
         ValidationScientificStage("validate-input"),
         ValidationScientificStage("validate-checks", ("validate-input",)),
         ValidationScientificStage("validate-memote", ("validate-checks",)),
+        ValidationScientificStage("assemble-validation-report", ("validate-memote",)),
     )
 
 

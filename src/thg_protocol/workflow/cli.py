@@ -65,6 +65,33 @@ def _configure_logging(verbosity: int, *, quiet: bool = False) -> None:
     logger.propagate = False
 
 
+def _is_validation_config(path: Path) -> bool:
+    if path.suffix.lower() != ".json":
+        return False
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return False
+    return isinstance(payload, dict) and payload.get("workflow") == "validate"
+
+
+def _direct_validation(
+    path: Path, profile: str, run_solver: bool | None, as_json: bool
+) -> int:
+    from thg_protocol.validation import load_model, validate_model
+
+    report = validate_model(load_model(path), profile, run_solver=run_solver)
+    if as_json:
+        print(json.dumps(report, indent=2, sort_keys=True))
+    else:
+        status = "passed" if report["passed"] else "failed"
+        print(f"validation: {status} ({profile})")
+        for check in report["checks"]:
+            if check["passed"] is not True:
+                print(f"warning: {check['id']}")
+    return 0 if report["passed"] else 1
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Run the THG resumable workflow.")
     _add_verbosity_argument(parser)
@@ -112,8 +139,29 @@ def build_parser() -> argparse.ArgumentParser:
             workflow_id, help=f"start a {workflow_id} registered workflow"
         )
         workflow_parser.add_argument(
-            "config", type=Path, help="workflow configuration"
+            "config_or_model" if workflow_id == "validate" else "config",
+            type=Path,
+            help=(
+                "validation configuration or model path"
+                if workflow_id == "validate"
+                else "workflow configuration"
+            ),
         )
+        if workflow_id == "validate":
+            from thg_protocol.validation import PROFILES
+
+            workflow_parser.add_argument(
+                "--profile", choices=tuple(PROFILES), default="structural-fast"
+            )
+            workflow_parser.add_argument(
+                "--run-solver",
+                action=argparse.BooleanOptionalAction,
+                default=None,
+                help="override the profile's solver setting in direct model mode",
+            )
+            workflow_parser.add_argument(
+                "--json", action="store_true", help="print the direct report as JSON"
+            )
         _add_verbosity_argument(
             workflow_parser,
             default=argparse.SUPPRESS,
@@ -167,18 +215,14 @@ def _print_final_report(run_dir: Path) -> None:
     )
     status = manifest["overall_status"]
     if gate_path is not None and gate_path.is_file():
-        status = json.loads(gate_path.read_text(encoding="utf-8")).get(
-            "status", status
-        )
+        status = json.loads(gate_path.read_text(encoding="utf-8")).get("status", status)
     print(f"final report: {report or run_dir}; status: {status}")
 
 
 def main(argv: list[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
-    _configure_logging(
-        getattr(args, "verbose", 0), quiet=getattr(args, "quiet", False)
-    )
+    _configure_logging(getattr(args, "verbose", 0), quiet=getattr(args, "quiet", False))
     try:
         if args.command == "start":
             print(f"run started/resumed: {start(args.config)}")
@@ -194,13 +238,30 @@ def main(argv: list[str] | None = None) -> int:
         }:
             from .config import load_workflow_config
 
-            config = load_workflow_config(args.config)
+            config_path = (
+                args.config_or_model if args.command == "validate" else args.config
+            )
+            if args.command == "validate" and not _is_validation_config(config_path):
+                return _direct_validation(
+                    config_path, args.profile, args.run_solver, args.json
+                )
+            if args.command == "validate" and (
+                args.profile != "structural-fast"
+                or args.run_solver is not None
+                or args.json
+            ):
+                raise ConfigError(
+                    "validation CLI overrides require a model path, not a config"
+                )
+            config = load_workflow_config(
+                config_path if args.command == "validate" else args.config
+            )
             if config.workflow != args.command:
                 raise ConfigError(
                     f"configuration selects workflow '{config.workflow}', "
                     f"not '{args.command}'"
                 )
-            run = start(args.config)
+            run = start(config_path)
             print(f"run started/resumed: {run}")
             if args.command in {"gapfill", "reference"}:
                 _print_final_report(run)

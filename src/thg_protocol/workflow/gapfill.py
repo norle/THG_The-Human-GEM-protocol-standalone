@@ -238,6 +238,8 @@ class GapfillStage:
     def __init__(self, stage_id: str, dependencies: tuple[str, ...] = ()) -> None:
         self.id = stage_id
         self.dependencies = dependencies
+        if stage_id in {"characterize-gapfill-baseline", "validate-gapfill"}:
+            self.implementation_version = 2
 
     def enabled(self, config: Any) -> bool:
         del config
@@ -539,21 +541,19 @@ class GapfillStage:
                     warnings.append(f"worsening-{metric}")
             payload["warnings"] = sorted(set(warnings))
             report = _dump(work_dir / "validation-report.json", payload)
+            from thg_protocol.validation_report import (
+                render_validation_html,
+                render_validation_summary,
+            )
+
             html = work_dir / "validation-report.html"
             html.write_text(
-                "<html><body><pre>"
-                + json.dumps(payload, indent=2, sort_keys=True, default=str)
-                + "</pre></body></html>\n",
+                render_validation_html(payload),
                 encoding="utf-8",
             )
             summary = work_dir / "validation-summary.md"
             summary.write_text(
-                "# Gapfill validation\n\n"
-                + "\n".join(
-                    f"- {key}: {value}"
-                    for key, value in payload["metric_deltas"].items()
-                )
-                + "\n",
+                render_validation_summary(payload),
                 encoding="utf-8",
             )
             return StageResult(

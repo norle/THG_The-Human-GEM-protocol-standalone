@@ -49,8 +49,61 @@ def test_topology_checks_report_failures_when_findings_exist():
 
 def test_solver_profile_reports_singleton_inconsistent_sets():
     report = minimal_inconsistent_sets(model())
-    assert report["method"] == "singleton-blocked-reactions"
+    assert report["method"] == "blocked-reaction-singletons"
     assert report["complete"] is True
+
+
+def test_validation_preserves_infrastructure_error(monkeypatch):
+    monkeypatch.setattr(
+        "thg_protocol.validation.stoichiometric_consistency",
+        lambda model: {"status": "infrastructure-error", "passed": None},
+    )
+    check = next(
+        item
+        for item in validate_model(model())["checks"]
+        if item["id"] == "stoichiometric-consistency"
+    )
+    assert check["status"] == "infrastructure-error"
+    assert check["passed"] is None
+
+
+def test_release_full_applies_stricter_profile_policy():
+    checks = {
+        item["id"]: item for item in validate_model(model(), "release-full")["checks"]
+    }
+    assert checks["mass-balance"]["release_blocking"] is True
+    assert checks["stoichiometric-consistency"]["release_blocking"] is False
+
+
+def test_stoichiometric_consistency_excludes_boundary_reactions():
+    source = model()
+    uptake = cobra.Reaction("uptake")
+    uptake.add_metabolites({source.metabolites.source_c: 1})
+    sink = cobra.Reaction("sink")
+    sink.add_metabolites({source.metabolites.product_c: -1})
+    source.add_reactions([uptake, sink])
+    source.objective = "sink"
+    assert validate_model(source, "release-full")["passed"] is True
+
+
+def test_stoichiometric_inconsistency_is_a_nonblocking_warning(monkeypatch):
+    source = model()
+    inconsistent = cobra.Reaction("inconsistent")
+    inconsistent.add_metabolites(
+        {source.metabolites.source_c: -1, source.metabolites.product_c: 2}
+    )
+    source.add_reactions([inconsistent])
+    assert stoichiometric_consistency(source)["passed"] is False
+    # Isolate the conservation warning from the separate chemical-balance gate.
+    for check in ("_mass_balance", "_charge_balance"):
+        monkeypatch.setattr(
+            f"thg_protocol.validation.{check}", lambda m: {"passed": True}
+        )
+    report = validate_model(source, "release-full", run_solver=False)
+    check = next(c for c in report["checks"] if c["id"] == "stoichiometric-consistency")
+    assert check["status"] == "failed"
+    assert check["release_blocking"] is False
+    assert report["passed"] is True
 
 
 def test_tasks_copy_model_and_classify_solver_status(tmp_path):
@@ -126,8 +179,15 @@ def test_registered_validation_workflow_writes_check_and_memote_artifacts(tmp_pa
         "validate-input",
         "validate-checks",
         "validate-memote",
+        "assemble-validation-report",
     }
     assert manifest["overall_status"] == "completed"
+    outputs = manifest["steps"]["assemble-validation-report"]["outputs"]
+    assert {item["role"] for item in outputs} == {
+        "validation",
+        "validation-html",
+        "validation-summary",
+    }
 
 
 @pytest.mark.memote

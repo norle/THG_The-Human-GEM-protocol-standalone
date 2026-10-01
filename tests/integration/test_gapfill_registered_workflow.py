@@ -194,6 +194,35 @@ def test_forcing_validation_reuses_gapfill_plan_and_model(tmp_path):
     )
 
 
+def test_resume_refreshes_old_validation_without_reapplying_gapfill(
+    tmp_path, monkeypatch
+):
+    from thg_protocol.workflow.registry import get_workflow
+
+    source = tmp_path / "model.json"
+    _model(source)
+    with monkeypatch.context() as previous_version:
+        for stage in get_workflow("gapfill").stages:
+            if stage.id == "validate-gapfill":
+                previous_version.setattr(stage, "implementation_version", 1)
+        start(_config(tmp_path, source))
+    before = get_status(tmp_path / "run")["steps"]
+
+    resume(tmp_path / "run")
+    after = get_status(tmp_path / "run")["steps"]
+
+    assert (
+        after["validate-gapfill"]["attempt"]
+        == before["validate-gapfill"]["attempt"] + 1
+    )
+    for stage_id in (
+        "characterize-gapfill-baseline",
+        "generate-gapfill-plan",
+        "apply-gapfill",
+    ):
+        assert after[stage_id]["attempt"] == before[stage_id]["attempt"]
+
+
 def test_reference_gapfill_uses_human_database_integration(tmp_path):
     fixture = (
         Path(__file__).parents[1]

@@ -12,6 +12,18 @@ model**.
 
 ## Registered validation workflow
 
+For a quick one-off check, pass a model directly. This uses the
+`structural-fast` profile and prints a compact result; use `--json` for the
+full report or override the profile and solver behavior:
+
+```bash
+thg-run validate path/to/model.json
+thg-run validate path/to/model.json --profile final-standard --run-solver --json
+```
+
+The direct form does not create a resumable run or run MEMOTE. Use the
+configuration form below when those artifacts are required.
+
 Save the configuration as `configs/validation.json` and run
 `thg-run validate configs/validation.json` with a model and a reusable profile.
 It can write structural, chemical, topology, and optional solver-backed checks, plus
@@ -24,6 +36,16 @@ model-test failures.
  "validation": {"input_model": "../inputs/models/model.json", "profile": "final-standard",
                  "run_memote": false}}
 ```
+
+The registered workflow writes one canonical `validation-report.json`, a
+self-contained `validation-report.html` viewer, and `validation-summary.md`.
+The HTML is rendered from the JSON and does not rerun or reinterpret checks.
+
+Stoichiometric consistency is diagnostic in every profile, including
+`release-full`: failure produces a warning rather than blocking release.
+The check seeks positive conserved metabolite weights over internal reactions,
+excluding boundary reactions. Pool metabolites and lumped reactions may need
+manual interpretation; warnings remain visible for review.
 
 ## Metabolic task API
 

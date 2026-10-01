@@ -15,14 +15,39 @@ from typing import Any
 from .analysis import consistency
 from .gpr import ast_gpr
 
+_STRUCTURAL = frozenset({"reference-integrity", "identifier-uniqueness", "gpr"})
 PROFILES: dict[str, dict[str, object]] = {
-    "structural-fast": {"solver": False, "release_blocking": True},
-    "beta1-standard": {"solver": True, "release_blocking": True},
-    "beta2-standard": {"solver": True, "release_blocking": True},
-    "post-gapfill": {"solver": True, "release_blocking": True},
-    "final-standard": {"solver": True, "release_blocking": True},
-    "cell-specific-standard": {"solver": True, "release_blocking": True},
-    "release-full": {"solver": True, "release_blocking": True},
+    "structural-fast": {"solver": False, "blocking": _STRUCTURAL},
+    "beta1-standard": {
+        "solver": True,
+        "blocking": _STRUCTURAL | {"objective-feasibility"},
+    },
+    "beta2-standard": {
+        "solver": True,
+        "blocking": _STRUCTURAL | {"objective-feasibility"},
+    },
+    "post-gapfill": {
+        "solver": True,
+        "blocking": _STRUCTURAL | {"objective-feasibility", "flux-consistency"},
+    },
+    "final-standard": {
+        "solver": True,
+        "blocking": _STRUCTURAL | {"objective-feasibility", "flux-consistency"},
+    },
+    "cell-specific-standard": {
+        "solver": True,
+        "blocking": _STRUCTURAL | {"objective-feasibility"},
+    },
+    "release-full": {
+        "solver": True,
+        "blocking": _STRUCTURAL
+        | {
+            "mass-balance",
+            "charge-balance",
+            "objective-feasibility",
+            "flux-consistency",
+        },
+    },
 }
 
 
@@ -51,15 +76,21 @@ def _check(
 ) -> CheckResult:
     try:
         value = fn()
-        passed = (
-            value["passed"]
-            if isinstance(value, Mapping) and isinstance(value.get("passed"), bool)
-            else bool(value) if isinstance(value, bool) else True
-        )
+        passed = value.get("passed") if isinstance(value, Mapping) else value
+        passed = passed if isinstance(passed, bool) else None
+        detail_status = value.get("status") if isinstance(value, Mapping) else None
         return CheckResult(
             check_id,
             family,
-            "passed" if passed else "failed",
+            (
+                "infrastructure-error"
+                if passed is None and detail_status == "infrastructure-error"
+                else "not-evaluated"
+                if passed is None
+                else "passed"
+                if passed
+                else "failed"
+            ),
             passed,
             value if isinstance(value, Mapping) else {"value": value},
             blocking,
@@ -217,7 +248,7 @@ def stoichiometric_consistency(model: Any) -> dict[str, object]:
         from scipy.optimize import linprog
 
         metabolites = list(model.metabolites)
-        reactions = list(model.reactions)
+        reactions = [reaction for reaction in model.reactions if not reaction.boundary]
         matrix = np.zeros((len(reactions), len(metabolites)))
         positions = {
             metabolite.id: index for index, metabolite in enumerate(metabolites)
@@ -227,9 +258,9 @@ def stoichiometric_consistency(model: Any) -> dict[str, object]:
                 matrix[row, positions[metabolite.id]] = float(coefficient)
         result = linprog(
             np.zeros(len(metabolites)),
-            A_eq=np.vstack((matrix, np.ones(len(metabolites)))),
-            b_eq=np.r_[np.zeros(len(reactions)), 1.0],
-            bounds=[(1e-9, None)] * len(metabolites),
+            A_eq=matrix,
+            b_eq=np.zeros(len(reactions)),
+            bounds=[(1.0, None)] * len(metabolites),
             method="highs",
         )
         return {
@@ -244,16 +275,16 @@ def stoichiometric_consistency(model: Any) -> dict[str, object]:
 def minimal_inconsistent_sets(
     model: Any, *, maximum: int | None = None
 ) -> dict[str, object]:
-    """Return singleton sets; larger MILP sets are intentionally bounded."""
+    """Return blocked-reaction singletons, not a mathematical MIS analysis."""
     blocked = consistency.blocked_reactions(model)
     sets = [[reaction_id] for reaction_id in blocked]
     if maximum is not None:
         sets = sets[:maximum]
     return {
-        "method": "singleton-blocked-reactions",
-        "complete": True,
+        "method": "blocked-reaction-singletons",
+        "complete": maximum is None or maximum >= len(blocked),
         "sets": sets,
-        "passed": not sets,
+        "passed": not blocked,
     }
 
 
@@ -279,6 +310,7 @@ def validate_model(
     if profile not in PROFILES:
         raise ValueError(f"unknown validation profile: {profile}")
     solver = bool(PROFILES[profile]["solver"]) if run_solver is None else run_solver
+    blocking = PROFILES[profile]["blocking"]
     # Several checks consume the same model-wide topology/solver result. Cache
     # those values for the duration of this validation pass; in particular,
     # blocked-reaction and FVA analyses can each invoke a full LP/MILP sweep.
@@ -321,14 +353,30 @@ def validate_model(
         )
 
     checks = [
-        _check("reference-integrity", "structural", lambda: _references(model)),
-        _check("identifier-uniqueness", "structural", lambda: _ids(model)),
-        _check("gpr", "structural", lambda: _gprs(model)),
         _check(
-            "mass-balance", "chemical", lambda: _mass_balance(model), blocking=False
+            "reference-integrity",
+            "structural",
+            lambda: _references(model),
+            blocking="reference-integrity" in blocking,
         ),
         _check(
-            "charge-balance", "chemical", lambda: _charge_balance(model), blocking=False
+            "identifier-uniqueness",
+            "structural",
+            lambda: _ids(model),
+            blocking="identifier-uniqueness" in blocking,
+        ),
+        _check("gpr", "structural", lambda: _gprs(model), blocking="gpr" in blocking),
+        _check(
+            "mass-balance",
+            "chemical",
+            lambda: _mass_balance(model),
+            blocking="mass-balance" in blocking,
+        ),
+        _check(
+            "charge-balance",
+            "chemical",
+            lambda: _charge_balance(model),
+            blocking="charge-balance" in blocking,
         ),
         _check(
             "dead-end-topology",
@@ -353,7 +401,7 @@ def validate_model(
             "stoichiometric-consistency",
             "stoichiometry",
             lambda: stoichiometric_consistency(model),
-            blocking=False,
+            blocking="stoichiometric-consistency" in blocking,
         ),
         _check(
             "workflow-specific-invariants",
@@ -378,6 +426,7 @@ def validate_model(
                         "blocked": _blocked(),
                         "passed": not _blocked(),
                     },
+                    blocking="flux-consistency" in blocking,
                 ),
                 _check(
                     "energy-generating-cycles",
@@ -389,10 +438,10 @@ def validate_model(
                     blocking=False,
                 ),
                 _check(
-                    "minimal-inconsistent-sets",
+                    "blocked-reaction-singletons",
                     "solver",
                     lambda: {
-                        "method": "singleton-blocked-reactions",
+                        "method": "blocked-reaction-singletons",
                         "complete": True,
                         "sets": [[reaction_id] for reaction_id in _blocked()],
                         "passed": not _blocked(),
@@ -403,6 +452,7 @@ def validate_model(
                     "objective-feasibility",
                     "solver",
                     lambda: _objective(model),
+                    blocking="objective-feasibility" in blocking,
                 ),
             ]
         )

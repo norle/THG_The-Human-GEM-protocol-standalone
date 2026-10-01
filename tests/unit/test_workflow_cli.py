@@ -26,6 +26,12 @@ def test_cli_parser_exposes_all_commands_and_help(capsys):
     assert parser.parse_args(["-v", "beta1", "config.json"]).verbose == 1
     assert parser.parse_args(["resume", "run", "-vv"]).verbose == 2
     assert parser.parse_args(["beta1", "config.json", "-q"]).quiet
+    direct = parser.parse_args(
+        ["validate", "model.json", "--profile", "final-standard", "--no-run-solver"]
+    )
+    assert direct.config_or_model == Path("model.json")
+    assert direct.profile == "final-standard"
+    assert direct.run_solver is False
 
     with pytest.raises(SystemExit) as error:
         main(["--help"])
@@ -120,3 +126,40 @@ def test_status_json_is_read_only_and_parseable(tmp_path, capsys):
     output = json.loads(capsys.readouterr().out)
     assert output["overall_status"] == "pending"
     assert (tmp_path / "manifest.json").read_text(encoding="utf-8") == before
+
+
+def test_direct_validation_accepts_model_path_and_cli_defaults(tmp_path, capsys):
+    import cobra
+    from cobra.io import save_json_model
+
+    source = cobra.Metabolite("source_c", formula="H2O", charge=0, compartment="c")
+    product = cobra.Metabolite("product_c", formula="H2O", charge=0, compartment="c")
+    reaction = cobra.Reaction("convert")
+    reaction.add_metabolites({source: -1, product: 1})
+    model = cobra.Model("direct-validation")
+    model.add_reactions([reaction])
+    path = tmp_path / "model.json"
+    save_json_model(model, str(path))
+
+    assert main(["validate", str(path), "--json"]) == 0
+    report = json.loads(capsys.readouterr().out)
+    assert report["profile"] == "structural-fast"
+    assert report["passed"] is True
+
+
+def test_configured_validation_uses_config_path(tmp_path, monkeypatch, capsys):
+    config = tmp_path / "validation.json"
+    config.write_text(
+        json.dumps(
+            {
+                "workflow": "validate",
+                "run": {"name": "validation", "output_dir": str(tmp_path / "run")},
+                "validation": {"input_model": str(MODEL)},
+            }
+        ),
+        encoding="utf-8",
+    )
+    monkeypatch.setattr("thg_protocol.workflow.cli.start", lambda path: path)
+
+    assert main(["validate", str(config)]) == 0
+    assert str(config) in capsys.readouterr().out
