@@ -50,9 +50,11 @@ def _task_results(model: Any, section: Mapping[str, object]) -> dict[str, object
     task_suite = section.get("task_suite")
     if not isinstance(task_suite, str):
         return {"status": "not-requested", "passed": None, "tasks": []}
-    from thg_protocol.tasks import load_task_suite, run_task_suite
+    from thg_protocol.raven_tasks import load_task_input
+    from thg_protocol.tasks import run_task_suite
 
-    return run_task_suite(model, load_task_suite(task_suite))
+    suite = load_task_input(task_suite, model, mapping=section.get("task_mapping"))
+    return run_task_suite(model, suite)
 
 
 def _gimme_objective_results(
@@ -163,7 +165,7 @@ class CellSpecificStage:
             },
         }
         if isinstance(section, Mapping):
-            for key in ("input_model", "expression_file", "task_suite"):
+            for key in ("input_model", "expression_file", "task_suite", "task_mapping"):
                 value = section.get(key)
                 if isinstance(value, str) and Path(value).is_file():
                     result[f"{key}_sha256"] = sha256_file(value)
@@ -930,9 +932,9 @@ class CellSpecificStage:
             source = Path(str(section["input_model"]))
             task_suite_version = None
             if isinstance(section.get("task_suite"), str):
-                from thg_protocol.tasks import load_task_suite
+                from thg_protocol.raven_tasks import task_input_version
 
-                task_suite_version = load_task_suite(str(section["task_suite"])).version
+                task_suite_version = task_input_version(str(section["task_suite"]))
             gimme_solver_names = sorted(
                 {
                     str(row.get("solver_name", "unknown"))

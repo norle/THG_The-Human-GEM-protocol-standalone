@@ -110,7 +110,8 @@ def test_tasks_copy_model_and_classify_solver_status(tmp_path):
     source = model()
     before = [tuple(reaction.bounds) for reaction in source.reactions]
     report = run_task(source, MetabolicTask("core-convert", bounds={"convert": (0, 0)}))
-    assert report["status"] == "optimal"
+    assert report["status"] == "passed"
+    assert report["solver_status"] == "optimal"
     assert [tuple(reaction.bounds) for reaction in source.reactions] == before
     suite = TaskSuite("core", "1", (MetabolicTask("task", expected=False),))
     assert run_task_suite(source, suite)["suite_version"] == "1"
@@ -135,7 +136,7 @@ def test_task_temporary_reactions_round_trip_and_execute(tmp_path):
     )
     loaded = load_task_suite(suite_path)
     assert len(loaded.tasks[0].temporary_reactions) == 1
-    assert run_task(model(), loaded.tasks[0])["status"] == "optimal"
+    assert run_task(model(), loaded.tasks[0])["status"] == "passed"
 
 
 def test_memote_adapter_records_command_failure_and_artifact_manifest(

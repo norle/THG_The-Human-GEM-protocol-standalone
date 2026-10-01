@@ -43,6 +43,7 @@ WORKFLOW_SECTION_KEYS = {
         "bounds",
         "gpr",
         "task_suite",
+        "task_mapping",
         "validation_profile",
     },
     "beta1": {
@@ -137,6 +138,7 @@ WORKFLOW_SECTION_KEYS = {
         "preserved_reactions",
         "exchange_settings",
         "task_suite",
+        "task_mapping",
         "validation_profile",
         "matrix_key",
         "legacy_row_order",
@@ -166,6 +168,7 @@ WORKFLOW_SECTION_KEYS = {
         "penalties",
         "validation_profile",
         "task_suite",
+        "task_mapping",
     },
     "reference": {"human_database_integration"},
 }
@@ -414,13 +417,14 @@ def _parse_workflow(
                     raise ConfigError(
                         "'cell_specific.preserved_reactions' must be a list"
                     )
-                if "task_suite" in value:
-                    value["task_suite"] = str(
-                        _input_path(
-                            _required_string(value, "task_suite", "cell_specific"),
-                            input_base,
+                for key in ("task_suite", "task_mapping"):
+                    if key in value:
+                        value[key] = str(
+                            _input_path(
+                                _required_string(value, key, "cell_specific"),
+                                input_base,
+                            )
                         )
-                    )
                 if "gene_mapping" in value and not isinstance(
                     value["gene_mapping"], dict
                 ):
@@ -719,7 +723,7 @@ def _parse_workflow(
                             "gapfill milp does not accept: "
                             + ", ".join(sorted(incompatible & set(value)))
                         )
-                for file_key in ("candidate_universe", "task_suite"):
+                for file_key in ("candidate_universe", "task_suite", "task_mapping"):
                     if file_key in value:
                         value[file_key] = str(
                             _input_path(
@@ -895,6 +899,7 @@ def _resolve_workflow_paths(value: object, base: Path, *, key: str = "") -> obje
             "beta2_model",
             "database_model",
             "task_suite",
+            "task_mapping",
             "uniprot_snapshot",
             "rhea_snapshot",
             "reactome_snapshot",

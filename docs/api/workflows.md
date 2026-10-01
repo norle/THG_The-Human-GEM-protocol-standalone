@@ -42,11 +42,26 @@ writers below.
     options:
       members:
         - MetabolicTask
+        - TaskObjective
         - TaskSuite
         - load_task_suite
+        - save_task_suite
         - run_task
         - run_tasks
         - run_task_suite
+
+::: thg_protocol.raven_tasks
+    options:
+      members:
+        - RavenImport
+        - TaskMapping
+        - convert_raven_tasks
+        - import_raven_tasks
+        - is_raven_table
+        - load_task_input
+        - load_task_mapping
+        - read_raven_rows
+        - task_input_version
 
 ::: thg_protocol.memote
     options:

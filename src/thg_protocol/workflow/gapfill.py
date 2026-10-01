@@ -117,9 +117,11 @@ def _task_report(model: Any, section: Mapping[str, object]) -> dict[str, object]
     task_suite = section.get("task_suite")
     if not isinstance(task_suite, str):
         return {"status": "not-requested", "tasks": [], "passed": None}
-    from thg_protocol.tasks import load_task_suite, run_task_suite
+    from thg_protocol.raven_tasks import load_task_input
+    from thg_protocol.tasks import run_task_suite
 
-    return run_task_suite(model, load_task_suite(task_suite))
+    suite = load_task_input(task_suite, model, mapping=section.get("task_mapping"))
+    return run_task_suite(model, suite)
 
 
 def _as_error_status(value: object) -> object:
@@ -264,13 +266,14 @@ class GapfillStage:
             data["algorithm"] = {
                 key: value
                 for key, value in section.items()
-                if key not in {"validation_profile", "task_suite"}
+                if key not in {"validation_profile", "task_suite", "task_mapping"}
             }
             data["candidate_universe_sha256"] = _hash(section.get("candidate_universe"))
             data["universal_model_sha256"] = _hash(section.get("universal_model"))
         elif self.id == "characterize-gapfill-baseline":
             data["validation_profile"] = section.get("validation_profile")
             data["task_suite_sha256"] = _hash(section.get("task_suite"))
+            data["task_mapping_sha256"] = _hash(section.get("task_mapping"))
         elif self.id in {
             "validate-gapfill",
             "gate-gapfill",
@@ -278,6 +281,7 @@ class GapfillStage:
         }:
             data["validation_profile"] = section.get("validation_profile")
             data["task_suite_sha256"] = _hash(section.get("task_suite"))
+            data["task_mapping_sha256"] = _hash(section.get("task_mapping"))
         return data
 
     def run(self, context: StageContext, work_dir: Path) -> StageResult:
@@ -380,6 +384,7 @@ class GapfillStage:
                     "method",
                     "validation_profile",
                     "task_suite",
+                    "task_mapping",
                     "candidate_universe",
                     "external_input",
                     "input_model",

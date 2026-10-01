@@ -49,6 +49,8 @@ models/
 /files/*
 !/files/pathway/
 !/files/pathway/**
+!/files/metabolic_tasks/
+!/files/metabolic_tasks/**
 /files/caches/
 /files/*cache*
 /files/*checkpoint*

@@ -284,11 +284,12 @@ class FinalTHGStage:
                     input_hashes["reference_upstream"] = {
                         "error": f"{type(error).__name__}: {error}"
                     }
-            task_suite = section.get("task_suite")
-            if isinstance(task_suite, str):
-                result["task_suite_sha256"] = (
-                    sha256_file(task_suite) if Path(task_suite).is_file() else None
-                )
+            for key in ("task_suite", "task_mapping"):
+                path = section.get(key)
+                if isinstance(path, str):
+                    result[f"{key}_sha256"] = (
+                        sha256_file(path) if Path(path).is_file() else None
+                    )
             result["inputs"] = input_hashes
         return result
 
@@ -414,9 +415,13 @@ class FinalTHGStage:
             )
             task_suite = None
             if isinstance(section.get("task_suite"), str):
-                from thg_protocol.tasks import load_task_suite
+                from thg_protocol.raven_tasks import load_task_input
 
-                task_suite = load_task_suite(str(section["task_suite"]))
+                task_suite = load_task_input(
+                    str(section["task_suite"]),
+                    model,
+                    mapping=section.get("task_mapping"),
+                )
             from thg_protocol.merge import validate_merged_model
 
             report = validate_merged_model(

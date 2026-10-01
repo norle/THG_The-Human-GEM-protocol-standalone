@@ -59,7 +59,8 @@
     {"module": "thg_protocol.pathway.cli", "page": "api/cli.md", "symbols": ["build_parser", "main"]},
     {"module": "thg_protocol.workflow.cli", "page": "api/cli.md", "symbols": ["build_parser", "main"]},
     {"module": "thg_protocol.validation", "page": "api/workflows.md", "symbols": ["PROFILES", "CheckResult", "load_model", "minimal_inconsistent_sets", "stoichiometric_consistency", "validate_model"]},
-    {"module": "thg_protocol.tasks", "page": "api/workflows.md", "symbols": ["MetabolicTask", "TaskSuite", "load_task_suite", "run_task", "run_tasks", "run_task_suite"]},
+    {"module": "thg_protocol.tasks", "page": "api/workflows.md", "symbols": ["MetabolicTask", "TaskObjective", "TaskSuite", "load_task_suite", "save_task_suite", "run_task", "run_tasks", "run_task_suite"]},
+    {"module": "thg_protocol.raven_tasks", "page": "api/workflows.md", "symbols": ["RavenImport", "TaskMapping", "convert_raven_tasks", "import_raven_tasks", "is_raven_table", "load_task_input", "load_task_mapping", "read_raven_rows", "task_input_version"]},
     {"module": "thg_protocol.memote", "page": "api/workflows.md", "symbols": ["run_memote"]}
   ],
   "compatibility_exports": [
