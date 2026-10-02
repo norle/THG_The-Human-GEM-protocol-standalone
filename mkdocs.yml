@@ -81,6 +81,7 @@ nav:
           - Human Database: workflows/human-database.md
           - Pathway implementation: workflows/pathway.md
           - Validation: workflows/validation.md
+          - Conservation: workflows/conservation.md
           - Reproducible and resumable runs: workflows/runs.md
   - Tools:
       - Model construction and enrichment: tools/model-construction.md

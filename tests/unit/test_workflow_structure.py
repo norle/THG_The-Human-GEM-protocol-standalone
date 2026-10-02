@@ -53,6 +53,7 @@ def test_public_runner_and_builtin_registry_contract():
         "reference",
         "validate",
         "compare",
+        "conservation",
         "cell-specific",
         "pathway",
         "human-database",

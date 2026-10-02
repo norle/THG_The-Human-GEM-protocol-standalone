@@ -136,6 +136,7 @@ def build_parser() -> argparse.ArgumentParser:
         "reference",
         "validate",
         "compare",
+        "conservation",
         "cell-specific",
         "pathway",
     ):
@@ -237,6 +238,7 @@ def main(argv: list[str] | None = None) -> int:
             "reference",
             "validate",
             "compare",
+            "conservation",
             "cell-specific",
             "pathway",
         }:

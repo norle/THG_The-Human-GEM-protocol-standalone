@@ -7,6 +7,7 @@
     {"page": "workflows/human-database.md", "symbols": ["thg_protocol.database.reconstruct_model_from_json", "thg_protocol.database_workflow.harvest_snapshot"], "cli": "thg-run start"},
     {"page": "workflows/final-thg.md", "symbols": ["thg_protocol.merge.generate_merge_plan", "thg_protocol.merge.apply_merge_plan", "thg_protocol.merge.merge_models", "thg_protocol.merge.validate_merged_model"], "cli": "thg-run start"},
     {"page": "workflows/validation.md", "symbols": ["thg_protocol.validation.validate_model", "thg_protocol.tasks.run_task_suite", "thg_protocol.memote.run_memote"], "cli": "thg-run validate"},
+    {"page": "workflows/conservation.md", "symbols": ["thg_protocol.analysis.conservation.find_unconserved_metabolites", "thg_protocol.analysis.conservation.localize", "thg_protocol.analysis.conservation.propose_fixes", "thg_protocol.analysis.conservation.apply_conservation_fixes"], "cli": "thg-run conservation"},
     {"page": "workflows/runs.md", "symbols": ["thg_protocol.workflow.runner.start", "thg_protocol.workflow.runner.resume", "thg_protocol.workflow.runner.get_status"], "cli": "thg-run"},
     {"page": "tools/model-construction.md", "symbols": ["thg_protocol.database.reconstruct_model", "thg_protocol.database.reconstruct_model_from_json", "thg_protocol.model_build.build_model"], "cli": null},
     {"page": "tools/annotation.md", "symbols": ["thg_protocol.annotation.model_annotations.analyze_model_annotations", "thg_protocol.gpr.lookup.get_gpr", "thg_protocol.gpr.location.resolve_locations"], "cli": null},

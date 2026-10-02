@@ -125,6 +125,13 @@ WORKFLOW_SECTION_KEYS = {
         "reference_model",
     },
     "compare": {"left", "right", "upstream"},
+    "conservation": {
+        "input_model",
+        "comparison_model",
+        "exclusions",
+        "decisions_file",
+        "upstream",
+    },
     "cell_specific": {
         "input_model",
         "expression_file",
@@ -341,6 +348,27 @@ def _parse_workflow(
                         MODEL_SUFFIXES,
                     )
                 )
+            if section == "conservation":
+                value = dict(value)
+                value["input_model"] = str(
+                    _input_path(
+                        _required_string(value, "input_model", section),
+                        input_base,
+                        "conservation.input_model",
+                        MODEL_SUFFIXES,
+                    )
+                )
+                if "comparison_model" in value:
+                    value["comparison_model"] = str(
+                        _input_path(
+                            _required_string(value, "comparison_model", section),
+                            input_base,
+                            "conservation.comparison_model",
+                            MODEL_SUFFIXES,
+                        )
+                    )
+                if "decisions_file" in value:
+                    _required_string(value, "decisions_file", section)
             for key in ("exclusions", "conservation_exclusions"):
                 if section in {"conservation", "validation"} and key in value:
                     items = value[key]
@@ -916,6 +944,7 @@ def _resolve_workflow_paths(value: object, base: Path, *, key: str = "") -> obje
             "run_dir",
             "cache_dir",
             "input_model",
+            "comparison_model",
             "records",
             "beta2_model",
             "database_model",

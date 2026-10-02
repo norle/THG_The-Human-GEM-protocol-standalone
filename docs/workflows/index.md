@@ -23,6 +23,7 @@ an existing THG reference model.
 | [Compare](../tools/analysis.md) | Produce a semantic comparison of two model inputs | `thg-run compare CONFIG` |
 | [Human Database](human-database.md) | Reconstruct a model independently for optional integration before gapfill | `thg-run start configs/human-database.json` |
 | [Validation](validation.md) | Running reusable checks or MEMOTE | `thg-run validate configs/validation.json` |
+| [Conservation](conservation.md) | Finding, reviewing and fixing unconserved metabolites | `thg-run conservation CONFIG` |
 | [Runs](runs.md) | Resuming, auditing, or recovering a run | `thg-run resume RUN_DIR` |
 
 The standalone `thg-compare` command remains useful for quick analysis; the

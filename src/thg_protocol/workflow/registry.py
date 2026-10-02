@@ -110,6 +110,7 @@ def register_builtin_workflows() -> None:
     from .beta2.definition import BETA2_WORKFLOW
     from .cell_specific import CELL_SPECIFIC_WORKFLOW
     from .compare import COMPARE_WORKFLOW
+    from .conservation import CONSERVATION_WORKFLOW
     from .final_thg import FINAL_THG_WORKFLOW
     from .gapfill import GAPFILL_WORKFLOW
     from .human_database import HUMAN_DATABASE_WORKFLOW
@@ -131,6 +132,7 @@ def register_builtin_workflows() -> None:
             "Model validation and optional MEMOTE checks",
         ),
         COMPARE_WORKFLOW,
+        CONSERVATION_WORKFLOW,
         CELL_SPECIFIC_WORKFLOW,
         PATHWAY_WORKFLOW,
     )

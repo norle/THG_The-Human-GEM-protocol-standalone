@@ -1,8 +1,182 @@
 # Unconserved metabolites: detect, localize, propose, review, apply
 
-Plan only; nothing is implemented. Written 2026-10-01. Related:
+Written 2026-10-01; implemented 2026-10-01/02 in `analysis/conservation.py`,
+the `conservation` workflow and the validation checks; see
+`docs/workflows/conservation.md` and `docs/workflows/validation.md`.
+Detection reuses MEMOTE's `check_stoichiometric_consistency` /
+`find_unconserved_metabolites` with the model's solver; localization is one
+optlang LP built the same way. The sections from **Goal** on are the
+original plan; where they differ from the implementation (step 2 in
+particular), the next section is authoritative. Related:
 `metabolic_task_leaks_plan.md` (VerifyModel leaks in the endo models) and
 `metabolic_task_decisions.md` (open decision 1).
+
+## What was implemented and why (2026-10-02)
+
+All changes are uncommitted on `refactoring-cleanup`. Measurements are on
+`models/THG-beta1.xml` against `models/Human-GEM_2022-06-21.xml`.
+
+### 1. Localization: one LP instead of one LP per metabolite
+
+**What.** `blame_reactions` in `analysis/conservation.py` solves
+
+    min Σ_j w_j |s_j|   s.t.   Σ_i S_ij m_i = s_j,   m_i ≥ 1
+
+over the non-excluded internal reactions. Every metabolite gets a positive
+mass; `s_j` is the mass reaction `j` creates or destroys. Reactions with
+`s_j ≠ 0` are **blamed**. `leakage_modes`, `rank_reactions` and the
+`conservation.max_modes` key were removed.
+
+**Why.**
+
+- The per-metabolite leakage-mode LPs did not scale: β1 has 7,428
+  unconserved metabolites, and GLPK found 20 modes in more than 25 minutes.
+  Nearly the whole model being unconserved meant a few reactions were the
+  cause, so the question is better asked of reactions than of metabolites.
+- One LP of about the detection LP's size: 22 s with Gurobi, 311 s with
+  GLPK. It needs no list of unconserved metabolites.
+- Removing the blamed reactions always restores consistency, because `m`
+  then conserves every remaining reaction. Verified on β1 with MEMOTE: 66
+  reactions blamed, consistent after removal.
+- It is the LP relaxation of the minimal-inconsistent-set MILP that did not
+  finish at Human-GEM scale: small, not provably minimal.
+
+**Tie-break.** A loop can be broken at several reactions at equal cost.
+`chemically_suspect` reactions (element or charge imbalance, a metabolite
+without formula or charge, a non-integer coefficient) cost 1, all others
+1.001, so ties go to suspect reactions and the optimum moves by at most
+0.1%. It uses the model alone.
+
+**Rejected alternatives.**
+
+- Origin weights (added 1, changed 2, unchanged 10 relative to the input
+  model): blamed only β1-introduced reactions, but made the result depend
+  on the input model.
+- Reading leakage modes from the LP dual: the dual flux covered about
+  11,000 reactions, too many to show a curator.
+- A joint "reaction or formula" LP (`m` anchored to atom counts with weight
+  λ, to blame wrong formulas): at λ = 0.1 it shifted about 10,700 formulas,
+  at λ = 1-10 it blamed 157-228 reactions, and atom counts are no mass
+  anchor with `R`/`X` pseudo-elements (ACP is `HOR`). It also could not have
+  caught the EPA case below, where the formula is right and the identity is
+  wrong.
+
+### 2. Chemical flags on blamed reactions and new proposal rules
+
+**What.** `localize` reports each blamed reaction with its imbalance,
+origin, element and charge balance, non-integer coefficients
+(`fractional-coefficients`), metabolites whose formula disagrees
+(`formula-disagreement`) and possibly mislabelled metabolites
+(`possibly-mislabelled`). Flagged reactions come first; the review page
+shows flagged and unflagged blamed reactions in separate tables.
+`propose_fixes` works per blamed reaction, with a new rule
+`integer-stoichiometry`: each non-integer coefficient is rounded down or up
+(never to zero) and the element-balanced results are proposed. The re-check
+reruns the LP and reports a fix as ineffective when its reaction is still
+blamed.
+
+**Why.** The LP says which reactions break conservation, not what is wrong
+with them. The flags say what, and separate real culprits from innocent
+loop members. On β1 most culprits carry fitted coefficients
+(`1.2 O2 -> 1.5 product`, `2.5 O2`, `1.3 …`), hence the integer rule.
+
+### 3. Validation checks
+
+**What** (`validation.py`, all diagnostic in every profile, no solver):
+
+| Check | Flags | β1 vs Human-GEM |
+| --- | --- | --- |
+| `fractional-coefficients` | Internal reactions with non-integer coefficients (pseudo-reactions skipped by the conservation exclusion rules) | 202 |
+| `formula-disagreement` | Formula or charge differing across compartments or from the reference (compared as element counts) | 0 |
+| `annotation-conflict` | Names shared by different compounds (formula beyond H, or KEGG); metabolites renamed from the reference to another, conflicting compound's name | 19 names, 33 renamed |
+| `unusual-protons` | More than 10 H+, new or changed relative to the reference | 22 |
+
+`validation.reference_model` (optional) names the model the checked one
+derives from; its conservation exclusions carry over and the checks above
+compare against it. The closed-medium FVA `energy-generating-cycles` check
+was removed. A β1 validation run with `beta1-standard` and solver checks
+takes about 5 minutes with Gurobi.
+
+**Why.**
+
+- Fractional coefficients and wrong identities were the main causes found
+  on β1; the checks find them without the LP.
+- ChEBI is not compared because it gives an acid and its conjugate base
+  different IDs (hundreds of false conflicts). The rename check requires the
+  new name to belong to another, conflicting compound; any name change gave
+  1,289 hits, mostly spelling ("eicosenoyl" -> "Icosenoyl").
+- Proton limit 10: Human-GEM itself has 139 reactions above 4 and 63 above
+  10 (mostly transport chains); compared with the reference, β1 has 22, all
+  new or changed, including known culprits.
+- The removed check reported internal loops, not energy-generating cycles,
+  and a second full FVA was too slow at β1 scale.
+
+### 4. The EPA case: wrong mappings in the legacy merge
+
+**Finding.** `R08179_c` (`EPA-CoA + H2O -> 2 EPA + CoA + 14 H+`) is
+element-balanced but wrong. Human Database has it right (`EPA-CoA + H2O ->
+CoA + H+ + EPA`, KEGG `C06428`, `C20H29O2`). The legacy merge that built
+THG-2023-02-25, and from it β1, mapped `C06428` onto Human-GEM's
+`MAM00668c` (2-naphthol, `C10H8O`, KEGG `C11713`), renamed it to
+icosapentaenoic acid, and fitted the coefficients to the wrong formula.
+Human-GEM's real EPA is `MAM01784`, and Human-GEM itself is correctly named.
+The same merge renamed about 30 other Human-GEM metabolites to other
+compounds' names, for example succinylacetone -> arachidonyl-CoA, maltose ->
+presqualene diphosphate, midazolam -> 2-oxoglutaramate, histidine ->
+1-alkenyl-2-acylglycerol, sucrose -> 5-phosphoribosylamine, tyramine ->
+2-hydroxyglutarate, valeric acid -> selenite.
+
+**Prevention** (this repository; the legacy script is not part of it):
+
+- `merge.generate_merge_plan` already maps only on shared identifiers, never
+  on names. It now refuses a mapping (`identity-conflict`, unresolved) when
+  another identifier namespace disagrees or, under the default
+  `formula_charge="report"` policy, the formulas differ beyond hydrogen.
+- β1 identity scoring (`score_metabolite_candidate`) no longer counts a name
+  match whose formula conflicts beyond hydrogen; the β1 stage now passes
+  InChI/InChIKey/SMILES annotations as structural identifiers.
+- The β1 balance strategy was already safe: `proton-water` adds only H+/H2O
+  and only when that removes both element and charge residuals, so it cannot
+  fit `2 EPA + 14 H+`.
+- Shared helper: `model_build.mass_balance.formulas_conflict` (formulas that
+  differ only in H are protonation states, not a conflict).
+
+**Detection.** The charge flag (+14), `annotation-conflict`,
+`unusual-protons`, and the `possibly-mislabelled` flag on blamed reactions.
+
+**Not done.** The wrong mappings already in β1 are not repaired; the
+`annotation-conflict` details list them for curation.
+
+### 5. Solver
+
+cobrapy picks Gurobi, then CPLEX, then GLPK; `gurobipy` 12.0.1 is now
+installed in `thg_standalone`, so Gurobi is the default there. Two fixes
+followed:
+
+- `leakage_modes` (since removed) read the solution after changing a bound;
+  GLPK keeps the old solution, Gurobi discards it. The LP code now reads
+  results before any model change.
+- `thg-run validate MODEL --json` sends solver output to stderr, since
+  Gurobi's licence banner on stdout broke the JSON. The GIMME test accepts
+  the configured solver instead of GLPK.
+
+### Tests
+
+New or extended: `tests/unit/test_conservation.py`,
+`test_phase3_validation.py`, `test_beta1_curation.py`, `test_merge_api.py`,
+`test_workflow_structure.py`, `test_cell_specific_gimme.py`. 333 unit tests
+pass with Gurobi; the conservation, validation, merge and β1 curation tests
+also pass with GLPK. The strict docs build passes.
+
+### Next
+
+1. Curate the mislabelled metabolites in β1 (the `annotation-conflict`
+   list) and remap affected reactions, for example `R08179_c` to `MAM01784`.
+2. Run the `conservation` workflow on β1 against Human-GEM and review the
+   proposals.
+3. Review and commit.
+4. Later: stage-level use after each pipeline step; the "found while
+   planning" items below.
 
 ## Goal
 
@@ -59,7 +233,7 @@ copy and to the change ledger.
   decision 1 for its policy). It replaces the pass/fail-only
   `stoichiometric_consistency` result with one that names the metabolites.
 
-### 2. Localize (one LP per unconserved metabolite or group)
+### 2. Localize (one LP per unconserved metabolite or group; superseded by one LP, see above)
 
 - For an unconserved metabolite `i`, find the smallest combination of
   reactions (directions ignored, `min Σ|v|`) with `Sv ≥ 0` and `(Sv)ᵢ ≥ 1`,
@@ -159,10 +333,10 @@ produced it, and a confidence level. A fix whose "after" is still unbalanced
 
 ## Found while planning (not part of this flow)
 
-- The `energy-generating-cycles` check in `validation.py` runs closed-medium
-  FVA, so it reports internal loops, not energy-generating cycles. Rename
-  (e.g. `internal-cycles`), and add a real Fritzemeier test separately if
-  wanted.
+- The `energy-generating-cycles` check (closed-medium FVA, so it reported
+  internal loops, not energy-generating cycles) was removed from
+  `validation.py` on 2026-10-02: a second full FVA was too slow at beta1
+  scale. Add a real Fritzemeier test separately if wanted.
 - `minimal_inconsistent_sets` returns blocked-reaction singletons, not
   inconsistent sets; step 2 supersedes it.
 - MEMOTE runs only with `run_memote: true`, and its results never affect

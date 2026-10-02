@@ -11,6 +11,7 @@
 | `thg-run pathway CONFIG` | Run versioned pathway implementation |
 | `thg-run validate CONFIG` | Start a registered validation workflow |
 | `thg-run compare CONFIG` | Start a registered comparison workflow |
+| `thg-run conservation CONFIG` | Propose fixes for unconserved metabolites; rerun after writing decisions to apply them |
 | `thg-run resume RUN_DIR` | Resume valid stages |
 | `thg-run status RUN_DIR [--json]` | Inspect run state |
 | `thg-run unlock RUN_DIR [--force]` | Remove a stale lock deliberately |
