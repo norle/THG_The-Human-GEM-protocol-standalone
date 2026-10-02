@@ -69,12 +69,12 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Install solver dependencies
+      - name: Install solver and MEMOTE dependencies
         run: >-
           python -m pip install --upgrade pip &&
-          python -m pip install -c constraints/py312-glpk.txt -e ".[dev,solver]"
-      - name: Run solver tests
-        run: pytest -m "solver and not gurobi and not memote" || test "$?" -eq 5
+          python -m pip install -c constraints/py312-glpk.txt -e ".[dev,solver,memote]"
+      - name: Run solver and MEMOTE tests
+        run: pytest -m "(solver or memote) and not gurobi" || test "$?" -eq 5
 
   slow-online:
     if: github.event_name == 'workflow_dispatch' || github.event_name == 'schedule'
