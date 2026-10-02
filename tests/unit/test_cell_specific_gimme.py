@@ -87,7 +87,7 @@ def test_native_gimme_matches_frozen_compatibility_fixture():
             )
         ],
     )
-    assert "glpk" in result.solver_name.lower()
+    assert result.solver_name == model.solver.interface.__name__
     assert result.objective_maxima["out"] == pytest.approx(
         fixture["objective_maximum"]
     )
