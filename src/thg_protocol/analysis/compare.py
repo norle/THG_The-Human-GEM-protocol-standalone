@@ -145,10 +145,9 @@ def _categorize_signature_diff(
                 else:
                     category = "other_semantic_changes"
             elif collection == "metabolites":
-                if (
-                    before.get("formula") != after.get("formula")
-                    or before.get("charge") != after.get("charge")
-                ):
+                if before.get("formula") != after.get("formula") or before.get(
+                    "charge"
+                ) != after.get("charge"):
                     category = "formula_or_charge_correction"
                 elif before.get("compartment") != after.get("compartment"):
                     category = "localization_expansion"
@@ -290,6 +289,7 @@ def compare_workflow_runs(run_a: str | Path, run_b: str | Path) -> dict[str, Any
         ),
     }
     for role in ("validation", "tasks", "task-results"):
+
         def payload(root: Path, artifact_role: str = role) -> Any:
             manifest = json.loads((root / "manifest.json").read_text(encoding="utf-8"))
             paths = [
@@ -299,6 +299,7 @@ def compare_workflow_runs(run_a: str | Path, run_b: str | Path) -> dict[str, Any
                 if output.get("role") == artifact_role
             ]
             return json.loads(paths[-1].read_text(encoding="utf-8")) if paths else None
+
         a, b = payload(left), payload(right)
         if a != b:
             result[role] = {"changed": True, "a": a, "b": b}
@@ -340,6 +341,7 @@ def compare_models_from_files(
     include_blocked: bool = True,
 ) -> dict[str, dict[str, Any]]:
     """Load two JSON/SBML models and optionally write comparison CSV reports."""
+
     def load(path: Path) -> Any:
         from thg_protocol.io.models import load_model
 

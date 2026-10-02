@@ -100,7 +100,7 @@ class GprSelection:
 
 
 def _candidate_key(
-    candidate: tuple[str, tuple[str, ...], Mapping[str, object]]
+    candidate: tuple[str, tuple[str, ...], Mapping[str, object]],
 ) -> tuple[str, ...]:
     gpr, _, record = candidate
     return (

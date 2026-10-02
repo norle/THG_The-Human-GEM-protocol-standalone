@@ -64,9 +64,7 @@ def gather_metabolites(model: cobra.Model) -> list[tuple[str, str, str, str]]:
         # ``annotation`` is commonly a dict and therefore cannot itself be
         # placed in a set. Serialize a canonical key once instead of scanning
         # the growing output list for every metabolite.
-        key = json.dumps(
-            met_tuple, ensure_ascii=False, sort_keys=True, default=str
-        )
+        key = json.dumps(met_tuple, ensure_ascii=False, sort_keys=True, default=str)
         if key in seen:
             continue
         seen.add(key)

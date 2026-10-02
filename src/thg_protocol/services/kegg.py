@@ -151,8 +151,12 @@ class KeggClient:
             return self._cache[url]
         try:
             response = request(
-                self.session, "get", url, timeout=self.timeout,
-                retries=self.retries, backoff=self.backoff,
+                self.session,
+                "get",
+                url,
+                timeout=self.timeout,
+                retries=self.retries,
+                backoff=self.backoff,
             )
         except requests.RequestException as error:
             raise KeggError(f"KEGG request failed for {url}") from error

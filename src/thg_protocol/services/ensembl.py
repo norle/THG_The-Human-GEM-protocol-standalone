@@ -97,8 +97,12 @@ class EnsemblClient:
         url = f"{self.base_url}{path}"
         try:
             response = request(
-                self.session, method.lower(), url, timeout=self.timeout,
-                retries=self.retries, backoff=self.backoff,
+                self.session,
+                method.lower(),
+                url,
+                timeout=self.timeout,
+                retries=self.retries,
+                backoff=self.backoff,
                 headers={"Accept": "application/json"},
             )
             return response.json()

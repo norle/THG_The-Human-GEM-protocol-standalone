@@ -231,9 +231,11 @@ def get_gpr_evidence(
             warnings.append("biocyc-gene-list-no-complex-structure")
             break
 
-    symbols = list(genes_in_sgpr(canonical_node)) if canonical_node is not None else [
-        symbol for symbol, _ in pairs
-    ]
+    symbols = (
+        list(genes_in_sgpr(canonical_node))
+        if canonical_node is not None
+        else [symbol for symbol, _ in pairs]
+    )
     identifiers = [identifier for _, identifier in pairs]
     if canonical_node is not None and not identifiers:
         identifiers = list(structured.identifiers) or list(symbols)
@@ -282,9 +284,7 @@ def get_gpr_evidence(
         "candidate_sgpr": to_sgpr(node) if node is not None else "",
         "sgpr_structure": sgpr_to_dict(node) if node is not None else None,
         "legacy_sgpr_structure": (
-            sgpr_to_dict(default_sgpr_coefficients(node))
-            if node is not None
-            else None
+            sgpr_to_dict(default_sgpr_coefficients(node)) if node is not None else None
         ),
         "legacy_coefficients_defaulted": bool(node),
         "sgpr_status": (

@@ -215,11 +215,7 @@ class FinalTHGStage:
             if stage_id in {"final-thg-merge", "export-final-thg"}
             else "artifact"
         )
-        self.kind = (
-            "mutation"
-            if stage_id == "final-thg-merge"
-            else "analysis"
-        )
+        self.kind = "mutation" if stage_id == "final-thg-merge" else "analysis"
 
     def enabled(self, config: Any) -> bool:
         del config

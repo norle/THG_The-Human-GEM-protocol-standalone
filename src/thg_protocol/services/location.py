@@ -65,8 +65,12 @@ class LocationClient:
             return self._cache[url]
         try:
             response = request(
-                self.session, "get", url, timeout=self.timeout,
-                retries=self.retries, backoff=self.backoff,
+                self.session,
+                "get",
+                url,
+                timeout=self.timeout,
+                retries=self.retries,
+                backoff=self.backoff,
             )
         except requests.RequestException as error:
             raise LocationError(f"Location request failed for {url}") from error
@@ -79,8 +83,13 @@ class LocationClient:
             raise RuntimeError("LocationClient requires the 'requests' dependency")
         try:
             return request(
-                self.session, "post", url, files=files, timeout=self.timeout,
-                retries=self.retries, backoff=self.backoff,
+                self.session,
+                "post",
+                url,
+                files=files,
+                timeout=self.timeout,
+                retries=self.retries,
+                backoff=self.backoff,
             ).text
         except requests.RequestException as error:
             raise LocationError(f"Location upload failed for {url}") from error

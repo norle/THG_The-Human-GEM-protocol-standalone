@@ -10,8 +10,10 @@ from typing import Protocol
 try:
     from tqdm import tqdm
 except ImportError:  # pragma: no cover - exercised by clean-wheel checks
+
     def tqdm(iterable: Iterable[object], **_kwargs: object) -> Iterable[object]:
         return iterable
+
 
 from ._http import request
 
@@ -104,9 +106,7 @@ class UniProtClient(StaticUniProtClient):
     def annotations_for(
         self, identifiers: Iterable[str], *, progress: bool = False
     ) -> list[UniProtAnnotation]:
-        wanted = sorted(
-            {str(item).strip() for item in identifiers} - {""}
-        )
+        wanted = sorted({str(item).strip() for item in identifiers} - {""})
         local = super().annotations_for(wanted)
         if local or not wanted:
             return local
@@ -121,11 +121,7 @@ class UniProtClient(StaticUniProtClient):
             disable=not progress,
         ):
             query = " OR ".join(
-                (
-                    f"xref:ensembl-{item}"
-                    if item.startswith("ENS")
-                    else f"gene:{item}"
-                )
+                (f"xref:ensembl-{item}" if item.startswith("ENS") else f"gene:{item}")
                 for item in wanted[start : start + 100]
             )
             response = request(
@@ -181,9 +177,7 @@ class UniProtClient(StaticUniProtClient):
                     sl_id = str(value.get("location", {}).get("id", ""))
                     mappings = record.get("sl_to_go", {})
                     mapped = (
-                        mappings.get(sl_id, [])
-                        if isinstance(mappings, Mapping)
-                        else []
+                        mappings.get(sl_id, []) if isinstance(mappings, Mapping) else []
                     )
                     for gene_id in gene_ids:
                         parsed.extend(

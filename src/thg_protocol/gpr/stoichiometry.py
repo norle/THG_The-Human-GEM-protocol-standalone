@@ -217,8 +217,10 @@ def to_legacy_sgpr(node: SgprNode) -> str:
         operator = " and " if isinstance(value, AndNode) else " or "
         parts = [render(child) for child in value.children]
         if isinstance(value, AndNode):
-            parts = [part[1:-1] if isinstance(child, GeneNode) else part
-                     for child, part in zip(value.children, parts, strict=True)]
+            parts = [
+                part[1:-1] if isinstance(child, GeneNode) else part
+                for child, part in zip(value.children, parts, strict=True)
+            ]
             return f"({operator.join(parts)})"
         return operator.join(parts)
 

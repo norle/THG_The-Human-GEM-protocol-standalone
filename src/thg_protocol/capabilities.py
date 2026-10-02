@@ -31,9 +31,10 @@ def validate_capability_registry(
             raise CapabilityRegistryError(
                 f"{identifier}: invalid scientific_effect {effect!r}"
             )
-        if effect not in {"mutation", "selection"} or capability.get(
-            "support_tier"
-        ) not in _WORKFLOW_TIERS:
+        if (
+            effect not in {"mutation", "selection"}
+            or capability.get("support_tier") not in _WORKFLOW_TIERS
+        ):
             continue
         missing = [
             key

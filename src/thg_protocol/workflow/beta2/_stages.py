@@ -14,8 +14,10 @@ from typing import Any
 try:
     from tqdm import tqdm
 except ImportError:  # pragma: no cover - exercised by clean-wheel checks
+
     def tqdm(iterable: object, **_kwargs: object) -> object:
         return iterable
+
 
 from thg_protocol.io.models import load_model as _load_cobra_model
 from thg_protocol.runtime.artifacts import resolve_artifact, upstream_fingerprint
@@ -64,9 +66,7 @@ def _gpr_checkpoint(
         {
             "schema_version": 1,
             "phase": phase,
-            "records": {
-                key: candidates[key] for key in sorted(candidates)
-            },
+            "records": {key: candidates[key] for key in sorted(candidates)},
             "source_metadata": dict(source_metadata),
         },
     )
@@ -131,9 +131,7 @@ def _resolve_location_payload(
     reaction_id, gpr, location_items, raw_location_items, fallback, record = payload
     locations = dict(location_items)
     effective_gpr = str(record.get("candidate_sgpr") or gpr)
-    result = resolve_gpr_locations(
-        effective_gpr, locations, fallback_location=fallback
-    )
+    result = resolve_gpr_locations(effective_gpr, locations, fallback_location=fallback)
     evidence = [{"reaction_id": reaction_id, **item} for item in result.evidence]
     genes = record.get("genes", [])
     for gene, value in raw_location_items:
@@ -393,9 +391,8 @@ class DetailedBeta2Stage:
             snapshot = _snapshot_records(section) if mode == "snapshot" else []
             snapshot_by_reaction: dict[str, list[dict[str, object]]] = {}
             for item in snapshot:
-                if (
-                    _record_kind(item) in {"gpr", "gpr-evidence"}
-                    and item.get("reaction_id")
+                if _record_kind(item) in {"gpr", "gpr-evidence"} and item.get(
+                    "reaction_id"
                 ):
                     snapshot_by_reaction.setdefault(
                         str(item["reaction_id"]), []
@@ -586,12 +583,16 @@ class DetailedBeta2Stage:
                         to_sgpr,
                     )
 
-                    sgpr = OrNode(
-                        tuple(
-                            GeneNode(gene, None, "unknown", "rhea", (rhea_id,))
-                            for gene in genes
+                    sgpr = (
+                        OrNode(
+                            tuple(
+                                GeneNode(gene, None, "unknown", "rhea", (rhea_id,))
+                                for gene in genes
+                            )
                         )
-                    ) if genes else None
+                        if genes
+                        else None
+                    )
                     candidate = {
                         "ec": ec,
                         "rhea_id": rhea_id,
@@ -645,6 +646,7 @@ class DetailedBeta2Stage:
                     sgpr_to_dict,
                     to_sgpr,
                 )
+
                 rhea_file = section.get("rhea_snapshot")
                 rhea_payload = {}
                 if isinstance(rhea_file, str) and Path(rhea_file).is_file():
@@ -672,7 +674,8 @@ class DetailedBeta2Stage:
                         and (
                             not str(item.get("organism", item.get("taxon", "")))
                             or any(
-                                marker in str(
+                                marker
+                                in str(
                                     item.get("organism", item.get("taxon", ""))
                                 ).lower()
                                 for marker in ("human", "9606", "homo sapiens")
@@ -687,20 +690,22 @@ class DetailedBeta2Stage:
                             and item.get("gene", item.get("gene_symbol"))
                         }
                     )
-                    sgpr = OrNode(
-                        tuple(
-                            GeneNode(gene, None, "unknown", "rhea", (rhea_id,))
-                            for gene in genes
+                    sgpr = (
+                        OrNode(
+                            tuple(
+                                GeneNode(gene, None, "unknown", "rhea", (rhea_id,))
+                                for gene in genes
+                            )
                         )
-                    ) if genes else None
+                        if genes
+                        else None
+                    )
                     candidates.setdefault(
                         f"direct:{reaction_id}",
                         {
                             "reaction_id": reaction_id,
                             "rhea_id": rhea_id,
-                            "candidate_gpr": " or ".join(
-                                f"({gene})" for gene in genes
-                            ),
+                            "candidate_gpr": " or ".join(f"({gene})" for gene in genes),
                             "gene_symbols": genes,
                             "source": "rhea",
                             "status": "candidate" if genes else "unresolved",
@@ -724,9 +729,7 @@ class DetailedBeta2Stage:
                     catalyst_sgpr,
                 )
 
-                reactome = ReactomeClient(
-                    release=_source_release(section, "reactome")
-                )
+                reactome = ReactomeClient(release=_source_release(section, "reactome"))
                 for _ec, candidate in tqdm(
                     rhea_candidates.items(),
                     desc="Reactome",
@@ -1086,9 +1089,9 @@ class DetailedBeta2Stage:
                     annotations = parse_gaf(
                         Path(annotation_file).read_text(encoding="utf-8"),
                         source_release=str(
-                            section.get("source_releases", {}).get("goa", {}).get(
-                                "release", ""
-                            )
+                            section.get("source_releases", {})
+                            .get("goa", {})
+                            .get("release", "")
                             if isinstance(section.get("source_releases"), Mapping)
                             and isinstance(
                                 section.get("source_releases", {}).get("goa"),
@@ -1104,9 +1107,7 @@ class DetailedBeta2Stage:
                         if isinstance(goa_release, Mapping)
                         else ""
                     )
-                    goa_client = GOAClient(
-                        release=str(goa_release)
-                    )
+                    goa_client = GOAClient(release=str(goa_release))
                     annotations = goa_client.annotations_for(model_genes)
                     if goa_client.metadata:
                         source_metadata["goa"] = dict(goa_client.metadata)
@@ -1287,9 +1288,7 @@ class DetailedBeta2Stage:
                 )
                 release_info = release_info if isinstance(release_info, Mapping) else {}
                 loader = GOALoader(
-                    url=str(
-                        section.get("go_ontology_url", release_info.get("url", ""))
-                    )
+                    url=str(section.get("go_ontology_url", release_info.get("url", "")))
                     or None,
                     release=str(
                         section.get(

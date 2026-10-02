@@ -25,8 +25,13 @@ def uniprot_sgpr_evidence(
             identifiers.append(str(identifier))
     node = normalize_sgpr(OrNode(tuple(nodes))) if nodes else None
     return SgprEvidence(
-        "uniprot", ec, node, "supporting", "candidate" if node else "unresolved",
-        tuple(sorted(set(identifiers))), warnings=("uniprot-supporting-only",),
+        "uniprot",
+        ec,
+        node,
+        "supporting",
+        "candidate" if node else "unresolved",
+        tuple(sorted(set(identifiers))),
+        warnings=("uniprot-supporting-only",),
     )
 
 

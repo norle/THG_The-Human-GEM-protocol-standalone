@@ -16,6 +16,4 @@ def convert_json_to_sbml(input_path: str | Path, output_path: str | Path) -> Pat
     return destination
 
 
-__all__ = [
-    "convert_json_to_sbml", "load_model", "save_model", "save_json", "save_sbml"
-]
+__all__ = ["convert_json_to_sbml", "load_model", "save_model", "save_json", "save_sbml"]

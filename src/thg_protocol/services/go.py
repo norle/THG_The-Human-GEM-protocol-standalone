@@ -62,9 +62,9 @@ class GOALoader:
             "source": "Gene Ontology",
             "release": self.release,
             "url": self.url,
-            "retrieved_at": datetime.now(timezone.utc).isoformat().replace(
-                "+00:00", "Z"
-            ),
+            "retrieved_at": datetime.now(timezone.utc)
+            .isoformat()
+            .replace("+00:00", "Z"),
             "raw_response_sha256": hashlib.sha256(response.content).hexdigest(),
             "parser_version": "1",
         }

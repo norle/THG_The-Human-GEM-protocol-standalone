@@ -1,5 +1,6 @@
 """Gene-protein-reaction parsing and sanitization helpers."""
 
+
 def __getattr__(name: str):
     """Load legacy GPR helpers lazily because they require optional COBRA deps."""
     if name not in __all__:
