@@ -401,3 +401,26 @@ def test_real_memote_smoke_when_optional_dependency_is_installed(tmp_path):
     assert {"memote-result.json", "memote-report.html"} <= set(report["artifacts"])
     assert report["report_returncode"] == 0
 
+
+def test_model_metrics_reuse_the_validation_fva_and_report_failures(monkeypatch):
+    from thg_protocol.analysis import consistency
+    from thg_protocol.workflow._scientific import _model_metrics
+
+    calls = []
+
+    def blocked(model):
+        calls.append(model.id)
+        return ["R1"]
+
+    monkeypatch.setattr(consistency, "blocked_reactions", blocked)
+    metrics = _model_metrics(model(), profile="cell-specific-standard")
+    assert metrics["blocked_reactions"] == ["R1"]
+    assert len(calls) == 1
+
+    def broken(model):
+        raise RuntimeError("solver down")
+
+    monkeypatch.setattr(consistency, "blocked_reactions", broken)
+    metrics = _model_metrics(model(), profile="structural-fast")
+    assert metrics["blocked_reactions"] is None
+    assert metrics["blocked_reactions_error"] == "RuntimeError: solver down"

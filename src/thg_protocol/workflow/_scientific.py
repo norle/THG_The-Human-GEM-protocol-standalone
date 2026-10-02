@@ -111,13 +111,22 @@ def _model_metrics(model: Any, *, profile: str) -> dict[str, object]:
 
     validation = validate_model(model, profile)
     components = find_network_components(model)
-    try:
-        from thg_protocol.analysis.consistency import blocked_reactions
+    # Reuse the validation's FVA sweep when the profile ran one.
+    flux = next(
+        (item for item in validation["checks"] if item["id"] == "flux-consistency"),
+        None,
+    )
+    blocked_error = None
+    if flux is not None and "blocked" in flux["details"]:
+        blocked = list(flux["details"]["blocked"])
+    else:
+        try:
+            from thg_protocol.analysis.consistency import blocked_reactions
 
-        blocked = blocked_reactions(model)
-    except Exception:
-        blocked = []
-    return {
+            blocked = blocked_reactions(model)
+        except Exception as error:
+            blocked, blocked_error = None, f"{type(error).__name__}: {error}"
+    result = {
         "counts": {
             "reactions": len(model.reactions),
             "metabolites": len(model.metabolites),
@@ -128,6 +137,9 @@ def _model_metrics(model: Any, *, profile: str) -> dict[str, object]:
         "network_components": components["component_info"],
         "validation": validation,
     }
+    if blocked_error is not None:
+        result["blocked_reactions_error"] = blocked_error
+    return result
 
 
 class CellSpecificStage:
