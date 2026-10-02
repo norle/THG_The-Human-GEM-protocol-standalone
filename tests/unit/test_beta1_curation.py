@@ -469,3 +469,62 @@ def test_formulas_conflict_ignores_hydrogen_and_missing_formulas():
     assert not formulas_conflict("C20H29O2", "C20H30O2")
     assert not formulas_conflict("C20H29O2", None)
     assert not formulas_conflict("", "C1")
+
+
+def test_unsupported_candidates_are_never_selected_or_merged():
+    lone = resolve_metabolite_identity(
+        [MetaboliteCandidate("C99999", "kegg", name="something else")],
+        reference_name="2-naphthol",
+        reference_formula="C10H8O",
+    )
+    assert (lone["status"], lone["reason"]) == (
+        "no-match",
+        "supporting evidence is insufficient",
+    )
+    # Dropping a contradicted name match must not promote an unsupported one.
+    mixed = resolve_metabolite_identity(
+        [
+            MetaboliteCandidate(
+                "C06428", "kegg", name="2-naphthol", formula="C20H30O2"
+            ),
+            MetaboliteCandidate("HMDB0001", "hmdb", name="unrelated"),
+        ],
+        reference_name="2-naphthol",
+        reference_formula="C10H8O",
+    )
+    assert mixed["status"] == "no-match"
+    # A supplied score does not override a conflicting formula.
+    scored = resolve_metabolite_identity(
+        [
+            {
+                "identity": "C06428",
+                "namespace": "kegg",
+                "formula": "C20H30O2",
+                "score": 10,
+            }
+        ],
+        reference_name="2-naphthol",
+        reference_formula="C10H8O",
+    )
+    assert scored["candidates"][0]["score"] == 0.0
+    assert scored["status"] == "no-match"
+
+
+def test_contradicted_candidate_is_not_merged_as_a_cross_reference():
+    model = _model()
+    model.metabolites.a_c.annotation = {}
+    resolution = resolve_metabolite_identity(
+        [
+            MetaboliteCandidate("C11713", "kegg", formula="C10H8O"),
+            MetaboliteCandidate(
+                "C06428", "kegg", name="2-naphthol", formula="C20H30O2"
+            ),
+        ],
+        reference_name="2-naphthol",
+        reference_formula="C10H8O",
+    )
+    assert resolution["selected"]["identity"] == "C11713"
+    (proposal,) = generate_curation_proposals(
+        model, metabolite_identities={"a_c": resolution}
+    )
+    assert proposal.after == {"kegg": ["C11713"]}

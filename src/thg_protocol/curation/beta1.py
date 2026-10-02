@@ -435,13 +435,16 @@ def resolve_metabolite_identity(
             reference_charge=reference_charge,
             reference_structural_identifiers=reference_structural_identifiers,
         )
+        # A conflicting formula overrides a supplied score; curated and
+        # structural evidence score before the formula check and never get here.
+        contradicted = calculated_reason == FORMULA_CONFLICT_REASON
         items.append(
             MetaboliteCandidate(
                 identity,
                 namespace or "",
                 item.evidence,
-                item.score if item.score else calculated_score,
-                item.reason or calculated_reason,
+                item.score if item.score and not contradicted else calculated_score,
+                calculated_reason if contradicted else item.reason or calculated_reason,
                 item.name,
                 item.formula,
                 item.charge,
@@ -461,14 +464,16 @@ def resolve_metabolite_identity(
             "evidence": [],
             "reason": "no candidate was supplied",
         }
-    usable = [
+    chemical = [
         item
         for item in ordered
         if item.namespace.casefold() not in NON_CHEMICAL_IDENTITY_NAMESPACES
     ]
-    contradicted = [item for item in usable if item.reason == FORMULA_CONFLICT_REASON]
-    usable = [item for item in usable if item.reason != FORMULA_CONFLICT_REASON]
-    if not usable and contradicted:
+    contradicted = [item for item in chemical if item.reason == FORMULA_CONFLICT_REASON]
+    # A zero score means no supporting evidence (or a contradicted name), so
+    # such a candidate is never selected, even when it is the only one.
+    usable = [item for item in chemical if item.score > 0]
+    if not usable and chemical and len(contradicted) == len(chemical):
         return {
             "status": "no-match",
             "selected": None,
@@ -478,6 +483,17 @@ def resolve_metabolite_identity(
                 {evidence for item in contradicted for evidence in item.evidence}
             ),
             "reason": "every candidate has a formula conflicting with the reference",
+        }
+    if not usable and chemical:
+        return {
+            "status": "no-match",
+            "selected": None,
+            "candidates": [_json(item.__dict__) for item in ordered],
+            "errors": [],
+            "evidence": sorted(
+                {evidence for item in chemical for evidence in item.evidence}
+            ),
+            "reason": "supporting evidence is insufficient",
         }
     if not usable:
         return {
@@ -760,9 +776,9 @@ def generate_curation_proposals(
 
     ``metabolite_identities`` contains the result of
     ``resolve_metabolite_identity``. The selected candidate is canonical for
-    reporting, while all supplied cross-references are merged into the model.
-    Ambiguous and failed resolutions are deliberately left out of the mutation
-    set.
+    reporting, while every supported (positive-score) cross-reference is
+    merged into the model. Ambiguous and failed resolutions are deliberately
+    left out of the mutation set.
     """
     proposals: list[Proposal] = []
     for metabolite_id, resolution in sorted(metabolite_identities.items()):
@@ -771,10 +787,12 @@ def generate_curation_proposals(
         selected = resolution.get("selected")
         if not isinstance(selected, Mapping):
             continue
+        # Candidates without support (score 0, including names contradicted by
+        # a conflicting formula) are not cross-references of this metabolite.
         references = [
             candidate
             for candidate in resolution.get("candidates", [])
-            if isinstance(candidate, Mapping)
+            if isinstance(candidate, Mapping) and float(candidate.get("score") or 0) > 0
         ] or [selected]
         metabolite = model.metabolites.get_by_id(metabolite_id)
         before = _json(getattr(metabolite, "annotation", {}) or {})
