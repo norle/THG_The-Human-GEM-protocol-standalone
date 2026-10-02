@@ -113,3 +113,40 @@ def test_identifier_merge_does_not_match_different_ids_by_chemistry():
     assert merged.metabolites.has_id("b_c")
     assert merged.reactions.has_id("R1")
     assert merged.reactions.has_id("R2")
+
+
+def test_shared_identifier_with_conflicting_formula_or_ids_is_not_mapped():
+    from thg_protocol.merge import generate_merge_plan
+
+    base = _model("base", "R1", "a_c")
+    incoming = _model("incoming", "R2", "b_c")
+    base.metabolites.a_c.annotation = {"chebi": "1", "kegg.compound": "C11713"}
+    incoming.metabolites.b_c.annotation = {"chebi": "1", "kegg.compound": "C06428"}
+    plan = generate_merge_plan(base, incoming)
+    assert plan.metabolite_map == {}
+    (decision,) = [
+        item for item in plan.decisions if item.category == "identity-conflict"
+    ]
+    assert "kegg.compound" in decision.reason
+
+    incoming.metabolites.b_c.annotation = {"chebi": "1"}
+    incoming.metabolites.b_c.formula = "C2"
+    plan = generate_merge_plan(base, incoming)
+    assert plan.metabolite_map == {}
+    assert "formula C1 vs C2" in plan.decisions[0].reason
+
+    incoming.metabolites.b_c.formula = "C1H2"  # protonation only
+    assert generate_merge_plan(base, incoming).metabolite_map == {"b_c": "a_c"}
+
+    # Acid and conjugate base share KEGG but differ in ChEBI/InChIKey.
+    base.metabolites.a_c.annotation = {
+        "kegg.compound": "C00022",
+        "chebi": "CHEBI:32816",
+        "inchikey": "A",
+    }
+    incoming.metabolites.b_c.annotation = {
+        "kegg.compound": "C00022",
+        "chebi": "CHEBI:15361",
+        "inchikey": "B",
+    }
+    assert generate_merge_plan(base, incoming).metabolite_map == {"b_c": "a_c"}

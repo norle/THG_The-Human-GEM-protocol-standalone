@@ -142,8 +142,11 @@ def generate_merge_plan(
     """Generate conservative, compartment-aware equivalence proposals.
 
     Cross-model identity uses explicit annotation identifiers when present;
-    names and chemistry alone never create an equivalence.  Ambiguous matches
-    are recorded as unresolved decisions.
+    names and chemistry alone never create an equivalence.  A shared
+    identifier is not enough when another identifier namespace disagrees or,
+    under the default ``formula_charge="report"`` policy, when the formulas
+    differ beyond hydrogen (``identity-conflict``).  Ambiguous
+    and conflicting matches are recorded as unresolved decisions.
     """
 
     policy = policy or MergePolicy()
@@ -159,10 +162,31 @@ def generate_merge_plan(
                         result.setdefault(f"{key}:{identifier}", []).append(item.id)
         return result
 
-    left = index(base_model.metabolites, ("kegg.compound", "chebi", "hmdb", "inchikey"))
-    right = index(
-        incoming_model.metabolites, ("kegg.compound", "chebi", "hmdb", "inchikey")
-    )
+    identity_keys = ("kegg.compound", "chebi", "hmdb", "inchikey")
+    left = index(base_model.metabolites, identity_keys)
+    right = index(incoming_model.metabolites, identity_keys)
+
+    def identity_conflict(first: Any, second: Any) -> str | None:
+        """Why one shared identifier is not enough, or None."""
+        from thg_protocol.model_build.mass_balance import formulas_conflict
+        from thg_protocol.validation import IDENTITY_ANNOTATIONS
+
+        # An explicit formula/charge precedence policy accepts formula
+        # differences and resolves them; the default "report" does not map.
+        if policy.formula_charge == "report" and formulas_conflict(
+            first.formula, second.formula
+        ):
+            return f"formula {first.formula} vs {second.formula}"
+        # Only namespaces in IDENTITY_ANNOTATIONS: ChEBI, HMDB and InChIKey
+        # give an acid and its conjugate base different IDs.
+        for key in IDENTITY_ANNOTATIONS:
+            ours, theirs = first.annotation.get(key), second.annotation.get(key)
+            ours = set(ours if isinstance(ours, list) else [ours]) - {None, ""}
+            theirs = set(theirs if isinstance(theirs, list) else [theirs]) - {None, ""}
+            if ours and theirs and not ours & theirs:
+                return f"{key} {sorted(ours)} vs {sorted(theirs)}"
+        return None
+
     metabolite_map: dict[str, str] = {}
     decisions: list[MergeDecision] = []
     for token in sorted(set(left) & set(right)):
@@ -172,7 +196,18 @@ def generate_merge_plan(
             target, source = targets[0], candidates[0]
             left_obj = base_model.metabolites.get_by_id(target)
             right_obj = incoming_model.metabolites.get_by_id(source)
-            if left_obj.compartment == right_obj.compartment:
+            conflict = identity_conflict(left_obj, right_obj)
+            if conflict is not None:
+                decisions.append(
+                    MergeDecision(
+                        "identity-conflict",
+                        target,
+                        source,
+                        "unresolved",
+                        f"{token}; conflicting {conflict}",
+                    )
+                )
+            elif left_obj.compartment == right_obj.compartment:
                 metabolite_map[source] = target
                 decisions.append(
                     MergeDecision(
