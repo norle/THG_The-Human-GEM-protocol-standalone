@@ -43,9 +43,51 @@ The HTML is rendered from the JSON and does not rerun or reinterpret checks.
 
 Stoichiometric consistency is diagnostic in every profile, including
 `release-full`: failure produces a warning rather than blocking release.
-The check seeks positive conserved metabolite weights over internal reactions,
-excluding boundary reactions. Pool metabolites and lumped reactions may need
-manual interpretation; warnings remain visible for review.
+The check runs MEMOTE's consistency functions (Gevorgyan et al. 2008) with the
+model's solver and names the unconserved metabolites (ID, name, compartment).
+Boundary, biomass (`SBO:0000629`), "Artificial reactions" and "Pool
+reactions" reactions are excluded, as are reaction IDs listed in
+`validation.conservation_exclusions`; the details list each exclusion with its
+rule. Without the optional `memote` extra the check is reported as not
+evaluated. To find the responsible reactions and review fixes, run the
+[conservation workflow](conservation.md).
+
+`validation.reference_model` (optional) names the model the checked one derives
+from, for example Human-GEM for a β1 model. Its conservation exclusions carry
+over, and formulas and charges are compared against it (below).
+
+Four chemistry checks flag common causes of mass creation and wrong
+identities. All are diagnostic in every profile:
+
+- `fractional-coefficients` lists internal reactions with non-integer
+  coefficients, such as fitted `1.2 O2 -> 1.5 product`. Reactions the
+  conservation check excludes (biomass, artificial and pool reactions, the
+  reference model's exclusions, `validation.conservation_exclusions`) are
+  skipped, since pseudo-reactions are fractional by design.
+- `formula-disagreement` lists metabolites whose formula or charge differs
+  from the same metabolite in another compartment (IDs equal after removing
+  the compartment suffix, as `MAM00668c`/`MAM00668m` or `C03024_c`) and, with
+  a reference model, from the same ID there. Formulas are compared as element
+  counts, so `CH1O2` equals `CHO2`. A formula that is wrong in the reference
+  as well is not caught here.
+- `annotation-conflict` finds mislabelled metabolites. Within the model, it
+  lists names shared by metabolites that are different compounds: their
+  formulas differ beyond hydrogen or their KEGG IDs are disjoint (ChEBI is
+  not compared, as it gives an acid and its conjugate base different IDs).
+  With a reference model, it also lists metabolites renamed from the
+  reference to the name of another, conflicting compound there. Both catch a
+  merge that mapped a compound onto the wrong metabolite: the legacy merge
+  behind THG β1 renamed Human-GEM's `MAM00668` (2-naphthol) to
+  icosapentaenoic acid, which `MAM01784` already is, and about 30 others.
+- `unusual-protons` lists internal reactions with more than 10 H+ (formula
+  `H`, charge +1), a common sign of a reaction balanced against a wrong
+  formula (`EPA-CoA + H2O -> 2 EPA + CoA + 14 H+`). With a reference model,
+  reactions with the same proton coefficients there are not listed, so
+  inherited transport chains (63 in Human-GEM) do not drown new cases.
+
+The closed-medium FVA formerly reported as `energy-generating-cycles` was
+removed: it found internal loops rather than energy-generating cycles, and a
+second full FVA was too slow at β1 scale.
 
 ## Metabolic task API
 

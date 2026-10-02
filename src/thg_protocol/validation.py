@@ -6,8 +6,9 @@ owned by its caller and solver checks copy it before changing bounds.
 
 from __future__ import annotations
 
+import itertools
 from collections import Counter
-from collections.abc import Callable, Mapping
+from collections.abc import Callable, Iterable, Mapping
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -217,6 +218,302 @@ def _charge_balance(model: Any) -> dict[str, object]:
     }
 
 
+def fractional_coefficients(
+    model: Any,
+    *,
+    reference_model: Any | None = None,
+    exclusions: Iterable[str] = (),
+) -> dict[str, object]:
+    """List internal reactions with non-integer stoichiometric coefficients.
+
+    Fitted coefficients (``1.2 O2``, ``1.5 product``) are a common source of
+    mass creation. Boundary reactions and the reactions the conservation check
+    excludes (biomass, artificial/pool, model notes, the reference model's
+    exclusions and configured IDs) are skipped, since pseudo-reactions are
+    fractional by design.
+    """
+    from .analysis.conservation import conservation_exclusions
+
+    skipped = conservation_exclusions(
+        model, input_model=reference_model, configured=exclusions
+    )
+    reactions = {}
+    for reaction in model.reactions:
+        if reaction.boundary or reaction.id in skipped:
+            continue
+        fractional = {
+            metabolite.id: float(coefficient)
+            for metabolite, coefficient in reaction.metabolites.items()
+            if abs(coefficient - round(coefficient)) > 1e-6
+        }
+        if fractional:
+            reactions[reaction.id] = {
+                "coefficients": dict(sorted(fractional.items())),
+                "equation": reaction.build_reaction_string(),
+            }
+    return {
+        "reactions": dict(sorted(reactions.items())),
+        "skipped": len(skipped),
+        "passed": not reactions,
+    }
+
+
+def _base_id(metabolite: Any) -> str | None:
+    """Return the metabolite ID without its compartment suffix, if it has one."""
+    compartment = getattr(metabolite, "compartment", None)
+    if not compartment:
+        return None
+    for suffix in (f"_{compartment}", str(compartment)):
+        if metabolite.id.endswith(suffix) and len(metabolite.id) > len(suffix):
+            return metabolite.id[: -len(suffix)]
+    return None
+
+
+def _formula_key(formula: object) -> tuple[tuple[str, int], ...] | None:
+    from .model_build.mass_balance import formula_atoms
+
+    atoms = formula_atoms(formula) if isinstance(formula, str) else {}
+    return tuple(sorted(atoms.items())) if atoms else None
+
+
+def formula_disagreement(
+    model: Any, *, reference_model: Any | None = None
+) -> dict[str, object]:
+    """Find metabolites whose formula or charge disagrees with a counterpart.
+
+    Compares the same metabolite across compartments (IDs equal after removing
+    the compartment suffix, as ``MAM00668c``/``MAM00668m`` or ``C03024_c``)
+    and, with ``reference_model``, the same ID in the reference. Formulas are
+    compared as element counts, so ``CH1O2`` equals ``CHO2``. Missing formulas
+    and charges are not compared.
+    """
+    groups: dict[str, list[Any]] = {}
+    for metabolite in model.metabolites:
+        base = _base_id(metabolite)
+        if base is not None:
+            groups.setdefault(base, []).append(metabolite)
+
+    def differs(items: Iterable[Any], attribute: str) -> bool:
+        values = {
+            _formula_key(item.formula) if attribute == "formula" else item.charge
+            for item in items
+        }
+        values.discard(None)
+        return len(values) > 1
+
+    def describe(item: Any) -> dict[str, object]:
+        return {"formula": item.formula or None, "charge": item.charge}
+
+    compartments = {}
+    for base, items in sorted(groups.items()):
+        fields = [name for name in ("formula", "charge") if differs(items, name)]
+        if fields:
+            compartments[base] = {
+                "differs": fields,
+                "metabolites": {item.id: describe(item) for item in items},
+            }
+    reference = {}
+    if reference_model is not None:
+        for item in model.metabolites:
+            if item.id not in reference_model.metabolites:
+                continue
+            other = reference_model.metabolites.get_by_id(item.id)
+            fields = [
+                name for name in ("formula", "charge") if differs((item, other), name)
+            ]
+            if fields:
+                reference[item.id] = {
+                    "differs": fields,
+                    "model": describe(item),
+                    "reference": describe(other),
+                }
+    return {
+        "across_compartments": compartments,
+        "against_reference": reference,
+        "reference": None if reference_model is None else reference_model.id,
+        "passed": not compartments and not reference,
+    }
+
+
+#: Annotation namespaces compared by ``annotation_conflict``. ChEBI is left
+#: out: it gives an acid and its conjugate base different IDs.
+IDENTITY_ANNOTATIONS = ("kegg.compound",)
+#: ``unusual_protons`` flags reactions with more protons than this
+#: (Human-GEM 2022-06-21 has 63 such reactions, mostly transport chains).
+PROTON_LIMIT = 10
+
+
+def _identifiers(metabolite: Any) -> dict[str, set[str]]:
+    annotation = getattr(metabolite, "annotation", {}) or {}
+    result = {}
+    for key in IDENTITY_ANNOTATIONS:
+        value = annotation.get(key)
+        values = set(value if isinstance(value, list) else [value]) - {None, ""}
+        if values:
+            result[key] = {str(item) for item in values}
+    return result
+
+
+def _identity_conflict(first: Any, second: Any) -> list[str]:
+    """Reasons two metabolites with the same name are different compounds."""
+    from .model_build.mass_balance import formulas_conflict
+
+    reasons = []
+    if formulas_conflict(first.formula, second.formula):
+        reasons.append("formula")
+    ours, theirs = _identifiers(first), _identifiers(second)
+    reasons.extend(
+        key
+        for key in IDENTITY_ANNOTATIONS
+        if key in ours and key in theirs and not ours[key] & theirs[key]
+    )
+    return reasons
+
+
+def _describe_identity(metabolite: Any) -> dict[str, object]:
+    return {
+        "formula": metabolite.formula or None,
+        **{key: sorted(value) for key, value in _identifiers(metabolite).items()},
+    }
+
+
+def annotation_conflict(
+    model: Any, *, reference_model: Any | None = None
+) -> dict[str, object]:
+    """Find mislabelled metabolites: shared names and renamed reference IDs.
+
+    Within the model, metabolites with the same name (ignoring case) but
+    different IDs after removing the compartment suffix are reported when
+    their formulas differ beyond hydrogen or their KEGG identifiers are
+    disjoint. With ``reference_model``, a metabolite is reported as renamed
+    when its ID is in the reference under another name and its new name
+    belongs to a different, conflicting metabolite there. Both catch a merge
+    that mapped a compound onto the wrong metabolite and overwrote its name:
+    the legacy merge behind THG β1 renamed Human-GEM's ``MAM00668``
+    (2-naphthol, ``C10H8O``) to icosapentaenoic acid, which ``MAM01784``
+    (``C20H29O2``) already is.
+    """
+
+    def by_name(source: Any) -> dict[str, list[Any]]:
+        groups: dict[str, list[Any]] = {}
+        for metabolite in source.metabolites:
+            if metabolite.name:
+                groups.setdefault(metabolite.name.casefold(), []).append(metabolite)
+        return groups
+
+    within = {}
+    for name, items in sorted(by_name(model).items()):
+        bases: dict[str, Any] = {}
+        for item in sorted(items, key=lambda value: value.id):
+            bases.setdefault(_base_id(item) or item.id, item)
+        if len(bases) < 2:
+            continue
+        reasons = sorted(
+            {
+                reason
+                for first, second in itertools.combinations(bases.values(), 2)
+                for reason in _identity_conflict(first, second)
+            }
+        )
+        if reasons:
+            within[name] = {
+                "conflicts": reasons,
+                "metabolites": {
+                    item.id: _describe_identity(item)
+                    for item in sorted(items, key=lambda value: value.id)
+                },
+            }
+    renamed = {}
+    if reference_model is not None:
+        named = by_name(reference_model)
+        for item in sorted(model.metabolites, key=lambda value: value.id):
+            if item.id not in reference_model.metabolites:
+                continue
+            original = reference_model.metabolites.get_by_id(item.id)
+            if (item.name or "").casefold() == (original.name or "").casefold():
+                continue
+            base = _base_id(item) or item.id
+            owners = [
+                other
+                for other in named.get((item.name or "").casefold(), [])
+                if (_base_id(other) or other.id) != base
+                and _identity_conflict(item, other)
+            ]
+            if owners:
+                renamed[item.id] = {
+                    "reference_name": original.name,
+                    "model_name": item.name,
+                    "model": _describe_identity(item),
+                    "name_belongs_to": {
+                        other.id: _describe_identity(other)
+                        for other in sorted(owners, key=lambda value: value.id)
+                    },
+                }
+    return {
+        "within_model": within,
+        "renamed_from_reference": renamed,
+        "reference": None if reference_model is None else reference_model.id,
+        "passed": not within and not renamed,
+    }
+
+
+def unusual_protons(
+    model: Any,
+    *,
+    reference_model: Any | None = None,
+    exclusions: Iterable[str] = (),
+    limit: int = PROTON_LIMIT,
+) -> dict[str, object]:
+    """List internal reactions with more than ``limit`` protons (H+, charge +1).
+
+    A large proton coefficient often marks a reaction balanced against a wrong
+    formula, as ``EPA-CoA + H2O -> 2 EPA + CoA + 14 H+``. Reactions the
+    conservation check excludes are skipped. With ``reference_model``, a
+    reaction with the same proton coefficients there is not reported, so
+    inherited transport chains do not drown the new cases.
+    """
+    from .analysis.conservation import conservation_exclusions
+    from .model_build.mass_balance import formula_atoms
+
+    skipped = conservation_exclusions(
+        model, input_model=reference_model, configured=exclusions
+    )
+    reactions = {}
+    for reaction in model.reactions:
+        if reaction.boundary or reaction.id in skipped:
+            continue
+        protons = {
+            metabolite.id: float(coefficient)
+            for metabolite, coefficient in reaction.metabolites.items()
+            if formula_atoms(metabolite.formula or "") == {"H": 1}
+            and metabolite.charge == 1
+            and abs(coefficient) > limit
+        }
+        if (
+            protons
+            and reference_model is not None
+            and reaction.id in reference_model.reactions
+        ):
+            original = {
+                metabolite.id: float(coefficient)
+                for metabolite, coefficient in reference_model.reactions.get_by_id(
+                    reaction.id
+                ).metabolites.items()
+            }
+            if all(original.get(key) == value for key, value in protons.items()):
+                continue
+        if protons:
+            reactions[reaction.id] = {
+                "protons": protons,
+                "equation": reaction.build_reaction_string(),
+            }
+    return {
+        "limit": limit,
+        "reactions": dict(sorted(reactions.items())),
+        "passed": not reactions,
+    }
+
+
 def _objective(model: Any) -> dict[str, object]:
     solution = model.optimize()
     status = str(solution.status)
@@ -241,33 +538,34 @@ def _optional_invariant(
     }
 
 
-def stoichiometric_consistency(model: Any) -> dict[str, object]:
-    """Check for a positive metabolite conservation vector when practical."""
-    try:
-        import numpy as np
-        from scipy.optimize import linprog
+def stoichiometric_consistency(
+    model: Any,
+    *,
+    exclusions: Iterable[str] = (),
+    reference_model: Any | None = None,
+) -> dict[str, object]:
+    """Name the unconserved metabolites (Gevorgyan et al. 2008).
 
-        metabolites = list(model.metabolites)
-        reactions = [reaction for reaction in model.reactions if not reaction.boundary]
-        matrix = np.zeros((len(reactions), len(metabolites)))
-        positions = {
-            metabolite.id: index for index, metabolite in enumerate(metabolites)
-        }
-        for row, reaction in enumerate(reactions):
-            for metabolite, coefficient in reaction.metabolites.items():
-                matrix[row, positions[metabolite.id]] = float(coefficient)
-        result = linprog(
-            np.zeros(len(metabolites)),
-            A_eq=matrix,
-            b_eq=np.zeros(len(reactions)),
-            bounds=[(1.0, None)] * len(metabolites),
-            method="highs",
-        )
+    Uses MEMOTE's consistency functions with the model's solver. Boundary,
+    biomass (SBO:0000629), artificial/pool and configured reactions are
+    excluded, as are the reactions ``reference_model`` excludes; the details
+    list each exclusion with its rule. Without MEMOTE
+    installed the check is reported as not evaluated.
+    """
+    try:
+        import memote.support.consistency  # noqa: F401
+    except ImportError:
         return {
-            "status": result.status,
-            "message": result.message,
-            "passed": bool(result.success),
+            "status": "not-evaluated",
+            "reason": "requires the optional 'memote' dependency",
+            "passed": None,
         }
+    try:
+        from .analysis.conservation import find_unconserved_metabolites
+
+        return find_unconserved_metabolites(
+            model, input_model=reference_model, configured=exclusions
+        )
     except Exception as error:
         return {"status": "infrastructure-error", "error": str(error), "passed": None}
 
@@ -305,15 +603,22 @@ def validate_model(
     run_solver: bool | None = None,
     workflow_invariants: Mapping[str, object] | None = None,
     ledger_diff: Mapping[str, object] | None = None,
+    conservation_exclusions: Iterable[str] = (),
+    reference_model: Any | None = None,
 ) -> dict[str, object]:
-    """Run an independently callable validation profile and return JSON data."""
+    """Run an independently callable validation profile and return JSON data.
+
+    ``reference_model`` (optional) is the model the checked one derives from:
+    formulas and charges are compared against it, and the reactions it
+    excludes from conservation checks stay excluded.
+    """
     if profile not in PROFILES:
         raise ValueError(f"unknown validation profile: {profile}")
     solver = bool(PROFILES[profile]["solver"]) if run_solver is None else run_solver
     blocking = PROFILES[profile]["blocking"]
     # Several checks consume the same model-wide topology/solver result. Cache
     # those values for the duration of this validation pass; in particular,
-    # blocked-reaction and FVA analyses can each invoke a full LP/MILP sweep.
+    # the blocked-reaction analysis invokes an FVA sweep.
     cached: dict[str, object] = {}
 
     def _cached(name: str, fn: Callable[[], object]) -> object:
@@ -344,14 +649,6 @@ def validate_model(
             _cached("blocked-reactions", lambda: consistency.blocked_reactions(model))
         )
 
-    def _cycles() -> list[str]:
-        return list(
-            _cached(
-                "balanced-cycles",
-                lambda: consistency.stoichiometrically_balanced_cycles(model),
-            )
-        )
-
     checks = [
         _check(
             "reference-integrity",
@@ -379,6 +676,38 @@ def validate_model(
             blocking="charge-balance" in blocking,
         ),
         _check(
+            "fractional-coefficients",
+            "chemical",
+            lambda: fractional_coefficients(
+                model,
+                reference_model=reference_model,
+                exclusions=conservation_exclusions,
+            ),
+            blocking=False,
+        ),
+        _check(
+            "formula-disagreement",
+            "chemical",
+            lambda: formula_disagreement(model, reference_model=reference_model),
+            blocking=False,
+        ),
+        _check(
+            "annotation-conflict",
+            "chemical",
+            lambda: annotation_conflict(model, reference_model=reference_model),
+            blocking=False,
+        ),
+        _check(
+            "unusual-protons",
+            "chemical",
+            lambda: unusual_protons(
+                model,
+                reference_model=reference_model,
+                exclusions=conservation_exclusions,
+            ),
+            blocking=False,
+        ),
+        _check(
             "dead-end-topology",
             "topology",
             lambda: {
@@ -400,7 +729,11 @@ def validate_model(
         _check(
             "stoichiometric-consistency",
             "stoichiometry",
-            lambda: stoichiometric_consistency(model),
+            lambda: stoichiometric_consistency(
+                model,
+                exclusions=conservation_exclusions,
+                reference_model=reference_model,
+            ),
             blocking="stoichiometric-consistency" in blocking,
         ),
         _check(
@@ -427,15 +760,6 @@ def validate_model(
                         "passed": not _blocked(),
                     },
                     blocking="flux-consistency" in blocking,
-                ),
-                _check(
-                    "energy-generating-cycles",
-                    "solver",
-                    lambda: {
-                        "reactions": _cycles(),
-                        "passed": not _cycles(),
-                    },
-                    blocking=False,
                 ),
                 _check(
                     "blocked-reaction-singletons",
@@ -484,10 +808,16 @@ def validate_model(
 
 
 __all__ = [
+    "IDENTITY_ANNOTATIONS",
     "PROFILES",
+    "PROTON_LIMIT",
     "CheckResult",
+    "annotation_conflict",
+    "formula_disagreement",
+    "fractional_coefficients",
     "load_model",
     "minimal_inconsistent_sets",
     "stoichiometric_consistency",
+    "unusual_protons",
     "validate_model",
 ]

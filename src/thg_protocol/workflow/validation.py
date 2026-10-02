@@ -18,7 +18,7 @@ from thg_protocol.runtime.stage import dependency_path as _dependency_path
 class ValidationScientificStage:
     """Run structural validation and optional MEMOTE checks."""
 
-    implementation_version = 3
+    implementation_version = 5
 
     def __init__(self, stage_id: str, dependencies: tuple[str, ...] = ()) -> None:
         self.id, self.dependencies = stage_id, dependencies
@@ -31,11 +31,16 @@ class ValidationScientificStage:
 
     def fingerprint_data(self, context: StageContext) -> Mapping[str, object]:
         section = context.config.sections.get("validation", {})
-        return {
+        section = dict(section) if isinstance(section, Mapping) else {}
+        data: dict[str, object] = {
             "stage": self.id,
             "version": self.implementation_version,
-            "configuration": dict(section) if isinstance(section, Mapping) else {},
+            "configuration": section,
         }
+        reference = section.get("reference_model")
+        if self.id == "validate-checks" and reference is not None:
+            data["reference_model_sha256"] = sha256_file(Path(str(reference)))
+        return data
 
     def run(self, context: StageContext, work_dir: Path) -> StageResult:
         section = context.config.sections.get("validation", {})
@@ -54,10 +59,15 @@ class ValidationScientificStage:
         if self.id == "validate-checks":
             from thg_protocol.validation import validate_model
 
+            reference = section.get("reference_model")
             report = validate_model(
                 model,
                 str(section.get("profile", "structural-fast")),
                 run_solver=section.get("run_solver"),
+                conservation_exclusions=section.get("conservation_exclusions", ()),
+                reference_model=None
+                if reference is None
+                else _load_cobra_model(Path(str(reference))),
             )
             output = work_dir / "validation.json"
             output.write_text(

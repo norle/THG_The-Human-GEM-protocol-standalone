@@ -50,6 +50,7 @@
     {"module": "thg_protocol.analysis.compaction", "page": "api/analysis.md", "symbols": ["are_reactions_proportional", "combine_identical_reactions", "full_compaction"]},
     {"module": "thg_protocol.analysis.compare", "page": "api/analysis.md", "symbols": ["compare_models", "compare_models_from_files", "compare_reactions", "reactions_by_compartment", "remove_blocked_reactions", "save_comparison_csv", "compare_semantic_models", "compare_model_files_semantically", "compare_workflow_runs", "save_semantic_comparison"]},
     {"module": "thg_protocol.analysis.model_signature", "page": "api/analysis.md", "symbols": ["model_signature", "diff_model_signatures"]},
+    {"module": "thg_protocol.analysis.conservation", "page": "api/analysis.md", "symbols": ["conservation_exclusions", "find_unconserved_metabolites", "blame_reactions", "chemically_suspect", "localize", "fractional", "integer_candidates", "reaction_origin", "element_residual", "charge_residual", "reaction_summary", "cofactor_candidates", "infer_formula", "propose_fixes", "apply_conservation_fixes", "compare_detections"]},
     {"module": "thg_protocol.analysis.consistency", "page": "api/analysis.md", "symbols": ["dead_end_metabolites", "orphan_metabolites", "reaction_balance", "charge_balance", "unbalanced_reactions_by_charge", "blocked_reactions", "stoichiometrically_balanced_cycles", "metabolites_not_produced", "metabolites_not_consumed", "unbounded_reactions", "unbalanced_reactions"]},
     {"module": "thg_protocol.analysis.network", "page": "api/analysis.md", "symbols": ["find_network_components", "write_component_report"]},
     {"module": "thg_protocol.figures.comparison", "page": "api/figures.md", "symbols": ["AnnotationGroupSummary", "FigureGenerationResult", "annotation_group_percentages", "generate_annotation_comparison_figures", "read_annotation_group_summary", "summarize_annotation_rows"]},
@@ -58,7 +59,7 @@
     {"module": "thg_protocol.gapfill.cli", "page": "api/cli.md", "symbols": ["build_parser", "main"]},
     {"module": "thg_protocol.pathway.cli", "page": "api/cli.md", "symbols": ["build_parser", "main"]},
     {"module": "thg_protocol.workflow.cli", "page": "api/cli.md", "symbols": ["build_parser", "main"]},
-    {"module": "thg_protocol.validation", "page": "api/workflows.md", "symbols": ["PROFILES", "CheckResult", "load_model", "minimal_inconsistent_sets", "stoichiometric_consistency", "validate_model"]},
+    {"module": "thg_protocol.validation", "page": "api/workflows.md", "symbols": ["PROFILES", "CheckResult", "annotation_conflict", "formula_disagreement", "fractional_coefficients", "load_model", "minimal_inconsistent_sets", "stoichiometric_consistency", "unusual_protons", "validate_model"]},
     {"module": "thg_protocol.tasks", "page": "api/workflows.md", "symbols": ["MetabolicTask", "TaskObjective", "TaskSuite", "load_task_suite", "save_task_suite", "run_task", "run_tasks", "run_task_suite"]},
     {"module": "thg_protocol.raven_tasks", "page": "api/workflows.md", "symbols": ["RavenImport", "TaskMapping", "convert_raven_tasks", "import_raven_tasks", "is_raven_table", "load_task_input", "load_task_mapping", "read_raven_rows", "task_input_version"]},
     {"module": "thg_protocol.memote", "page": "api/workflows.md", "symbols": ["run_memote"]}

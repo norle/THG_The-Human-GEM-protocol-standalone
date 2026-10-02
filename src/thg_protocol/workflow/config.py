@@ -121,6 +121,8 @@ WORKFLOW_SECTION_KEYS = {
         "run_solver",
         "memote_threshold",
         "memote_command",
+        "conservation_exclusions",
+        "reference_model",
     },
     "compare": {"left", "right", "upstream"},
     "cell_specific": {
@@ -329,6 +331,25 @@ def _parse_workflow(
                         MODEL_SUFFIXES,
                     )
                 )
+            if section == "validation" and "reference_model" in value:
+                value = dict(value)
+                value["reference_model"] = str(
+                    _input_path(
+                        _required_string(value, "reference_model", section),
+                        input_base,
+                        "validation.reference_model",
+                        MODEL_SUFFIXES,
+                    )
+                )
+            for key in ("exclusions", "conservation_exclusions"):
+                if section in {"conservation", "validation"} and key in value:
+                    items = value[key]
+                    if not isinstance(items, list) or not all(
+                        isinstance(item, str) and item for item in items
+                    ):
+                        raise ConfigError(
+                            f"'{section}.{key}' must be a list of reaction IDs"
+                        )
             if section == "final_thg":
                 value = dict(value)
                 for key in ("beta2_model", "database_model"):

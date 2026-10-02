@@ -40,6 +40,28 @@ for semantic model parity and artifact comparisons.
         - unbounded_reactions
         - unbalanced_reactions
 
+## Conservation
+
+::: thg_protocol.analysis.conservation
+    options:
+      members:
+        - conservation_exclusions
+        - find_unconserved_metabolites
+        - blame_reactions
+        - chemically_suspect
+        - localize
+        - fractional
+        - integer_candidates
+        - reaction_origin
+        - element_residual
+        - charge_residual
+        - reaction_summary
+        - cofactor_candidates
+        - infer_formula
+        - propose_fixes
+        - apply_conservation_fixes
+        - compare_detections
+
 ## Comparison
 
 ::: thg_protocol.analysis.compare

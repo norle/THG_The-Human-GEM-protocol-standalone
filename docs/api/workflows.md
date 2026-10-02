@@ -33,9 +33,13 @@ writers below.
       members:
         - PROFILES
         - CheckResult
+        - annotation_conflict
+        - formula_disagreement
+        - fractional_coefficients
         - load_model
         - minimal_inconsistent_sets
         - stoichiometric_consistency
+        - unusual_protons
         - validate_model
 
 ::: thg_protocol.tasks

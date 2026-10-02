@@ -3,8 +3,10 @@
 from __future__ import annotations
 
 import argparse
+import contextlib
 import json
 import logging
+import sys
 from pathlib import Path
 
 from thg_protocol.runtime.locking import RunLockedError, unlock_run
@@ -80,7 +82,9 @@ def _direct_validation(
 ) -> int:
     from thg_protocol.validation import load_model, validate_model
 
-    report = validate_model(load_model(path), profile, run_solver=run_solver)
+    # Solvers print licence banners (Gurobi) on stdout; keep stdout for the report.
+    with contextlib.redirect_stdout(sys.stderr):
+        report = validate_model(load_model(path), profile, run_solver=run_solver)
     if as_json:
         print(json.dumps(report, indent=2, sort_keys=True))
     else:
