@@ -159,12 +159,39 @@ def _decision_items(section: Mapping[str, object]) -> tuple[Any, ...]:
     return read_decisions(path) if isinstance(path, str) else ()
 
 
+#: Annotation keys whose values identify a structure, not just a database entry.
+_STRUCTURAL_ANNOTATIONS = ("inchi", "inchikey", "inchi_key", "smiles")
+
+
+def _structural_identifiers(metabolite: Any) -> tuple[str, ...]:
+    annotation = getattr(metabolite, "annotation", {}) or {}
+    values = []
+    for key in _STRUCTURAL_ANNOTATIONS:
+        value = annotation.get(key)
+        values.extend(value if isinstance(value, list) else [value] if value else [])
+    return tuple(sorted({str(item) for item in values}))
+
+
 def _resolve_metabolite_payload(
-    payload: tuple[str, Mapping[str, object], str | None, str | None, int | None]
+    payload: tuple[
+        str,
+        Mapping[str, object],
+        str | None,
+        str | None,
+        int | None,
+        tuple[str, ...],
+    ],
 ) -> tuple[str, dict[str, object]]:
     from thg_protocol.curation.beta1 import resolve_metabolite_identity
 
-    object_id, record, reference_name, reference_formula, reference_charge = payload
+    (
+        object_id,
+        record,
+        reference_name,
+        reference_formula,
+        reference_charge,
+        structural,
+    ) = payload
     return object_id, resolve_metabolite_identity(
         record.get("candidates", []),
         errors=record.get("errors", [])
@@ -173,6 +200,7 @@ def _resolve_metabolite_payload(
         reference_name=reference_name,
         reference_formula=reference_formula,
         reference_charge=reference_charge,
+        reference_structural_identifiers=structural,
     )
 
 
@@ -184,7 +212,7 @@ def _curate_gpr_payload(
         tuple[str, ...],
         Mapping[str, object],
         bool,
-    ]
+    ],
 ) -> tuple[dict[str, object], list[dict[str, str]]] | None:
     from thg_protocol.curation.beta1 import (
         canonicalize_gpr,
@@ -269,7 +297,7 @@ def _run_provenance(
 class DetailedBeta1Stage:
     """One stage in the explicit Phase 1 scientific DAG."""
 
-    implementation_version = 3
+    implementation_version = 4
 
     def __init__(self, stage_id: str, dependencies: tuple[str, ...] = ()) -> None:
         self.id = stage_id
@@ -424,9 +452,9 @@ class DetailedBeta1Stage:
                                 object_id,
                                 dict(record),
                                 str(getattr(metabolite, "name", "") or "") or None,
-                                str(getattr(metabolite, "formula", "") or "")
-                                or None,
+                                str(getattr(metabolite, "formula", "") or "") or None,
                                 getattr(metabolite, "charge", None),
+                                _structural_identifiers(metabolite),
                             )
                         )
                 else:
@@ -620,9 +648,7 @@ class DetailedBeta1Stage:
                 {
                     "schema_version": 1,
                     "resolutions": resolutions,
-                    "duplicate_chemistry": [
-                        list(group) for group in duplicate_groups
-                    ],
+                    "duplicate_chemistry": [list(group) for group in duplicate_groups],
                 },
             )
             return StageResult((("identities", output),), {"records": len(resolutions)})

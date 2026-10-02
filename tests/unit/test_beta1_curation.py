@@ -434,3 +434,38 @@ def test_release_gate_rejects_self_declared_sanctioned_input(tmp_path):
 
     assert not gate["ready"]
     assert "maintained sanctioned β1 fixture" in " ".join(gate["reasons"])
+
+
+def test_name_match_with_conflicting_formula_is_not_identity_evidence():
+    # The legacy merge renamed Human-GEM's MAM00668 (2-naphthol, C10H8O) to EPA.
+    result = resolve_metabolite_identity(
+        [
+            MetaboliteCandidate(
+                "C11713",
+                "kegg",
+                name="(5Z,8Z,11Z,14Z,17Z)-Icosapentaenoic acid",
+                formula="C10H8O",
+            )
+        ],
+        reference_name="(5Z,8Z,11Z,14Z,17Z)-icosapentaenoic acid",
+        reference_formula="C20H29O2",
+    )
+    assert result["candidates"][0]["score"] == 0.0
+    assert "conflicting formula" in result["candidates"][0]["reason"]
+    assert result["status"] == "no-match"
+    assert result["selected"] is None
+    protonated = resolve_metabolite_identity(
+        [MetaboliteCandidate("C1", "kegg", name="acid", formula="C20H30O2")],
+        reference_name="Acid",
+        reference_formula="C20H29O2",
+    )
+    assert protonated["candidates"][0]["score"] == 10.0
+
+
+def test_formulas_conflict_ignores_hydrogen_and_missing_formulas():
+    from thg_protocol.model_build.mass_balance import formulas_conflict
+
+    assert formulas_conflict("C20H29O2", "C10H8O")
+    assert not formulas_conflict("C20H29O2", "C20H30O2")
+    assert not formulas_conflict("C20H29O2", None)
+    assert not formulas_conflict("", "C1")

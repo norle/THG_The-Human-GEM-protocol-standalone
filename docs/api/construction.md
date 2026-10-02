@@ -69,6 +69,7 @@ injected and record cache/error provenance explicitly.
       members:
         - atom10
         - formula_atoms
+        - formulas_conflict
         - gcd
         - missing_atoms
         - reaction_compare

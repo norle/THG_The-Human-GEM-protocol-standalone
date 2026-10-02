@@ -20,7 +20,7 @@ from typing import Any
 
 from thg_protocol.analysis.consistency import reaction_balance
 from thg_protocol.analysis.model_signature import model_signature
-from thg_protocol.model_build.mass_balance import formula_atoms
+from thg_protocol.model_build.mass_balance import formula_atoms, formulas_conflict
 from thg_protocol.runtime.concurrency import parallel_map
 from thg_protocol.runtime.hashing import sha256_file
 from thg_protocol.workflow.proposals import (
@@ -82,6 +82,7 @@ IDENTITY_NAMESPACE_PRIORITY = (
     "lipidmaps",
 )
 NON_CHEMICAL_IDENTITY_NAMESPACES = {"sbo", "ontology"}
+FORMULA_CONFLICT_REASON = "name support contradicted by a conflicting formula"
 
 
 def _json(value: object) -> object:
@@ -465,6 +466,19 @@ def resolve_metabolite_identity(
         for item in ordered
         if item.namespace.casefold() not in NON_CHEMICAL_IDENTITY_NAMESPACES
     ]
+    contradicted = [item for item in usable if item.reason == FORMULA_CONFLICT_REASON]
+    usable = [item for item in usable if item.reason != FORMULA_CONFLICT_REASON]
+    if not usable and contradicted:
+        return {
+            "status": "no-match",
+            "selected": None,
+            "candidates": [_json(item.__dict__) for item in ordered],
+            "errors": [],
+            "evidence": sorted(
+                {evidence for item in contradicted for evidence in item.evidence}
+            ),
+            "reason": "every candidate has a formula conflicting with the reference",
+        }
     if not usable:
         return {
             "status": "no-match",
@@ -479,8 +493,7 @@ def resolve_metabolite_identity(
     top_score = usable[0].score
     tied = [item for item in usable if item.score == top_score]
     priority = {
-        namespace: index
-        for index, namespace in enumerate(IDENTITY_NAMESPACE_PRIORITY)
+        namespace: index for index, namespace in enumerate(IDENTITY_NAMESPACE_PRIORITY)
     }
     best_priority = min(
         priority.get(item.namespace.casefold(), len(priority)) for item in tied
@@ -507,9 +520,7 @@ def resolve_metabolite_identity(
         "selected": _json(top.__dict__),
         "candidates": [_json(item.__dict__) for item in ordered],
         "errors": [],
-        "evidence": sorted(
-            {evidence for item in usable for evidence in item.evidence}
-        ),
+        "evidence": sorted({evidence for item in usable for evidence in item.evidence}),
         "reason": top.reason,
     }
 
@@ -545,6 +556,10 @@ def score_metabolite_candidate(
         return 60.0, "formula and charge compatible"
     if formula_match:
         return 50.0, "formula compatible"
+    if formulas_conflict(reference_formula, candidate.formula):
+        # A shared name does not make two compounds the same: the legacy merge
+        # renamed Human-GEM's MAM00668 (2-naphthol) to EPA this way.
+        return 0.0, FORMULA_CONFLICT_REASON
     if (
         reference_name
         and candidate.name
@@ -796,8 +811,7 @@ def generate_curation_proposals(
                 evidence=tuple(
                     str(x)
                     for x in (
-                        resolution.get("evidence", [])
-                        or selected.get("evidence", [])
+                        resolution.get("evidence", []) or selected.get("evidence", [])
                     )
                 ),
                 confidence=str(selected.get("score", "matched")),
@@ -1047,7 +1061,7 @@ def _compare_reaction_identity_payload(
         Mapping[str, str],
         str,
         tuple[str, ...],
-    ]
+    ],
 ) -> ReactionIdentity:
     reaction, target, metabolite_mapping, proton_water_policy, normalization_species = (
         payload
@@ -1142,10 +1156,7 @@ class BalanceAudit:
             reaction_class=str(payload.get("reaction_class", "unknown")),
             mass_status=str(payload.get("mass_status", "unknown")),
             charge_status=str(payload.get("charge_status", "unknown")),
-            mass_residual={
-                str(key): float(value)
-                for key, value in residual.items()
-            }
+            mass_residual={str(key): float(value) for key, value in residual.items()}
             if isinstance(residual, Mapping)
             else {},
             charge_residual=float(charge) if charge is not None else None,
@@ -1266,9 +1277,7 @@ def audit_reaction(
         )
     )
     selected_policy = (
-        {
-            str(key): str(value) for key, value in formula_policy.items()
-        }
+        {str(key): str(value) for key, value in formula_policy.items()}
         if formula_policy is not None
         else dict(DEFAULT_FORMULA_POLICY)
     )
@@ -1430,8 +1439,7 @@ def audit_model(
         DEFAULT_FORMULA_POLICY if formula_policy is None else formula_policy
     )
     payloads = tuple(
-        (_reaction_payload(reaction), dict(selected_policy))
-        for reaction in reactions
+        (_reaction_payload(reaction), dict(selected_policy)) for reaction in reactions
     )
     del reactions, model
     return parallel_map(_audit_reaction_payload, payloads, n_jobs=n_jobs)

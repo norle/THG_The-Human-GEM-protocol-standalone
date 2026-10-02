@@ -43,6 +43,22 @@ def formula_atoms(formula: str) -> dict[str, int]:
     return dict(atoms) if consumed == formula else {}
 
 
+def formulas_conflict(first: object, second: object) -> bool:
+    """Return whether two formulas differ in anything but hydrogen.
+
+    Formulas that differ only in H describe protonation states of the same
+    compound and do not conflict. A missing or unparsable formula never
+    conflicts.
+    """
+    left = formula_atoms(first) if isinstance(first, str) else {}
+    right = formula_atoms(second) if isinstance(second, str) else {}
+    if not left or not right:
+        return False
+    left.pop("H", None)
+    right.pop("H", None)
+    return left != right
+
+
 def atom10(formula: str) -> list[int]:
     """Return legacy C/H/O/N/P/S/K/Ca/Na/Fe/X/R counts."""
     atoms = formula_atoms(formula)
@@ -338,6 +354,7 @@ def reformulate_glycan_equation(
 __all__ = [
     "atom10",
     "formula_atoms",
+    "formulas_conflict",
     "gcd",
     "missing_atoms",
     "reaction_compare",
