@@ -24,11 +24,7 @@ def _stage_artifact(run: Path, stage: str, role: str) -> Path:
 
 def _jsonl(path: Path) -> list[dict[str, object]]:
     return [
-        {
-            key: value
-            for key, value in json.loads(line).items()
-            if key != "record_type"
-        }
+        {key: value for key, value in json.loads(line).items() if key != "record_type"}
         for line in path.read_text().splitlines()
         if line.strip()
     ]
@@ -165,10 +161,7 @@ def test_live_smoke_snapshot_replay_is_semantically_identical(tmp_path, monkeypa
     ):
         assert _stage_artifact(live_run, "collect-gpr-evidence", role).is_file()
     assert (
-        calls.count("1.1.1.1")
-        == calls.count("2.2.2.2")
-        == calls.count("3.3.3.3")
-        == 1
+        calls.count("1.1.1.1") == calls.count("2.2.2.2") == calls.count("3.3.3.3") == 1
     )
     assert "cco:CCO-IMEM" in calls and "cco:CCO-MIT" in calls
 
@@ -203,9 +196,10 @@ def test_live_smoke_snapshot_replay_is_semantically_identical(tmp_path, monkeypa
     assert snapshot_metadata["source_releases"]["biocyc"]["release"] == (
         "fixture-release"
     )
-    assert snapshot_metadata["source_releases"]["biocyc"][
-        "raw_response_sha256"
-    ] == "a" * 64
+    assert (
+        snapshot_metadata["source_releases"]["biocyc"]["raw_response_sha256"]
+        == "a" * 64
+    )
     snapshot_config = tmp_path / "snapshot.json"
     snapshot_run = tmp_path / "snapshot-run"
     _config(
@@ -229,9 +223,7 @@ def test_live_smoke_snapshot_replay_is_semantically_identical(tmp_path, monkeypa
     for role in ("compartment-resolution-evidence", "id-registry"):
         assert _semantic(
             json.loads(_artifact(snapshot_run, role).read_text())
-        ) == _semantic(
-            json.loads(_artifact(live_run, role).read_text())
-        )
+        ) == _semantic(json.loads(_artifact(live_run, role).read_text()))
 
 
 def test_snapshot_keeps_each_source_and_prefers_reactome_structure(tmp_path):

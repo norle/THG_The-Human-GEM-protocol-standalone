@@ -19,10 +19,14 @@ def _config(path, workflow, output, section=None):
         "run": {"name": workflow, "output_dir": str(output)},
     }
     section = dict(section or {})
-    if workflow in {"beta1", "beta2"} and not {
-        "input_model",
-        "upstream",
-    } & section.keys():
+    if (
+        workflow in {"beta1", "beta2"}
+        and not {
+            "input_model",
+            "upstream",
+        }
+        & section.keys()
+    ):
         section["input_model"] = str(DEFAULT_MODEL)
     if section:
         payload[workflow] = section
@@ -132,8 +136,7 @@ def test_start_resumes_matching_run_and_allows_worker_count_change(tmp_path):
         for stage in before["steps"]
     )
     assert (
-        json.loads((run / "config.snapshot.json").read_text())["beta1"]["n_jobs"]
-        == 2
+        json.loads((run / "config.snapshot.json").read_text())["beta1"]["n_jobs"] == 2
     )
 
 
@@ -200,8 +203,5 @@ def test_decision_file_change_invalidates_application_and_descendants(tmp_path):
         after["steps"]["generate-curation-proposals"]["attempt"]
         == attempts["generate-curation-proposals"]
     )
-    assert (
-        after["steps"]["apply-curation"]["attempt"]
-        == attempts["apply-curation"] + 1
-    )
+    assert after["steps"]["apply-curation"]["attempt"] == attempts["apply-curation"] + 1
     assert after["steps"]["export-beta1"]["attempt"] == attempts["export-beta1"] + 1

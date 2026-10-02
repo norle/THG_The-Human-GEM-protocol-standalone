@@ -67,9 +67,7 @@ def test_gimme_prefers_high_expression_path_and_does_not_mutate_model():
 def test_native_gimme_matches_frozen_compatibility_fixture():
     fixture = json.loads(
         (
-            Path(__file__).parents[1]
-            / "fixtures"
-            / "gimme_legacy_reference.json"
+            Path(__file__).parents[1] / "fixtures" / "gimme_legacy_reference.json"
         ).read_text()
     )
     model = _alternatives()
@@ -88,17 +86,13 @@ def test_native_gimme_matches_frozen_compatibility_fixture():
         ],
     )
     assert result.solver_name == model.solver.interface.__name__
-    assert result.objective_maxima["out"] == pytest.approx(
-        fixture["objective_maximum"]
-    )
+    assert result.objective_maxima["out"] == pytest.approx(fixture["objective_maximum"])
     assert result.objective_requirements["out"] == pytest.approx(
         fixture["objective_requirement"]
     )
     assert result.inconsistency_score == pytest.approx(fixture["inconsistency_score"])
     assert {
-        reaction_id
-        for reaction_id, active in result.reaction_active.items()
-        if active
+        reaction_id for reaction_id, active in result.reaction_active.items() if active
     } == set(fixture["active_reactions"])
 
 

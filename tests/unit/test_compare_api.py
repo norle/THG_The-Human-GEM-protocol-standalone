@@ -37,8 +37,13 @@ def _cobra_model(*, formula="C", gpr="G1"):
     left = Metabolite("a_c", formula, 0, "c")
     right = Metabolite("b_c", "C", 0, "c")
     reaction = SimpleNamespace(
-        id="R1", name=None, lower_bound=0, upper_bound=1000,
-        metabolites={left: -1, right: 1}, gene_reaction_rule=gpr, annotation={}
+        id="R1",
+        name=None,
+        lower_bound=0,
+        upper_bound=1000,
+        metabolites={left: -1, right: 1},
+        gene_reaction_rule=gpr,
+        annotation={},
     )
     return SimpleNamespace(
         id="semantic",

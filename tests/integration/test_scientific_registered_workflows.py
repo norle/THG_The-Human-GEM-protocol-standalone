@@ -139,9 +139,7 @@ def test_cell_specific_native_gimme_exports_labeled_consensus_artifacts(tmp_path
     assert manifest["overall_status"] == "completed"
     assert exports["gimme-results"].is_file()
     assert exports["consensus-reaction-activity"].is_file()
-    assert exports["gimme-activity-matrix"].read_text().startswith(
-        "reaction_id,sample"
-    )
+    assert exports["gimme-activity-matrix"].read_text().startswith("reaction_id,sample")
     assert load_json_model(exports["model"]).reactions.has_id("low")
 
 

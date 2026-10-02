@@ -216,9 +216,7 @@ def test_uniprot_search_uses_cross_references_for_ensembl_identifiers(monkeypatc
 
     monkeypatch.setattr(uniprot, "request", fake_request)
 
-    uniprot.UniProtClient(session=object()).annotations_for(
-        ["ENSG00000000419", "DPM1"]
-    )
+    uniprot.UniProtClient(session=object()).annotations_for(["ENSG00000000419", "DPM1"])
 
     assert calls == ["gene:DPM1 OR xref:ensembl-ENSG00000000419"]
 
@@ -285,9 +283,7 @@ def test_uniprot_sl_to_go_mapping_is_location_specific():
             }
         ]
     ).annotations_for(["GENE1"])
-    assert [(item.sl_id, item.go_id) for item in result] == [
-        ("SL-001", "GO:0005739")
-    ]
+    assert [(item.sl_id, item.go_id) for item in result] == [("SL-001", "GO:0005739")]
 
 
 def test_live_provider_metadata_records_release_and_raw_checksum(monkeypatch):
@@ -356,34 +352,37 @@ def test_live_provider_metadata_records_release_and_raw_checksum(monkeypatch):
         metadata = client.metadata
         assert metadata["source"].lower() == source
         assert metadata["release"] == f"{source}-1"
-        assert metadata["raw_response_sha256"] == hashlib.sha256(
-            client_metadata_payload(source)
-        ).hexdigest()
+        assert (
+            metadata["raw_response_sha256"]
+            == hashlib.sha256(client_metadata_payload(source)).hexdigest()
+        )
 
 
 def client_metadata_payload(source):
     return {
         "goa": gzip.compress(
-            ("!gaf-version: 2.2\n" + "\t".join(
-                [
-                    "UniProt",
-                    "P1",
-                    "GENE1",
-                    "",
-                    "GO:0005739",
-                    "PMID:1",
-                    "IDA",
-                    "",
-                    "C",
-                    "",
-                    "",
-                    "",
-                    "",
-                    "",
-                    "GOA",
-                ]
-            )
-        ).encode(),
+            (
+                "!gaf-version: 2.2\n"
+                + "\t".join(
+                    [
+                        "UniProt",
+                        "P1",
+                        "GENE1",
+                        "",
+                        "GO:0005739",
+                        "PMID:1",
+                        "IDA",
+                        "",
+                        "C",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "",
+                        "GOA",
+                    ]
+                )
+            ).encode(),
             mtime=0,
         ),
         "uniprot": b'{"results": []}',

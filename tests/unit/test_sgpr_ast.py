@@ -32,12 +32,18 @@ def test_canonical_serializers_keep_branch_local_coefficients():
 
 def test_merge_reports_conflicts_and_keeps_conservative_structure():
     left = SgprEvidence(
-        "biocyc", "1.1.1.1", OrNode((GeneNode("A"), GeneNode("B"))),
-        "strong", "resolved"
+        "biocyc",
+        "1.1.1.1",
+        OrNode((GeneNode("A"), GeneNode("B"))),
+        "strong",
+        "resolved",
     )
     right = SgprEvidence(
-        "reactome", "1.1.1.1", AndNode((GeneNode("A"), GeneNode("B"))),
-        "strong", "resolved"
+        "reactome",
+        "1.1.1.1",
+        AndNode((GeneNode("A"), GeneNode("B"))),
+        "strong",
+        "resolved",
     )
     result = merge_sgpr_evidence([left, right])
     assert result.status == "conflict"
