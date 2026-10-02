@@ -1,6 +1,6 @@
 # THG Protocol: Current State
 
-Last reviewed: 2026-08-31
+Last reviewed: 2026-10-02
 
 The package structure cleanup is complete. Supported code
 lives under `src/thg_protocol`; tests use package APIs; preserved artifacts have
@@ -9,7 +9,7 @@ canonical locations. Historical implementation details remain in Git history.
 ## Current status
 
 - Branch: `refactoring-cleanup`
-- Reviewed commit: `601b9d9`
+- Reviewed commit: `00c52cd` plus the 2026-10-02 review fixes
 - Supported Python: 3.10–3.12
 - Installed commands: `thg-gapfill`, `thg-pathway`, `thg-compare`, and `thg-run`
 - Legacy checkout directories: removed and excluded from distributions
@@ -17,8 +17,8 @@ canonical locations. Historical implementation details remain in Git history.
 
 The package provides annotation, GPR, pathway, gapfill, comparison, model
 construction, merge, network analysis, figures, cell-specific helpers, model
-I/O, validation, and resumable workflows. External lookups use injectable
-clients and offline test adapters.
+I/O, validation, conservation analysis, and resumable workflows. External
+lookups use injectable clients and offline test adapters.
 
 The completed workflow, gapfill, first-class workflow, sGPR, and structural
 cleanup plans were consolidated into this state record; Git history retains the
@@ -31,17 +31,16 @@ publication-artifact reproduction remains unverified.
 
 ## Latest validation
 
-The latest local default offline gate passed under Python 3.12 with `1984
-passed, 1 skipped`. Ruff, bytecode compilation, strict documentation build,
-artifact integrity checks, and all four CLI help checks passed from a clean
-source build. The one skipped test requires the optional figures dependency.
+On 2026-10-02 the full local suite passed under Python 3.12 with memote and
+Gurobi installed: `2106 passed`. The mkdocs tests were run separately, from an
+environment with mkdocs installed (`6 passed`). The CI offline selection also
+passed with memote unavailable (`2100 passed`), and the solver/memote selection
+passed on GLPK. `ruff check` and `ruff format --check` are clean.
 
-An isolated source/wheel build installed outside the checkout and passed package
-imports and CLI smoke tests. `git lfs fsck` passed for all nine approved
-objects, and a fresh source archive reproduced the package contents.
+The isolated wheel build, `git lfs fsck`, and source-archive checks were last
+run at `601b9d9` and have not been repeated since.
 
-Hosted run `30340915763` passed Python 3.10–3.12. A newer run tested an older
-commit and exposed a Python 3.11 compatibility issue fixed on the current branch.
+Hosted run `30340915763` passed Python 3.10–3.12 on an earlier commit.
 
 ## Remaining release gate
 
