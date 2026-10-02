@@ -543,10 +543,14 @@ def stoichiometric_consistency(
     *,
     exclusions: Iterable[str] = (),
     reference_model: Any | None = None,
+    identify: bool = True,
 ) -> dict[str, object]:
     """Name the unconserved metabolites (Gevorgyan et al. 2008).
 
-    Uses MEMOTE's consistency functions with the model's solver. Boundary,
+    Uses MEMOTE's consistency functions with the model's solver. With
+    ``identify=False`` only the consistency LP runs: an inconsistent model
+    fails without naming its unconserved metabolites, which skips MEMOTE's
+    MILP. Boundary,
     biomass (SBO:0000629), artificial/pool and configured reactions are
     excluded, as are the reactions ``reference_model`` excludes; the details
     list each exclusion with its rule. Without MEMOTE
@@ -564,7 +568,10 @@ def stoichiometric_consistency(
         from .analysis.conservation import find_unconserved_metabolites
 
         return find_unconserved_metabolites(
-            model, input_model=reference_model, configured=exclusions
+            model,
+            input_model=reference_model,
+            configured=exclusions,
+            identify=identify,
         )
     except Exception as error:
         return {"status": "infrastructure-error", "error": str(error), "passed": None}
@@ -733,6 +740,7 @@ def validate_model(
                 model,
                 exclusions=conservation_exclusions,
                 reference_model=reference_model,
+                identify=solver,
             ),
             blocking="stoichiometric-consistency" in blocking,
         ),

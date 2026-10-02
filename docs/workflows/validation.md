@@ -44,7 +44,9 @@ The HTML is rendered from the JSON and does not rerun or reinterpret checks.
 Stoichiometric consistency is diagnostic in every profile, including
 `release-full`: failure produces a warning rather than blocking release.
 The check runs MEMOTE's consistency functions (Gevorgyan et al. 2008) with the
-model's solver and names the unconserved metabolites (ID, name, compartment).
+model's solver. Profiles that run solver checks also name the unconserved
+metabolites (ID, name, compartment) with MEMOTE's MILP; `structural-fast` runs
+only the consistency LP and reports `unconserved` as `null` when it fails.
 Boundary, biomass (`SBO:0000629`), "Artificial reactions" and "Pool
 reactions" reactions are excluded, as are reaction IDs listed in
 `validation.conservation_exclusions`; the details list each exclusion with its

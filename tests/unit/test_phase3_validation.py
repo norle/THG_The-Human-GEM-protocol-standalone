@@ -129,6 +129,8 @@ def test_stoichiometric_inconsistency_is_a_nonblocking_warning(monkeypatch):
     check = next(c for c in report["checks"] if c["id"] == "stoichiometric-consistency")
     assert check["status"] == "failed"
     assert check["release_blocking"] is False
+    # Without solver checks only the LP runs; MEMOTE's MILP names nothing.
+    assert check["details"]["unconserved"] is None
     assert report["passed"] is True
 
 
@@ -398,3 +400,4 @@ def test_real_memote_smoke_when_optional_dependency_is_installed(tmp_path):
     assert report["status"] == "completed"
     assert {"memote-result.json", "memote-report.html"} <= set(report["artifacts"])
     assert report["report_returncode"] == 0
+

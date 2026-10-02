@@ -163,18 +163,21 @@ def find_unconserved_metabolites(
     configured: Iterable[str] = (),
     exclusions: Mapping[str, str] | None = None,
     solver: str | None = None,
+    identify: bool = True,
 ) -> dict[str, object]:
     """Name the metabolites no positive conservation vector can weight.
 
     Runs MEMOTE's ``check_stoichiometric_consistency`` (one LP) and, only when
-    that fails, ``find_unconserved_metabolites`` (one MILP), both on a copy of
-    the model without the excluded reactions and with the model's solver
-    unless ``solver`` is given. Reactions MEMOTE itself treats as biomass are
-    added to the exclusions with the rule ``memote-biomass``.
+    that fails and ``identify`` is true, ``find_unconserved_metabolites`` (one
+    MILP), both on a copy of the model without the excluded reactions and with
+    the model's solver unless ``solver`` is given. With ``identify=False`` an
+    inconsistent model reports ``unconserved`` as ``None``. Reactions MEMOTE
+    itself treats as biomass are added to the exclusions with the rule
+    ``memote-biomass``.
     """
+    consistency = _memote_consistency()
     from memote.support.helpers import find_biomass_reaction
 
-    consistency = _memote_consistency()
     if exclusions is None:
         exclusions = conservation_exclusions(
             model, input_model=input_model, configured=configured
@@ -193,6 +196,8 @@ def find_unconserved_metabolites(
     }
     if consistency.check_stoichiometric_consistency(pruned):
         return {**base, "consistent": True, "unconserved": [], "passed": True}
+    if not identify:
+        return {**base, "consistent": False, "unconserved": None, "passed": False}
     unconserved = sorted(
         (_describe(item) for item in consistency.find_unconserved_metabolites(pruned)),
         key=lambda item: str(item["id"]),
