@@ -187,49 +187,85 @@ def generate_merge_plan(
                 return f"{key} {sorted(ours)} vs {sorted(theirs)}"
         return None
 
-    metabolite_map: dict[str, str] = {}
-    decisions: list[MergeDecision] = []
+    def compartment(model: Any, metabolite_id: str) -> str:
+        return model.metabolites.get_by_id(metabolite_id).compartment or ""
+
+    # A shared identifier pairs metabolites within one compartment: ATP in the
+    # cytosol and in mitochondria share a KEGG ID but are different species.
+    # Pairs and ambiguous groups collect every token that supports them, so
+    # each gets one decision however many identifiers it shares.
+    pairs: dict[tuple[str, str], list[str]] = {}
+    ambiguous: dict[tuple[str, str], list[str]] = {}
     for token in sorted(set(left) & set(right)):
         targets = sorted(set(left[token]))
         candidates = sorted(set(right[token]))
         if len(targets) == len(candidates) == 1:
-            target, source = targets[0], candidates[0]
-            left_obj = base_model.metabolites.get_by_id(target)
-            right_obj = incoming_model.metabolites.get_by_id(source)
-            conflict = identity_conflict(left_obj, right_obj)
-            if conflict is not None:
-                decisions.append(
-                    MergeDecision(
-                        "identity-conflict",
-                        target,
-                        source,
-                        "unresolved",
-                        f"{token}; conflicting {conflict}",
-                    )
+            pairs.setdefault((targets[0], candidates[0]), []).append(token)
+            continue
+        places = {compartment(base_model, item) for item in targets} & {
+            compartment(incoming_model, item) for item in candidates
+        }
+        for place in sorted(places):
+            here = [item for item in targets if compartment(base_model, item) == place]
+            there = [
+                item
+                for item in candidates
+                if compartment(incoming_model, item) == place
+            ]
+            group = pairs if len(here) == len(there) == 1 else ambiguous
+            group.setdefault((",".join(here), ",".join(there)), []).append(token)
+    targets_of: dict[str, set[str]] = {}
+    sources_of: dict[str, set[str]] = {}
+    for target, source in pairs:
+        targets_of.setdefault(source, set()).add(target)
+        sources_of.setdefault(target, set()).add(source)
+
+    metabolite_map: dict[str, str] = {}
+    decisions: list[MergeDecision] = []
+    for (target, source), tokens in sorted(pairs.items()):
+        token = ", ".join(tokens)
+        left_obj = base_model.metabolites.get_by_id(target)
+        right_obj = incoming_model.metabolites.get_by_id(source)
+        if len(targets_of[source]) > 1 or len(sources_of[target]) > 1:
+            # Different identifiers pair one metabolite with different ones.
+            key = (
+                ",".join(sorted(targets_of[source])),
+                ",".join(sorted(sources_of[target])),
+            )
+            ambiguous.setdefault(key, []).extend(tokens)
+            continue
+        conflict = identity_conflict(left_obj, right_obj)
+        if conflict is not None:
+            decisions.append(
+                MergeDecision(
+                    "identity-conflict",
+                    target,
+                    source,
+                    "unresolved",
+                    f"{token}; conflicting {conflict}",
                 )
-            elif left_obj.compartment == right_obj.compartment:
-                metabolite_map[source] = target
-                decisions.append(
-                    MergeDecision(
-                        "metabolite-equivalence", target, source, "map", token
-                    )
-                )
-            else:
-                decisions.append(
-                    MergeDecision(
-                        "compartment-conflict", target, source, "unresolved", token
-                    )
-                )
+            )
+        elif left_obj.compartment == right_obj.compartment:
+            metabolite_map[source] = target
+            decisions.append(
+                MergeDecision("metabolite-equivalence", target, source, "map", token)
+            )
         else:
             decisions.append(
                 MergeDecision(
-                    "ambiguous-metabolite",
-                    ",".join(targets),
-                    ",".join(candidates),
-                    "unresolved",
-                    token,
+                    "compartment-conflict", target, source, "unresolved", token
                 )
             )
+    decisions.extend(
+        MergeDecision(
+            "ambiguous-metabolite",
+            targets,
+            candidates,
+            "unresolved",
+            ", ".join(sorted(set(tokens))),
+        )
+        for (targets, candidates), tokens in sorted(ambiguous.items())
+    )
     gene_map = {
         gene.id: gene.id
         for gene in incoming_model.genes

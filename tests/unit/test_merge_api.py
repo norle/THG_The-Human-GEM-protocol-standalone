@@ -150,3 +150,47 @@ def test_shared_identifier_with_conflicting_formula_or_ids_is_not_mapped():
         "inchikey": "B",
     }
     assert generate_merge_plan(base, incoming).metabolite_map == {"b_c": "a_c"}
+
+
+def _atp_model(model_id, prefix):
+    model = cobra.Model(model_id)
+    for compartment in ("c", "m"):
+        metabolite = cobra.Metabolite(
+            f"{prefix}atp_{compartment}", compartment=compartment, formula="C10"
+        )
+        metabolite.annotation = {"kegg.compound": "C00002", "chebi": "CHEBI:30616"}
+        model.add_metabolites([metabolite])
+    return model
+
+
+def test_shared_identifiers_pair_metabolites_within_each_compartment():
+    from thg_protocol.merge import generate_merge_plan
+
+    plan = generate_merge_plan(_atp_model("base", "x"), _atp_model("incoming", "y"))
+    assert plan.metabolite_map == {"yatp_c": "xatp_c", "yatp_m": "xatp_m"}
+    mapped = [item for item in plan.decisions if item.category.startswith("metab")]
+    assert [(item.left_id, item.right_id) for item in mapped] == [
+        ("xatp_c", "yatp_c"),
+        ("xatp_m", "yatp_m"),
+    ]
+    assert mapped[0].reason == "chebi:CHEBI:30616, kegg.compound:C00002"
+
+
+def test_identifiers_pairing_one_metabolite_with_two_are_ambiguous():
+    from thg_protocol.merge import generate_merge_plan
+
+    base = _model("base", "R1", "a_c")
+    base.add_metabolites([cobra.Metabolite("b_c", compartment="c", formula="C1")])
+    base.metabolites.a_c.annotation = {"chebi": "1"}
+    base.metabolites.b_c.annotation = {"hmdb": "H1"}
+    incoming = _model("incoming", "R2", "z_c")
+    incoming.metabolites.z_c.annotation = {"chebi": "1", "hmdb": "H1"}
+    plan = generate_merge_plan(base, incoming)
+    assert plan.metabolite_map == {}
+    (decision,) = plan.decisions
+    assert (decision.category, decision.left_id, decision.right_id) == (
+        "ambiguous-metabolite",
+        "a_c,b_c",
+        "z_c",
+    )
+    assert decision.reason == "chebi:1, hmdb:H1"
