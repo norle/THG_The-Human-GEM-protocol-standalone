@@ -124,6 +124,13 @@ def collect_fixes(
                         exclude_pseudo=False,
                     ),
                 )
+            if check_id == "charge-balance":
+                add(
+                    check_id,
+                    conservation.charge_fixes(
+                        model, map(str, _REACTION_CHECKS[check_id](details))
+                    ),
+                )
     return sorted(
         by_id.values(), key=lambda item: (item["object_id"], item["proposal_id"])
     )

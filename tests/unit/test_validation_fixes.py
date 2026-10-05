@@ -225,6 +225,131 @@ def test_pool_reactions_alone_pass_the_balance_checks():
     assert checks["charge-balance"]["passed"] is True
 
 
+REDOX = [
+    ("hete_c", "C20H31O3", -1, "c"),
+    ("ltb4_c", "C20H31O4", -1, "c"),
+    ("o2_c", "O2", 0, "c"),
+    ("h2o_c", "H2O", 0, "c"),
+    ("h_c", "H", 1, "c"),
+    ("nadp_c", "C21H25N7O17P3", -3, "c"),
+    ("nadph_c", "C21H26N7O17P3", -4, "c"),
+]
+
+
+def _redox_model() -> cobra.Model:
+    model = _model(
+        *REDOX,
+        reactions=[
+            # A P450 hydroxylation written with 2 H+ instead of NADPH + H+.
+            ("P450", {"hete_c": -1, "o2_c": -1, "h_c": -2, "ltb4_c": 1, "h2o_c": 1})
+        ],
+    )
+    names = {"h_c": "H+", "nadp_c": "NADP+", "nadph_c": "NADPH"}
+    for metabolite in model.metabolites:
+        metabolite.name = names.get(metabolite.id, metabolite.id)
+    return model
+
+
+def test_redox_candidate_fixes_a_charge_only_imbalance():
+    model = _redox_model()
+    [candidate] = conservation.redox_candidates(model.reactions.P450, model)
+    assert candidate["label"] == "NADPH → NADP+"
+    after = candidate["after"]
+    assert after == {
+        "hete_c": -1,
+        "o2_c": -1,
+        "h_c": -1,
+        "nadph_c": -1,
+        "ltb4_c": 1,
+        "h2o_c": 1,
+        "nadp_c": 1,
+    }
+    assert conservation.element_residual(after, model)["balanced"]
+    assert conservation.charge_residual(after, model)["balanced"]
+    [proposal] = conservation.reaction_fixes(model.reactions.P450, model)
+    assert proposal.policy == "redox-cofactor"
+
+
+@pytest.mark.parametrize("metabolite_id", ["nadp_c", "nadph_c", "h_c"])
+def test_redox_candidates_require_all_cofactor_charges(metabolite_id):
+    model = _redox_model()
+    model.metabolites.get_by_id(metabolite_id).charge = None
+    assert conservation.redox_candidates(model.reactions.P450, model) == []
+    assert conservation.reaction_fixes(model.reactions.P450, model) == []
+
+
+def test_charge_fix_changes_one_metabolite_by_one():
+    model = _model(
+        ("a_c", "C2H6O", 0, "c"),
+        ("b_c", "C2H6O", -1, "c"),
+        reactions=[("R1", {"a_c": -1, "b_c": 1})],
+    )
+    [proposal] = [
+        item
+        for item in conservation.charge_fixes(model, ["R1"])
+        if item.object_id == "b_c"
+    ]
+    assert (proposal.operation, proposal.before, proposal.after) == (
+        "set-charge",
+        -1,
+        0,
+    )
+    assert proposal.metadata["targets"] == ["R1"]
+
+
+def test_apply_rejects_charge_fixes_that_overcorrect_the_same_reaction():
+    model = _model(
+        ("a_c", "C2H6O", 0, "c"),
+        ("b_c", "C2H6O", -1, "c"),
+        reactions=[("R1", {"a_c": -1, "b_c": 1})],
+    )
+    proposals = conservation.charge_fixes(model, ["R1"])
+    assert len(proposals) == 2
+    for proposal in proposals:
+        fixed, _, _ = conservation.apply_conservation_fixes(
+            model, proposals, [Decision(proposal.proposal_id, "approve")]
+        )
+        assert fixed.reactions.R1.check_mass_balance() == {}
+    for batch in (proposals, list(reversed(proposals))):
+        with pytest.raises(ProposalError, match="conflicting charge fixes.*R1"):
+            conservation.apply_conservation_fixes(
+                model, batch, [Decision(p.proposal_id, "approve") for p in batch]
+            )
+    assert (model.metabolites.a_c.charge, model.metabolites.b_c.charge) == (0, -1)
+
+
+def test_apply_allows_independent_charge_fixes():
+    model = _model(
+        ("a_c", "C2H6O", 0, "c"),
+        ("b_c", "C2H6O", -1, "c"),
+        ("d_c", "C2H6O", 0, "c"),
+        ("e_c", "C2H6O", -1, "c"),
+        reactions=[("R1", {"a_c": -1, "b_c": 1}), ("R2", {"d_c": -1, "e_c": 1})],
+    )
+    proposals = [
+        p
+        for p in conservation.charge_fixes(model, ["R1", "R2"])
+        if p.object_id in {"b_c", "e_c"}
+    ]
+    fixed, applied, _ = conservation.apply_conservation_fixes(
+        model, proposals, [Decision(p.proposal_id, "approve") for p in proposals]
+    )
+    assert len(applied) == 2
+    assert all(not reaction.check_mass_balance() for reaction in fixed.reactions)
+
+
+def test_charge_fix_keeps_reactions_that_balance_now():
+    model = _model(
+        ("a_c", "C2H6O", 0, "c"),
+        ("b_c", "C2H6O", -1, "c"),
+        ("c_c", "C2H6O", -1, "c"),
+        reactions=[("R1", {"a_c": -1, "b_c": 1}), ("R2", {"b_c": -1, "c_c": 1})],
+    )
+    # b_c -> 0 balances R1 but breaks R2; only a_c -> -1 is safe.
+    proposals = conservation.charge_fixes(model, ["R1"])
+    assert [(p.object_id, p.after) for p in proposals] == [("a_c", -1)]
+
+
 def test_topology_and_blocked_checks_group_by_compartment():
     model = _model(*ETHANOL, reactions=TRANSPORT)
     report = validate_model(model, "structural-fast")

@@ -49,6 +49,10 @@ COFACTOR_FIXES: tuple[tuple[str, Mapping[str, int]], ...] = (
     ("Pi", {"Pi": 1}),
     ("CoA", {"CoA": 1}),
 )
+#: Redox pairs (oxidised, reduced) tried against a charge-only residual.
+REDOX_FIXES: tuple[tuple[str, str], ...] = (("NAD+", "NADH"), ("NADP+", "NADPH"))
+#: Largest number of redox pairs ``redox_candidates`` adds to one reaction.
+REDOX_LIMIT = 4
 
 # --------------------------------------------------------------------------
 # Exclusions
@@ -726,6 +730,73 @@ def cofactor_candidates(
     return candidates
 
 
+def redox_candidates(
+    reaction: Any, model: Any, *, names: Mapping[tuple[str, str], Any] | None = None
+) -> list[dict[str, object]]:
+    """Return redox-pair additions that cancel a charge-only residual.
+
+    When the elements balance but the charge does not, the reaction usually
+    moves electrons without a carrier, as ``12-HETE + O2 + 2 H+ -> LTB4 +
+    H2O`` for a P450 hydroxylation that needs NADPH. Turning ``NADPH`` into
+    ``NADP+ + H+`` (or back) changes the charge by two and no element, so an
+    even residual of up to ``2 * REDOX_LIMIT`` gets one candidate per redox
+    pair and compartment, or only the pairs the reaction already uses.
+    """
+    stoichiometry = _stoichiometry(reaction)
+    if not element_residual(stoichiometry, model)["balanced"]:
+        return []
+    charge = charge_residual(stoichiometry, model)
+    if charge["missing_charge"] or not charge["residual"]:
+        return []
+    names = _by_name(model) if names is None else names
+    compartments = sorted(
+        {
+            metabolite.compartment
+            for metabolite in reaction.metabolites
+            if metabolite.compartment
+        }
+    )
+    candidates = []
+    for compartment in compartments:
+        for oxidised, reduced in REDOX_FIXES:
+            ids = [names.get((name, compartment)) for name in (oxidised, reduced, "H+")]
+            if any(item is None for item in ids):
+                continue
+            # Reduced cofactor in; oxidised cofactor and a proton out.
+            pair = {ids[1].id: -1.0, ids[0].id: 1.0, ids[2].id: 1.0}
+            if not element_residual(pair, model)["balanced"]:
+                continue
+            pair_charge = charge_residual(pair, model)
+            if pair_charge["missing_charge"]:
+                continue
+            step = pair_charge["residual"]
+            count = -float(charge["residual"]) / step if step else 0.0
+            if not count or abs(count - round(count)) > 1e-6:
+                continue
+            count = round(count)
+            if abs(count) > REDOX_LIMIT:
+                continue
+            addition = {key: count * value for key, value in pair.items()}
+            after = _merge(stoichiometry, addition)
+            if not charge_residual(after, model)["balanced"]:
+                continue
+            label = (
+                f"{reduced} → {oxidised}" if count > 0 else f"{oxidised} → {reduced}"
+            )
+            candidates.append(
+                {
+                    "label": (f"{abs(count)} × " if abs(count) > 1 else "") + label,
+                    "compartment": compartment,
+                    "addition": addition,
+                    "after": after,
+                    "present": bool({ids[0].id, ids[1].id} & set(stoichiometry)),
+                }
+            )
+    # A pair the reaction already uses is the likely carrier.
+    present = [item for item in candidates if item.pop("present")]
+    return present or candidates
+
+
 def _flags(summary: Mapping[str, object], prefix: str = "after-") -> list[str]:
     flags = []
     elements = summary["elements"]
@@ -868,7 +939,8 @@ def reaction_fixes(
     with ``exclude_pseudo``); a reaction whose stoichiometry differs from the
     input model is restored; non-integer coefficients are rounded to the
     integer stoichiometries that balance the elements; an element residual
-    matching a cofactor pair gets that pair. Several candidates from one rule
+    matching a cofactor pair gets that pair; a charge-only residual gets a
+    redox pair (see ``redox_candidates``). Several candidates from one rule
     are mutually exclusive alternatives. ``context`` carries the blamed row
     (origin, imbalance, flags) when the reaction was blamed.
     """
@@ -954,6 +1026,28 @@ def reaction_fixes(
                         evidence=evidence,
                         metadata=details,
                         reason=f"element residual matches {candidate['label']}",
+                    )
+                )
+        if not group:
+            redox = redox_candidates(reaction, model, names=names)
+            for candidate in redox:
+                after = {k: _round(v) for k, v in sorted(candidate["after"].items())}
+                details = metadata(after, "redox-cofactor")
+                details["cofactor"] = candidate["label"]
+                details["compartment"] = candidate["compartment"]
+                group.append(
+                    _proposal(
+                        operation="set-stoichiometry",
+                        object_type="reaction",
+                        object_id=reaction.id,
+                        before=before,
+                        after=after,
+                        policy="redox-cofactor",
+                        confidence="medium" if len(redox) == 1 else "low",
+                        evidence=evidence,
+                        metadata=details,
+                        reason="elements balance but the charge does not; "
+                        "electrons move without a carrier",
                     )
                 )
     return _alternatives(group)
@@ -1094,6 +1188,73 @@ def formula_fixes(
                             for source in sorted(sources)
                         )
                     ),
+                )
+            )
+        proposals.extend(_alternatives(group))
+    return proposals
+
+
+def charge_fixes(model: Any, reaction_ids: Iterable[str]) -> list[Proposal]:
+    """Propose ``set-charge`` for a metabolite whose charge is off by one.
+
+    For each charge-unbalanced reaction, a metabolite qualifies when changing
+    its charge by exactly one balances the reaction and keeps every reaction
+    of it that balances now balanced. Larger changes are not proposed: they
+    contradict the formula's protonation state more often than they fix it.
+    Each proposal is low confidence and lists the reactions it balances.
+    """
+    candidates: dict[str, dict[int, set[str]]] = defaultdict(dict)
+    for reaction_id in reaction_ids:
+        try:
+            reaction = model.reactions.get_by_id(reaction_id)
+        except KeyError:
+            continue
+        residual = charge_residual(_stoichiometry(reaction), model)
+        if residual["missing_charge"] or not residual["residual"]:
+            continue
+        for metabolite, coefficient in reaction.metabolites.items():
+            value = metabolite.charge - residual["residual"] / float(coefficient)
+            if (
+                abs(value - round(value)) > 1e-6
+                or abs(round(value) - metabolite.charge) != 1
+            ):
+                continue
+            candidates[metabolite.id].setdefault(int(round(value)), set()).add(
+                reaction.id
+            )
+    proposals: list[Proposal] = []
+    for metabolite_id, options in sorted(candidates.items()):
+        metabolite = model.metabolites.get_by_id(metabolite_id)
+        before = _balanced_reactions(metabolite, model, charge=metabolite.charge)
+        group = []
+        for value, reactions in sorted(options.items()):
+            after = _balanced_reactions(metabolite, model, charge=value)
+            if not set(before["reactions"]) < set(after["reactions"]):
+                continue
+            group.append(
+                _proposal(
+                    operation="set-charge",
+                    object_type="metabolite",
+                    object_id=metabolite_id,
+                    before=metabolite.charge,
+                    after=value,
+                    policy="metabolite-charge",
+                    confidence="low",
+                    evidence=[f"charge-balance:{item}" for item in sorted(reactions)],
+                    metadata={
+                        "rule": "metabolite-charge",
+                        "field": "charge",
+                        "metabolite": _describe(metabolite),
+                        "balance": {"before": before, "after": after},
+                        "targets": sorted(
+                            set(after["reactions"]) - set(before["reactions"])
+                        ),
+                    },
+                    reason=f"charge {value} balances "
+                    + ", ".join(
+                        sorted(set(after["reactions"]) - set(before["reactions"]))
+                    )
+                    + " and unbalances none",
                 )
             )
         proposals.extend(_alternatives(group))
@@ -1276,7 +1437,8 @@ def apply_conservation_fixes(
     Returns the modified copy, the applied proposals and the ledger entries.
     The input model is never changed. Two applied fixes on the same target
     (see ``fix_target``) are rejected, since alternatives (e.g. NAD vs NADP)
-    are mutually exclusive.
+    are mutually exclusive. Charge repairs must still balance their targets
+    and preserve previously balanced reactions after the whole batch is applied.
     """
     from thg_protocol.workflow.proposals import ProposalError, apply_proposals
 
@@ -1347,6 +1509,20 @@ def apply_conservation_fixes(
     applied, ledger = apply_proposals(
         proposals, mode="user-approved-only", decisions=decisions, apply=apply
     )
+    for proposal in applied:
+        if proposal.policy != "metabolite-charge":
+            continue
+        original = model.metabolites.get_by_id(proposal.object_id)
+        before = _balanced_reactions(original, model, charge=original.charge)
+        metabolite = result.metabolites.get_by_id(proposal.object_id)
+        after = _balanced_reactions(metabolite, result, charge=metabolite.charge)
+        required = set(before["reactions"]) | set(proposal.metadata.get("targets", []))
+        unbalanced = required - set(after["reactions"])
+        if unbalanced:
+            raise ProposalError(
+                "conflicting charge fixes leave reactions unbalanced: "
+                + ", ".join(sorted(unbalanced))
+            )
     return result, applied, ledger
 
 
@@ -1385,9 +1561,12 @@ __all__ = [
     "COFACTOR_FIXES",
     "EXCLUSION_NOTE",
     "PSEUDO_SUBSYSTEMS",
+    "REDOX_FIXES",
+    "REDOX_LIMIT",
     "TIE_BREAK",
     "apply_conservation_fixes",
     "blame_reactions",
+    "charge_fixes",
     "charge_residual",
     "chemically_suspect",
     "cofactor_candidates",
@@ -1407,4 +1586,5 @@ __all__ = [
     "reaction_fixes",
     "reaction_origin",
     "reaction_summary",
+    "redox_candidates",
 ]
