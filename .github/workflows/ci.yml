@@ -50,7 +50,7 @@ jobs:
           smoke_dir="$(mktemp -d)"
           trap 'rm -rf "$smoke_dir"' EXIT
           python -m venv "$smoke_dir/venv"
-          "$smoke_dir/venv/bin/python" -m pip install --no-deps dist/*.whl
+          "$smoke_dir/venv/bin/python" -m pip install -c "${{ matrix.constraints }}" dist/*.whl
           (
             cd "$smoke_dir"
             "$smoke_dir/venv/bin/python" -c \
