@@ -7,6 +7,7 @@ owned by its caller and solver checks copy it before changing bounds.
 from __future__ import annotations
 
 import itertools
+import re
 from collections import Counter
 from collections.abc import Callable, Iterable, Mapping
 from dataclasses import dataclass
@@ -159,13 +160,41 @@ def _gprs(model: Any) -> dict[str, object]:
     }
 
 
-def _mass_balance(model: Any) -> dict[str, object]:
+def _balance_result(
+    statuses: dict[str, str],
+    imbalance: Mapping[str, object],
+    pseudo: Mapping[str, str],
+) -> dict[str, object]:
+    """Split unbalanced reactions into real ones and pseudo-reactions.
+
+    Pseudo-reactions (biomass, pool and artificial reactions, see
+    ``conservation_exclusions``) are unbalanced by design: they are listed
+    with their rule but do not fail the check.
+    """
+    unbalanced = sorted(key for key, value in statuses.items() if value == "unbalanced")
+    real = [key for key in unbalanced if key not in pseudo]
+    by_design = {key: pseudo[key] for key in unbalanced if key in pseudo}
+    for key in by_design:
+        statuses[key] = "unbalanced-by-design"
+    return {
+        "statuses": statuses,
+        "unbalanced": real,
+        "unbalanced_by_design": by_design,
+        "imbalance": {key: imbalance[key] for key in unbalanced},
+        "passed": not real,
+    }
+
+
+def _mass_balance(model: Any, pseudo: Mapping[str, str]) -> dict[str, object]:
     statuses: dict[str, str] = {}
+    imbalance: dict[str, object] = {}
     for reaction in model.reactions:
         if reaction.boundary:
             statuses[reaction.id] = "excluded-boundary"
             continue
-        if any(token in reaction.id.lower() for token in ("biomass", "pseudo")):
+        if reaction.id not in pseudo and any(
+            token in reaction.id.lower() for token in ("biomass", "pseudo")
+        ):
             statuses[reaction.id] = (
                 "excluded-biomass"
                 if "biomass" in reaction.id.lower()
@@ -180,17 +209,17 @@ def _mass_balance(model: Any) -> dict[str, object]:
             continue
         residual = consistency.reaction_balance(reaction)
         statuses[reaction.id] = "balanced" if not residual else "unbalanced"
-    return {
-        "statuses": statuses,
-        "unbalanced": sorted(
-            key for key, value in statuses.items() if value == "unbalanced"
-        ),
-        "passed": not any(value == "unbalanced" for value in statuses.values()),
-    }
+        if residual:
+            imbalance[reaction.id] = {
+                element: round(float(value), 6)
+                for element, value in sorted(residual.items())
+            }
+    return _balance_result(statuses, imbalance, pseudo)
 
 
-def _charge_balance(model: Any) -> dict[str, object]:
+def _charge_balance(model: Any, pseudo: Mapping[str, str]) -> dict[str, object]:
     statuses: dict[str, str] = {}
+    imbalance: dict[str, object] = {}
     for reaction in model.reactions:
         if reaction.boundary:
             statuses[reaction.id] = "excluded-boundary"
@@ -201,17 +230,55 @@ def _charge_balance(model: Any) -> dict[str, object]:
         ):
             statuses[reaction.id] = "not-evaluable-missing-charge"
             continue
-        statuses[reaction.id] = (
-            "balanced"
-            if abs(consistency.charge_balance(reaction)["charge"]) <= 1e-9
-            else "unbalanced"
-        )
+        charge = consistency.charge_balance(reaction)["charge"]
+        statuses[reaction.id] = "balanced" if abs(charge) <= 1e-9 else "unbalanced"
+        if abs(charge) > 1e-9:
+            imbalance[reaction.id] = round(float(charge), 6)
+    return _balance_result(statuses, imbalance, pseudo)
+
+
+def reaction_compartment(reaction: Any) -> str:
+    """The compartment of a reaction, or ``a+b`` for one spanning several."""
+    return "+".join(
+        sorted({str(item.compartment) for item in reaction.metabolites}) or ["none"]
+    )
+
+
+def by_compartment(model: Any, kind: str, ids: Iterable[str]) -> dict[str, list[str]]:
+    """Group metabolite or reaction IDs by compartment (``reaction_compartment``)."""
+    collection = model.metabolites if kind == "metabolites" else model.reactions
+    groups: dict[str, list[str]] = {}
+    for identifier in ids:
+        try:
+            item = collection.get_by_id(identifier)
+        except KeyError:
+            key = "unknown"
+        else:
+            key = (
+                str(item.compartment or "none")
+                if kind == "metabolites"
+                else reaction_compartment(item)
+            )
+        groups.setdefault(key, []).append(identifier)
+    return dict(sorted(groups.items()))
+
+
+def compartment_summary(model: Any) -> dict[str, object]:
+    """Compartment names and how many metabolites and reactions each holds."""
     return {
-        "statuses": statuses,
-        "unbalanced": sorted(
-            key for key, value in statuses.items() if value == "unbalanced"
+        "names": dict(sorted((model.compartments or {}).items())),
+        "metabolites": dict(
+            sorted(
+                Counter(
+                    str(item.compartment or "none") for item in model.metabolites
+                ).items()
+            )
         ),
-        "passed": not any(value == "unbalanced" for value in statuses.values()),
+        "reactions": dict(
+            sorted(
+                Counter(reaction_compartment(item) for item in model.reactions).items()
+            )
+        ),
     }
 
 
@@ -657,6 +724,30 @@ def validate_model(
             _cached("blocked-reactions", lambda: consistency.blocked_reactions(model))
         )
 
+    def _pseudo() -> dict[str, str]:
+        """Conservation exclusions, reactions named as pseudo-reactions, and
+        reactions of a pool metabolite (``NEFA blood pool in``)."""
+        from .analysis.conservation import _is_pseudo
+        from .analysis.conservation import conservation_exclusions as excluded
+
+        def find() -> dict[str, str]:
+            result = excluded(
+                model, input_model=reference_model, configured=conservation_exclusions
+            )
+            for reaction in model.reactions:
+                if reaction.boundary or reaction.id in result:
+                    continue
+                if _is_pseudo(reaction):
+                    result[reaction.id] = "pseudo-name"
+                elif any(
+                    re.search(r"\bpool\b", (item.name or "").lower())
+                    for item in reaction.metabolites
+                ):
+                    result[reaction.id] = "pool-metabolite"
+            return result
+
+        return dict(_cached("pseudo-reactions", find))
+
     checks = [
         _check(
             "reference-integrity",
@@ -674,13 +765,13 @@ def validate_model(
         _check(
             "mass-balance",
             "chemical",
-            lambda: _mass_balance(model),
+            lambda: _mass_balance(model, _pseudo()),
             blocking="mass-balance" in blocking,
         ),
         _check(
             "charge-balance",
             "chemical",
-            lambda: _charge_balance(model),
+            lambda: _charge_balance(model, _pseudo()),
             blocking="charge-balance" in blocking,
         ),
         _check(
@@ -720,6 +811,7 @@ def validate_model(
             "topology",
             lambda: {
                 "metabolites": _dead_ends(),
+                "by_compartment": by_compartment(model, "metabolites", _dead_ends()),
                 "passed": not _dead_ends(),
             },
             blocking=False,
@@ -730,6 +822,14 @@ def validate_model(
             lambda: {
                 "not-produced": _not_produced(),
                 "not-consumed": _not_consumed(),
+                "by_compartment": {
+                    "not-produced": by_compartment(
+                        model, "metabolites", _not_produced()
+                    ),
+                    "not-consumed": by_compartment(
+                        model, "metabolites", _not_consumed()
+                    ),
+                },
                 "passed": not (_not_produced() or _not_consumed()),
             },
             blocking=False,
@@ -766,20 +866,12 @@ def validate_model(
                     "solver",
                     lambda: {
                         "blocked": _blocked(),
+                        "by_compartment": by_compartment(
+                            model, "reactions", _blocked()
+                        ),
                         "passed": not _blocked(),
                     },
                     blocking="flux-consistency" in blocking,
-                ),
-                _check(
-                    "blocked-reaction-singletons",
-                    "solver",
-                    lambda: {
-                        "method": "blocked-reaction-singletons",
-                        "complete": True,
-                        "sets": [[reaction_id] for reaction_id in _blocked()],
-                        "passed": not _blocked(),
-                    },
-                    blocking=False,
                 ),
                 _check(
                     "objective-feasibility",
@@ -829,6 +921,7 @@ def validate_model(
         "passed": passed,
         "checks": records,
         "solver": {"requested": solver, "configuration": solver_configuration},
+        "compartments": compartment_summary(model),
         **fixes,
     }
 

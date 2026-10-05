@@ -191,3 +191,63 @@ def test_validation_proposes_fixes_and_merges_checks():
 def test_validation_omits_proposals_unless_asked():
     model = _model(*BASE, reactions=[("R2", {"a_c": -1, "b_c": 1})])
     assert "proposals" not in validate_model(model, "structural-fast")
+
+
+def test_balance_checks_list_pool_reactions_apart_from_real_ones():
+    model = _model(
+        ("a_c", "C2H6O", 0, "c"),
+        ("b_c", "C2H4O", -1, "c"),
+        reactions=[
+            ("R_real", {"a_c": -1, "b_c": 1}),
+            ("R_pool", {"a_c": -1, "b_c": 2}),
+        ],
+    )
+    model.reactions.R_pool.name = "fatty acid pool"
+    checks = {c["id"]: c for c in validate_model(model, "structural-fast")["checks"]}
+    for check_id in ("mass-balance", "charge-balance"):
+        details = checks[check_id]["details"]
+        assert details["unbalanced"] == ["R_real"]
+        assert details["unbalanced_by_design"] == {"R_pool": "pseudo-name"}
+        assert set(details["imbalance"]) == {"R_real", "R_pool"}
+    assert checks["mass-balance"]["details"]["imbalance"]["R_real"] == {"H": -2.0}
+    assert checks["charge-balance"]["details"]["imbalance"]["R_real"] == -1.0
+
+
+def test_pool_reactions_alone_pass_the_balance_checks():
+    model = _model(
+        ("a_c", "C2H6O", 0, "c"),
+        ("b_c", "C2H4O", -1, "c"),
+        reactions=[("R_pool", {"a_c": -1, "b_c": 2})],
+    )
+    model.reactions.R_pool.name = "fatty acid pool"
+    checks = {c["id"]: c for c in validate_model(model, "structural-fast")["checks"]}
+    assert checks["mass-balance"]["passed"] is True
+    assert checks["charge-balance"]["passed"] is True
+
+
+def test_topology_and_blocked_checks_group_by_compartment():
+    model = _model(*ETHANOL, reactions=TRANSPORT)
+    report = validate_model(model, "structural-fast")
+    checks = {c["id"]: c for c in report["checks"]}
+    assert checks["dead-end-topology"]["details"]["by_compartment"] == {
+        "c": ["a_c"],
+        "m": ["a_m"],
+        "x": ["a_x"],
+    }
+    assert report["compartments"]["reactions"] == {"c+m": 1, "c+x": 1}
+    assert "blocked-reaction-singletons" not in checks
+
+
+def test_reactions_of_a_pool_metabolite_are_unbalanced_by_design():
+    model = _model(
+        ("a_c", "C2H6O", 0, "c"),
+        ("pool_c", "C2H4O", 0, "c"),
+        reactions=[("R1", {"pool_c": -1, "a_c": 1})],
+    )
+    model.metabolites.pool_c.name = "NEFA blood pool in"
+    details = next(
+        c["details"]
+        for c in validate_model(model, "structural-fast")["checks"]
+        if c["id"] == "mass-balance"
+    )
+    assert details["unbalanced_by_design"] == {"R1": "pool-metabolite"}

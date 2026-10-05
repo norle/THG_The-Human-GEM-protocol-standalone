@@ -123,7 +123,7 @@ def test_stoichiometric_inconsistency_is_a_nonblocking_warning(monkeypatch):
     # Isolate the conservation warning from the separate chemical-balance gate.
     for check in ("_mass_balance", "_charge_balance"):
         monkeypatch.setattr(
-            f"thg_protocol.validation.{check}", lambda m: {"passed": True}
+            f"thg_protocol.validation.{check}", lambda m, pseudo: {"passed": True}
         )
     report = validate_model(source, "release-full", run_solver=False)
     check = next(c for c in report["checks"] if c["id"] == "stoichiometric-consistency")
