@@ -24,7 +24,7 @@ def test_ci_keeps_default_release_checks_offline_and_installed_smoke_scoped():
     for marker in ("slow", "online", "solver", "gurobi", "memote"):
         assert f"not {marker}" in workflow
     assert "python -m build" in workflow
-    assert "pip install --no-deps dist/*.whl" in workflow
+    assert 'pip install -c "${{ matrix.constraints }}" dist/*.whl' in workflow
     for command in ("thg-gapfill", "thg-compare", "thg-pathway", "thg-run"):
         assert f'"$smoke_dir/venv/bin/{command}" --help' in workflow
 
