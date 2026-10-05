@@ -23,7 +23,7 @@ from thg_protocol.runtime.stage import (
 
 
 class HumanDatabaseIntegrationStage:
-    implementation_version = 1
+    implementation_version = 2
 
     def __init__(self, stage_id: str, dependencies: tuple[str, ...]) -> None:
         self.id, self.dependencies = stage_id, dependencies

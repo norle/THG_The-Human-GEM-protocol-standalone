@@ -163,12 +163,20 @@ def test_proton_water_strategy_only_proposes_a_verified_local_repair():
     assert proposals[0].metadata["imbalance_after"]["charge_status"] == "balanced"
 
 
-def test_reaction_identity_supports_reversal_and_explicit_proton_water_policy():
+def test_reaction_identity_supports_reversal_and_counts_protons_and_water():
     model = _model()
     reaction = model.reactions.R_A
     reversed_result = compare_reaction_identity(reaction, {"a_c": 1, "b_c": -1})
     assert reversed_result.status == "equivalent-reversed"
-    assert reversed_result.normalization_policy == "strict"
+    # H+ and H2O count, as in the merge; only named species are skipped.
+    proton = Metabolite("h_c", formula="H", charge=1, compartment="c")
+    reaction.add_metabolites({proton: 1})
+    assert compare_reaction_identity(reaction, {"a_c": 1, "b_c": -1}).status == (
+        "no-match"
+    )
+    assert compare_reaction_identity(
+        reaction, {"a_c": 1, "b_c": -1}, normalization_species=["h"]
+    ).status == ("equivalent-reversed")
 
 
 def test_balance_audit_distinguishes_missing_and_generic_formula_cases():
@@ -247,7 +255,6 @@ def test_identity_conflicts_and_s_gpr_metadata_are_explicit_proposals():
             "R_A": {
                 "status": "conflict",
                 "reason": "reference coefficients conflict",
-                "normalization_policy": "strict",
             }
         },
         subunit_stoichiometry={"R_A": {"G2": 2, "G1": 1}},

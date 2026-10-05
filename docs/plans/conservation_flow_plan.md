@@ -128,10 +128,10 @@ presqualene diphosphate, midazolam -> 2-oxoglutaramate, histidine ->
 
 **Prevention** (this repository; the legacy script is not part of it):
 
-- `merge.generate_merge_plan` already maps only on shared identifiers, never
-  on names. It now refuses a mapping (`identity-conflict`, unresolved) when
-  another identifier namespace disagrees or, under the default
-  `formula_charge="report"` policy, the formulas differ beyond hydrogen.
+- `merge.generate_merge_plan` maps only on shared identifiers, never on
+  names, and only when formula (hydrogen included) and charge are identical
+  and KEGG compound IDs are not disjoint; see
+  [final THG merge](../workflows/final-thg.md#merge-and-validation).
 - β1 identity scoring (`score_metabolite_candidate`) no longer counts a name
   match whose formula conflicts beyond hydrogen; the β1 stage now passes
   InChI/InChIKey/SMILES annotations as structural identifiers.

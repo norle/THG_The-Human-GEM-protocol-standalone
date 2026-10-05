@@ -94,7 +94,7 @@ def test_merge_policy_reports_conflicts_and_apply_adds_provenance():
     r_left.add_metabolites({a: -1})
     left.add_reactions([r_left])
     right = cobra.Model("right")
-    b = cobra.Metabolite("b_c", compartment="c", formula="C2", charge=1)
+    b = cobra.Metabolite("b_c", compartment="c", formula="C", charge=0)
     b.annotation["chebi"] = "CHEBI:1"
     right.add_metabolites([b])
     r_right = cobra.Reaction("R", lower_bound=-2, upper_bound=3)
@@ -102,25 +102,27 @@ def test_merge_policy_reports_conflicts_and_apply_adds_provenance():
     r_right.gene_reaction_rule = "G1"
     right.add_reactions([r_right])
     plan = generate_merge_plan(
-        left,
-        right,
-        policy=MergePolicy(
-            bounds="incoming", formula_charge="incoming", gpr="incoming"
-        ),
+        left, right, policy=MergePolicy(bounds="incoming", gpr="incoming")
     )
+    assert plan.metabolite_map == {"b_c": "a_c"}
     categories = {decision.category for decision in plan.decisions}
     assert {
+        "metabolite-equivalence",
+        "reaction-equivalence",
         "bounds-conflict",
-        "formula-conflict",
-        "charge-conflict",
         "gpr-conflict",
     } <= categories
     merged, _ = apply_merge_plan(left, right, plan)
     assert merged.reactions.R.annotation["thg.provenance"]["source_model"] == "right"
     assert merged.reactions.R.bounds == (-2, 3)
     assert merged.reactions.R.gene_reaction_rule == "G1"
-    assert merged.metabolites.a_c.formula == "C2"
-    assert merged.metabolites.a_c.charge == 1
+
+
+def test_merge_plan_with_removed_policy_fields_must_be_regenerated():
+    payload = generate_merge_plan(cobra.Model("l"), cobra.Model("r")).to_dict()
+    payload["policy"]["formula_charge"] = "report"
+    with pytest.raises(ValueError, match="regenerate"):
+        MergePlan.from_dict(payload)
 
 
 def test_final_thg_validation_rejects_failed_nested_report(tmp_path):

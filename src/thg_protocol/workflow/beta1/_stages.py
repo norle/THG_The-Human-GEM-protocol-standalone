@@ -588,9 +588,6 @@ class DetailedBeta1Stage:
                         "normalized": {},
                         "reversed": False,
                         "reason": "no reference stoichiometry was supplied",
-                        "normalization_policy": str(
-                            section.get("proton_water_policy", "strict")
-                        ),
                         "evidence": list(
                             evidence_record.get("evidence", [])
                             if isinstance(evidence_record, Mapping)
@@ -605,7 +602,6 @@ class DetailedBeta1Stage:
                             _reaction_payload(reaction),
                             dict(target),
                             metabolite_mapping,
-                            str(section.get("proton_water_policy", "strict")),
                             tuple(
                                 str(item)
                                 for item in section.get("normalization_species", ())
@@ -636,7 +632,6 @@ class DetailedBeta1Stage:
                     "normalized": dict(result.normalized),
                     "reversed": result.reversed,
                     "reason": result.reason,
-                    "normalization_policy": result.normalization_policy,
                     "evidence": list(
                         evidence_record.get("evidence", [])
                         if isinstance(evidence_record, Mapping)

@@ -24,11 +24,37 @@ immediately before validation, using it with separate β2 and Human Database
 inputs is a standalone combined workflow, not the canonical ordering. In the
 canonical pipeline, use the same merge-plan APIs for optional Human Database
 integration before gapfill, then send the gapfilled THG candidate to the final
-gate. `generate_merge_plan` creates a reviewable semantic plan. Matching requires
-compatible identifiers and compartments; ambiguous or conflicting matches stay
-unresolved. `apply_merge_plan` applies approved decisions to a private copy.
-The retained-base merge policy preserves base stoichiometry and bounds while
-allowing non-empty annotations and missing GPRs to enrich it.
+gate.
+
+`generate_merge_plan` creates a reviewable plan, and `apply_merge_plan`
+applies it to private copies of both models. One rule decides which
+metabolites merge:
+
+1. they are linked: the same metabolite ID or, for metabolites whose ID is
+   not in the other model, a shared KEGG, ChEBI, HMDB or InChIKey identifier;
+2. they are in the same compartment;
+3. they are the same species: identical formula (element counts, hydrogen
+   included) and charge, and no disjoint KEGG compound IDs.
+
+Every other linked pair is kept separate, with a decision naming why:
+`protonation-conflict` (differs only in H and charge), `formula-conflict`,
+`charge-conflict`, `missing-chemistry` (formula or charge known on one side
+only), `identifier-conflict`, `compartment-conflict` or
+`ambiguous-metabolite`. A protonation difference is a conflict because
+every reaction written for one form is unbalanced with the other. An incoming
+metabolite kept separate from a base metabolite with the same ID is renamed
+with the suffix `__incoming` (recorded in the plan's `renamed`), so each
+model's reactions stay balanced against their own chemistry.
+
+Reactions with the same ID are the same reaction: the base stoichiometry is
+kept, and a different incoming stoichiometry is reported
+(`reaction-stoichiometry-conflict` or `direction-conflict`, action
+`keep-base`). Reactions with different IDs merge only when they share a KEGG,
+EC or BiGG reaction identifier and have exactly the same stoichiometry, H+
+and H2O included. Overlaps keep base bounds and GPRs unless `bounds` or
+`gpr` is `incoming`; `source_precedence` decides only whose names win.
+Formula and charge have no policy: merged metabolites have identical
+chemistry by construction.
 
 The merge-plan and application functions are available in the [workflow API
 reference](../api/workflows.md) for Python callers.

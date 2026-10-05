@@ -20,6 +20,7 @@ from typing import Any
 
 from thg_protocol.analysis.consistency import reaction_balance
 from thg_protocol.analysis.model_signature import model_signature
+from thg_protocol.merge import reaction_stoichiometry, species_ignored
 from thg_protocol.model_build.mass_balance import formula_atoms, formulas_conflict
 from thg_protocol.runtime.concurrency import parallel_map
 from thg_protocol.runtime.hashing import sha256_file
@@ -933,7 +934,6 @@ def generate_curation_proposals(
             "reason": str(
                 identity.get("reason", "reaction identity remains unresolved")
             ),
-            "normalization_policy": str(identity.get("normalization_policy", "strict")),
         }
         if after == before:
             continue
@@ -969,9 +969,6 @@ def generate_curation_proposals(
                     else "reaction identity conflict is flagged without resolving it"
                 ),
                 metadata={
-                    "normalization_policy": str(
-                        identity.get("normalization_policy", "strict")
-                    ),
                     "semantic_impact": "annotation only; no stoichiometry is mutated",
                 },
             )
@@ -985,32 +982,21 @@ class ReactionIdentity:
     normalized: Mapping[str, float]
     reversed: bool = False
     reason: str = ""
-    normalization_policy: str = "strict"
 
 
 def normalized_stoichiometry(
     reaction: Any,
     metabolite_mapping: Mapping[str, str] | None = None,
     *,
-    proton_water_policy: str = "strict",
     normalization_species: Iterable[str] = (),
 ) -> dict[str, float]:
-    if proton_water_policy not in {"strict", "ignore"}:
-        raise ValueError("proton_water_policy must be 'strict' or 'ignore'")
-    result: defaultdict[str, float] = defaultdict(float)
-    mapping = metabolite_mapping or {}
-    ignored = {str(item) for item in normalization_species}
-    if proton_water_policy == "ignore":
-        ignored.update({"h", "h2o", "proton", "water"})
-    for metabolite, coefficient in reaction.metabolites.items():
-        identifier = mapping.get(str(metabolite.id), str(metabolite.id))
-        normalized_identifier = str(identifier).lower()
-        if normalized_identifier in ignored or any(
-            normalized_identifier.startswith(f"{item.lower()}_") for item in ignored
-        ):
-            continue
-        result[identifier] += float(coefficient)
-    return {key: value for key, value in sorted(result.items()) if abs(value) > 1e-12}
+    """Stoichiometry as the merge compares it: H+ and H2O count.
+
+    Only ``normalization_species`` named by the caller are left out.
+    """
+    return reaction_stoichiometry(
+        reaction, metabolite_mapping, ignore=normalization_species
+    )
 
 
 def compare_reaction_identity(
@@ -1019,57 +1005,28 @@ def compare_reaction_identity(
     *,
     metabolite_mapping: Mapping[str, str] | None = None,
     allow_reversal: bool = True,
-    proton_water_policy: str = "strict",
     normalization_species: Iterable[str] = (),
 ) -> ReactionIdentity:
     observed = normalized_stoichiometry(
-        reaction,
-        metabolite_mapping,
-        proton_water_policy=proton_water_policy,
-        normalization_species=normalization_species,
+        reaction, metabolite_mapping, normalization_species=normalization_species
     )
-    ignored = {str(item).lower() for item in normalization_species}
-    if proton_water_policy == "ignore":
-        ignored.update({"h", "h2o", "proton", "water"})
     expected = {
-        str(k): float(v)
-        for k, v in target.items()
-        if abs(float(v)) > 1e-12
-        and str(k).lower() not in ignored
-        and not any(str(k).lower().startswith(f"{item}_") for item in ignored)
+        str(key): float(value)
+        for key, value in target.items()
+        if abs(float(value)) > 1e-12
+        and not species_ignored(str(key), normalization_species)
     }
     if observed == expected:
+        return ReactionIdentity("exact", observed, False, "stoichiometry matches")
+    if allow_reversal and observed == {k: -v for k, v in expected.items()}:
         return ReactionIdentity(
-            "exact",
-            observed,
-            False,
-            "normalized stoichiometry matches",
-            proton_water_policy,
-        )
-    reversed_target = {key: -value for key, value in expected.items()}
-    if allow_reversal and observed == reversed_target:
-        return ReactionIdentity(
-            "equivalent-reversed",
-            observed,
-            True,
-            "normalized stoichiometry is reversed",
-            proton_water_policy,
+            "equivalent-reversed", observed, True, "stoichiometry is reversed"
         )
     if set(observed) == set(expected):
         return ReactionIdentity(
-            "conflict",
-            observed,
-            False,
-            "species match but coefficients differ",
-            proton_water_policy,
+            "conflict", observed, False, "species match but coefficients differ"
         )
-    return ReactionIdentity(
-        "no-match",
-        observed,
-        False,
-        f"normalized species differ; policy={proton_water_policy}",
-        proton_water_policy,
-    )
+    return ReactionIdentity("no-match", observed, False, "species differ")
 
 
 def _compare_reaction_identity_payload(
@@ -1077,18 +1034,14 @@ def _compare_reaction_identity_payload(
         tuple[object, ...],
         Mapping[str, float],
         Mapping[str, str],
-        str,
         tuple[str, ...],
     ],
 ) -> ReactionIdentity:
-    reaction, target, metabolite_mapping, proton_water_policy, normalization_species = (
-        payload
-    )
+    reaction, target, metabolite_mapping, normalization_species = payload
     return compare_reaction_identity(
         _reaction_from_payload(reaction),
         target,
         metabolite_mapping=metabolite_mapping,
-        proton_water_policy=proton_water_policy,
         normalization_species=normalization_species,
     )
 

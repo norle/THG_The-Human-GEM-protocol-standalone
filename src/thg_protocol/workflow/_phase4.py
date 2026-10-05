@@ -208,7 +208,13 @@ class FinalTHGStage:
 
     def __init__(self, stage_id: str, dependencies: tuple[str, ...] = ()) -> None:
         self.id, self.dependencies = stage_id, dependencies
-        if stage_id == "validate-final-thg":
+        if stage_id in {
+            "final-thg-merge-plan",
+            "final-thg-merge",
+            "validate-final-thg",
+        }:
+            # Merge plans changed format: metabolites merge only on identical
+            # chemistry and same-ID conflicts are renamed.
             self.implementation_version = 2
         self.output_role = (
             "model"
@@ -350,8 +356,6 @@ class FinalTHGStage:
             policy = MergePolicy(
                 source_precedence=str(section.get("source_precedence", "base")),
                 direction=str(section.get("direction", "strict")),
-                proton_water=str(section.get("proton_water", "strict")),
-                formula_charge=str(section.get("formula_charge", "report")),
                 bounds=str(section.get("bounds", "report")),
                 gpr=str(section.get("gpr", "report")),
             )

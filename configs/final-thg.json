@@ -17,8 +17,6 @@
     },
     "source_precedence": "base",
     "direction": "strict",
-    "proton_water": "strict",
-    "formula_charge": "report",
     "bounds": "report",
     "gpr": "report",
     "validation_profile": "final-standard"

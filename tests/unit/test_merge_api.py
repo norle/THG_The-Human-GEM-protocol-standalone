@@ -62,7 +62,9 @@ def test_merge_models_from_paths_removes_isolated_metabolites(tmp_path):
     assert output_path.exists()
 
 
-def test_identifier_merge_retains_base_chemistry_bounds_and_gpr_on_conflict():
+def test_same_id_metabolite_with_other_chemistry_is_renamed_not_merged():
+    from thg_protocol.merge import generate_merge_plan
+
     base = cobra.Model("base")
     base_metabolite = cobra.Metabolite(
         "a_c", compartment="c", formula="C1", charge=0, name="base A"
@@ -86,16 +88,23 @@ def test_identifier_merge_retains_base_chemistry_bounds_and_gpr_on_conflict():
     incoming_reaction.annotation["kegg.reaction"] = "R00001"
     incoming.add_reactions([incoming_reaction])
 
+    plan = generate_merge_plan(base, incoming)
+    assert plan.renamed == {"a_c": "a_c__incoming"}
+    categories = {item.category: item for item in plan.decisions}
+    assert categories["formula-conflict"].action == "keep-separate"
+    assert "renamed to a_c__incoming" in categories["formula-conflict"].reason
+    assert categories["reaction-stoichiometry-conflict"].action == "keep-base"
+
     merged, report = merge_models(base, incoming)
     reaction = merged.reactions.R1
-    metabolite = merged.metabolites.a_c
-
-    assert report.overlapping_metabolites == 1
+    assert report.overlapping_metabolites == 0
+    assert report.added_metabolites == 1
     assert report.overlapping_reactions == 1
-    assert metabolite.formula == "C1"
-    assert metabolite.charge == 0
+    assert (merged.metabolites.a_c.formula, merged.metabolites.a_c.charge) == ("C1", 0)
+    renamed = merged.metabolites.a_c__incoming
+    assert (renamed.formula, renamed.charge) == ("C2", 1)
     assert reaction.bounds == (-1, 2)
-    assert reaction.metabolites[metabolite] == -1
+    assert reaction.metabolites == {merged.metabolites.a_c: -1}
     assert reaction.gene_reaction_rule == "G1"
     assert reaction.annotation == {"kegg.reaction": "R00001"}
 
@@ -115,7 +124,46 @@ def test_identifier_merge_does_not_match_different_ids_by_chemistry():
     assert merged.reactions.has_id("R2")
 
 
-def test_shared_identifier_with_conflicting_formula_or_ids_is_not_mapped():
+def _linked(base_formula, base_charge, formula, charge):
+    from thg_protocol.merge import generate_merge_plan
+
+    base = _model("base", "R1", "a_c")
+    incoming = _model("incoming", "R2", "b_c")
+    base.metabolites.a_c.formula, base.metabolites.a_c.charge = (
+        base_formula,
+        base_charge,
+    )
+    incoming.metabolites.b_c.formula, incoming.metabolites.b_c.charge = (
+        formula,
+        charge,
+    )
+    base.metabolites.a_c.annotation = {"chebi": "1"}
+    incoming.metabolites.b_c.annotation = {"chebi": "1"}
+    return generate_merge_plan(base, incoming)
+
+
+def test_linked_metabolites_merge_only_with_identical_formula_and_charge():
+    assert _linked("C1H2", 0, "C1H2", 0).metabolite_map == {"b_c": "a_c"}
+    assert _linked("CH2", 0, "C1H2", 0).metabolite_map == {"b_c": "a_c"}
+    # Unknown on both sides is not a difference.
+    assert _linked("C1", None, "C1", None).metabolite_map == {"b_c": "a_c"}
+    for chemistry, category in (
+        (("C1H3", 0, "C1H2", -1), "protonation-conflict"),
+        (("C1H2", 0, "C1H3", 0), "protonation-conflict"),
+        (("C1H2", 0, "C1H2", 1), "charge-conflict"),
+        (("C1H2", 0, "C2H2", 0), "formula-conflict"),
+        (("C1H2", 0, None, 0), "missing-chemistry"),
+        (("C1H2", 0, "C1H2", None), "missing-chemistry"),
+    ):
+        plan = _linked(*chemistry)
+        assert plan.metabolite_map == {}, chemistry
+        (decision,) = plan.decisions
+        assert (decision.category, decision.action) == (category, "keep-separate")
+        assert decision.reason.startswith("chebi:1; formula ")
+        assert plan.renamed == {}  # different IDs need no rename
+
+
+def test_same_chemistry_with_disjoint_kegg_ids_is_an_identifier_conflict():
     from thg_protocol.merge import generate_merge_plan
 
     base = _model("base", "R1", "a_c")
@@ -124,32 +172,54 @@ def test_shared_identifier_with_conflicting_formula_or_ids_is_not_mapped():
     incoming.metabolites.b_c.annotation = {"chebi": "1", "kegg.compound": "C06428"}
     plan = generate_merge_plan(base, incoming)
     assert plan.metabolite_map == {}
-    (decision,) = [
-        item for item in plan.decisions if item.category == "identity-conflict"
-    ]
+    (decision,) = plan.decisions
+    assert decision.category == "identifier-conflict"
     assert "kegg.compound" in decision.reason
 
-    incoming.metabolites.b_c.annotation = {"chebi": "1"}
-    incoming.metabolites.b_c.formula = "C2"
-    plan = generate_merge_plan(base, incoming)
-    assert plan.metabolite_map == {}
-    assert "formula C1 vs C2" in plan.decisions[0].reason
 
-    incoming.metabolites.b_c.formula = "C1H2"  # protonation only
-    assert generate_merge_plan(base, incoming).metabolite_map == {"b_c": "a_c"}
+def test_protonation_variants_keep_their_own_balanced_reactions():
+    base = cobra.Model("base")
+    acid = cobra.Metabolite("x_c", compartment="c", formula="C2H4O2", charge=0)
+    product = cobra.Metabolite("p_c", compartment="c", formula="C2H4O2", charge=0)
+    reaction = cobra.Reaction("R_base")
+    reaction.add_metabolites({acid: -1, product: 1})
+    base.add_reactions([reaction])
 
-    # Acid and conjugate base share KEGG but differ in ChEBI/InChIKey.
-    base.metabolites.a_c.annotation = {
-        "kegg.compound": "C00022",
-        "chebi": "CHEBI:32816",
-        "inchikey": "A",
-    }
-    incoming.metabolites.b_c.annotation = {
-        "kegg.compound": "C00022",
-        "chebi": "CHEBI:15361",
-        "inchikey": "B",
-    }
-    assert generate_merge_plan(base, incoming).metabolite_map == {"b_c": "a_c"}
+    incoming = cobra.Model("incoming")
+    anion = cobra.Metabolite("x_c", compartment="c", formula="C2H3O2", charge=-1)
+    proton = cobra.Metabolite("h_c", compartment="c", formula="H", charge=1)
+    product = cobra.Metabolite("p_c", compartment="c", formula="C2H4O2", charge=0)
+    reaction = cobra.Reaction("R_incoming")
+    reaction.add_metabolites({anion: -1, proton: -1, product: 1})
+    incoming.add_reactions([reaction])
+
+    merged, _ = merge_models(base, incoming)
+    assert merged.metabolites.x_c.formula == "C2H4O2"
+    assert merged.metabolites.x_c__incoming.formula == "C2H3O2"
+    for reaction_id in ("R_base", "R_incoming"):
+        assert not merged.reactions.get_by_id(reaction_id).check_mass_balance()
+
+
+def test_annotation_linked_reactions_need_identical_protons():
+    from thg_protocol.merge import generate_merge_plan
+
+    def model(model_id, reaction_id, protons):
+        result = cobra.Model(model_id)
+        a = cobra.Metabolite("a_c", compartment="c", formula="C1", charge=0)
+        h = cobra.Metabolite("h_c", compartment="c", formula="H", charge=1)
+        reaction = cobra.Reaction(reaction_id)
+        reaction.add_metabolites({a: -1, h: protons})
+        reaction.annotation["kegg.reaction"] = "R00001"
+        result.add_reactions([reaction])
+        return result
+
+    plan = generate_merge_plan(model("base", "R1", 1), model("incoming", "R2", 1))
+    assert plan.reaction_map == {"R2": "R1"}
+    plan = generate_merge_plan(model("base", "R1", 1), model("incoming", "R2", 2))
+    assert plan.reaction_map == {}
+    assert [
+        item.category for item in plan.decisions if "reaction" in item.category
+    ] == ["reaction-stoichiometry-conflict"]
 
 
 def _atp_model(model_id, prefix):
@@ -194,3 +264,19 @@ def test_identifiers_pairing_one_metabolite_with_two_are_ambiguous():
         "z_c",
     )
     assert decision.reason == "chebi:1, hmdb:H1"
+
+
+def test_shared_annotations_do_not_compete_with_matching_ids():
+    from thg_protocol.merge import generate_merge_plan
+
+    def model(model_id):
+        result = cobra.Model(model_id)
+        for metabolite_id in ("a_c", "b_c"):  # duplicate ChEBI in one compartment
+            metabolite = cobra.Metabolite(metabolite_id, compartment="c", formula="C1")
+            metabolite.annotation = {"chebi": "1"}
+            result.add_metabolites([metabolite])
+        return result
+
+    plan = generate_merge_plan(model("base"), model("incoming"))
+    assert plan.metabolite_map == {"a_c": "a_c", "b_c": "b_c"}
+    assert {item.category for item in plan.decisions} == {"metabolite-equivalence"}

@@ -3,8 +3,8 @@
 from __future__ import annotations
 
 import copy
-from collections.abc import Mapping
-from dataclasses import dataclass
+from collections.abc import Iterable, Mapping
+from dataclasses import dataclass, field, replace
 from pathlib import Path
 from typing import Any
 
@@ -35,12 +35,16 @@ class MergeDecision:
 
 @dataclass(frozen=True)
 class MergePolicy:
-    """Explicit policies controlling semantic merge decisions."""
+    """Policies for the merge decisions that are a matter of preference.
+
+    Metabolite chemistry has no policy: two metabolites merge only when their
+    formula and charge are identical (see
+    [`generate_merge_plan`][thg_protocol.merge.generate_merge_plan]).
+    ``source_precedence`` picks the side whose names win on overlaps.
+    """
 
     source_precedence: str = "base"
     direction: str = "strict"
-    proton_water: str = "strict"
-    formula_charge: str = "report"
     bounds: str = "report"
     gpr: str = "report"
 
@@ -48,8 +52,6 @@ class MergePolicy:
         choices = {
             "source_precedence": {"base", "incoming"},
             "direction": {"strict", "allow-reversal"},
-            "proton_water": {"strict", "ignore"},
-            "formula_charge": {"report", "base", "incoming"},
             "bounds": {"report", "base", "incoming"},
             "gpr": {"report", "base", "incoming"},
         }
@@ -60,19 +62,25 @@ class MergePolicy:
 
 @dataclass(frozen=True)
 class MergePlan:
-    """Complete plan emitted before a merge mutates a copied model."""
+    """Complete plan emitted before a merge mutates a copied model.
+
+    ``renamed`` gives the new ID of each incoming metabolite that shares an ID
+    with a base metabolite but is not the same species.
+    """
 
     metabolite_map: dict[str, str]
     gene_map: dict[str, str]
     reaction_map: dict[str, str]
     decisions: tuple[MergeDecision, ...]
     policy: MergePolicy = MergePolicy()
+    renamed: dict[str, str] = field(default_factory=dict)
 
     def to_dict(self) -> dict[str, object]:
         return {
             "metabolite_map": dict(sorted(self.metabolite_map.items())),
             "gene_map": dict(sorted(self.gene_map.items())),
             "reaction_map": dict(sorted(self.reaction_map.items())),
+            "renamed": dict(sorted(self.renamed.items())),
             "policy": copy.deepcopy(self.policy.__dict__),
             "decisions": [
                 copy.deepcopy(decision.__dict__) for decision in self.decisions
@@ -85,120 +93,182 @@ class MergePlan:
         decisions = payload.get("decisions", ())
         if not isinstance(policy, Mapping) or not isinstance(decisions, (list, tuple)):
             raise ValueError("invalid merge plan payload")
+        removed = sorted(set(policy) - set(MergePolicy.__dataclass_fields__))
+        if removed:
+            raise ValueError(
+                f"merge plan uses removed policy fields {removed}; regenerate it"
+            )
+
+        def mapping(key: str) -> dict[str, str]:
+            return {
+                str(name): str(value)
+                for name, value in dict(payload.get(key, {})).items()
+            }
+
         return cls(
-            {
-                str(key): str(value)
-                for key, value in dict(payload.get("metabolite_map", {})).items()
-            },
-            {
-                str(key): str(value)
-                for key, value in dict(payload.get("gene_map", {})).items()
-            },
-            {
-                str(key): str(value)
-                for key, value in dict(payload.get("reaction_map", {})).items()
-            },
+            mapping("metabolite_map"),
+            mapping("gene_map"),
+            mapping("reaction_map"),
             tuple(
                 MergeDecision(**dict(item))
                 for item in decisions
                 if isinstance(item, Mapping)
             ),
             MergePolicy(**dict(policy)),
+            mapping("renamed"),
         )
 
 
-def _reaction_signature(
-    reaction: Any,
-    metabolite_map: dict[str, str],
-    *,
-    ignored_species: frozenset[str] = frozenset(),
-) -> tuple[tuple[str, float], ...]:
-    return tuple(
-        sorted(
-            (
-                metabolite_map.get(metabolite.id, metabolite.id),
-                round(float(coefficient), 12),
-            )
-            for metabolite, coefficient in reaction.metabolites.items()
-            if metabolite.id.lower().rsplit("_", 1)[0] not in ignored_species
-        )
+#: Annotation namespaces that link metabolites across models.
+METABOLITE_LINKS = ("kegg.compound", "chebi", "hmdb", "inchikey")
+#: Annotation namespaces that link reactions with different IDs.
+REACTION_LINKS = ("kegg.reaction", "ec-code", "bigg.reaction")
+#: Suffix for incoming metabolites renamed because their ID is taken.
+RENAME_SUFFIX = "__incoming"
+
+
+def _annotation_values(item: Any, key: str) -> set[str]:
+    value = item.annotation.get(key)
+    values = value if isinstance(value, (list, tuple, set)) else [value]
+    return {str(entry) for entry in values if entry not in (None, "")}
+
+
+def _index(objects: Any, keys: tuple[str, ...]) -> dict[str, list[str]]:
+    result: dict[str, list[str]] = {}
+    for item in objects:
+        for key in keys:
+            for identifier in sorted(_annotation_values(item, key)):
+                result.setdefault(f"{key}:{identifier}", []).append(item.id)
+    return result
+
+
+def _chemistry(metabolite: Any) -> tuple[object, object]:
+    """Element counts (with hydrogen) and charge; ``None`` where unknown."""
+    from thg_protocol.model_build.mass_balance import formula_atoms
+
+    atoms = formula_atoms(metabolite.formula or "")
+    charge = metabolite.charge
+    return (
+        tuple(sorted(atoms.items())) if atoms else None,
+        None if charge is None else float(charge),
     )
 
 
-def _reverse_signature(
-    signature: tuple[tuple[str, float], ...],
-) -> tuple[tuple[str, float], ...]:
-    return tuple(
-        sorted((identifier, -coefficient) for identifier, coefficient in signature)
-    )
+def _metabolite_conflict(first: Any, second: Any) -> tuple[str, str] | None:
+    """Why two linked metabolites are not the same species, or None.
 
-
-def generate_merge_plan(
-    base_model: Any,
-    incoming_model: Any,
-    *,
-    policy: MergePolicy | None = None,
-) -> MergePlan:
-    """Generate conservative, compartment-aware equivalence proposals.
-
-    Cross-model identity uses explicit annotation identifiers when present;
-    names and chemistry alone never create an equivalence.  A shared
-    identifier is not enough when another identifier namespace disagrees or,
-    under the default ``formula_charge="report"`` policy, when the formulas
-    differ beyond hydrogen (``identity-conflict``).  Ambiguous
-    and conflicting matches are recorded as unresolved decisions.
+    Returns the decision category and a description. Formula and charge must
+    be identical, hydrogen included: a protonation difference changes the
+    stoichiometry of every reaction written for either form.
     """
-
-    policy = policy or MergePolicy()
-
-    def index(objects: Any, annotation_keys: tuple[str, ...]) -> dict[str, list[str]]:
-        result: dict[str, list[str]] = {}
-        for item in objects:
-            for key in annotation_keys:
-                value = item.annotation.get(key)
-                values = value if isinstance(value, list) else [value]
-                for identifier in values:
-                    if identifier:
-                        result.setdefault(f"{key}:{identifier}", []).append(item.id)
-        return result
-
-    identity_keys = ("kegg.compound", "chebi", "hmdb", "inchikey")
-    left = index(base_model.metabolites, identity_keys)
-    right = index(incoming_model.metabolites, identity_keys)
-
-    def identity_conflict(first: Any, second: Any) -> str | None:
-        """Why one shared identifier is not enough, or None."""
-        from thg_protocol.model_build.mass_balance import formulas_conflict
-        from thg_protocol.validation import IDENTITY_ANNOTATIONS
-
-        # An explicit formula/charge precedence policy accepts formula
-        # differences and resolves them; the default "report" does not map.
-        if policy.formula_charge == "report" and formulas_conflict(
-            first.formula, second.formula
+    if first.compartment != second.compartment:
+        return (
+            "compartment-conflict",
+            f"compartment {first.compartment} vs {second.compartment}",
+        )
+    ours, theirs = _chemistry(first), _chemistry(second)
+    if ours != theirs:
+        detail = (
+            f"formula {first.formula or '-'} vs {second.formula or '-'}, "
+            f"charge {first.charge} vs {second.charge}"
+        )
+        if None in ours or None in theirs:
+            category = "missing-chemistry"
+        elif ours[0] == theirs[0]:
+            category = "charge-conflict"
+        elif dict(ours[0]).keys() - {"H"} == dict(theirs[0]).keys() - {"H"} and all(
+            count == dict(theirs[0])[element]
+            for element, count in ours[0]
+            if element != "H"
         ):
-            return f"formula {first.formula} vs {second.formula}"
-        # Only namespaces in IDENTITY_ANNOTATIONS: ChEBI, HMDB and InChIKey
-        # give an acid and its conjugate base different IDs.
-        for key in IDENTITY_ANNOTATIONS:
-            ours, theirs = first.annotation.get(key), second.annotation.get(key)
-            ours = set(ours if isinstance(ours, list) else [ours]) - {None, ""}
-            theirs = set(theirs if isinstance(theirs, list) else [theirs]) - {None, ""}
-            if ours and theirs and not ours & theirs:
-                return f"{key} {sorted(ours)} vs {sorted(theirs)}"
-        return None
+            category = "protonation-conflict"
+        else:
+            category = "formula-conflict"
+        return category, detail
+    # Same chemistry is not the same compound (glucose and fructose share
+    # C6H12O6): disjoint KEGG compound IDs mean a mis-annotation.
+    from thg_protocol.validation import IDENTITY_ANNOTATIONS
+
+    for key in IDENTITY_ANNOTATIONS:
+        left, right = _annotation_values(first, key), _annotation_values(second, key)
+        if left and right and not left & right:
+            return "identifier-conflict", f"{key} {sorted(left)} vs {sorted(right)}"
+    return None
+
+
+def species_ignored(identifier: str, ignore: Iterable[str]) -> bool:
+    """Whether ``identifier`` is one of the ``ignore`` species (or its compartments)."""
+    lowered = str(identifier).lower()
+    return any(
+        lowered == str(item).lower() or lowered.startswith(f"{str(item).lower()}_")
+        for item in ignore
+    )
+
+
+def reaction_stoichiometry(
+    reaction: Any,
+    metabolite_map: Mapping[str, str] | None = None,
+    *,
+    ignore: Iterable[str] = (),
+) -> dict[str, float]:
+    """Metabolite ID -> coefficient, the identity of a reaction's chemistry.
+
+    ``metabolite_map`` renames metabolites first (coefficients of metabolites
+    that map to one ID add up). Every species counts, H+ and H2O included:
+    two reactions that differ only in protons or water are different
+    reactions. ``ignore`` names species to leave out, matched by ID or ID
+    prefix before the compartment (``"atp"`` skips ``atp_c``); only a caller
+    that asks for it drops anything.
+    """
+    result: dict[str, float] = {}
+    for metabolite, coefficient in reaction.metabolites.items():
+        identifier = (metabolite_map or {}).get(metabolite.id, metabolite.id)
+        if species_ignored(identifier, ignore):
+            continue
+        result[identifier] = result.get(identifier, 0.0) + float(coefficient)
+    rounded = {key: round(value, 12) for key, value in result.items()}
+    return {key: value for key, value in sorted(rounded.items()) if value}
+
+
+def _reverse(stoichiometry: Mapping[str, float]) -> dict[str, float]:
+    return {key: -value for key, value in stoichiometry.items()}
+
+
+def _link_metabolites(
+    base_model: Any, incoming_model: Any
+) -> tuple[dict[tuple[str, str], list[str]], dict[tuple[str, str], list[str]]]:
+    """Return linked (base, incoming) pairs and ambiguous groups, with tokens.
+
+    A link is the same metabolite ID. Metabolites whose ID is not in the other
+    model are linked by a shared annotation identifier in the same
+    compartment (ATP in the cytosol and in mitochondria share a KEGG ID but
+    are different species). A metabolite linked to more than one on the
+    other side is ambiguous.
+    """
 
     def compartment(model: Any, metabolite_id: str) -> str:
         return model.metabolites.get_by_id(metabolite_id).compartment or ""
 
-    # A shared identifier pairs metabolites within one compartment: ATP in the
-    # cytosol and in mitochondria share a KEGG ID but are different species.
-    # Pairs and ambiguous groups collect every token that supports them, so
-    # each gets one decision however many identifiers it shares.
     pairs: dict[tuple[str, str], list[str]] = {}
     ambiguous: dict[tuple[str, str], list[str]] = {}
+    for metabolite in incoming_model.metabolites:
+        if base_model.metabolites.has_id(metabolite.id):
+            pairs.setdefault((metabolite.id, metabolite.id), []).append("metabolite ID")
+    left = _index(base_model.metabolites, METABOLITE_LINKS)
+    right = _index(incoming_model.metabolites, METABOLITE_LINKS)
     for token in sorted(set(left) & set(right)):
-        targets = sorted(set(left[token]))
-        candidates = sorted(set(right[token]))
+        targets = sorted(
+            {
+                item
+                for item in left[token]
+                if not incoming_model.metabolites.has_id(item)
+            }
+        )
+        candidates = sorted(
+            {item for item in right[token] if not base_model.metabolites.has_id(item)}
+        )
+        if not targets or not candidates:
+            continue
         if len(targets) == len(candidates) == 1:
             pairs.setdefault((targets[0], candidates[0]), []).append(token)
             continue
@@ -214,151 +284,199 @@ def generate_merge_plan(
             ]
             group = pairs if len(here) == len(there) == 1 else ambiguous
             group.setdefault((",".join(here), ",".join(there)), []).append(token)
+
     targets_of: dict[str, set[str]] = {}
     sources_of: dict[str, set[str]] = {}
     for target, source in pairs:
         targets_of.setdefault(source, set()).add(target)
         sources_of.setdefault(target, set()).add(source)
-
-    metabolite_map: dict[str, str] = {}
-    decisions: list[MergeDecision] = []
-    for (target, source), tokens in sorted(pairs.items()):
-        token = ", ".join(tokens)
-        left_obj = base_model.metabolites.get_by_id(target)
-        right_obj = incoming_model.metabolites.get_by_id(source)
+    unique: dict[tuple[str, str], list[str]] = {}
+    for (target, source), tokens in pairs.items():
         if len(targets_of[source]) > 1 or len(sources_of[target]) > 1:
-            # Different identifiers pair one metabolite with different ones.
             key = (
                 ",".join(sorted(targets_of[source])),
                 ",".join(sorted(sources_of[target])),
             )
             ambiguous.setdefault(key, []).extend(tokens)
-            continue
-        conflict = identity_conflict(left_obj, right_obj)
-        if conflict is not None:
-            decisions.append(
-                MergeDecision(
-                    "identity-conflict",
-                    target,
-                    source,
-                    "unresolved",
-                    f"{token}; conflicting {conflict}",
-                )
-            )
-        elif left_obj.compartment == right_obj.compartment:
+        else:
+            unique[(target, source)] = tokens
+    return unique, ambiguous
+
+
+def generate_merge_plan(
+    base_model: Any,
+    incoming_model: Any,
+    *,
+    policy: MergePolicy | None = None,
+) -> MergePlan:
+    """Plan a merge: which metabolites, reactions and genes are the same.
+
+    Metabolites are linked by the same ID or, when their ID is not in the
+    other model, by a shared annotation identifier (KEGG, ChEBI, HMDB,
+    InChIKey) in the same compartment. A
+    linked pair is merged only when it is the same species: identical
+    formula (element counts, hydrogen included) and charge, and no disjoint
+    KEGG compound IDs. Every other linked pair is kept separate with a
+    decision naming why (``protonation-conflict``, ``formula-conflict``,
+    ``charge-conflict``, ``missing-chemistry``, ``identifier-conflict``,
+    ``compartment-conflict`` or ``ambiguous-metabolite``); an incoming
+    metabolite kept separate from a base metabolite with its ID is renamed
+    with the ``__incoming`` suffix, so each model's reactions stay balanced
+    against their own chemistry.
+
+    Reactions with the same ID are the same reaction; when their
+    stoichiometry differs (after mapping and renaming), the base reaction is
+    kept and the difference reported. Reactions with different IDs merge
+    when they share an annotation identifier and have exactly the same
+    stoichiometry, H+ and H2O included.
+    """
+    policy = policy or MergePolicy()
+    decisions: list[MergeDecision] = []
+
+    pairs, ambiguous = _link_metabolites(base_model, incoming_model)
+    metabolite_map: dict[str, str] = {}
+    kept_separate: list[tuple[str, str, str, str, str]] = []
+    for (target, source), tokens in sorted(pairs.items()):
+        conflict = _metabolite_conflict(
+            base_model.metabolites.get_by_id(target),
+            incoming_model.metabolites.get_by_id(source),
+        )
+        if conflict is None:
             metabolite_map[source] = target
             decisions.append(
-                MergeDecision("metabolite-equivalence", target, source, "map", token)
-            )
-        else:
-            decisions.append(
                 MergeDecision(
-                    "compartment-conflict", target, source, "unresolved", token
+                    "metabolite-equivalence", target, source, "map", ", ".join(tokens)
                 )
             )
+        else:
+            kept_separate.append((*conflict, target, source, ", ".join(tokens)))
+
+    taken = {item.id for item in base_model.metabolites} | {
+        item.id for item in incoming_model.metabolites
+    }
+    renamed: dict[str, str] = {}
+    for metabolite in sorted(incoming_model.metabolites, key=lambda item: item.id):
+        if base_model.metabolites.has_id(metabolite.id) and (
+            metabolite_map.get(metabolite.id) != metabolite.id
+        ):
+            new_id, counter = f"{metabolite.id}{RENAME_SUFFIX}", 1
+            while new_id in taken:
+                counter += 1
+                new_id = f"{metabolite.id}{RENAME_SUFFIX}{counter}"
+            taken.add(new_id)
+            renamed[metabolite.id] = new_id
+
+    def note(source_ids: str) -> str:
+        names = [renamed[item] for item in source_ids.split(",") if item in renamed]
+        return f"; incoming renamed to {', '.join(names)}" if names else ""
+
+    for category, detail, target, source, token in kept_separate:
+        decisions.append(
+            MergeDecision(
+                category,
+                target,
+                source,
+                "keep-separate",
+                f"{token}; {detail}{note(source)}",
+            )
+        )
     decisions.extend(
         MergeDecision(
             "ambiguous-metabolite",
             targets,
             candidates,
-            "unresolved",
-            ", ".join(sorted(set(tokens))),
+            "keep-separate",
+            ", ".join(sorted(set(tokens))) + note(candidates),
         )
         for (targets, candidates), tokens in sorted(ambiguous.items())
     )
+
+    incoming_ids = {**metabolite_map, **renamed}
     gene_map = {
         gene.id: gene.id
         for gene in incoming_model.genes
         if base_model.genes.has_id(gene.id)
     }
-    reaction_map = {
-        reaction.id: reaction.id
-        for reaction in incoming_model.reactions
-        if base_model.reactions.has_id(reaction.id)
-    }
-    # Reaction IDs are strongest.  For distinct IDs, explicit reaction
-    # annotations can establish equivalence only after metabolite mapping.
-    reaction_tokens: dict[str, list[str]] = {}
-    for reaction in incoming_model.reactions:
-        for key in ("kegg.reaction", "ec-code", "bigg.reaction"):
-            value = reaction.annotation.get(key)
-            values = value if isinstance(value, list) else [value]
-            for identifier in values:
-                if identifier:
-                    reaction_tokens.setdefault(f"{key}:{identifier}", []).append(
-                        reaction.id
-                    )
-    base_tokens: dict[str, list[str]] = {}
-    for reaction in base_model.reactions:
-        for key in ("kegg.reaction", "ec-code", "bigg.reaction"):
-            value = reaction.annotation.get(key)
-            values = value if isinstance(value, list) else [value]
-            for identifier in values:
-                if identifier:
-                    base_tokens.setdefault(f"{key}:{identifier}", []).append(
-                        reaction.id
-                    )
-    for token in sorted(set(reaction_tokens) & set(base_tokens)):
-        sources, targets = (
-            sorted(set(reaction_tokens[token])),
-            sorted(set(base_tokens[token])),
+    reaction_map: dict[str, str] = {}
+    for reaction in sorted(incoming_model.reactions, key=lambda item: item.id):
+        if not base_model.reactions.has_id(reaction.id):
+            continue
+        reaction_map[reaction.id] = reaction.id
+        base_signature = reaction_stoichiometry(
+            base_model.reactions.get_by_id(reaction.id)
         )
-        if len(sources) == len(targets) == 1 and sources[0] not in reaction_map:
-            source, target = sources[0], targets[0]
-            ignored_species = (
-                frozenset({"h", "h2o", "proton", "water"})
-                if policy.proton_water == "ignore"
-                else frozenset()
+        signature = reaction_stoichiometry(reaction, incoming_ids)
+        if signature == base_signature:
+            decisions.append(
+                MergeDecision(
+                    "reaction-equivalence",
+                    reaction.id,
+                    reaction.id,
+                    "map",
+                    "reaction ID",
+                )
             )
-            incoming_signature = _reaction_signature(
-                incoming_model.reactions.get_by_id(source),
-                metabolite_map,
-                ignored_species=ignored_species,
+        else:
+            category = (
+                "direction-conflict"
+                if signature == _reverse(base_signature)
+                else "reaction-stoichiometry-conflict"
             )
-            base_signature = _reaction_signature(
-                base_model.reactions.get_by_id(target),
-                {},
-                ignored_species=ignored_species,
+            decisions.append(
+                MergeDecision(
+                    category,
+                    reaction.id,
+                    reaction.id,
+                    "keep-base",
+                    "reaction ID; stoichiometry differs",
+                )
             )
-            if incoming_signature == base_signature:
+
+    incoming_tokens = _index(incoming_model.reactions, REACTION_LINKS)
+    base_tokens = _index(base_model.reactions, REACTION_LINKS)
+    for token in sorted(set(incoming_tokens) & set(base_tokens)):
+        sources = sorted(set(incoming_tokens[token]))
+        targets = sorted(set(base_tokens[token]))
+        if len(sources) != 1 or len(targets) != 1:
+            continue
+        source, target = sources[0], targets[0]
+        if source in reaction_map or target in reaction_map.values():
+            continue
+        signature = reaction_stoichiometry(
+            incoming_model.reactions.get_by_id(source), incoming_ids
+        )
+        base_signature = reaction_stoichiometry(base_model.reactions.get_by_id(target))
+        if signature == base_signature:
+            reaction_map[source] = target
+            decisions.append(
+                MergeDecision("reaction-equivalence", target, source, "map", token)
+            )
+        elif signature == _reverse(base_signature):
+            action = "map" if policy.direction == "allow-reversal" else "unresolved"
+            if action == "map":
                 reaction_map[source] = target
-                decisions.append(
-                    MergeDecision("reaction-equivalence", target, source, "map", token)
+            decisions.append(
+                MergeDecision("direction-conflict", target, source, action, token)
+            )
+        else:
+            decisions.append(
+                MergeDecision(
+                    "reaction-stoichiometry-conflict",
+                    target,
+                    source,
+                    "unresolved",
+                    token,
                 )
-            elif incoming_signature == _reverse_signature(base_signature):
-                action = "map" if policy.direction == "allow-reversal" else "unresolved"
-                if action == "map":
-                    reaction_map[source] = target
-                decisions.append(
-                    MergeDecision("direction-conflict", target, source, action, token)
-                )
-            else:
-                decisions.append(
-                    MergeDecision(
-                        "reaction-stoichiometry-conflict",
-                        target,
-                        source,
-                        "unresolved",
-                        token,
-                    )
-                )
+            )
     decisions.extend(
         MergeDecision(
             "gene-equivalence", identifier, identifier, "map", "explicit identifier"
         )
         for identifier in sorted(gene_map)
     )
-    decisions.extend(
-        MergeDecision(
-            "reaction-equivalence", identifier, identifier, "map", "explicit identifier"
-        )
-        for identifier in sorted(reaction_map)
-    )
-    common_reaction_ids = sorted(
-        {item.id for item in base_model.reactions}
-        & {item.id for item in incoming_model.reactions}
-    )
-    for identifier in common_reaction_ids:
+    for identifier in sorted(
+        key for key, value in reaction_map.items() if key == value
+    ):
         base_reaction = base_model.reactions.get_by_id(identifier)
         incoming_reaction = incoming_model.reactions.get_by_id(identifier)
         if base_reaction.bounds != incoming_reaction.bounds:
@@ -381,22 +499,9 @@ def generate_merge_plan(
                     "GPR differs",
                 )
             )
-        for field in ("formula", "charge"):
-            base_values = {getattr(item, field) for item in base_reaction.metabolites}
-            incoming_values = {
-                getattr(item, field) for item in incoming_reaction.metabolites
-            }
-            if base_values != incoming_values:
-                decisions.append(
-                    MergeDecision(
-                        f"{field}-conflict",
-                        identifier,
-                        identifier,
-                        policy.formula_charge,
-                        f"{field} differs",
-                    )
-                )
-    return MergePlan(metabolite_map, gene_map, reaction_map, tuple(decisions), policy)
+    return MergePlan(
+        metabolite_map, gene_map, reaction_map, tuple(decisions), policy, renamed
+    )
 
 
 def apply_merge_plan(
@@ -405,75 +510,56 @@ def apply_merge_plan(
     plan: MergePlan,
     *,
     output_path: str | Path | None = None,
+    provenance: bool = True,
 ) -> tuple[Any, MergeReport]:
-    """Apply a reviewed plan to a copied model, preserving old merge behavior."""
+    """Apply a reviewed plan to copies of both models.
+
+    Incoming metabolites are renamed and mapped as planned, so a mapped
+    metabolite takes the base ID (its chemistry is identical by
+    construction). Overlapping reactions keep the base stoichiometry; bounds
+    and GPRs follow the plan's policy, and names follow its source
+    precedence.
+    """
     incoming = incoming_model.copy()
+    for source, target in sorted(plan.renamed.items()):
+        if incoming.metabolites.has_id(source):
+            incoming.metabolites.get_by_id(source).id = target
     for source, target in sorted(plan.metabolite_map.items()):
-        if incoming.metabolites.has_id(source) and not incoming.metabolites.has_id(
-            target
+        if (
+            source != target
+            and incoming.metabolites.has_id(source)
+            and not incoming.metabolites.has_id(target)
         ):
             incoming.metabolites.get_by_id(source).id = target
     for source, target in sorted(plan.reaction_map.items()):
-        if incoming.reactions.has_id(source) and not incoming.reactions.has_id(target):
+        if (
+            source != target
+            and incoming.reactions.has_id(source)
+            and not incoming.reactions.has_id(target)
+        ):
             incoming.reactions.get_by_id(source).id = target
-    merged, report = merge_models(
+    merged, report = _combine(
         base_model,
         incoming,
-        output_path=output_path,
         source_precedence=plan.policy.source_precedence,
-        provenance=True,
+        provenance=provenance,
     )
-
-    # ``MergePolicy`` controls each conflict family independently.  The
-    # low-level merge function intentionally exposes only a broad source
-    # precedence switch, so apply the reviewed structural decisions here
-    # after the copied merge has been constructed.
-    for incoming_metabolite in incoming.metabolites:
-        identifier = incoming_metabolite.id
-        if not merged.metabolites.has_id(identifier):
-            continue
-        target = merged.metabolites.get_by_id(identifier)
-        base = (
-            base_model.metabolites.get_by_id(identifier)
-            if base_model.metabolites.has_id(identifier)
-            else None
-        )
-        if base is None:
-            continue
-        if plan.policy.formula_charge == "incoming":
-            if incoming_metabolite.formula is not None:
-                target.formula = incoming_metabolite.formula
-            if incoming_metabolite.charge is not None:
-                target.charge = incoming_metabolite.charge
-        else:
-            # ``base`` and ``report`` both retain the reviewed base value;
-            # ``report`` records the conflict without silently choosing it.
-            target.formula = base.formula
-            target.charge = base.charge
-
     for incoming_reaction in incoming.reactions:
         identifier = incoming_reaction.id
-        if not merged.reactions.has_id(identifier):
+        if not base_model.reactions.has_id(identifier):
             continue
         target = merged.reactions.get_by_id(identifier)
-        base = (
-            base_model.reactions.get_by_id(identifier)
-            if base_model.reactions.has_id(identifier)
-            else None
+        base = base_model.reactions.get_by_id(identifier)
+        source = incoming_reaction if plan.policy.bounds == "incoming" else base
+        target.bounds = source.bounds
+        target.gene_reaction_rule = (
+            incoming_reaction.gene_reaction_rule
+            if plan.policy.gpr == "incoming"
+            else base.gene_reaction_rule
         )
-        if base is None:
-            continue
-        if plan.policy.bounds == "incoming":
-            target.bounds = incoming_reaction.bounds
-        else:
-            target.bounds = base.bounds
-        if plan.policy.gpr == "incoming":
-            target.gene_reaction_rule = incoming_reaction.gene_reaction_rule
-        else:
-            target.gene_reaction_rule = base.gene_reaction_rule
-
     if output_path is not None:
         _write_model(merged, Path(output_path))
+        report = replace(report, output_path=Path(output_path))
     return merged, report
 
 
@@ -510,24 +596,21 @@ def _write_model(model: Any, output_path: Path) -> None:
     save_model(model, output_path)
 
 
-def merge_models(
+def _combine(
     base_model: Any,
     incoming_model: Any,
     *,
-    output_path: str | Path | None = None,
-    remove_isolated_metabolites: bool = False,
-    source_precedence: str = "base",
-    provenance: bool = False,
+    source_precedence: str,
+    provenance: bool,
 ) -> tuple[Any, MergeReport]:
-    """Merge ``incoming_model`` into a copy of ``base_model``.
+    """Add the incoming objects to a copy of the base model, by ID.
 
-    Existing objects retain their stoichiometry and bounds; incoming names,
-    non-empty annotations, and missing GPRs enrich overlaps. New reactions
-    and metabolites are copied by identifier, so neither input model is
-    mutated and the returned model owns all of its objects.
+    Called with an incoming model already renamed and mapped by a plan, so
+    an overlapping metabolite has the same chemistry on both sides. Overlaps
+    keep the base formula, charge, stoichiometry and bounds; names follow
+    ``source_precedence``, non-empty annotations are added and missing GPRs
+    filled.
     """
-    if source_precedence not in {"base", "incoming"}:
-        raise ValueError("source_precedence must be 'base' or 'incoming'")
     from cobra import Reaction
 
     result = base_model.copy()
@@ -537,17 +620,8 @@ def merge_models(
         if result.metabolites.has_id(incoming.id):
             target = result.metabolites.get_by_id(incoming.id)
             overlapping_metabolites += 1
-            if not target.name and incoming.name:
+            if incoming.name and (source_precedence == "incoming" or not target.name):
                 target.name = incoming.name
-            if target.formula is None and incoming.formula:
-                target.formula = incoming.formula
-            if target.charge is None and incoming.charge is not None:
-                target.charge = incoming.charge
-            if source_precedence == "incoming":
-                target.name = incoming.name or target.name
-                target.formula = incoming.formula or target.formula
-                if incoming.charge is not None:
-                    target.charge = incoming.charge
             _merge_annotation(target, incoming)
             if provenance:
                 target.annotation["thg.provenance"] = {
@@ -569,16 +643,10 @@ def merge_models(
         if result.reactions.has_id(incoming.id):
             target = result.reactions.get_by_id(incoming.id)
             overlapping_reactions += 1
-            if not target.name and incoming.name:
+            if incoming.name and (source_precedence == "incoming" or not target.name):
                 target.name = incoming.name
             if not target.gene_reaction_rule and incoming.gene_reaction_rule:
                 target.gene_reaction_rule = incoming.gene_reaction_rule
-            if source_precedence == "incoming":
-                target.name = incoming.name or target.name
-                target.lower_bound = incoming.lower_bound
-                target.upper_bound = incoming.upper_bound
-                if incoming.gene_reaction_rule:
-                    target.gene_reaction_rule = incoming.gene_reaction_rule
             _merge_annotation(target, incoming)
             if provenance:
                 target.annotation["thg.provenance"] = {
@@ -609,29 +677,49 @@ def merge_models(
         result.add_reactions([reaction])
         added_reactions += 1
 
-    removed_isolated = 0
-    if remove_isolated_metabolites:
-        isolated = [
-            metabolite for metabolite in result.metabolites if not metabolite.reactions
-        ]
-        result.remove_metabolites(isolated, destructive=False)
-        removed_isolated = len(isolated)
-
-    if source_precedence == "incoming":
-        # Incoming precedence is intentionally limited to non-structural
-        # fields; replacing base stoichiometry would bypass the reviewed plan.
-        result.annotation["thg.source_precedence"] = "incoming"
-    destination = Path(output_path) if output_path is not None else None
-    if destination is not None:
-        _write_model(result, destination)
     return result, MergeReport(
         added_metabolites=added_metabolites,
         added_reactions=added_reactions,
         overlapping_metabolites=overlapping_metabolites,
         overlapping_reactions=overlapping_reactions,
-        removed_isolated_metabolites=removed_isolated,
-        output_path=destination,
+        removed_isolated_metabolites=0,
     )
+
+
+def merge_models(
+    base_model: Any,
+    incoming_model: Any,
+    *,
+    output_path: str | Path | None = None,
+    remove_isolated_metabolites: bool = False,
+    source_precedence: str = "base",
+    provenance: bool = False,
+) -> tuple[Any, MergeReport]:
+    """Merge ``incoming_model`` into a copy of ``base_model``.
+
+    Plans the merge with
+    [`generate_merge_plan`][thg_protocol.merge.generate_merge_plan] and
+    applies it, so metabolites merge only when they are the same species.
+    Neither input model is mutated.
+    """
+    plan = generate_merge_plan(
+        base_model,
+        incoming_model,
+        policy=MergePolicy(source_precedence=source_precedence),
+    )
+    merged, report = apply_merge_plan(
+        base_model, incoming_model, plan, provenance=provenance
+    )
+    if remove_isolated_metabolites:
+        isolated = [
+            metabolite for metabolite in merged.metabolites if not metabolite.reactions
+        ]
+        merged.remove_metabolites(isolated, destructive=False)
+        report = replace(report, removed_isolated_metabolites=len(isolated))
+    if output_path is not None:
+        _write_model(merged, Path(output_path))
+        report = replace(report, output_path=Path(output_path))
+    return merged, report
 
 
 def merge_models_from_paths(
