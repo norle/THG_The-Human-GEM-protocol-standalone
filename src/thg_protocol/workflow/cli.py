@@ -96,6 +96,29 @@ def _direct_validation(
     return 0 if report["passed"] else 1
 
 
+def _apply_decisions(args: argparse.Namespace) -> int:
+    from thg_protocol.validation_apply import apply_decisions
+    from thg_protocol.workflow.proposals import ProposalError
+
+    try:
+        # Solvers print licence banners (Gurobi) on stdout; keep it for results.
+        with contextlib.redirect_stdout(sys.stderr):
+            result = apply_decisions(
+                args.report, args.decisions, args.model, args.output
+            )
+    except (OSError, ProposalError) as error:
+        print(f"error: {error}", file=sys.stderr)
+        return 2
+    print(f"applied {len(result['applied'])} of {result['decisions']} decisions")
+    print(f"fixed model: {result['model']}")
+    print(f"ledger: {result['ledger']}")
+    print(f"report: {result['html']}")
+    for check, change in sorted(result["changed"].items()):
+        print(f"{check}: {change['before']} -> {change['after']}")
+    print(f"validation: {'passed' if result['passed'] else 'failed'}")
+    return 0 if result["passed"] else 1
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Run the THG resumable workflow.")
     _add_verbosity_argument(parser)
@@ -127,6 +150,27 @@ def build_parser() -> argparse.ArgumentParser:
     )
     unlock_parser.add_argument("run_dir", type=Path)
     unlock_parser.add_argument("--force", action="store_true")
+
+    apply_parser = commands.add_parser(
+        "apply-decisions",
+        help="apply fixes decided in a validation report and validate again",
+    )
+    apply_parser.add_argument(
+        "report", type=Path, help="validation-report.json with the proposals"
+    )
+    apply_parser.add_argument(
+        "decisions", type=Path, help="decisions.jsonl exported from the report"
+    )
+    apply_parser.add_argument(
+        "--model", type=Path, required=True, help="the model the report validated"
+    )
+    apply_parser.add_argument(
+        "-o",
+        "--output",
+        type=Path,
+        required=True,
+        help="where to write the fixed model",
+    )
 
     # Public names make the maintained workflow entry points discoverable.
     for workflow_id in (
@@ -271,6 +315,8 @@ def main(argv: list[str] | None = None) -> int:
             print(f"run started/resumed: {run}")
             if args.command in {"gapfill", "reference"}:
                 _print_final_report(run)
+        elif args.command == "apply-decisions":
+            return _apply_decisions(args)
         elif args.command == "resume":
             print(f"run resumed: {resume(args.run_dir, force_step=args.force_step)}")
         elif args.command == "status":

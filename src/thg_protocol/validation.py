@@ -17,6 +17,8 @@ from .analysis import consistency
 from .gpr import ast_gpr
 
 _STRUCTURAL = frozenset({"reference-integrity", "identifier-uniqueness", "gpr"})
+# Blocked reactions are reported but never block a release: a genome-scale
+# reconstruction always has reactions without flux under its default bounds.
 PROFILES: dict[str, dict[str, object]] = {
     "structural-fast": {"solver": False, "blocking": _STRUCTURAL},
     "beta1-standard": {
@@ -29,11 +31,11 @@ PROFILES: dict[str, dict[str, object]] = {
     },
     "post-gapfill": {
         "solver": True,
-        "blocking": _STRUCTURAL | {"objective-feasibility", "flux-consistency"},
+        "blocking": _STRUCTURAL | {"objective-feasibility"},
     },
     "final-standard": {
         "solver": True,
-        "blocking": _STRUCTURAL | {"objective-feasibility", "flux-consistency"},
+        "blocking": _STRUCTURAL | {"objective-feasibility"},
     },
     "cell-specific-standard": {
         "solver": True,
@@ -42,12 +44,7 @@ PROFILES: dict[str, dict[str, object]] = {
     "release-full": {
         "solver": True,
         "blocking": _STRUCTURAL
-        | {
-            "mass-balance",
-            "charge-balance",
-            "objective-feasibility",
-            "flux-consistency",
-        },
+        | {"mass-balance", "charge-balance", "objective-feasibility"},
     },
 }
 
@@ -612,12 +609,16 @@ def validate_model(
     ledger_diff: Mapping[str, object] | None = None,
     conservation_exclusions: Iterable[str] = (),
     reference_model: Any | None = None,
+    propose_fixes: bool = False,
 ) -> dict[str, object]:
     """Run an independently callable validation profile and return JSON data.
 
     ``reference_model`` (optional) is the model the checked one derives from:
     formulas and charges are compared against it, and the reactions it
-    excludes from conservation checks stay excluded.
+    excludes from conservation checks stay excluded. With ``propose_fixes``
+    the result also holds ``proposals`` for the failed checks a rule can fix
+    and an ``index`` of the reactions and metabolites the checks mention (see
+    ``validation_fixes``); a curator decides on them in the HTML report.
     """
     if profile not in PROFILES:
         raise ValueError(f"unknown validation profile: {profile}")
@@ -789,6 +790,22 @@ def validate_model(
             ]
         )
     passed = all(item.passed is True for item in checks if item.release_blocking)
+    records = [item.to_dict() for item in checks]
+    fixes: dict[str, object] = {}
+    if propose_fixes:
+        from .validation_fixes import build_index, collect_fixes
+
+        try:
+            proposals = collect_fixes(model, records, reference_model=reference_model)
+            fixes = {
+                "proposals": proposals,
+                "index": build_index(model, records, proposals),
+            }
+        except Exception as error:  # a failed proposal step must not hide results
+            fixes = {
+                "proposals": [],
+                "proposal_error": f"{type(error).__name__}: {error}",
+            }
     solver_configuration = None
     if solver:
         try:
@@ -810,8 +827,9 @@ def validate_model(
         "schema_version": 1,
         "profile": profile,
         "passed": passed,
-        "checks": [item.to_dict() for item in checks],
+        "checks": records,
         "solver": {"requested": solver, "configuration": solver_configuration},
+        **fixes,
     }
 
 

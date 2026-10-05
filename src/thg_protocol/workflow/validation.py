@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import json
-import platform
 import shutil
 from collections.abc import Mapping
 from pathlib import Path
@@ -18,7 +17,7 @@ from thg_protocol.runtime.stage import dependency_path as _dependency_path
 class ValidationScientificStage:
     """Run structural validation and optional MEMOTE checks."""
 
-    implementation_version = 5
+    implementation_version = 6
 
     def __init__(self, stage_id: str, dependencies: tuple[str, ...] = ()) -> None:
         self.id, self.dependencies = stage_id, dependencies
@@ -68,6 +67,7 @@ class ValidationScientificStage:
                 reference_model=None
                 if reference is None
                 else _load_cobra_model(Path(str(reference))),
+                propose_fixes=True,
             )
             output = work_dir / "validation.json"
             output.write_text(
@@ -90,31 +90,24 @@ class ValidationScientificStage:
                     encoding="utf-8"
                 )
             )
-            payload = {
-                "schema": "thg.validation.report/v1",
-                "schema_version": 1,
-                "model_id": model.id,
-                "model_checksum": sha256_file(model_path),
-                "validation_profile": validation["profile"],
-                "validation_profile_version": 1,
-                "software": {"python": platform.python_version()},
-                "after": {
-                    "reactions": len(model.reactions),
-                    "metabolites": len(model.metabolites),
-                    "genes": len(model.genes),
-                    "compartments": len(model.compartments),
+            from thg_protocol.validation_apply import report_payload
+
+            reference = section.get("reference_model")
+            payload = report_payload(
+                model,
+                model_path,
+                validation,
+                previous={
+                    "reference_model": None
+                    if reference is None
+                    else str(Path(str(reference)).resolve()),
+                    "conservation_exclusions": list(
+                        section.get("conservation_exclusions", [])
+                    )
+                    or None,
                 },
-                "validation": validation,
-                "solver": validation.get("solver", {}),
-                "tasks": {"status": "not-requested", "tasks": [], "passed": None},
-                "memote": memote,
-                "warnings": sorted(
-                    str(item["id"])
-                    for item in validation.get("checks", [])
-                    if item.get("passed") is not True
-                    and not item.get("release_blocking")
-                ),
-            }
+            )
+            payload["memote"] = memote
             report = work_dir / "validation-report.json"
             report.write_text(
                 json.dumps(payload, indent=2, sort_keys=True) + "\n",

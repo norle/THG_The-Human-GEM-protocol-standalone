@@ -240,8 +240,10 @@ class GapfillStage:
     def __init__(self, stage_id: str, dependencies: tuple[str, ...] = ()) -> None:
         self.id = stage_id
         self.dependencies = dependencies
-        if stage_id in {"characterize-gapfill-baseline", "validate-gapfill"}:
+        if stage_id == "characterize-gapfill-baseline":
             self.implementation_version = 2
+        elif stage_id == "validate-gapfill":
+            self.implementation_version = 3
 
     def enabled(self, config: Any) -> bool:
         del config
@@ -484,6 +486,7 @@ class GapfillStage:
             validation = validate_model(
                 result,
                 profile,
+                propose_fixes=True,
                 ledger_diff={
                     "passed": _model_diff_is_clean(
                         json.loads(

@@ -510,13 +510,21 @@ def element_residual(
 
 
 def charge_residual(
-    stoichiometry: Mapping[str, float], model: Any, *, input_model: Any | None = None
+    stoichiometry: Mapping[str, float],
+    model: Any,
+    *,
+    input_model: Any | None = None,
+    charges: Mapping[str, int] | None = None,
 ) -> dict[str, object]:
     """Return the net charge of a stoichiometry, or the metabolites lacking one."""
     total = 0.0
     missing = []
     for metabolite_id, coefficient in stoichiometry.items():
-        charge = getattr(_metabolite(model, metabolite_id, input_model), "charge", None)
+        charge = (charges or {}).get(metabolite_id)
+        if charge is None:
+            charge = getattr(
+                _metabolite(model, metabolite_id, input_model), "charge", None
+            )
         if charge is None:
             missing.append(metabolite_id)
         else:
@@ -807,6 +815,291 @@ def _is_pseudo(reaction: Any) -> bool:
     )
 
 
+def _alternatives(group: list[Proposal]) -> list[Proposal]:
+    ids = [item.proposal_id for item in group]
+    for item in group:
+        item.metadata["alternatives"] = [x for x in ids if x != item.proposal_id]
+    return group
+
+
+def _reaction_metadata(
+    reaction: Any,
+    model: Any,
+    after: Mapping[str, float] | None,
+    rule: str,
+    *,
+    input_model: Any | None,
+    context: Mapping[str, object],
+) -> dict[str, object]:
+    reversible = bool(reaction.reversibility)
+    before_summary = reaction_summary(
+        _stoichiometry(reaction), model, input_model=input_model, reversible=reversible
+    )
+    after_summary = (
+        reaction_summary(after, model, input_model=input_model, reversible=reversible)
+        if after is not None
+        else None
+    )
+    return {
+        "rule": rule,
+        "reaction": {"before": before_summary, "after": after_summary},
+        "input_model": _input_context(input_model, reaction.id),
+        "origin": context.get("origin"),
+        "imbalance": context.get("imbalance"),
+        "blamed_flags": list(context.get("flags", [])),
+        "targets": [reaction.id],
+        "flags": _flags(after_summary) if after_summary else [],
+    }
+
+
+def reaction_fixes(
+    reaction: Any,
+    model: Any,
+    *,
+    input_model: Any | None = None,
+    names: Mapping[tuple[str, str], Any] | None = None,
+    evidence: Iterable[str] = (),
+    context: Mapping[str, object] | None = None,
+    exclude_pseudo: bool = True,
+) -> list[Proposal]:
+    """Per-reaction fix rules, tried in order until one yields proposals.
+
+    Rules: a biomass/pool/lumped reaction is excluded from conservation (only
+    with ``exclude_pseudo``); a reaction whose stoichiometry differs from the
+    input model is restored; non-integer coefficients are rounded to the
+    integer stoichiometries that balance the elements; an element residual
+    matching a cofactor pair gets that pair. Several candidates from one rule
+    are mutually exclusive alternatives. ``context`` carries the blamed row
+    (origin, imbalance, flags) when the reaction was blamed.
+    """
+    context = dict(context or {})
+    context.setdefault("origin", reaction_origin(reaction, input_model))
+    origin = context["origin"]
+    evidence = list(evidence)
+    before = {k: _round(v) for k, v in sorted(_stoichiometry(reaction).items())}
+
+    def metadata(after: Mapping[str, float] | None, rule: str) -> dict[str, object]:
+        return _reaction_metadata(
+            reaction, model, after, rule, input_model=input_model, context=context
+        )
+
+    original = _input_reaction(input_model, reaction.id)
+    group: list[Proposal] = []
+    if exclude_pseudo and _is_pseudo(reaction):
+        group.append(
+            _proposal(
+                operation="exclude-reaction",
+                object_type="reaction",
+                object_id=reaction.id,
+                before={"excluded": False},
+                after={"excluded": True},
+                policy="exclude-pseudo-reaction",
+                confidence="medium",
+                evidence=evidence,
+                metadata=metadata(None, "exclude-pseudo-reaction"),
+                reason="biomass, pool or lumped reaction; unbalanced by design",
+            )
+        )
+    elif original is not None and origin == "changed":
+        after = {k: _round(v) for k, v in sorted(_stoichiometry(original).items())}
+        details = metadata(after, "restore-input-stoichiometry")
+        group.append(
+            _proposal(
+                operation="set-stoichiometry",
+                object_type="reaction",
+                object_id=reaction.id,
+                before=before,
+                after=after,
+                policy="restore-input-stoichiometry",
+                confidence="medium" if details["flags"] else "high",
+                evidence=evidence,
+                metadata=details,
+                reason="stoichiometry differs from the input model",
+            )
+        )
+    else:
+        candidates = integer_candidates(reaction, model)
+        for after in candidates:
+            group.append(
+                _proposal(
+                    operation="set-stoichiometry",
+                    object_type="reaction",
+                    object_id=reaction.id,
+                    before=before,
+                    after=after,
+                    policy="integer-stoichiometry",
+                    confidence="medium" if len(candidates) == 1 else "low",
+                    evidence=evidence,
+                    metadata=metadata(after, "integer-stoichiometry"),
+                    reason="non-integer coefficients; this integer "
+                    "stoichiometry balances the elements",
+                )
+            )
+        if not group:
+            cofactors = cofactor_candidates(reaction, model, names=names)
+            for candidate in cofactors:
+                after = {k: _round(v) for k, v in sorted(candidate["after"].items())}
+                details = metadata(after, "cofactor-pair")
+                details["cofactor"] = candidate["label"]
+                details["compartment"] = candidate["compartment"]
+                group.append(
+                    _proposal(
+                        operation="set-stoichiometry",
+                        object_type="reaction",
+                        object_id=reaction.id,
+                        before=before,
+                        after=after,
+                        policy="cofactor-pair",
+                        confidence="medium" if len(cofactors) == 1 else "low",
+                        evidence=evidence,
+                        metadata=details,
+                        reason=f"element residual matches {candidate['label']}",
+                    )
+                )
+    return _alternatives(group)
+
+
+def _balanced_reactions(
+    metabolite: Any,
+    model: Any,
+    *,
+    formula: str | None = None,
+    charge: int | None = None,
+) -> dict[str, object]:
+    """Count the internal reactions of a metabolite that balance, optionally
+    with a substituted formula or charge."""
+    balanced = []
+    total = 0
+    for reaction in sorted(metabolite.reactions, key=lambda item: item.id):
+        if reaction.boundary:
+            continue
+        total += 1
+        stoichiometry = _stoichiometry(reaction)
+        if charge is None:
+            result = element_residual(
+                stoichiometry,
+                model,
+                formulas=None if formula is None else {metabolite.id: formula},
+            )
+        else:
+            result = charge_residual(
+                stoichiometry, model, charges={metabolite.id: charge}
+            )
+        if result["balanced"]:
+            balanced.append(reaction.id)
+    return {"balanced": len(balanced), "total": total, "reactions": balanced}
+
+
+def formula_fixes(
+    model: Any,
+    disagreement: Mapping[str, object],
+    *,
+    reference_model: Any | None = None,
+) -> list[Proposal]:
+    """Turn formula disagreements into ``set-formula``/``set-charge`` proposals.
+
+    For a metabolite whose formula or charge differs across compartments, the
+    value held by most compartments (when one value has a strict majority of
+    the members that have a value) is proposed for each member that differs.
+    For a metabolite that differs from ``reference_model``, the reference value
+    is proposed. Both can apply to one metabolite; they are then alternatives.
+    Each proposal records how many of the metabolite's internal reactions are
+    balanced before and after.
+    """
+    from thg_protocol.validation import _formula_key
+
+    candidates: dict[tuple[str, str], dict[object, set[str]]] = defaultdict(dict)
+
+    def offer(metabolite_id: str, field: str, value: object, source: str) -> None:
+        if value is None or value == "":
+            return
+        candidates[(metabolite_id, field)].setdefault(value, set()).add(source)
+
+    groups = disagreement.get("across_compartments") or {}
+    for group in groups.values():
+        members = group.get("metabolites") or {}
+        for field in group.get("differs", []):
+            values: dict[object, list[str]] = defaultdict(list)
+            for metabolite_id, item in members.items():
+                value = item.get(field)
+                if value is None or value == "":
+                    continue
+                key = _formula_key(value) if field == "formula" else value
+                values[key].append(metabolite_id)
+            if not values:
+                continue
+            winners = max(values.values(), key=len)
+            if 2 * len(winners) <= sum(len(ids) for ids in values.values()):
+                continue
+            value = members[sorted(winners)[0]][field]
+            for metabolite_id in members:
+                if metabolite_id not in winners:
+                    offer(metabolite_id, field, value, "majority")
+    for metabolite_id, item in (disagreement.get("against_reference") or {}).items():
+        for field in item.get("differs", []):
+            offer(metabolite_id, field, item["reference"].get(field), "reference")
+
+    proposals: list[Proposal] = []
+    for (metabolite_id, field), options in sorted(
+        candidates.items(), key=lambda pair: pair[0]
+    ):
+        try:
+            metabolite = model.metabolites.get_by_id(metabolite_id)
+        except KeyError:
+            continue
+        if field == "formula":
+            current: object = metabolite.formula or ""
+            before_balance = _balanced_reactions(metabolite, model)
+        else:
+            current = metabolite.charge
+            before_balance = _balanced_reactions(
+                metabolite, model, charge=metabolite.charge
+            )
+        group = []
+        for value, sources in sorted(options.items(), key=lambda pair: str(pair[0])):
+            after_balance = _balanced_reactions(
+                metabolite,
+                model,
+                formula=str(value) if field == "formula" else None,
+                charge=int(value) if field == "charge" else None,
+            )
+            policy = "+".join(sorted(sources))
+            group.append(
+                _proposal(
+                    operation=f"set-{field}",
+                    object_type="metabolite",
+                    object_id=metabolite_id,
+                    before=current,
+                    after=value,
+                    policy=f"formula-disagreement-{policy}",
+                    confidence="medium" if len(options) == 1 else "low",
+                    evidence=[f"formula-disagreement:{metabolite_id}"],
+                    metadata={
+                        "rule": "formula-disagreement",
+                        "field": field,
+                        "sources": sorted(sources),
+                        "metabolite": _describe(metabolite),
+                        "balance": {"before": before_balance, "after": after_balance},
+                        "targets": sorted(
+                            set(after_balance["reactions"])
+                            - set(before_balance["reactions"])
+                        ),
+                    },
+                    reason=(
+                        f"{field} used by "
+                        + " and ".join(
+                            "the reference model"
+                            if source == "reference"
+                            else "most compartments"
+                            for source in sorted(sources)
+                        )
+                    ),
+                )
+            )
+        proposals.extend(_alternatives(group))
+    return proposals
+
+
 def propose_fixes(
     model: Any,
     localization: Mapping[str, object],
@@ -838,122 +1131,18 @@ def propose_fixes(
             for key in sorted(reaction_ids)
         ]
 
-    def reaction_metadata(reaction: Any, after: Mapping[str, float] | None, rule: str):
-        reversible = bool(reaction.reversibility)
-        before_summary = reaction_summary(
-            _stoichiometry(reaction),
-            model,
-            input_model=input_model,
-            reversible=reversible,
-        )
-        after_summary = (
-            reaction_summary(
-                after, model, input_model=input_model, reversible=reversible
-            )
-            if after is not None
-            else None
-        )
-        row = rows[reaction.id]
-        return {
-            "rule": rule,
-            "reaction": {"before": before_summary, "after": after_summary},
-            "input_model": _input_context(input_model, reaction.id),
-            "origin": row.get("origin"),
-            "imbalance": row.get("imbalance"),
-            "blamed_flags": list(row.get("flags", [])),
-            "targets": [reaction.id],
-            "flags": _flags(after_summary) if after_summary else [],
-        }
-
-    def alternatives(group: list[Proposal]) -> list[Proposal]:
-        ids = [item.proposal_id for item in group]
-        for item in group:
-            item.metadata["alternatives"] = [x for x in ids if x != item.proposal_id]
-        return group
-
     for row in blamed:
         reaction = model.reactions.get_by_id(str(row["id"]))
-        before = {k: _round(v) for k, v in sorted(_stoichiometry(reaction).items())}
-        original = _input_reaction(input_model, reaction.id)
-        group: list[Proposal] = []
-        if _is_pseudo(reaction):
-            group.append(
-                _proposal(
-                    operation="exclude-reaction",
-                    object_type="reaction",
-                    object_id=reaction.id,
-                    before={"excluded": False},
-                    after={"excluded": True},
-                    policy="exclude-pseudo-reaction",
-                    confidence="medium",
-                    evidence=evidence([reaction.id]),
-                    metadata=reaction_metadata(
-                        reaction, None, "exclude-pseudo-reaction"
-                    ),
-                    reason="biomass, pool or lumped reaction; unbalanced by design",
-                )
-            )
-        elif original is not None and row.get("origin") == "changed":
-            after = {k: _round(v) for k, v in sorted(_stoichiometry(original).items())}
-            metadata = reaction_metadata(reaction, after, "restore-input-stoichiometry")
-            group.append(
-                _proposal(
-                    operation="set-stoichiometry",
-                    object_type="reaction",
-                    object_id=reaction.id,
-                    before=before,
-                    after=after,
-                    policy="restore-input-stoichiometry",
-                    confidence="medium" if metadata["flags"] else "high",
-                    evidence=evidence([reaction.id]),
-                    metadata=metadata,
-                    reason="stoichiometry differs from the input model",
-                )
-            )
-        else:
-            candidates = integer_candidates(reaction, model)
-            for after in candidates:
-                metadata = reaction_metadata(reaction, after, "integer-stoichiometry")
-                group.append(
-                    _proposal(
-                        operation="set-stoichiometry",
-                        object_type="reaction",
-                        object_id=reaction.id,
-                        before=before,
-                        after=after,
-                        policy="integer-stoichiometry",
-                        confidence="medium" if len(candidates) == 1 else "low",
-                        evidence=evidence([reaction.id]),
-                        metadata=metadata,
-                        reason="non-integer coefficients; this integer "
-                        "stoichiometry balances the elements",
-                    )
-                )
-            if not group:
-                cofactors = cofactor_candidates(reaction, model, names=names)
-                for candidate in cofactors:
-                    after = {
-                        k: _round(v) for k, v in sorted(candidate["after"].items())
-                    }
-                    metadata = reaction_metadata(reaction, after, "cofactor-pair")
-                    metadata["cofactor"] = candidate["label"]
-                    metadata["compartment"] = candidate["compartment"]
-                    group.append(
-                        _proposal(
-                            operation="set-stoichiometry",
-                            object_type="reaction",
-                            object_id=reaction.id,
-                            before=before,
-                            after=after,
-                            policy="cofactor-pair",
-                            confidence="medium" if len(cofactors) == 1 else "low",
-                            evidence=evidence([reaction.id]),
-                            metadata=metadata,
-                            reason=f"element residual matches {candidate['label']}",
-                        )
-                    )
+        group = reaction_fixes(
+            reaction,
+            model,
+            input_model=input_model,
+            names=names,
+            evidence=evidence([reaction.id]),
+            context=row,
+        )
         if group:
-            proposals.extend(alternatives(group))
+            proposals.extend(group)
             covered.add(reaction.id)
 
     # Formula-less metabolites in blamed reactions (only added ones with an input).
@@ -1036,7 +1225,14 @@ def propose_fixes(
                 policy="unresolved",
                 confidence="low",
                 evidence=evidence([reaction.id]),
-                metadata=reaction_metadata(reaction, None, "unresolved"),
+                metadata=_reaction_metadata(
+                    reaction,
+                    model,
+                    None,
+                    "unresolved",
+                    input_model=input_model,
+                    context=rows[reaction.id],
+                ),
                 status="unresolved",
                 reason="no rule applies; left for manual curation",
             )
@@ -1052,6 +1248,22 @@ def propose_fixes(
 # --------------------------------------------------------------------------
 
 
+def fix_target(
+    object_type: str, object_id: str, operation: str
+) -> tuple[str, str, str]:
+    """The part of the model a fix changes; one approved fix per target.
+
+    A metabolite's formula and charge are separate targets; every fix to a
+    reaction targets the whole reaction.
+    """
+    field = (
+        operation.removeprefix("set-")
+        if object_type == "metabolite" and operation in {"set-formula", "set-charge"}
+        else ""
+    )
+    return (object_type, object_id, field)
+
+
 def apply_conservation_fixes(
     model: Any,
     proposals: Iterable[Proposal],
@@ -1062,20 +1274,21 @@ def apply_conservation_fixes(
     """Apply approved or replaced proposals to a copy of ``model``.
 
     Returns the modified copy, the applied proposals and the ledger entries.
-    The input model is never changed. Two applied fixes on the same object are
-    rejected, since alternatives (e.g. NAD vs NADP) are mutually exclusive.
+    The input model is never changed. Two applied fixes on the same target
+    (see ``fix_target``) are rejected, since alternatives (e.g. NAD vs NADP)
+    are mutually exclusive.
     """
     from thg_protocol.workflow.proposals import ProposalError, apply_proposals
 
     result = model.copy()
-    targets: set[tuple[str, str]] = set()
+    targets: set[tuple[str, str, str]] = set()
 
     def apply(proposal: Proposal, value: object) -> None:
-        key = (proposal.object_type, proposal.object_id)
+        key = fix_target(proposal.object_type, proposal.object_id, proposal.operation)
         if key in targets:
             raise ProposalError(
                 f"more than one approved fix for {proposal.object_type} "
-                f"{proposal.object_id}"
+                f"{proposal.object_id}" + (f" ({key[2]})" if key[2] else "")
             )
         targets.add(key)
         if proposal.operation == "set-formula":
@@ -1084,6 +1297,17 @@ def apply_conservation_fixes(
                     f"invalid formula for {proposal.object_id}: {value!r}"
                 )
             result.metabolites.get_by_id(proposal.object_id).formula = value
+            return
+        if proposal.operation == "set-charge":
+            if isinstance(value, bool) or not isinstance(value, (int, float)):
+                raise ProposalError(
+                    f"invalid charge for {proposal.object_id}: {value!r}"
+                )
+            if value != int(value):
+                raise ProposalError(
+                    f"charge for {proposal.object_id} must be an integer: {value!r}"
+                )
+            result.metabolites.get_by_id(proposal.object_id).charge = int(value)
             return
         reaction = result.reactions.get_by_id(proposal.object_id)
         if proposal.operation == "exclude-reaction":
@@ -1108,7 +1332,13 @@ def apply_conservation_fixes(
                         ) from None
                     metabolite = source.copy()
                     result.add_metabolites([metabolite])
-                new[metabolite] = float(coefficient)
+                try:
+                    new[metabolite] = float(coefficient)
+                except (TypeError, ValueError):
+                    raise ProposalError(
+                        f"invalid coefficient for {metabolite_id} in fix for "
+                        f"{proposal.object_id}: {coefficient!r}"
+                    ) from None
             reaction.subtract_metabolites(dict(reaction.metabolites), combine=True)
             reaction.add_metabolites(new)
         else:
@@ -1166,12 +1396,15 @@ __all__ = [
     "element_residual",
     "equation",
     "find_unconserved_metabolites",
+    "fix_target",
+    "formula_fixes",
     "fractional",
     "hill_formula",
     "infer_formula",
     "integer_candidates",
     "localize",
     "propose_fixes",
+    "reaction_fixes",
     "reaction_origin",
     "reaction_summary",
 ]

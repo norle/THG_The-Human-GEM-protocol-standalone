@@ -51,8 +51,8 @@ Boundary, biomass (`SBO:0000629`), "Artificial reactions" and "Pool
 reactions" reactions are excluded, as are reaction IDs listed in
 `validation.conservation_exclusions`; the details list each exclusion with its
 rule. Without the optional `memote` extra the check is reported as not
-evaluated. To find the responsible reactions and review fixes, run the
-[conservation workflow](conservation.md).
+evaluated. When it fails, the validation report names the responsible
+reactions and lists [suggested fixes](#suggested-fixes).
 
 `validation.reference_model` (optional) names the model the checked one derives
 from, for example Human-GEM for a β1 model. Its conservation exclusions carry
@@ -90,6 +90,46 @@ identities. All are diagnostic in every profile:
 The closed-medium FVA formerly reported as `energy-generating-cycles` was
 removed: it found internal loops rather than energy-generating cycles, and a
 second full FVA was too slow at β1 scale.
+
+Blocked reactions (`flux-consistency`) are diagnostic in every profile. A
+genome-scale reconstruction always has reactions that carry no flux under its
+default bounds, so they are reported as a warning and never block release.
+
+## Suggested fixes
+
+The validation report written by the `validate` workflow and by gap-filling
+lists suggested fixes under the failed checks that a rule can fix. The JSON
+report holds them as `validation.proposals` (the conservation workflow's
+proposal records plus `checks`, the checks that produced each one):
+
+| Check | Fixes |
+| --- | --- |
+| `stoichiometric-consistency` | The [conservation workflow](conservation.md)'s localization and proposal rules; the check also lists the blamed reactions, split by chemical flag |
+| `formula-disagreement` | Set the formula or charge to the reference model's value, or to the value most compartments have |
+| `fractional-coefficients` | Integer stoichiometries that balance the elements |
+| `mass-balance`, `charge-balance`, `unusual-protons` | Restore the reference stoichiometry, round to integers, or add a cofactor pair |
+
+In the HTML report, pick one fix per reaction (or per metabolite formula and
+charge), or reject or defer it. Choices are kept in the browser per model;
+**Export decisions.jsonl** in the bar at the bottom writes them out, and
+**Import decisions** loads a file back. Then apply them:
+
+```bash
+thg-run apply-decisions runs/validation/.../validation-report.json decisions.jsonl \
+    --model path/to/model.xml -o path/to/model-fixed.xml
+```
+
+The command refuses a model whose SHA-256 differs from the report's, and an
+invalid decision (an unknown proposal, two fixes for one target, a malformed
+replacement) stops it before anything is written. It writes the fixed model,
+`model-fixed.ledger.jsonl`, and `model-fixed.validation-report.json`/`.html`
+from re-validating with the same profile, reference model and exclusions, and
+prints the checks whose status changed. Repeat with the new report until the
+checks pass.
+
+Reaction and metabolite IDs in the report open a panel with the equation,
+formula, charge and connected reactions, and the filter boxes also match
+names and subsystems.
 
 ## Metabolic task API
 

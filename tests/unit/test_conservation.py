@@ -1,13 +1,11 @@
 from __future__ import annotations
 
 import json
-import re
 
 import cobra
 import pytest
 
 from thg_protocol.analysis import conservation
-from thg_protocol.conservation_report import render_review_html, render_review_markdown
 from thg_protocol.workflow.proposals import Decision, ProposalError
 
 
@@ -402,26 +400,6 @@ def test_replace_formula_and_exclusion_decisions():
     assert len(fixed.reactions.R2.metabolites) == 5
 
 
-def test_review_pages_show_before_after_and_balances():
-    model = base_model()
-    localization = conservation.localize(model, detection_for("h2_c", "h_c"))
-    records = [
-        item.to_dict()
-        for item in conservation.propose_fixes(model, localization, exclusions={})
-    ]
-    markdown = render_review_markdown(records, localization)
-    assert "cofactor-pair (NAD+/NADH)" in markdown
-    assert "H: -2 / balanced" in markdown
-    assert "Unconserved metabolites: 2" in markdown
-    assert re.search(
-        r"Blamed reactions: \d+ \(\d+ with a chemical flag, 0 without\)", markdown
-    )
-    assert "## Blamed reactions with a chemical flag" in markdown
-    assert "| R2 | - | -" in markdown
-    html = render_review_html(records, localization)
-    assert "<table>" in html and "NAD+/NADH" in html
-
-
 @pytest.mark.memote
 def test_conservation_workflow_proposes_then_applies_decisions(tmp_path):
     pytest.importorskip("memote")
@@ -451,7 +429,6 @@ def test_conservation_workflow_proposes_then_applies_decisions(tmp_path):
     )
     records = [json.loads(line) for line in proposals[-1].read_text().splitlines()]
     fix = next(item for item in records if item["policy"] == "cofactor-pair")
-    assert (proposals[-1].parent / "review.html").is_file()
     recheck = sorted(
         (run / "artifacts" / "conservation-recheck").glob("*/recheck.json")
     )

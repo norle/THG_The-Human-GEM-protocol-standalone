@@ -77,8 +77,13 @@ and re-check stages rerun when the decisions file changes.
    often an innocent member of a loop that had to be broken somewhere.
    Metabolites already unconserved in the comparison model are reported as
    **inherited**.
-3. **Propose** (`conservation-propose`). Writes `proposals.jsonl`,
-   `review.html` and `review.md`.
+3. **Propose** (`conservation-propose`). Writes `proposals.jsonl`. The
+   [validation report](validation.md#suggested-fixes) shows the same
+   proposals (their IDs match for the same model) with decision controls,
+   next to fixes for other checks. Decisions exported there are applied with
+   `thg-run apply-decisions`, not with this workflow: the `decisions_file`
+   here may only reference proposals in `proposals.jsonl`, and any other
+   decision stops the apply stage.
 4. **Apply** (`conservation-apply`). Applies only `approve` and `replace`
    decisions (`mode="user-approved-only"`), writes `model-fixed.*` and
    `change-ledger.jsonl`.

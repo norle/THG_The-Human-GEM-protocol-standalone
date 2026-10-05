@@ -1,8 +1,9 @@
 """Conservation workflow: detect, localize, propose, apply and re-check.
 
-Run once to get ``proposals.jsonl`` and the review page; write the decisions
-file; run again with the same configuration to apply the approved fixes to a
-copy of the model and re-check it.
+Run once to get ``proposals.jsonl``; write decisions on those proposals; run
+again with the same configuration to apply the approved fixes to a copy of the
+model and re-check it. Decisions exported from the validation report may cover
+other checks' fixes too and are applied with ``thg-run apply-decisions``.
 """
 
 from __future__ import annotations
@@ -33,7 +34,7 @@ def _read(path: Path) -> Any:
 class ConservationStage:
     """One stage of the unconserved-metabolite review flow."""
 
-    implementation_version = 2
+    implementation_version = 3
 
     def __init__(self, stage_id: str, dependencies: tuple[str, ...] = ()) -> None:
         self.id, self.dependencies = stage_id, dependencies
@@ -139,11 +140,6 @@ class ConservationStage:
             )
 
         if self.id == "conservation-propose":
-            from thg_protocol.conservation_report import (
-                render_review_html,
-                render_review_markdown,
-            )
-
             from .proposals import write_proposals
 
             model, comparison = self._models(context)
@@ -159,22 +155,8 @@ class ConservationStage:
                 exclusions=detection["model"]["excluded"],
                 input_model=comparison,
             )
-            records = [item.to_dict() for item in proposals]
             path = write_proposals(work_dir / "proposals.jsonl", proposals)
-            html = work_dir / "review.html"
-            html.write_text(render_review_html(records, localization), encoding="utf-8")
-            markdown = work_dir / "review.md"
-            markdown.write_text(
-                render_review_markdown(records, localization), encoding="utf-8"
-            )
-            return StageResult(
-                (
-                    ("proposals", path),
-                    ("review-html", html),
-                    ("review-markdown", markdown),
-                ),
-                {"proposals": len(records)},
-            )
+            return StageResult((("proposals", path),), {"proposals": len(proposals)})
 
         if self.id == "conservation-apply":
             from thg_protocol.io.models import save_model
