@@ -160,3 +160,144 @@ def test_report_without_proposals_has_no_decision_bar():
     html = render_validation_html(report)
     assert 'class="decision-bar"' not in html
     assert "<fieldset" not in html
+
+
+def _check(check_id, details):
+    return {
+        "id": check_id,
+        "family": "chemical",
+        "status": "failed",
+        "passed": False,
+        "release_blocking": False,
+        "details": details,
+    }
+
+
+def test_balance_evidence_separates_pool_reactions():
+    html = render_validation_html(
+        {
+            "validation": {
+                "passed": True,
+                "checks": [
+                    _check(
+                        "mass-balance",
+                        {
+                            "statuses": {
+                                "R1": "unbalanced",
+                                "P1": "unbalanced-by-design",
+                            },
+                            "unbalanced": ["R1"],
+                            "unbalanced_by_design": {"P1": "pseudo-subsystem"},
+                            "imbalance": {"R1": {"H": -2.0}, "P1": {"C": 3.5}},
+                        },
+                    )
+                ],
+            }
+        }
+    )
+    assert "Metabolic reactions" in html
+    assert "Pool and pseudo-reactions" in html
+    assert "Pool or artificial reaction" in html
+    assert "H -2" in html and "C +3.5" in html
+    assert "1 pool or pseudo-reactions are unbalanced by design" in html
+
+
+def test_formula_evidence_compares_values_per_compartment():
+    html = render_validation_html(
+        {
+            "validation": {
+                "passed": True,
+                "compartments": {"names": {"c": "Cytosol", "m": "Mitochondria"}},
+                "checks": [
+                    _check(
+                        "formula-disagreement",
+                        {
+                            "across_compartments": {
+                                "a": {
+                                    "differs": ["formula"],
+                                    "metabolites": {
+                                        "a_c": {"formula": "C2H6O", "charge": 0},
+                                        "a_x": {"formula": "C2H6O", "charge": 0},
+                                        "a_m": {"formula": "C2H5O", "charge": 0},
+                                    },
+                                }
+                            },
+                            "against_reference": {},
+                        },
+                    )
+                ],
+            }
+        }
+    )
+    assert "Values and compartments" in html
+    assert '<span class="diff">H -1</span>' in html
+    assert ">Mitochondria<" in html
+
+
+def test_formula_evidence_ranks_equivalent_formulas_together():
+    formulas = ["C2H6O", "C2H6O", "H6C2O", "H6C2O", "C2H4O", "C2H4O", "C2H4O"]
+    html = render_validation_html(
+        {
+            "validation": {
+                "passed": True,
+                "checks": [
+                    _check(
+                        "formula-disagreement",
+                        {
+                            "across_compartments": {
+                                "a": {
+                                    "differs": ["formula"],
+                                    "metabolites": {
+                                        f"a_{i}": {"formula": formula, "charge": 0}
+                                        for i, formula in enumerate(formulas)
+                                    },
+                                }
+                            },
+                            "against_reference": {},
+                        },
+                    )
+                ],
+            }
+        }
+    )
+    assert html.count('class="variant"') == 2
+    assert '<code>C2H4O</code> <span class="diff">H -2</span>' in html
+    assert "H +2" not in html
+    assert all(f'title="a_{i}"' in html for i in range(len(formulas)))
+
+
+def test_blocked_reactions_are_counted_per_compartment():
+    html = render_validation_html(
+        {
+            "validation": {
+                "passed": True,
+                "compartments": {
+                    "names": {"c": "Cytosol", "m": "Mitochondria"},
+                    "reactions": {"c": 10, "c+m": 4},
+                },
+                "checks": [
+                    {
+                        **_check(
+                            "flux-consistency",
+                            {
+                                "blocked": ["R1", "R2", "T1"],
+                                "by_compartment": {"c": ["R1", "R2"], "c+m": ["T1"]},
+                            },
+                        ),
+                        "family": "solver",
+                    },
+                    _check("blocked-reaction-singletons", {"sets": [["R1"]]}),
+                ],
+            }
+        }
+    )
+    assert "Cytosol + Mitochondria" in html
+    assert "20%" in html and "25%" in html
+    assert "All compartments" in html
+    assert "check-blocked-reaction-singletons" not in html
+
+
+def test_fix_controls_offer_accept_and_reject_only():
+    html = render_validation_html(_report_with_fixes())
+    assert "Accept this option" in html and "Reject all options" in html
+    assert 'value="defer"' not in html and "Undecided" not in html

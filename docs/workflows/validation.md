@@ -94,6 +94,20 @@ second full FVA was too slow at β1 scale.
 Blocked reactions (`flux-consistency`) are diagnostic in every profile. A
 genome-scale reconstruction always has reactions that carry no flux under its
 default bounds, so they are reported as a warning and never block release.
+The report counts them per compartment against the compartment's size; a
+reaction spanning compartments (a transport) is grouped under all of them, as
+`c+m`. Dead-end and never-produced/never-consumed metabolites are split the
+same way. The former `blocked-reaction-singletons` check repeated the blocked
+reactions one per set and was removed.
+
+`mass-balance` and `charge-balance` list pool, biomass and artificial
+reactions (the conservation exclusions, plus reactions whose ID or name says
+pool, pseudo, lumped or artificial, or that make or use a pool
+metabolite) separately as unbalanced by design; only
+ordinary reactions fail the check. Mass balance tests each reaction against
+its formulas; `stoichiometric-consistency` tests the whole network without
+formulas, so it also catches metabolites without a formula and loops of
+reactions that together create matter.
 
 ## Suggested fixes
 
@@ -107,10 +121,12 @@ proposal records plus `checks`, the checks that produced each one):
 | `stoichiometric-consistency` | The [conservation workflow](conservation.md)'s localization and proposal rules; the check also lists the blamed reactions, split by chemical flag |
 | `formula-disagreement` | Set the formula or charge to the reference model's value, or to the value most compartments have |
 | `fractional-coefficients` | Integer stoichiometries that balance the elements |
-| `mass-balance`, `charge-balance`, `unusual-protons` | Restore the reference stoichiometry, round to integers, or add a cofactor pair |
+| `mass-balance`, `charge-balance`, `unusual-protons` | Restore the reference stoichiometry, round to integers, or add a cofactor pair; when only the charge is off, add the missing NAD(P)H/NAD(P)+ redox pair |
+| `charge-balance` | Change one metabolite's charge by one, when that balances the reaction and unbalances none of its other reactions (low confidence) |
 
-In the HTML report, pick one fix per reaction (or per metabolite formula and
-charge), or reject or defer it. Choices are kept in the browser per model;
+In the HTML report, accept one fix per reaction (or per metabolite formula and
+charge), or reject it; fixes left alone are not applied. Choices are kept in
+the browser per model;
 **Export decisions.jsonl** in the bar at the bottom writes them out, and
 **Import decisions** loads a file back. Then apply them:
 
@@ -121,7 +137,8 @@ thg-run apply-decisions runs/validation/.../validation-report.json decisions.jso
 
 The command refuses a model whose SHA-256 differs from the report's, and an
 invalid decision (an unknown proposal, two fixes for one target, a malformed
-replacement) stops it before anything is written. It writes the fixed model,
+replacement, or charge repairs that conflict when applied together) stops it
+before anything is written. It writes the fixed model,
 `model-fixed.ledger.jsonl`, and `model-fixed.validation-report.json`/`.html`
 from re-validating with the same profile, reference model and exclusions, and
 prints the checks whose status changed. Repeat with the new report until the

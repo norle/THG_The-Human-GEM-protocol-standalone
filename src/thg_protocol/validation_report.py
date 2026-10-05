@@ -31,12 +31,12 @@ CHECKS: dict[str, tuple[str, str, str]] = {
     ),
     "mass-balance": (
         "Mass balance",
-        "Each internal reaction has the same element counts on both sides. Boundary, biomass and pseudo-reactions are excluded; reactions with a metabolite lacking a formula cannot be evaluated.",
+        "Counts the atoms of each element on both sides of every internal reaction, one reaction at a time, using the metabolite formulas. Pool, biomass and other pseudo-reactions lump many compounds together, so they are listed separately as unbalanced by design and do not fail the check. Boundary reactions are skipped; reactions with a metabolite lacking a formula cannot be evaluated.",
         "An unbalanced reaction can create or destroy atoms, letting the model produce mass from nothing.",
     ),
     "charge-balance": (
         "Charge balance",
-        "Each internal reaction has the same total charge on both sides. Boundary reactions are excluded; reactions with a metabolite lacking a charge cannot be evaluated.",
+        "Sums the charges on both sides of every internal reaction, one reaction at a time. Pool, biomass and other pseudo-reactions are listed separately as unbalanced by design and do not fail the check. Boundary reactions are skipped; reactions with a metabolite lacking a charge cannot be evaluated.",
         "Charge imbalance usually means a wrong protonation state and distorts proton and energy budgets.",
     ),
     "fractional-coefficients": (
@@ -71,7 +71,7 @@ CHECKS: dict[str, tuple[str, str, str]] = {
     ),
     "stoichiometric-consistency": (
         "Stoichiometric consistency",
-        "Tests whether every metabolite can be given a positive molecular mass that all internal reactions conserve (Gevorgyan et al. 2008, via MEMOTE). Unconserved metabolites are those for which no such mass exists.",
+        "Tests the whole network at once, ignoring formulas: can every metabolite be given some positive mass that all internal reactions conserve together (Gevorgyan et al. 2008, via MEMOTE)? Unconserved metabolites are those for which no such mass exists. Unlike mass balance, it also catches errors in metabolites without a formula and in reactions that each balance on paper but together form a loop that creates matter; one wrong reaction can leave thousands of metabolites unconserved.",
         "An inconsistent network can create or destroy matter in a closed loop, which makes flux predictions unreliable.",
     ),
     "workflow-specific-invariants": (
@@ -88,11 +88,6 @@ CHECKS: dict[str, tuple[str, str, str]] = {
         "Blocked reactions",
         "Runs flux variability analysis under the model's current bounds and lists reactions that cannot carry any non-zero flux.",
         "Blocked reactions contribute nothing to simulations and usually point to missing transport, exchange or pathway steps.",
-    ),
-    "blocked-reaction-singletons": (
-        "Blocked-reaction sets",
-        "Lists each blocked reaction as its own set. This is not a full minimal-inconsistent-set analysis.",
-        "Repeats the blocked reactions above in the form downstream gap-filling tools expect.",
     ),
     "objective-feasibility": (
         "Objective is feasible",
@@ -373,6 +368,392 @@ def _fields(details: Mapping[str, object], ids: _Ids) -> str:
     return html
 
 
+#: Why a reaction is unbalanced by design, by ``conservation_exclusions`` rule.
+PSEUDO_RULES = {
+    "sbo-biomass": "Biomass reaction",
+    "memote-biomass": "Biomass reaction",
+    "pseudo-subsystem": "Pool or artificial reaction",
+    "pseudo-name": "Pool or pseudo-reaction (by name)",
+    "pool-metabolite": "Makes or uses a pool metabolite",
+    "model-note": "Excluded by an accepted fix",
+    "input-model": "Excluded in the reference model",
+    "configuration": "Excluded in the configuration",
+}
+_ATOM = re.compile(r"([A-Z][a-z]*)(\d*)")
+
+
+def _lookup(validation: Mapping[str, object], kind: str) -> Mapping[str, object]:
+    """Reactions or metabolites from the report's index, by ID."""
+    index = validation.get("index")
+    value = index.get(kind) if isinstance(index, Mapping) else None
+    return value if isinstance(value, Mapping) else {}
+
+
+def _block(title: str, count: int | None, body: str, note: str = "") -> str:
+    suffix = f' <span class="count">{count:,}</span>' if count is not None else ""
+    note = f'<p class="muted">{note}</p>' if note else ""
+    return f'<div class="block"><h4>{escape(title)}{suffix}</h4>{note}{body}</div>'
+
+
+def _equation(reaction: object) -> str:
+    if not isinstance(reaction, Mapping):
+        return '<span class="muted">–</span>'
+    return (
+        f'<span class="equation clamp" title="{escape(str(reaction.get("equation", "")))}">'
+        f"{escape(str(reaction.get('equation_names', '')))}</span>"
+    )
+
+
+def _imbalance(value: object) -> str:
+    if isinstance(value, Mapping):
+        return ", ".join(f"{key} {float(count):+g}" for key, count in value.items())
+    if isinstance(value, (int, float)) and not isinstance(value, bool):
+        return f"{float(value):+g}"
+    return "–"
+
+
+def _balance_evidence(
+    details: Mapping[str, object], ids: _Ids, validation: Mapping[str, object]
+) -> str:
+    """Real and by-design unbalanced reactions, then the status counts."""
+    reactions = _lookup(validation, "reactions")
+    imbalance = details.get("imbalance")
+    imbalance = imbalance if isinstance(imbalance, Mapping) else {}
+    real = details.get("unbalanced")
+    real = [str(item) for item in real] if isinstance(real, list) else []
+    design = details.get("unbalanced_by_design")
+    design = design if isinstance(design, Mapping) else {}
+
+    def subsystem(reaction_id: str) -> str:
+        item = reactions.get(reaction_id)
+        return (
+            escape(str(item.get("subsystem") or ""))
+            if isinstance(item, Mapping)
+            else ""
+        )
+
+    html = _block(
+        "Metabolic reactions",
+        len(real),
+        _table(
+            ["Reaction", "Imbalance", "Subsystem", "Equation"],
+            [
+                [
+                    f"<code>{escape(item)}</code>",
+                    f'<span class="nowrap">{escape(_imbalance(imbalance.get(item)))}</span>',
+                    subsystem(item),
+                    _equation(reactions.get(item)),
+                ]
+                for item in real
+            ],
+            ids,
+            "reactions",
+        )
+        if real
+        else '<p class="muted">None found.</p>',
+        "Ordinary reactions that should balance. These fail the check and need fixing. "
+        "Imbalance is products minus reactants; long equations are cut short, select the reaction for the full one.",
+    )
+    if design:
+        html += _block(
+            "Pool and pseudo-reactions",
+            len(design),
+            _table(
+                ["Reaction", "Kind", "Imbalance", "Equation"],
+                [
+                    [
+                        f"<code>{escape(str(item))}</code>",
+                        escape(PSEUDO_RULES.get(str(rule), _label(rule))),
+                        f'<span class="nowrap">{escape(_imbalance(imbalance.get(item)))}</span>',
+                        _equation(reactions.get(item)),
+                    ]
+                    for item, rule in design.items()
+                ],
+                ids,
+                "reactions",
+            ),
+            "Biomass, pool and artificial reactions combine many compounds into one "
+            "pseudo-metabolite, so they are not expected to balance. They are listed "
+            "for reference and do not fail the check.",
+        )
+    rest = {
+        key: value
+        for key, value in details.items()
+        if key not in {"unbalanced", "unbalanced_by_design", "imbalance"}
+    }
+    return html + (_fields(rest, ids) if rest else "")
+
+
+def _atoms(formula: object) -> Counter:
+    counts: Counter = Counter()
+    for element, number in _ATOM.findall(str(formula or "")):
+        counts[element] += int(number) if number else 1
+    return counts
+
+
+def _difference(value: object, base: object, field: str) -> str:
+    """How ``value`` differs from ``base``: element counts or charge."""
+    if field == "charge":
+        try:
+            return f"{int(value) - int(base):+d}"
+        except (TypeError, ValueError):
+            return "–"
+    new, old = _atoms(value), _atoms(base)
+    order = sorted(set(new) | set(old), key=lambda key: (key not in {"C", "H"}, key))
+    return (
+        ", ".join(
+            f"{key} {new[key] - old[key]:+d}" for key in order if new[key] != old[key]
+        )
+        or "same elements"
+    )
+
+
+def _metabolite_ref(metabolite_id: str, text: str, metabolites: Mapping) -> str:
+    """A metabolite shown as ``text`` that opens its details when indexed."""
+    if metabolite_id in metabolites:
+        return (
+            f'<button type="button" class="xref" data-xref="{escape(metabolite_id)}" '
+            f'title="{escape(metabolite_id)}">{escape(text)}</button>'
+        )
+    return f'<code title="{escape(metabolite_id)}">{escape(text)}</code>'
+
+
+def _formula_evidence(
+    details: Mapping[str, object], ids: _Ids, validation: Mapping[str, object]
+) -> str:
+    """One row per metabolite and field: each value, where it occurs, the change."""
+    metabolites = _lookup(validation, "metabolites")
+    names = validation.get("compartments")
+    names = names.get("names", {}) if isinstance(names, Mapping) else {}
+
+    def name(metabolite_id: str) -> str:
+        item = metabolites.get(metabolite_id)
+        return str(item.get("name") or "") if isinstance(item, Mapping) else ""
+
+    def compartment(metabolite_id: str, base: str) -> str:
+        item = metabolites.get(metabolite_id)
+        if isinstance(item, Mapping) and item.get("compartment"):
+            return str(item["compartment"])
+        return metabolite_id.removeprefix(base).lstrip("_") or metabolite_id
+
+    html = ""
+    across = details.get("across_compartments")
+    if isinstance(across, Mapping) and across:
+        rows = []
+        for base, group in across.items():
+            if not isinstance(group, Mapping):
+                continue
+            members = group.get("metabolites")
+            members = members if isinstance(members, Mapping) else {}
+            for field in group.get("differs", []):
+                values: dict[object, list[str]] = {}
+                for member, item in members.items():
+                    value = item.get(field) if isinstance(item, Mapping) else None
+                    if value is not None and value != "":
+                        key = (
+                            tuple(sorted(_atoms(value).items()))
+                            if field == "formula"
+                            else value
+                        )
+                        values.setdefault(key, []).append(str(member))
+                ranked = sorted(
+                    values.values(),
+                    key=lambda where: (-len(where), str(members[min(where)][field])),
+                )
+                common = members[min(ranked[0])][field] if ranked else ""
+                cells = []
+                for where in ranked:
+                    value = members[min(where)][field]
+                    places = " ".join(
+                        _metabolite_ref(
+                            member,
+                            str(
+                                names.get(
+                                    compartment(member, str(base)),
+                                    compartment(member, str(base)),
+                                )
+                            ),
+                            metabolites,
+                        )
+                        for member in sorted(where)
+                    )
+                    change = (
+                        ""
+                        if value == common
+                        else f' <span class="diff">{escape(_difference(value, common, field))}</span>'
+                    )
+                    cells.append(
+                        f'<div class="variant"><code>{escape(str(value))}</code>{change}'
+                        f'<span class="where">{places}</span></div>'
+                    )
+                first = next(iter(sorted(members)), str(base))
+                rows.append(
+                    [
+                        f"<code>{escape(str(base))}</code>",
+                        escape(name(first)),
+                        escape(field.capitalize()),
+                        "".join(cells),
+                    ]
+                )
+        html += _block(
+            "Across compartments",
+            len(across),
+            _table(
+                ["Metabolite", "Name", "Field", "Values and compartments"],
+                rows,
+                ids,
+                "metabolites",
+            ),
+            "Each value is followed by how it differs from the most common one and by "
+            "the compartments that use it. Select a compartment to see that metabolite.",
+        )
+    against = details.get("against_reference")
+    if isinstance(against, Mapping) and against:
+        rows = []
+        for metabolite_id, item in against.items():
+            if not isinstance(item, Mapping):
+                continue
+            model = item.get("model") if isinstance(item.get("model"), Mapping) else {}
+            reference = (
+                item.get("reference")
+                if isinstance(item.get("reference"), Mapping)
+                else {}
+            )
+            for field in item.get("differs", []):
+                rows.append(
+                    [
+                        f"<code>{escape(str(metabolite_id))}</code>",
+                        escape(name(str(metabolite_id))),
+                        escape(field.capitalize()),
+                        f"<code>{escape(str(model.get(field)))}</code>",
+                        f"<code>{escape(str(reference.get(field)))}</code>",
+                        f'<span class="diff">{escape(_difference(model.get(field), reference.get(field), field))}</span>',
+                    ]
+                )
+        html += _block(
+            f"Against the reference model {details.get('reference') or ''}".strip(),
+            len(against),
+            _table(
+                [
+                    "Metabolite",
+                    "Name",
+                    "Field",
+                    "This model",
+                    "Reference",
+                    "Difference",
+                ],
+                rows,
+                ids,
+                "metabolites",
+            ),
+        )
+    return html or '<p class="muted">None found.</p>'
+
+
+def _compartment_label(key: str, names: Mapping[str, object]) -> str:
+    return " + ".join(str(names.get(part, part)) for part in key.split("+"))
+
+
+def _compartment_split(
+    groups: Mapping[str, object],
+    totals: Mapping[str, object],
+    names: Mapping[str, object],
+    ids: _Ids,
+    noun: str,
+    kind: str,
+) -> str:
+    """Counts per compartment against its size, then the IDs per compartment."""
+    groups = {
+        str(key): [str(item) for item in value]
+        for key, value in groups.items()
+        if isinstance(value, list)
+    }
+    order = sorted(groups, key=lambda key: ("+" in key, -len(groups[key]), key))
+    rows = []
+    for key in order:
+        total = totals.get(key)
+        count = len(groups[key])
+        rows.append(
+            [
+                f"{escape(_compartment_label(key, names))} <code>{escape(key)}</code>",
+                f"{count:,}",
+                f"{total:,}" if isinstance(total, int) else "–",
+                f"{count / total:.0%}" if isinstance(total, int) and total else "–",
+            ]
+        )
+    count = sum(len(value) for value in groups.values())
+    total = sum(value for value in totals.values() if isinstance(value, int))
+    rows.append(
+        [
+            "<strong>All compartments</strong>",
+            f"<strong>{count:,}</strong>",
+            f"{total:,}" if total else "–",
+            f"{count / total:.0%}" if total else "–",
+        ]
+    )
+    table = _table(
+        ["Compartment", noun.capitalize(), f"All {kind} there", "Share"], rows, ids
+    )
+    lists = "".join(
+        f"<details><summary>{escape(_compartment_label(key, names))} <code>{escape(key)}</code> "
+        f'<span class="count">{len(groups[key]):,}</span></summary>'
+        f"{_id_list(groups[key], ids, noun)}</details>"
+        for key in order
+    )
+    return table + lists
+
+
+def _compartment_evidence(
+    details: Mapping[str, object], ids: _Ids, validation: Mapping[str, object]
+) -> str:
+    """Topology and blocked-reaction evidence split by compartment."""
+    split = details.get("by_compartment")
+    if not isinstance(split, Mapping):
+        return _fields(details, ids)
+    summary = validation.get("compartments")
+    summary = summary if isinstance(summary, Mapping) else {}
+    names = summary.get("names") if isinstance(summary.get("names"), Mapping) else {}
+    reactions = "blocked" in details
+    kind = "reactions" if reactions else "metabolites"
+    totals = summary.get(kind) if isinstance(summary.get(kind), Mapping) else {}
+    note = (
+        "Reactions are grouped by the compartments of their metabolites; "
+        "a reaction spanning several (a transport) is listed under all of them joined by +."
+        if reactions
+        else ""
+    )
+    if all(isinstance(value, list) for value in split.values()):
+        noun = "blocked reactions" if reactions else "dead ends"
+        return _block(
+            "By compartment",
+            None,
+            _compartment_split(split, totals, names, ids, noun, kind),
+            note,
+        )
+    return "".join(
+        _block(
+            _label(key),
+            sum(len(item) for item in value.values() if isinstance(item, list)),
+            _compartment_split(value, totals, names, ids, "metabolites", kind),
+        )
+        for key, value in split.items()
+        if isinstance(value, Mapping)
+    )
+
+
+#: Checks with their own evidence layout.
+EVIDENCE = {
+    "mass-balance": _balance_evidence,
+    "charge-balance": _balance_evidence,
+    "formula-disagreement": _formula_evidence,
+    "dead-end-topology": _compartment_evidence,
+    "unconserved-metabolites": _compartment_evidence,
+    "flux-consistency": _compartment_evidence,
+}
+#: Checks older reports hold that are no longer shown.
+_RETIRED = {"blocked-reaction-singletons"}
+
+
 def _headline(check: Mapping[str, object]) -> str:
     """One sentence summarising a check's result."""
     details = check.get("details", {})
@@ -392,6 +773,8 @@ def _headline(check: Mapping[str, object]) -> str:
         evaluated = counts["balanced"] + counts["unbalanced"]
         unevaluable = sum(v for k, v in counts.items() if k.startswith("not-evaluable"))
         text = f"{counts['unbalanced']:,} of {evaluated:,} evaluated reactions are unbalanced"
+        if counts["unbalanced-by-design"]:
+            text += f"; {counts['unbalanced-by-design']:,} pool or pseudo-reactions are unbalanced by design"
         if unevaluable:
             text += f"; {unevaluable:,} could not be evaluated"
         return text + "."
@@ -452,6 +835,8 @@ RULES = {
     "restore-input-stoichiometry": "Restore the reference model's stoichiometry",
     "integer-stoichiometry": "Round the coefficients to integers that balance the elements",
     "cofactor-pair": "Add a missing cofactor",
+    "redox-cofactor": "Add the missing redox cofactor",
+    "metabolite-charge": "Change this metabolite's charge by one",
     "infer-formula": "Set the one formula that balances all its reactions",
     "unresolved": "Remove the reaction (no rule fits; curate by hand)",
 }
@@ -637,16 +1022,16 @@ def _fixes(
         name = ids()
         options = "".join(
             f'<label class="alt"><input type="radio" name="{name}" value="{escape(str(item["proposal_id"]))}">'
-            f'<span class="alt-body">{_alternative(item, check_id)}</span></label>'
+            f'<span class="alt-body"><span class="alt-verb">Accept{" this option" if len(items) > 1 else ""}</span>{_alternative(item, check_id)}</span></label>'
             for item in items
         )
         fieldsets.append(
             f'<fieldset class="fix" data-group="{escape(key)}">{_fix_legend(items[0])}'
             f"{options}"
             f'<div class="fix-other">'
-            f'<label><input type="radio" name="{name}" value="reject"> Reject {"all" if len(items) > 1 else ""}</label>'
-            f'<label><input type="radio" name="{name}" value="defer"> Defer</label>'
-            f'<label><input type="radio" name="{name}" value="" checked> Undecided</label></div>'
+            f'<label><input type="radio" name="{name}" value="reject"> Reject{" all options" if len(items) > 1 else ""}</label>'
+            f'<input type="radio" name="{name}" value="" checked hidden>'
+            f'<button type="button" class="fix-clear" hidden>Clear choice</button></div>'
             f'<div class="fix-edit" hidden><label>Value to apply (JSON or plain text; change it to replace the suggestion)'
             f'<textarea rows="2" spellcheck="false"></textarea></label><p class="fix-error" role="alert"></p></div>'
             "</fieldset>"
@@ -654,7 +1039,8 @@ def _fixes(
     count = len(mine)
     return (
         f'<div class="block fixes-block"><h4>Suggested fixes <span class="count">{count:,}</span></h4>'
-        '<p class="muted">Choose one fix per reaction or metabolite, or reject or defer it. '
+        '<p class="muted">Accept one suggested fix per reaction or metabolite, or reject it; '
+        "anything you leave alone stays unchanged. "
         "Your choices are kept in this browser; export them from the bar at the bottom and apply them with "
         "<code>thg-run apply-decisions</code>.</p>"
         f'{_filter(target, count, "fixes")}<div class="fixes" id="{target}">{"".join(fieldsets)}</div></div>'
@@ -665,6 +1051,7 @@ def _check_card(
     check: Mapping[str, object],
     ids: _Ids,
     groups: Mapping[str, list[Mapping[str, object]]] | None = None,
+    validation: Mapping[str, object] | None = None,
 ) -> str:
     check_id = str(check.get("id", ""))
     title, what, why = CHECKS.get(check_id, (_label(check_id), "", ""))
@@ -679,6 +1066,13 @@ def _check_card(
         if fixes or status in {"failed", "infrastructure-error", "error"}
         else ""
     )
+    render = EVIDENCE.get(check_id)
+    if not evidence:
+        body = '<p class="muted">No evidence recorded.</p>'
+    elif render and status not in {"not-evaluated", "infrastructure-error", "error"}:
+        body = render(evidence, ids, validation or {})
+    else:
+        body = _fields(evidence, ids)
     explain = ""
     if what:
         explain = (
@@ -687,7 +1081,7 @@ def _check_card(
         )
     return f"""<details class="check {escape(status)}" id="{_anchor(check_id)}"{is_open}>
 <summary><span class="mark" aria-hidden="true"></span><span class="check-title">{escape(title)}</span>{_pill(status)}<span class="policy">{"Blocks release" if blocking else "Diagnostic"}</span><span class="headline">{escape(_headline(check))}</span></summary>
-<div class="check-body">{explain}{fixes}<div class="evidence">{_fields(evidence, ids) if evidence else '<p class="muted">No evidence recorded.</p>'}</div>
+<div class="check-body">{explain}{fixes}<div class="evidence">{body}</div>
 <p class="check-id">Check ID <code>{escape(check_id)}</code></p></div></details>"""
 
 
@@ -1096,13 +1490,15 @@ button.xref:focus-visible,.xref-id:focus-visible{outline:2px solid var(--link);o
 .fixes-block h4{color:var(--ink)}
 .fixes{max-height:640px;overflow:auto;display:flex;flex-direction:column;gap:10px;padding:2px 4px 2px 0}
 fieldset.fix{border:1px solid var(--line);border-left:4px solid var(--line);border-radius:8px;padding:8px 12px 10px;margin:0;background:var(--paper);min-width:0}
-fieldset.fix.approved{border-left-color:var(--ok)}fieldset.fix.rejected{border-left-color:var(--bad)}fieldset.fix.deferred{border-left-color:var(--warn)}
+fieldset.fix.accepted{border-left-color:var(--ok)}fieldset.fix.rejected{border-left-color:var(--bad)}
 fieldset.fix legend{padding:0 6px;font-size:13.5px;max-width:100%;overflow-wrap:anywhere}
 .fix-kind{color:var(--muted);font-size:11.5px;text-transform:uppercase;letter-spacing:.05em}
 label.alt{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px;padding:7px 8px;border-radius:6px;cursor:pointer}
 label.alt:hover{background:var(--soft)}label.alt:has(input:checked){background:var(--ok-bg)}
 .alt-body{display:flex;flex-direction:column;gap:3px;font-size:13.5px;min-width:0}
 .alt-head{display:flex;gap:8px;flex-wrap:wrap;align-items:baseline}.alt-rule{font-weight:600}
+.alt-verb{font-size:11.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--ok);font-weight:600}
+.fix-clear{margin-left:auto;font-size:12.5px;padding:2px 8px}
 .conf{font-size:11.5px;padding:0 7px;border-radius:999px;background:var(--na-bg);color:var(--na);white-space:nowrap}.conf.high{background:var(--ok-bg);color:var(--ok)}.conf.low{background:var(--warn-bg);color:var(--warn)}
 .balance{font-size:12.5px;color:var(--muted);font-family:var(--mono)}
 .fix-other{display:flex;gap:18px;flex-wrap:wrap;padding:6px 8px 0;margin-top:4px;border-top:1px dashed var(--line);font-size:13.5px}
@@ -1180,7 +1576,8 @@ if(!review)return;
 var groups=review.groups,state={};
 var fmt=function(v){return typeof v==="string"?v:JSON.stringify(v);};
 var parse=function(t){t=t.trim();try{return JSON.parse(t);}catch(e){return t;}};
-var load=function(){try{var v=JSON.parse(localStorage.getItem(review.key)||"{}");if(v&&typeof v==="object")state=v;}catch(e){}};
+var load=function(){try{var v=JSON.parse(localStorage.getItem(review.key)||"{}");if(v&&typeof v==="object")state=v;}catch(e){}
+  Object.keys(state).forEach(function(g){var c=state[g]&&state[g].choice;if(c!=="reject"&&!item(g,c))delete state[g];});};
 var save=function(){try{localStorage.setItem(review.key,JSON.stringify(state));}catch(e){}};
 var item=function(g,id){return (groups[g]||[]).filter(function(x){return x.id===id;})[0];};
 var fieldsets=document.querySelectorAll("fieldset.fix");
@@ -1199,17 +1596,17 @@ function render(){
     edit.hidden=!chosen;
     if(chosen&&document.activeElement!==area)area.value=st.text!=null?st.text:fmt(chosen.after);
     edit.querySelector(".fix-error").textContent=edited(g)?"Edited: this value replaces the suggestion when applied.":"";
-    fs.classList.toggle("approved",!!chosen);
+    fs.classList.toggle("accepted",!!chosen);
     fs.classList.toggle("rejected",st.choice==="reject");
-    fs.classList.toggle("deferred",st.choice==="defer");
+    fs.querySelector(".fix-clear").hidden=!st.choice;
   });
-  var total=Object.keys(groups).length,n={approved:0,rejected:0,deferred:0};
+  var total=Object.keys(groups).length,n={accepted:0,rejected:0};
   Object.keys(state).forEach(function(g){
     if(!groups[g])return;var c=state[g].choice;
-    if(c==="reject")n.rejected++;else if(c==="defer")n.deferred++;else if(item(g,c))n.approved++;
+    if(c==="reject")n.rejected++;else if(item(g,c))n.accepted++;
   });
-  var decided=n.approved+n.rejected+n.deferred;
-  document.getElementById("decision-count").textContent=decided+" of "+total+" fixes decided · "+n.approved+" approved · "+n.rejected+" rejected · "+n.deferred+" deferred";
+  var decided=n.accepted+n.rejected;
+  document.getElementById("decision-count").textContent=decided+" of "+total+" fixes decided · "+n.accepted+" accepted · "+n.rejected+" rejected";
   document.getElementById("decisions-export").disabled=!decided;
 }
 fieldsets.forEach(function(fs){
@@ -1219,6 +1616,7 @@ fieldsets.forEach(function(fs){
     if(e.target.value)state[g]={choice:e.target.value,text:null};else delete state[g];
     save();render();
   });
+  fs.querySelector(".fix-clear").addEventListener("click",function(){delete state[g];save();render();});
   fs.querySelector("textarea").addEventListener("input",function(e){
     if(!state[g])return;state[g].text=e.target.value;save();
     document.querySelectorAll('fieldset.fix').forEach(function(other){
@@ -1231,8 +1629,8 @@ function decisions(){
   var out=[];
   Object.keys(state).sort().forEach(function(g){
     var st=state[g],items=groups[g];if(!items)return;
-    if(st.choice==="reject"||st.choice==="defer"){
-      items.forEach(function(x){out.push({proposal_id:x.id,action:st.choice,reason:""});});return;
+    if(st.choice==="reject"){
+      items.forEach(function(x){out.push({proposal_id:x.id,action:"reject",reason:""});});return;
     }
     if(!item(g,st.choice))return;
     items.forEach(function(x){
@@ -1267,8 +1665,8 @@ document.getElementById("decisions-import").addEventListener("change",function(e
       var list=byGroup[g];
       var pick=list.filter(function(d){return d.action==="approve"||d.action==="replace";})[0];
       if(pick)state[g]={choice:pick.proposal_id,text:pick.action==="replace"?fmt(pick.replacement):null};
-      else if(list.some(function(d){return d.action==="defer";}))state[g]={choice:"defer",text:null};
-      else state[g]={choice:"reject",text:null};
+      else if(list.some(function(d){return d.action==="reject";}))state[g]={choice:"reject",text:null};
+      else delete state[g];
     });
     save();render();
     say("Imported "+count+" decisions"+(unknown?"; "+unknown+" lines did not match a fix in this report":"")+".");
@@ -1289,7 +1687,11 @@ def render_validation_html(report: Mapping[str, object]) -> str:
     validation = _validation(report)
     checks = validation.get("checks", [])
     checks = (
-        [item for item in checks if isinstance(item, Mapping)]
+        [
+            item
+            for item in checks
+            if isinstance(item, Mapping) and item.get("id") not in _RETIRED
+        ]
         if isinstance(checks, list)
         else []
     )
@@ -1372,7 +1774,7 @@ def render_validation_html(report: Mapping[str, object]) -> str:
         f'<section class="family" id="family-{escape(family)}">'
         f"<h3>{escape(FAMILIES.get(family, (_label(family), ''))[0])}"
         f'<span class="family-q">{escape(FAMILIES.get(family, ("", ""))[1])}</span></h3>'
-        + "".join(_check_card(item, ids, groups) for item in items)
+        + "".join(_check_card(item, ids, groups, validation) for item in items)
         + "</section>"
         for family, items in families.items()
     )
@@ -1450,7 +1852,11 @@ dl.fields{{display:grid;grid-template-columns:max-content 1fr;gap:4px 18px;margi
 .table-wrap{{max-height:420px;overflow:auto;border:1px solid var(--line);border-radius:6px}}
 table{{width:100%;border-collapse:collapse;font-size:13.5px}}th,td{{padding:7px 10px;text-align:left;vertical-align:top;border-bottom:1px solid var(--line)}}
 thead th{{position:sticky;top:0;background:var(--soft);font-weight:600;font-size:12.5px;color:var(--muted);z-index:1}}tbody tr:last-child td{{border-bottom:0}}
-td{{overflow-wrap:anywhere}}.equation{{display:block;min-width:28ch;line-height:1.45}}
+td{{overflow-wrap:break-word}}td code,.nowrap{{white-space:nowrap}}.equation{{display:block;min-width:28ch;line-height:1.45;overflow-wrap:anywhere}}
+.equation.clamp{{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}}
+.variant{{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:baseline;padding:2px 0}}.variant+.variant{{border-top:1px dashed var(--line)}}
+.where{{display:inline-flex;flex-wrap:wrap;gap:4px 8px;font-size:12.5px}}.diff{{font-family:var(--mono);font-size:12.5px;color:var(--warn);white-space:nowrap}}
+.evidence details{{margin-top:6px}}.evidence details>summary{{font-size:13.5px}}
 .pair{{display:inline-block;margin:0 10px 2px 0;overflow-wrap:normal;white-space:nowrap}}.muted{{color:var(--muted)}}.note{{color:var(--muted);font-size:13px;margin:8px 0 0}}
 .filter{{display:block;width:min(320px,100%);margin:0 0 6px;padding:5px 9px;font:inherit;font-size:13px;background:var(--paper);color:var(--ink);border:1px solid var(--line);border-radius:6px}}
 .delta.up{{color:var(--warn);font-weight:600}}.delta.down{{color:var(--link);font-weight:600}}.delta.zero{{color:var(--muted)}}
@@ -1482,7 +1888,7 @@ section>details,#memote .table-wrap{{margin-top:10px}}
 <dt>Profile</dt><dd>Decides which checks run and which of them block the release. Each check shows whether it blocks release or is diagnostic.</dd>
 <dt>Evidence</dt><dd>Open a check to see what it tests, why it matters and the affected identifiers. Long lists have a filter box, which also matches names and subsystems. The JSON report next to this file holds every value.</dd>
 <dt>Identifiers</dt><dd>Underlined reaction and metabolite IDs open a panel with the equation, formula and connected reactions.</dd>
-<dt>Suggested fixes</dt><dd>Where a rule can fix a problem, the check lists the fixes. Pick one per reaction or metabolite, or reject or defer it, then export the decisions and run <code>thg-run apply-decisions</code> to get a fixed model and a new report.</dd>
+<dt>Suggested fixes</dt><dd>Where a rule can fix a problem, the check lists the fixes. Accept one per reaction or metabolite, or reject it; fixes you leave alone are not applied. Then export the decisions and run <code>thg-run apply-decisions</code> to get a fixed model and a new report.</dd>
 </dl></details>
 {_metric_cards(report)}
 <section id="checks"><div class="toolbar"><div><h2>Checks</h2><p class="lead-small">Grouped by what they examine. Failed checks and checks with suggested fixes are open; select any check to see its evidence.</p></div>
