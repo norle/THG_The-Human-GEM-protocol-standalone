@@ -73,7 +73,13 @@ def test_report_explains_checks_and_summarises_large_evidence():
         },
     }
     html = render_validation_html(report)
-    assert "What it checks." in html
+    assert (
+        '<p class="explain">Compares element counts across internal reactions.' in html
+    )
+    assert "Why it matters" not in html
+    assert "An unbalanced reaction can create or destroy atoms" not in html
+    assert "How it works" not in html
+    assert "What it checks" not in html
     assert "1 of 301 evaluated reactions are unbalanced." in html
     assert "R_bad" in html
     # The per-reaction map is summarised as counts, not dumped.

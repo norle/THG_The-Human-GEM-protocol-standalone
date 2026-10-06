@@ -11,88 +11,71 @@ from collections import Counter
 from collections.abc import Mapping
 from html import escape
 
-#: Plain-language descriptions shown next to each check: title, what the
-#: check tests, and why a failure matters for using the model.
-CHECKS: dict[str, tuple[str, str, str]] = {
+#: Each check's title and concise description.
+CHECKS: dict[str, tuple[str, str]] = {
     "reference-integrity": (
         "Reaction metabolites exist",
-        "Every metabolite used by a reaction is also listed among the model's metabolites.",
-        "A dangling reference breaks SBML export and makes the stoichiometric matrix ill-defined.",
+        "Checks that all reaction metabolites exist in the model.",
     ),
     "identifier-uniqueness": (
         "Unique identifiers",
-        "No two reactions, metabolites or genes share an identifier.",
-        "Duplicate IDs make lookups ambiguous, so edits and mappings can hit the wrong object.",
+        "Checks for duplicate reaction, metabolite or gene IDs.",
     ),
     "gpr": (
         "Gene rules are valid",
-        "Every gene–protein–reaction rule parses as a Boolean expression and names only genes in the model.",
-        "Broken rules make gene knockouts and expression mapping (GIMME, context models) silently wrong.",
+        "Checks that gene rules parse and reference only genes in the model.",
     ),
     "mass-balance": (
         "Mass balance",
-        "Counts the atoms of each element on both sides of every internal reaction, one reaction at a time, using the metabolite formulas. Pool, biomass and other pseudo-reactions lump many compounds together, so they are listed separately as unbalanced by design and do not fail the check. Boundary reactions are skipped; reactions with a metabolite lacking a formula cannot be evaluated.",
-        "An unbalanced reaction can create or destroy atoms, letting the model produce mass from nothing.",
+        "Compares element counts across internal reactions. Pool, biomass and pseudo-reactions are reported separately without failing the check; boundary reactions and those missing formulas are skipped.",
     ),
     "charge-balance": (
         "Charge balance",
-        "Sums the charges on both sides of every internal reaction, one reaction at a time. Pool, biomass and other pseudo-reactions are listed separately as unbalanced by design and do not fail the check. Boundary reactions are skipped; reactions with a metabolite lacking a charge cannot be evaluated.",
-        "Charge imbalance usually means a wrong protonation state and distorts proton and energy budgets.",
+        "Compares total charge across internal reactions. Pool, biomass and pseudo-reactions are reported separately without failing the check; boundary reactions and those missing charges are skipped.",
     ),
     "fractional-coefficients": (
         "Fractional coefficients",
-        "Lists internal reactions with non-integer stoichiometric coefficients. Pseudo-reactions such as biomass and pools are skipped, since they are fractional by design.",
-        "Fitted coefficients such as 1.2 O2 are a common source of mass creation.",
+        "Lists non-integer coefficients in internal reactions, excluding biomass, pools and other pseudo-reactions.",
     ),
     "formula-disagreement": (
         "Formula disagreements",
-        "Finds a metabolite whose formula or charge differs between compartments, or from the reference model.",
-        "The same compound with two formulas makes its transport reactions unbalanced and signals a curation error.",
+        "Compares metabolite formulas and charges across compartments and against the reference model.",
     ),
     "annotation-conflict": (
         "Mislabelled metabolites",
-        "Finds metabolites sharing a name but differing in formula (beyond hydrogen) or KEGG ID, and reference metabolites renamed to a name that belongs to another compound.",
-        "These are the fingerprints of a merge that mapped a compound onto the wrong metabolite.",
+        "Flags shared names with conflicting formulas (excluding hydrogen) or KEGG IDs, and reference metabolites renamed to another compound's name.",
     ),
     "unusual-protons": (
         "Unusual proton counts",
-        "Lists internal reactions with more protons (H+) than the limit. Reactions with the same proton coefficients in the reference model are not reported.",
-        "A large proton coefficient often marks a reaction balanced against a wrong formula.",
+        "Flags proton coefficients above the limit, excluding those unchanged from the reference model.",
     ),
     "dead-end-topology": (
         "Dead-end metabolites",
-        "Lists metabolites that are only produced or only consumed by the network.",
-        "Dead ends cannot carry steady-state flux, so every reaction touching them is blocked.",
+        "Lists metabolites that are only produced or only consumed.",
     ),
     "unconserved-metabolites": (
         "Metabolites never produced or consumed",
         "Lists metabolites no reaction can produce, and metabolites no reaction can consume.",
-        "These are gaps in the network: pathways through them cannot operate.",
     ),
     "stoichiometric-consistency": (
         "Stoichiometric consistency",
-        "Tests the whole network at once, ignoring formulas: can every metabolite be given some positive mass that all internal reactions conserve together (Gevorgyan et al. 2008, via MEMOTE)? Unconserved metabolites are those for which no such mass exists. Unlike mass balance, it also catches errors in metabolites without a formula and in reactions that each balance on paper but together form a loop that creates matter; one wrong reaction can leave thousands of metabolites unconserved.",
-        "An inconsistent network can create or destroy matter in a closed loop, which makes flux predictions unreliable.",
+        "Uses MEMOTE to test whether all internal reactions conserve a shared set of positive metabolite masses, without formulas. Reports metabolites with no conserved mass assignment.",
     ),
     "workflow-specific-invariants": (
         "Workflow invariants",
-        "Checks invariants supplied by the workflow stage that produced the model.",
-        "Catches stage-specific mistakes the generic checks cannot see. Not configured means the stage supplied none.",
+        "Checks stage-specific invariants; not configured if none were supplied.",
     ),
     "ledger-to-diff-consistency": (
         "Ledger matches model changes",
-        "Compares the changes recorded in the decision ledger with the actual difference between models.",
-        "A mismatch means the model changed in ways the audit trail does not record. Not configured means no ledger was supplied.",
+        "Compares the decision ledger with actual model changes; not configured if no ledger was supplied.",
     ),
     "flux-consistency": (
         "Blocked reactions",
-        "Runs flux variability analysis under the model's current bounds and lists reactions that cannot carry any non-zero flux.",
-        "Blocked reactions contribute nothing to simulations and usually point to missing transport, exchange or pathway steps.",
+        "Uses flux variability analysis to find reactions unable to carry flux under current bounds.",
     ),
     "objective-feasibility": (
         "Objective is feasible",
-        "Optimises the model's objective under its current bounds and expects an optimal solution.",
-        "An infeasible or unbounded model cannot be used for any flux simulation.",
+        "Optimises the objective under current bounds and checks for an optimal solution.",
     ),
 }
 
@@ -1055,7 +1038,7 @@ def _check_card(
     validation: Mapping[str, object] | None = None,
 ) -> str:
     check_id = str(check.get("id", ""))
-    title, what, why = CHECKS.get(check_id, (_label(check_id), "", ""))
+    title, what = CHECKS.get(check_id, (_label(check_id), ""))
     status = _status(check)
     blocking = bool(check.get("release_blocking"))
     details = check.get("details", {})
@@ -1074,12 +1057,7 @@ def _check_card(
         body = render(evidence, ids, validation or {})
     else:
         body = _fields(evidence, ids)
-    explain = ""
-    if what:
-        explain = (
-            f'<p class="explain"><strong>What it checks.</strong> {escape(what)}</p>'
-            f'<p class="explain"><strong>Why it matters.</strong> {escape(why)}</p>'
-        )
+    explain = f'<p class="explain">{escape(what)}</p>' if what else ""
     return f"""<details class="check {escape(status)}" id="{_anchor(check_id)}"{is_open}>
 <summary><span class="mark" aria-hidden="true"></span><span class="check-title">{escape(title)}</span>{_pill(status)}<span class="policy">{"Blocks release" if blocking else "Diagnostic"}</span><span class="headline">{escape(_headline(check))}</span></summary>
 <div class="check-body">{explain}{fixes}<div class="evidence">{body}</div>
@@ -1841,7 +1819,7 @@ button{{font:inherit;font-size:13px;background:var(--paper);color:var(--ink);bor
 .mark{{align-self:stretch;border-radius:0 3px 3px 0;background:var(--na)}}.check.passed .mark{{background:var(--ok)}}.check.failed .mark,.check.infrastructure-error .mark{{background:var(--bad)}}.check.warning .mark{{background:var(--warn)}}
 .check-title{{font-weight:600}}.policy{{color:var(--muted);font-size:13px;white-space:nowrap}}.headline{{color:var(--muted);font-size:14px}}
 .check[open]>summary{{border-bottom:1px solid var(--line)}}.check-body{{padding:14px 18px 16px 18px}}
-.explain{{margin:0 0 6px;max-width:76ch;font:15.5px/1.6 var(--serif)}}.explain strong{{font-family:var(--sans);font-size:14px}}
+.explain{{margin:0 0 6px;max-width:76ch;font:15.5px/1.6 var(--serif)}}
 .evidence{{margin-top:14px}}.check-id{{margin:12px 0 0;color:var(--muted);font-size:12.5px}}
 .pill{{display:inline-block;padding:2px 9px;border-radius:999px;font-size:12.5px;font-weight:600;white-space:nowrap;background:var(--na-bg);color:var(--na)}}
 .pill.passed{{background:var(--ok-bg);color:var(--ok)}}.pill.failed,.pill.infrastructure-error,.pill.error,.pill.invalid{{background:var(--bad-bg);color:var(--bad)}}.pill.warning{{background:var(--warn-bg);color:var(--warn)}}
@@ -1887,7 +1865,7 @@ section>details,#memote .table-wrap{{margin-top:10px}}
 <dt>{_pill("not-evaluated")}</dt><dd>The check could not run, usually because an optional dependency is missing.</dd>
 <dt>{_pill("infrastructure-error")}</dt><dd>The check itself crashed; its result is unknown.</dd>
 <dt>Profile</dt><dd>Decides which checks run and which of them block the release. Each check shows whether it blocks release or is diagnostic.</dd>
-<dt>Evidence</dt><dd>Open a check to see what it tests, why it matters and the affected identifiers. Long lists have a filter box, which also matches names and subsystems. The JSON report next to this file holds every value.</dd>
+<dt>Evidence</dt><dd>Open a check for its description and affected identifiers. Filter long lists by ID, name or subsystem. Full results are in the accompanying JSON report.</dd>
 <dt>Identifiers</dt><dd>Underlined reaction and metabolite IDs open a panel with the equation, formula and connected reactions.</dd>
 <dt>Suggested fixes</dt><dd>Where a rule can fix a problem, the check lists the fixes. Accept one per reaction or metabolite, or reject it; fixes you leave alone are not applied. Then export the decisions and run <code>thg-run apply-decisions</code> to get a fixed model and a new report.</dd>
 </dl></details>
