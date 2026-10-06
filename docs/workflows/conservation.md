@@ -96,12 +96,24 @@ and re-check stages rerun when the decisions file changes.
 
 | Situation | Proposal | Policy |
 | --- | --- | --- |
-| Reaction is in the comparison model with different stoichiometry | Restore that stoichiometry | `restore-input-stoichiometry` |
-| Reaction has non-integer coefficients (such as fitted `1.2 O2 -> 1.5 product`) | Round each one down or up (never to zero) and keep the integer stoichiometries that balance the elements; several are listed as low-confidence alternatives | `integer-stoichiometry` |
-| Element residual equals a cofactor addition: NAD+/NADH + H+, NADP+/NADPH + H+, H2O, CO2, Pi, CoA (either direction) | Add it; every fitting candidate is listed, as low-confidence alternatives | `cofactor-pair` |
+| Existing compounds can balance by changing coefficients | Solve for minimal coefficient edits conserving both elements and charge, keeping formulas, charges and reaction sides fixed | `stoichiometry-balance` (or `integer-stoichiometry` when fractional coefficients become integers) |
+| Coefficient changes alone cannot balance the reaction | Solve with small molecules already in the reaction's compartment: H+, H2O, CO2, Pi, CoA and paired NAD(P) cofactors; coefficients can also change | `cofactor-pair` or `redox-cofactor` |
 | Added metabolite has no formula and one formula balances all its reactions | Set that formula | `infer-formula` |
 | Reaction ID or name looks like a biomass, pool, pseudo, lumped or artificial reaction | Exclude it from the analysis (recorded in its notes) | `exclude-pseudo-reaction` |
 | A blamed reaction no rule covers | `unresolved` removal, for manual curation only | `unresolved` |
+
+The comparison model is supporting context, not a source of restored
+stoichiometry. Balanced fractional coefficients are retained. The bounded
+mixed-integer search uses SciPy/HiGHS, with no additional solver dependency:
+original coefficients may be retained, replacement magnitudes are integers
+from 1 to 12, and new compounds have coefficients from -4 to 4. Up to four
+new compounds in a single compartment and four equally ranked alternatives
+are allowed. Each search has a five-second solver budget; only optimal,
+independently rechecked solutions become suggestions. Candidates minimize
+the number of added compounds, then changed original coefficients, then
+total absolute coefficient change. These limits and the rank are recorded
+in proposal metadata. Failure within these limits leaves the reaction for
+manual review; it does not prove no solution exists.
 
 Each proposal records, for the reaction before and after the fix, the
 equation with IDs and with names, the element residual (or the metabolites

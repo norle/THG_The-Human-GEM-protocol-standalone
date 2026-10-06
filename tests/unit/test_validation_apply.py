@@ -30,7 +30,7 @@ def _model(r2):
 @pytest.fixture
 def validated(tmp_path):
     reference = _model({"a_c": -1, "b_c": 1, "h2_c": 1})
-    model = _model({"a_c": -1, "b_c": 1})
+    model = _model({"a_c": -2, "b_c": 1, "h2_c": 1})
     model_path, reference_path = tmp_path / "model.json", tmp_path / "reference.json"
     cobra.io.save_json_model(model, str(model_path))
     cobra.io.save_json_model(reference, str(reference_path))

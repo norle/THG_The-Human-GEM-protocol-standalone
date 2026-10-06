@@ -243,7 +243,7 @@ class GapfillStage:
         if stage_id == "characterize-gapfill-baseline":
             self.implementation_version = 2
         elif stage_id == "validate-gapfill":
-            self.implementation_version = 3
+            self.implementation_version = 4
 
     def enabled(self, config: Any) -> bool:
         del config

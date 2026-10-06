@@ -21,7 +21,7 @@ dependencies = [
   "pandas>=2.1.4",
   "python-libsbml",
   "requests",
-  "scipy",
+  "scipy>=1.9",
   "tqdm>=4.66",
 ]
 

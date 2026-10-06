@@ -20,6 +20,7 @@ import re
 import warnings
 from collections import defaultdict
 from collections.abc import Iterable, Mapping
+from time import monotonic
 from typing import TYPE_CHECKING, Any
 
 from optlang.interface import OPTIMAL
@@ -39,8 +40,7 @@ TOLERANCE = 1e-9
 TIE_BREAK = 1e-3
 _PSEUDO_PATTERN = re.compile(r"biomass|pool|pseudo|lumped|artificial", re.IGNORECASE)
 
-#: Cofactor additions tried against an element residual, by metabolite name.
-#: Each is also tried negated (e.g. NADH + H+ -> NAD+).
+#: Supported cofactor families; retained for callers of the conservation API.
 COFACTOR_FIXES: tuple[tuple[str, Mapping[str, int]], ...] = (
     ("NAD+/NADH", {"NAD+": -1, "NADH": 1, "H+": 1}),
     ("NADP+/NADPH", {"NADP+": -1, "NADPH": 1, "H+": 1}),
@@ -53,6 +53,10 @@ COFACTOR_FIXES: tuple[tuple[str, Mapping[str, int]], ...] = (
 REDOX_FIXES: tuple[tuple[str, str], ...] = (("NAD+", "NADH"), ("NADP+", "NADPH"))
 #: Largest number of redox pairs ``redox_candidates`` adds to one reaction.
 REDOX_LIMIT = 4
+#: Integer replacement coefficients, additions and equally ranked alternatives.
+COEFFICIENT_LIMIT = 12
+ADDITION_LIMIT = 4
+BALANCE_ALTERNATIVES = 4
 
 # --------------------------------------------------------------------------
 # Exclusions
@@ -685,15 +689,167 @@ def _merge(
     return {key: value for key, value in merged.items() if abs(value) > TOLERANCE}
 
 
+def _balanced_stoichiometries(
+    reaction: Any,
+    model: Any,
+    *,
+    additions: Iterable[str] = (),
+    pairs: Iterable[tuple[str, str]] = (),
+) -> list[dict[str, object]]:
+    """Find bounded, minimal edits conserving both elements and charge.
+
+    Original species stay on their original sides. Existing fractional or
+    large coefficients may be retained; replacements are positive integers
+    up to COEFFICIENT_LIMIT. New species have signed integer coefficients up
+    to ADDITION_LIMIT. Lexicographically minimize added species, changed
+    original coefficients, then total absolute coefficient change.
+    """
+    import numpy as np
+    from scipy.optimize import Bounds, LinearConstraint, milp
+
+    before = _stoichiometry(reaction)
+    if reaction.boundary or not before:
+        return []
+    if (
+        element_residual(before, model)["balanced"]
+        and charge_residual(before, model)["balanced"]
+    ):
+        return []
+    ids = sorted(set(before) | set(additions))
+    atoms, charges = {}, {}
+    for key in ids:
+        metabolite = model.metabolites.get_by_id(key)
+        atoms[key] = formula_atoms(metabolite.formula or "")
+        charge = metabolite.charge
+        if not atoms[key] or charge is None or not math.isfinite(float(charge)):
+            return []
+        charges[key] = float(charge)
+    if any(not math.isfinite(value) or not value for value in before.values()):
+        return []
+
+    # ponytail: bounded discrete coefficients; add rational replacements if needed.
+    choices = []
+    groups = []
+    for key in ids:
+        old = before.get(key, 0.0)
+        if old:
+            values = {old} | {
+                math.copysign(value, old) for value in range(1, COEFFICIENT_LIMIT + 1)
+            }
+        else:
+            values = set(range(-ADDITION_LIMIT, ADDITION_LIMIT + 1))
+        start = len(choices)
+        choices.extend((key, value) for value in sorted(values))
+        groups.append(list(range(start, len(choices))))
+    size = len(choices)
+    elements = sorted({element for counts in atoms.values() for element in counts})
+    rows = [
+        [atoms[key].get(element, 0) * value for key, value in choices]
+        for element in elements
+    ]
+    rows.append([charges[key] * value for key, value in choices])
+    # Scale composition rows to avoid large protein formulas dominating numerics.
+    rows = [np.asarray(row) / max(1, max(map(abs, row))) for row in rows]
+    constraints = [LinearConstraint(np.asarray(rows), 0, 0)]
+    assignment = np.zeros((len(groups), size))
+    for row, group in enumerate(groups):
+        assignment[row, group] = 1
+    constraints.append(LinearConstraint(assignment, 1, 1))
+    for oxidised, reduced in pairs:
+        pair = (oxidised, reduced)
+        missing = set(pair) - before.keys()
+        if not missing:
+            continue
+        row = np.array([value if key in pair else 0 for key, value in choices])
+        if len(missing) == 2:
+            constraints.append(LinearConstraint(row, 0, 0))
+        else:
+            # Existing NAD can be cleaved; require a redox pair only if added.
+            unused = np.array(
+                [int(key in missing and value == 0) for key, value in choices]
+            )
+            bound = sum(
+                max(abs(value) for key, value in choices if key == partner)
+                for partner in pair
+            )
+            constraints.append(LinearConstraint(row - bound * unused, -np.inf, 0))
+            constraints.append(LinearConstraint(row + bound * unused, 0, np.inf))
+
+    added = np.array([int(key not in before and value != 0) for key, value in choices])
+    changed = np.array(
+        [int(key in before and value != before[key]) for key, value in choices]
+    )
+    distance = np.array([abs(value - before.get(key, 0)) for key, value in choices])
+    constraints.append(LinearConstraint(added, 0, ADDITION_LIMIT))
+    deadline = monotonic() + 5
+
+    def solve(cost):
+        remaining = deadline - monotonic()
+        if remaining <= 0:
+            return None
+        result = milp(
+            cost,
+            integrality=np.ones(size),
+            bounds=Bounds(0, 1),
+            constraints=constraints,
+            options={"time_limit": remaining, "mip_rel_gap": 0},
+        )
+        return result if result.success else None
+
+    solution = None
+    for cost in (added, changed, distance):
+        solution = solve(cost)
+        if solution is None:
+            return []
+        constraints.append(LinearConstraint(cost, -np.inf, solution.fun + 1e-8))
+
+    candidates = []
+    # ponytail: at most four equally ranked alternatives; expand on curator demand.
+    while solution is not None and len(candidates) < BALANCE_ALTERNATIVES:
+        selected = [group[int(np.argmax(solution.x[group]))] for group in groups]
+        after = {
+            choices[index][0]: choices[index][1]
+            for index in selected
+            if choices[index][1]
+        }
+        if (
+            element_residual(after, model)["balanced"]
+            and charge_residual(after, model)["balanced"]
+            and all(after.get(key, 0) * value > 0 for key, value in before.items())
+        ):
+            candidates.append(
+                {
+                    "after": after,
+                    "rank": [
+                        int(added @ solution.x + 0.5),
+                        int(changed @ solution.x + 0.5),
+                        _round(float(distance @ solution.x)),
+                    ],
+                }
+            )
+        row = np.zeros(size)
+        row[selected] = 1
+        constraints.append(LinearConstraint(row, -np.inf, len(groups) - 1))
+        if len(candidates) < BALANCE_ALTERNATIVES:
+            solution = solve(distance)
+    return candidates
+
+
+def coefficient_candidates(reaction: Any, model: Any) -> list[dict[str, object]]:
+    """Balance existing compounds, keeping formulas, charges and sides fixed."""
+    return _balanced_stoichiometries(reaction, model)
+
+
 def cofactor_candidates(
     reaction: Any, model: Any, *, names: Mapping[tuple[str, str], Any] | None = None
 ) -> list[dict[str, object]]:
-    """Return cofactor additions whose element delta cancels the residual."""
+    """Balance with bounded small-molecule additions in one compartment.
+
+    Coefficients may also change. NAD(P) oxidised/reduced partners are added
+    together, preferentially using a pair already present in the reaction.
+    No metabolites are created and no formula or charge is changed.
+    """
     stoichiometry = _stoichiometry(reaction)
-    balance = element_residual(stoichiometry, model)
-    if balance["missing_formula"] or not balance["residual"]:
-        return []
-    target = {key: -float(value) for key, value in balance["residual"].items()}
     names = _by_name(model) if names is None else names
     compartments = sorted(
         {
@@ -703,31 +859,79 @@ def cofactor_candidates(
         }
     )
     candidates = []
+    present_names = {metabolite.name for metabolite in reaction.metabolites}
+    present_pairs = {pair for pair in REDOX_FIXES if present_names.intersection(pair)}
+    small_names = ["H+"] + [
+        next(iter(template)) for _, template in COFACTOR_FIXES if len(template) == 1
+    ]
     for compartment in compartments:
-        for label, template in COFACTOR_FIXES:
-            for sign in (1, -1):
-                addition: dict[str, float] = {}
-                for name, coefficient in template.items():
-                    metabolite = names.get((name, compartment))
-                    if metabolite is None:
-                        break
-                    addition[metabolite.id] = sign * float(coefficient)
-                else:
-                    delta = element_residual(addition, model)
-                    if delta["missing_formula"]:
-                        continue
-                    if delta["residual"] == {
-                        key: _round(value) for key, value in target.items()
-                    }:
-                        candidates.append(
-                            {
-                                "label": label if sign == 1 else f"{label} (reverse)",
-                                "compartment": compartment,
-                                "addition": addition,
-                                "after": _merge(stoichiometry, addition),
-                            }
-                        )
-    return candidates
+        pool = [
+            names[(name, compartment)]
+            for name in small_names
+            if (name, compartment) in names
+        ]
+        pairs = []
+        for oxidised, reduced in REDOX_FIXES:
+            if present_pairs and (oxidised, reduced) not in present_pairs:
+                continue
+            partners = [names.get((name, compartment)) for name in (oxidised, reduced)]
+            if all(
+                partner is not None
+                and formula_atoms(partner.formula or "")
+                and partner.charge is not None
+                and math.isfinite(float(partner.charge))
+                for partner in partners
+            ):
+                pool.extend(partners)
+                pairs.append(tuple(partner.id for partner in partners))
+        # Missing composition data must not disable the other available cofactors.
+        pool = [
+            metabolite
+            for metabolite in pool
+            if formula_atoms(metabolite.formula or "")
+            and metabolite.charge is not None
+            and math.isfinite(float(metabolite.charge))
+        ]
+        available = {metabolite.id for metabolite in pool}
+        pairs = [pair for pair in pairs if set(pair) <= available]
+        for candidate in _balanced_stoichiometries(
+            reaction, model, additions=available, pairs=pairs
+        ):
+            after = candidate["after"]
+            addition = {
+                key: _round(value - stoichiometry.get(key, 0))
+                for key, value in after.items()
+                if abs(value - stoichiometry.get(key, 0)) > TOLERANCE
+            }
+            labels = []
+            for oxidised, reduced in pairs:
+                if oxidised in addition or reduced in addition:
+                    labels.append(
+                        f"{model.metabolites.get_by_id(oxidised).name}/"
+                        f"{model.metabolites.get_by_id(reduced).name}"
+                    )
+            labels.extend(
+                model.metabolites.get_by_id(key).name
+                for key in addition
+                if key in available and not any(key in pair for pair in pairs)
+            )
+            candidates.append(
+                {
+                    **candidate,
+                    "label": " + ".join(labels),
+                    "compartment": compartment,
+                    "addition": addition,
+                }
+            )
+    if not candidates:
+        return []
+    best = min(candidate["rank"] for candidate in candidates)
+    unique = {
+        tuple(candidate["after"].items()): candidate
+        for candidate in candidates
+        if candidate["rank"] == best
+    }
+    return list(unique.values())[:BALANCE_ALTERNATIVES]
 
 
 def redox_candidates(
@@ -815,7 +1019,7 @@ def _flags(summary: Mapping[str, object], prefix: str = "after-") -> list[str]:
 def integer_candidates(
     reaction: Any, model: Any, *, limit: int = 6
 ) -> list[dict[str, float]]:
-    """Round each non-integer coefficient down or up; keep element-balanced results.
+    """Round fractional coefficients; keep element- and charge-balanced results.
 
     Fitted coefficients such as ``1.2 O2 -> 1.5 product`` usually stand for a
     small integer stoichiometry. Coefficients are never rounded to zero.
@@ -833,7 +1037,10 @@ def integer_candidates(
     candidates = []
     for combination in itertools.product(*choices):
         after = {**stoichiometry, **dict(zip(odd, combination, strict=True))}
-        if element_residual(after, model)["balanced"]:
+        if (
+            element_residual(after, model)["balanced"]
+            and charge_residual(after, model)["balanced"]
+        ):
             candidates.append(
                 {key: _round(value) for key, value in sorted(after.items())}
             )
@@ -935,27 +1142,23 @@ def reaction_fixes(
 ) -> list[Proposal]:
     """Per-reaction fix rules, tried in order until one yields proposals.
 
-    Rules: a biomass/pool/lumped reaction is excluded from conservation (only
-    with ``exclude_pseudo``); a reaction whose stoichiometry differs from the
-    input model is restored; non-integer coefficients are rounded to the
-    integer stoichiometries that balance the elements; an element residual
-    matching a cofactor pair gets that pair; a charge-only residual gets a
-    redox pair (see ``redox_candidates``). Several candidates from one rule
-    are mutually exclusive alternatives. ``context`` carries the blamed row
-    (origin, imbalance, flags) when the reaction was blamed.
+    Exclude biomass/pool/lumped reactions when ``exclude_pseudo`` is true.
+    Otherwise balance existing coefficients first, then allow bounded
+    cofactor additions. Both elements and charge must balance. Formulas and
+    charges are fixed; the reference model supplies context only. Equally
+    ranked candidates are mutually exclusive alternatives. ``context``
+    carries the blamed row (origin, imbalance, flags).
     """
     context = dict(context or {})
     context.setdefault("origin", reaction_origin(reaction, input_model))
-    origin = context["origin"]
     evidence = list(evidence)
-    before = {k: _round(v) for k, v in sorted(_stoichiometry(reaction).items())}
+    before = dict(sorted(_stoichiometry(reaction).items()))
 
     def metadata(after: Mapping[str, float] | None, rule: str) -> dict[str, object]:
         return _reaction_metadata(
             reaction, model, after, rule, input_model=input_model, context=context
         )
 
-    original = _input_reaction(input_model, reaction.id)
     group: list[Proposal] = []
     if exclude_pseudo and _is_pseudo(reaction):
         group.append(
@@ -972,26 +1175,22 @@ def reaction_fixes(
                 reason="biomass, pool or lumped reaction; unbalanced by design",
             )
         )
-    elif original is not None and origin == "changed":
-        after = {k: _round(v) for k, v in sorted(_stoichiometry(original).items())}
-        details = metadata(after, "restore-input-stoichiometry")
-        group.append(
-            _proposal(
-                operation="set-stoichiometry",
-                object_type="reaction",
-                object_id=reaction.id,
-                before=before,
-                after=after,
-                policy="restore-input-stoichiometry",
-                confidence="medium" if details["flags"] else "high",
-                evidence=evidence,
-                metadata=details,
-                reason="stoichiometry differs from the input model",
-            )
-        )
     else:
-        candidates = integer_candidates(reaction, model)
-        for after in candidates:
+        candidates = coefficient_candidates(reaction, model)
+        for candidate in candidates:
+            after = candidate["after"]
+            policy = (
+                "integer-stoichiometry"
+                if fractional(before) and not fractional(after)
+                else "stoichiometry-balance"
+            )
+            details = metadata(after, policy)
+            details["search"] = {
+                "rank": candidate["rank"],
+                "coefficient_limit": COEFFICIENT_LIMIT,
+                "addition_limit": ADDITION_LIMIT,
+                "max_alternatives": BALANCE_ALTERNATIVES,
+            }
             group.append(
                 _proposal(
                     operation="set-stoichiometry",
@@ -999,21 +1198,33 @@ def reaction_fixes(
                     object_id=reaction.id,
                     before=before,
                     after=after,
-                    policy="integer-stoichiometry",
+                    policy=policy,
                     confidence="medium" if len(candidates) == 1 else "low",
                     evidence=evidence,
-                    metadata=metadata(after, "integer-stoichiometry"),
-                    reason="non-integer coefficients; this integer "
-                    "stoichiometry balances the elements",
+                    metadata=details,
+                    reason="minimal coefficient edits balance elements and charge; "
+                    "formulas, charges and reaction sides are unchanged",
                 )
             )
         if not group:
             cofactors = cofactor_candidates(reaction, model, names=names)
             for candidate in cofactors:
-                after = {k: _round(v) for k, v in sorted(candidate["after"].items())}
-                details = metadata(after, "cofactor-pair")
+                after = candidate["after"]
+                policy = (
+                    "redox-cofactor"
+                    if element_residual(before, model)["balanced"]
+                    and "NAD" in candidate["label"]
+                    else "cofactor-pair"
+                )
+                details = metadata(after, policy)
                 details["cofactor"] = candidate["label"]
                 details["compartment"] = candidate["compartment"]
+                details["search"] = {
+                    "rank": candidate["rank"],
+                    "coefficient_limit": COEFFICIENT_LIMIT,
+                    "addition_limit": ADDITION_LIMIT,
+                    "max_alternatives": BALANCE_ALTERNATIVES,
+                }
                 group.append(
                     _proposal(
                         operation="set-stoichiometry",
@@ -1021,33 +1232,12 @@ def reaction_fixes(
                         object_id=reaction.id,
                         before=before,
                         after=after,
-                        policy="cofactor-pair",
+                        policy=policy,
                         confidence="medium" if len(cofactors) == 1 else "low",
                         evidence=evidence,
                         metadata=details,
-                        reason=f"element residual matches {candidate['label']}",
-                    )
-                )
-        if not group:
-            redox = redox_candidates(reaction, model, names=names)
-            for candidate in redox:
-                after = {k: _round(v) for k, v in sorted(candidate["after"].items())}
-                details = metadata(after, "redox-cofactor")
-                details["cofactor"] = candidate["label"]
-                details["compartment"] = candidate["compartment"]
-                group.append(
-                    _proposal(
-                        operation="set-stoichiometry",
-                        object_type="reaction",
-                        object_id=reaction.id,
-                        before=before,
-                        after=after,
-                        policy="redox-cofactor",
-                        confidence="medium" if len(redox) == 1 else "low",
-                        evidence=evidence,
-                        metadata=details,
-                        reason="elements balance but the charge does not; "
-                        "electrons move without a carrier",
+                        reason=f"bounded coefficient edits and {candidate['label']} "
+                        "balance elements and charge; formulas and charges stay fixed",
                     )
                 )
     return _alternatives(group)
@@ -1166,7 +1356,7 @@ def formula_fixes(
                     before=current,
                     after=value,
                     policy=f"formula-disagreement-{policy}",
-                    confidence="medium" if len(options) == 1 else "low",
+                    confidence="low",
                     evidence=[f"formula-disagreement:{metabolite_id}"],
                     metadata={
                         "rule": "formula-disagreement",
@@ -1187,6 +1377,7 @@ def formula_fixes(
                             else "most compartments"
                             for source in sorted(sources)
                         )
+                        + "; verify independent chemical annotation before applying"
                     ),
                 )
             )
@@ -1270,11 +1461,10 @@ def propose_fixes(
 ) -> list[Proposal]:
     """Turn blamed reactions into fix proposals where a rule supports one.
 
-    Rules, per blamed reaction: biomass/pool/lumped reactions are excluded; a
-    reaction whose stoichiometry differs from the input model is restored;
-    non-integer coefficients are rounded to the integer stoichiometries that
-    balance the elements; an element residual matching a cofactor pair gets
-    that pair (all fitting candidates when ambiguous). A formula-less added
+    Rules, per blamed reaction: biomass/pool/lumped reactions are excluded;
+    coefficients are solved first, then bounded small-molecule/cofactor
+    additions, conserving both elements and charge with fixed formulas.
+    Equally ranked candidates are alternatives. A formula-less added
     metabolite in a blamed reaction gets the one formula that balances all its
     reactions. A blamed reaction no rule covers yields an ``unresolved``
     removal proposal for manual curation. Each proposal records the blamed
@@ -1356,7 +1546,7 @@ def propose_fixes(
                     before=metabolite.formula or "",
                     after=formula,
                     policy="infer-formula",
-                    confidence="medium" if flags else "high",
+                    confidence="low",
                     evidence=evidence(targets),
                     metadata={
                         "rule": "infer-formula",
@@ -1365,7 +1555,8 @@ def propose_fixes(
                         "targets": targets,
                         "flags": flags,
                     },
-                    reason="one formula balances all reactions of this metabolite",
+                    reason="one formula balances all reactions of this metabolite; "
+                    "verify independent chemical annotation before applying",
                 )
             )
             covered.update(targets)
@@ -1495,7 +1686,11 @@ def apply_conservation_fixes(
                     metabolite = source.copy()
                     result.add_metabolites([metabolite])
                 try:
+                    if isinstance(coefficient, bool):
+                        raise ValueError("boolean coefficient")
                     new[metabolite] = float(coefficient)
+                    if not math.isfinite(new[metabolite]):
+                        raise ValueError("non-finite coefficient")
                 except (TypeError, ValueError):
                     raise ProposalError(
                         f"invalid coefficient for {metabolite_id} in fix for "
@@ -1510,6 +1705,19 @@ def apply_conservation_fixes(
         proposals, mode="user-approved-only", decisions=decisions, apply=apply
     )
     for proposal in applied:
+        if proposal.metadata.get("search"):
+            reaction = result.reactions.get_by_id(proposal.object_id)
+            after = _stoichiometry(reaction)
+            before = _stoichiometry(model.reactions.get_by_id(proposal.object_id))
+            if (
+                not element_residual(after, result)["balanced"]
+                or not charge_residual(after, result)["balanced"]
+                or any(after.get(key, 0) * value <= 0 for key, value in before.items())
+            ):
+                raise ProposalError(
+                    f"stoichiometry fix for {proposal.object_id} must balance elements "
+                    "and charge and preserve the original reaction sides"
+                )
         if proposal.policy != "metabolite-charge":
             continue
         original = model.metabolites.get_by_id(proposal.object_id)
@@ -1570,6 +1778,7 @@ __all__ = [
     "charge_residual",
     "chemically_suspect",
     "cofactor_candidates",
+    "coefficient_candidates",
     "compare_detections",
     "conservation_exclusions",
     "element_residual",

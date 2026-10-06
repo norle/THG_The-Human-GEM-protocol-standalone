@@ -49,6 +49,8 @@ def test_formula_fix_proposes_the_majority_formula():
     balance = proposals[0].metadata["balance"]
     assert (balance["before"]["balanced"], balance["after"]["balanced"]) == (0, 1)
     assert proposals[0].metadata["targets"] == ["TM"]
+    assert proposals[0].confidence == "low"
+    assert "verify independent chemical annotation" in proposals[0].reason
 
 
 def test_formula_fix_offers_reference_and_majority_as_alternatives():
@@ -90,7 +92,8 @@ def test_formula_fix_requires_a_strict_majority():
     assert conservation.formula_fixes(model, formula_disagreement(model)) == []
 
 
-def test_malformed_replacement_coefficient_is_a_proposal_error():
+@pytest.mark.parametrize("coefficient", ["abc", True, float("nan"), float("inf")])
+def test_malformed_replacement_coefficient_is_a_proposal_error(coefficient):
     model = _model(*ETHANOL, reactions=TRANSPORT)
     proposal = conservation._proposal(
         operation="set-stoichiometry",
@@ -104,7 +107,7 @@ def test_malformed_replacement_coefficient_is_a_proposal_error():
         metadata={},
     )
     decision = Decision(
-        proposal.proposal_id, "replace", replacement={"a_c": "abc", "a_m": 1}
+        proposal.proposal_id, "replace", replacement={"a_c": coefficient, "a_m": 1}
     )
     with pytest.raises(ProposalError, match="invalid coefficient"):
         conservation.apply_conservation_fixes(model, [proposal], [decision])
@@ -156,36 +159,258 @@ def test_set_charge_and_formula_target_separate_fields():
 
 
 BASE = [
-    ("a_c", "C2H6O", 0, "c"),
-    ("b_c", "C2H4O", 0, "c"),
+    ("a_c", "C2H6O", -1, "c"),
+    ("b_c", "C2H4O", -1, "c"),
     ("h_c", "H", 1, "c"),
     ("h2_c", "H2", 0, "c"),
 ]
 
 
-def test_validation_proposes_fixes_and_merges_checks():
+def test_validation_proposes_fixes_and_merges_checks(monkeypatch):
     reference = _model(*BASE, reactions=[("R2", {"a_c": -1, "b_c": 1, "h2_c": 1})])
     model = _model(
         *BASE,
         reactions=[
-            # Element and charge imbalance; the reference has it balanced.
-            ("R2", {"a_c": -1, "b_c": 1, "h_c": 1}),
+            # Element and charge imbalance; solve without restoring the reference.
+            ("R2", {"a_c": -2, "b_c": 1, "h2_c": 1}),
             # 1.2 ethanol rounds to the balanced 1.
             ("FR", {"a_c": -1.2, "b_c": 1, "h2_c": 1}),
         ],
     )
+    calls = []
+    original = conservation.reaction_fixes
+
+    def spy(reaction, *args, **kwargs):
+        calls.append(reaction.id)
+        return original(reaction, *args, **kwargs)
+
+    monkeypatch.setattr(conservation, "reaction_fixes", spy)
     report = validate_model(
         model, "structural-fast", reference_model=reference, propose_fixes=True
     )
     by_object = {item["object_id"]: item for item in report["proposals"]}
-    assert by_object["R2"]["policy"] == "restore-input-stoichiometry"
+    assert by_object["R2"]["policy"] == "stoichiometry-balance"
     assert sorted(by_object["R2"]["checks"]) == ["charge-balance", "mass-balance"]
     assert by_object["FR"]["policy"] == "integer-stoichiometry"
     assert by_object["FR"]["after"] == {"a_c": -1, "b_c": 1, "h2_c": 1}
     assert "fractional-coefficients" in by_object["FR"]["checks"]
+    assert calls.count("R2") == calls.count("FR") == 1
+    assert {"mass-balance:R2", "charge-balance:R2"} <= set(by_object["R2"]["evidence"])
     index = report["index"]
     assert {"R2", "FR"} <= set(index["reactions"])
     assert index["metabolites"]["a_c"]["formula"] == "C2H6O"
+
+
+def test_integer_coefficient_repair_balances_elements_and_charge_without_reference():
+    model = _model(
+        ("h2_c", "H2", 0, "c"),
+        ("o2_c", "O2", 0, "c"),
+        ("water_c", "H2O", 0, "c"),
+        reactions=[("R1", {"h2_c": -1, "o2_c": -1, "water_c": 1})],
+    )
+    before = {m.id: (m.formula, m.charge) for m in model.metabolites}
+    [proposal] = conservation.reaction_fixes(model.reactions.R1, model)
+    assert proposal.policy == "stoichiometry-balance"
+    assert proposal.after == {"h2_c": -2, "o2_c": -1, "water_c": 2}
+    assert proposal.metadata["search"]["rank"] == [0, 2, 2]
+    fixed, _, _ = conservation.apply_conservation_fixes(
+        model, [proposal], [Decision(proposal.proposal_id, "approve")]
+    )
+    assert fixed.reactions.R1.check_mass_balance() == {}
+    assert {m.id: (m.formula, m.charge) for m in fixed.metabolites} == before
+    assert model.reactions.R1.get_coefficient("h2_c") == -1
+
+
+def test_equal_minimal_coefficient_edits_are_reviewable_alternatives():
+    model = _model(
+        ("a_c", "C", 0, "c"),
+        ("b_c", "C", 0, "c"),
+        ("c_c", "C3", 0, "c"),
+        reactions=[("R1", {"a_c": -2, "b_c": -2, "c_c": 1})],
+    )
+    proposals = conservation.reaction_fixes(model.reactions.R1, model)
+    assert len(proposals) == 2
+    assert {tuple(sorted(p.after.items())) for p in proposals} == {
+        (("a_c", -1), ("b_c", -2), ("c_c", 1)),
+        (("a_c", -2), ("b_c", -1), ("c_c", 1)),
+    }
+    assert all(
+        p.confidence == "low" and p.metadata["search"]["rank"] == [0, 1, 1]
+        for p in proposals
+    )
+    assert proposals[0].metadata["alternatives"] == [proposals[1].proposal_id]
+
+
+@pytest.mark.parametrize("formula,charge", [(None, 0), ("invalid", 0), ("H2O", None)])
+def test_coefficient_search_requires_known_formulas_and_charges(formula, charge):
+    model = _model(
+        ("a_c", "H2", 0, "c"),
+        ("b_c", "O2", 0, "c"),
+        ("c_c", formula, charge, "c"),
+        reactions=[("R1", {"a_c": -1, "b_c": -1, "c_c": 1})],
+    )
+    assert conservation.reaction_fixes(model.reactions.R1, model) == []
+
+
+def test_search_preserves_sides_and_respects_coefficient_bounds():
+    model = _model(
+        ("a_c", "C13", 0, "c"),
+        ("b_c", "C", 0, "c"),
+        ("o_c", "O", 0, "c"),
+        reactions=[
+            ("LIMIT", {"a_c": -1, "b_c": 1}),
+            ("DROP", {"b_c": -1, "a_c": 13, "o_c": 1}),
+        ],
+    )
+    assert conservation.coefficient_candidates(model.reactions.LIMIT, model) == []
+    assert conservation.coefficient_candidates(model.reactions.DROP, model) == []
+
+
+def test_balanced_fractional_stoichiometry_is_retained():
+    model = _model(
+        ("h_c", "H2", 0, "c"),
+        ("o_c", "O2", 0, "c"),
+        ("w_c", "H2O", 0, "c"),
+        reactions=[("R1", {"h_c": -1, "o_c": -0.5, "w_c": 1})],
+    )
+    assert conservation.reaction_fixes(model.reactions.R1, model) == []
+
+
+@pytest.mark.parametrize("add_water", [False, True])
+def test_repair_preserves_retained_fractional_coefficient_precision(add_water):
+    model = _model(
+        ("a_c", "C6H6O3" if add_water else "C6", 0, "c"),
+        ("b_c", "C2", 0, "c"),
+        ("h2_c", "H2", 0, "c"),
+        ("h_c", "H", 0, "c"),
+        ("w_c", "H2O", 0, "c"),
+        reactions=[
+            (
+                "R1",
+                {"a_c": -1 / 3, "b_c": 1}
+                | ({} if add_water else {"h2_c": -1, "h_c": 1}),
+            )
+        ],
+    )
+    model.metabolites.w_c.name = "H2O"
+    [proposal] = conservation.reaction_fixes(model.reactions.R1, model)
+    assert proposal.after == {"a_c": -1 / 3, "b_c": 1} | (
+        {"w_c": 1} if add_water else {"h2_c": -1, "h_c": 2}
+    )
+    fixed, _, _ = conservation.apply_conservation_fixes(
+        model, [proposal], [Decision(proposal.proposal_id, "approve")]
+    )
+    assert fixed.reactions.R1.get_coefficient("a_c") == -1 / 3
+    assert conservation.element_residual(proposal.after, fixed)["balanced"]
+    assert fixed.reactions.R1.check_mass_balance() == {}
+
+
+def test_nad_hydrolysis_can_add_water_when_nadh_is_available():
+    model = _model(
+        ("nad_c", "C21H26N7O14P2", -1, "c"),
+        ("nadh_c", "C21H27N7O14P2", -2, "c"),
+        ("adpr_c", "C15H21N5O14P2", -2, "c"),
+        ("nam_c", "C6H6N2O", 0, "c"),
+        ("h_c", "H", 1, "c"),
+        ("w_c", "H2O", 0, "c"),
+        reactions=[("R1", {"nad_c": -1, "adpr_c": 1, "nam_c": 1, "h_c": 1})],
+    )
+    names = {"nad_c": "NAD+", "nadh_c": "NADH", "h_c": "H+", "w_c": "H2O"}
+    for key, name in names.items():
+        model.metabolites.get_by_id(key).name = name
+    [proposal] = conservation.reaction_fixes(model.reactions.R1, model)
+    assert proposal.after == {
+        "nad_c": -1,
+        "adpr_c": 1,
+        "nam_c": 1,
+        "h_c": 1,
+        "w_c": -1,
+    }
+    fixed, _, _ = conservation.apply_conservation_fixes(
+        model, [proposal], [Decision(proposal.proposal_id, "approve")]
+    )
+    assert fixed.reactions.R1.check_mass_balance() == {}
+
+
+def test_missing_nad_partner_is_added_with_a_balanced_pair():
+    model = _model(
+        ("a_c", "C2H6O", 0, "c"),
+        ("b_c", "C2H4O", 0, "c"),
+        ("nad_c", "C21H26N7O14P2", -1, "c"),
+        ("nadh_c", "C21H27N7O14P2", -2, "c"),
+        ("h_c", "H", 1, "c"),
+        reactions=[("R1", {"a_c": -1, "b_c": 1, "nad_c": -1, "h_c": 1})],
+    )
+    for key, name in {"nad_c": "NAD+", "nadh_c": "NADH", "h_c": "H+"}.items():
+        model.metabolites.get_by_id(key).name = name
+    [proposal] = conservation.reaction_fixes(model.reactions.R1, model)
+    assert proposal.after == {
+        "a_c": -1,
+        "b_c": 1,
+        "nad_c": -1,
+        "nadh_c": 1,
+        "h_c": 1,
+    }
+
+
+def test_cofactor_search_combines_water_protons_and_coefficient_changes():
+    model = _model(
+        ("a_c", "C2H8O4", 0, "c"),
+        ("b_c", "CHO", -1, "c"),
+        ("h_c", "H", 1, "c"),
+        ("w_c", "H2O", 0, "c"),
+        reactions=[("R1", {"a_c": -1, "b_c": 1})],
+    )
+    model.metabolites.h_c.name = "H+"
+    model.metabolites.w_c.name = "H2O"
+    [proposal] = conservation.reaction_fixes(model.reactions.R1, model)
+    assert proposal.policy == "cofactor-pair"
+    assert proposal.after == {"a_c": -1, "b_c": 2, "h_c": 2, "w_c": 2}
+    assert proposal.metadata["search"]["rank"] == [2, 1, 5]
+    assert proposal.metadata["reaction"]["after"]["elements"]["balanced"]
+    assert proposal.metadata["reaction"]["after"]["charge"]["balanced"]
+    model.metabolites.w_c.compartment = "m"
+    assert conservation.reaction_fixes(model.reactions.R1, model) == []
+
+
+def test_cofactor_additions_are_bounded():
+    model = _model(
+        ("a_c", "C2H12O6", 0, "c"),
+        ("b_c", "C2HO", -1, "c"),
+        ("h_c", "H", 1, "c"),
+        ("w_c", "H2O", 0, "c"),
+        reactions=[("R1", {"a_c": -1, "b_c": 1})],
+    )
+    model.metabolites.h_c.name = "H+"
+    model.metabolites.w_c.name = "H2O"
+    assert conservation.reaction_fixes(model.reactions.R1, model) == []
+
+
+def test_search_does_not_use_nonoptimal_solver_results(monkeypatch):
+    import scipy.optimize
+
+    model = _model(*BASE, reactions=[("R1", {"a_c": -2, "b_c": 1, "h2_c": 1})])
+    monkeypatch.setattr(
+        scipy.optimize,
+        "milp",
+        lambda *a, **k: scipy.optimize.OptimizeResult(success=False, status=1),
+    )
+    assert conservation.coefficient_candidates(model.reactions.R1, model) == []
+
+
+def test_edited_stoichiometry_must_still_balance_and_preserve_sides():
+    model = _model(*BASE, reactions=[("R1", {"a_c": -2, "b_c": 1, "h2_c": 1})])
+    [proposal] = conservation.reaction_fixes(model.reactions.R1, model)
+    for replacement in (
+        {"a_c": -1, "b_c": 1, "h2_c": 2},
+        {"a_c": 1, "b_c": -1, "h2_c": -1},
+    ):
+        with pytest.raises(ProposalError, match="balance elements.*preserve"):
+            conservation.apply_conservation_fixes(
+                model,
+                [proposal],
+                [Decision(proposal.proposal_id, "replace", replacement)],
+            )
 
 
 def test_validation_omits_proposals_unless_asked():

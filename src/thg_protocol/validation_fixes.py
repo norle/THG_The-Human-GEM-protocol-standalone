@@ -73,8 +73,13 @@ def collect_fixes(
                 )
             if check_id not in record["checks"]:
                 record["checks"].append(check_id)
+            if proposal.object_type == "reaction":
+                record["evidence"] = sorted(
+                    set(record["evidence"]) | {f"{check_id}:{proposal.object_id}"}
+                )
 
     names = None
+    reaction_fixes: dict[str, list[Any]] = {}
     for check in checks:
         if not _failed(check):
             continue
@@ -113,22 +118,26 @@ def collect_fixes(
                     reaction = model.reactions.get_by_id(str(reaction_id))
                 except KeyError:
                     continue
-                add(
-                    check_id,
-                    conservation.reaction_fixes(
+                if reaction.id not in reaction_fixes:
+                    reaction_fixes[reaction.id] = conservation.reaction_fixes(
                         reaction,
                         model,
                         input_model=reference_model,
                         names=names,
                         evidence=[f"{check_id}:{reaction.id}"],
                         exclude_pseudo=False,
-                    ),
-                )
+                    )
+                add(check_id, reaction_fixes[reaction.id])
             if check_id == "charge-balance":
                 add(
                     check_id,
                     conservation.charge_fixes(
-                        model, map(str, _REACTION_CHECKS[check_id](details))
+                        model,
+                        (
+                            str(key)
+                            for key in _REACTION_CHECKS[check_id](details)
+                            if not reaction_fixes.get(str(key))
+                        ),
                     ),
                 )
     return sorted(

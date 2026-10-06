@@ -120,9 +120,16 @@ proposal records plus `checks`, the checks that produced each one):
 | --- | --- |
 | `stoichiometric-consistency` | The [conservation workflow](conservation.md)'s localization and proposal rules; the check also lists the blamed reactions, split by chemical flag |
 | `formula-disagreement` | Set the formula or charge to the reference model's value, or to the value most compartments have |
-| `fractional-coefficients` | Integer stoichiometries that balance the elements |
-| `mass-balance`, `charge-balance`, `unusual-protons` | Restore the reference stoichiometry, round to integers, or add a cofactor pair; when only the charge is off, add the missing NAD(P)H/NAD(P)+ redox pair |
-| `charge-balance` | Change one metabolite's charge by one, when that balances the reaction and unbalances none of its other reactions (low confidence) |
+| `fractional-coefficients` | Minimal coefficient edits that balance elements and charge; already balanced fractional stoichiometries are retained |
+| `mass-balance`, `charge-balance`, `unusual-protons` | Solve existing coefficients first, then allow bounded combinations of missing small molecules/cofactor partners in one reaction compartment; formulas, charges and original reaction sides stay fixed |
+| `charge-balance` | Only when no stoichiometry fix is found: change one metabolite's charge by one if that balances the reaction and unbalances none of its other reactions (low confidence, separate metabolite suggestion) |
+
+The reference model supplies context, not restored reaction coefficients.
+The [conservation proposal rules](conservation.md#proposal-rules) describe
+the search bounds and ranking. Equally ranked solutions appear as alternatives
+in the HTML, with element and charge balance before and after each change.
+Formula/charge disagreements and inferred formulas remain separate,
+low-confidence metabolite suggestions requiring independent chemical review.
 
 In the HTML report, accept one fix per reaction (or per metabolite formula and
 charge), or reject it; fixes left alone are not applied. Choices are kept in
@@ -137,7 +144,8 @@ thg-run apply-decisions runs/validation/.../validation-report.json decisions.jso
 
 The command refuses a model whose SHA-256 differs from the report's, and an
 invalid decision (an unknown proposal, two fixes for one target, a malformed
-replacement, or charge repairs that conflict when applied together) stops it
+replacement, stoichiometry repairs that no longer balance elements and charge
+or preserve reaction sides, or charge repairs that conflict when applied together) stops it
 before anything is written. It writes the fixed model,
 `model-fixed.ledger.jsonl`, and `model-fixed.validation-report.json`/`.html`
 from re-validating with the same profile, reference model and exclusions, and

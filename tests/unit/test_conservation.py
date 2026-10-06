@@ -226,7 +226,7 @@ def _proposals(model, input_model=None, detection=None):
 
 def test_missing_cofactor_proposes_the_nad_pair_with_balances():
     proposals = _proposals(base_model())
-    cofactor = [item for item in proposals if item.policy == "cofactor-pair"]
+    cofactor = [item for item in proposals if item.object_id == "R2"]
     assert len(cofactor) == 1
     proposal = cofactor[0]
     assert proposal.object_id == "R2"
@@ -246,25 +246,26 @@ def test_ambiguous_cofactors_are_all_listed_as_alternatives():
         item for item in _proposals(base_model(nadp=True)) if item.object_id == "R2"
     ]
     assert {item.metadata["cofactor"] for item in proposals} == {
-        "NAD+/NADH",
-        "NADP+/NADPH",
+        "NAD+/NADH + H+",
+        "NADP+/NADPH + H+",
     }
     assert {item.confidence for item in proposals} == {"low"}
     first, second = proposals
     assert first.metadata["alternatives"] == [second.proposal_id]
 
 
-def test_changed_stoichiometry_is_restored_from_the_input_model():
+def test_reference_is_context_and_does_not_override_chemical_suggestions():
     reference = base_model(broken=False)
-    proposals = _proposals(base_model(), input_model=reference)
-    restore = [
-        item for item in proposals if item.policy == "restore-input-stoichiometry"
-    ]
-    assert [item.object_id for item in restore] == ["R2"]
-    assert restore[0].confidence == "high"
-    assert restore[0].metadata["origin"] == "changed"
-    assert restore[0].metadata["input_model"]["present"] is True
-    assert not any(item.policy == "cofactor-pair" for item in proposals)
+    reference.reactions.R2.add_metabolites({reference.metabolites.a_c: -2})
+    with_reference = _proposals(base_model(), input_model=reference)
+    without_reference = _proposals(base_model())
+    assert {(item.policy, item.proposal_id) for item in with_reference} == {
+        (item.policy, item.proposal_id) for item in without_reference
+    }
+    fix = next(item for item in with_reference if item.object_id == "R2")
+    assert fix.policy == "cofactor-pair"
+    assert fix.metadata["origin"] == "changed"
+    assert fix.metadata["input_model"]["present"] is True
 
 
 def test_missing_formula_is_inferred_for_added_metabolites():
@@ -281,7 +282,7 @@ def test_missing_formula_is_inferred_for_added_metabolites():
     formula = [item for item in proposals if item.policy == "infer-formula"]
     assert [(item.object_id, item.after) for item in formula] == [("x_c", "C2H4O")]
     assert {item["id"] for item in formula[0].metadata["reactions"]} == {"RX", "RY"}
-    assert formula[0].confidence == "medium"  # charge stays unbalanced in RY
+    assert formula[0].confidence == "low"  # formula inference needs chemical review
     assert "after-unbalanced-charge" in formula[0].metadata["flags"]
 
 

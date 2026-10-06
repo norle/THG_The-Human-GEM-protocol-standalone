@@ -34,7 +34,7 @@ def _read(path: Path) -> Any:
 class ConservationStage:
     """One stage of the unconserved-metabolite review flow."""
 
-    implementation_version = 3
+    implementation_version = 4
 
     def __init__(self, stage_id: str, dependencies: tuple[str, ...] = ()) -> None:
         self.id, self.dependencies = stage_id, dependencies

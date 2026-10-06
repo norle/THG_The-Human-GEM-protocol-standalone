@@ -17,7 +17,7 @@ from thg_protocol.runtime.stage import dependency_path as _dependency_path
 class ValidationScientificStage:
     """Run structural validation and optional MEMOTE checks."""
 
-    implementation_version = 6
+    implementation_version = 7
 
     def __init__(self, stage_id: str, dependencies: tuple[str, ...] = ()) -> None:
         self.id, self.dependencies = stage_id, dependencies

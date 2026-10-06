@@ -833,8 +833,9 @@ def _pill(status: str) -> str:
 RULES = {
     "exclude-pseudo-reaction": "Exclude from conservation checks (biomass, pool or lumped reaction)",
     "restore-input-stoichiometry": "Restore the reference model's stoichiometry",
-    "integer-stoichiometry": "Round the coefficients to integers that balance the elements",
-    "cofactor-pair": "Add a missing cofactor",
+    "integer-stoichiometry": "Solve coefficients to balance elements and charge with integer replacements",
+    "stoichiometry-balance": "Solve the coefficients to balance elements and charge",
+    "cofactor-pair": "Balance coefficients with missing small molecules or cofactors",
     "redox-cofactor": "Add the missing redox cofactor",
     "metabolite-charge": "Change this metabolite's charge by one",
     "infer-formula": "Set the one formula that balances all its reactions",
