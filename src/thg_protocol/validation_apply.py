@@ -150,6 +150,7 @@ def apply_decisions(
         fixed,
         profile,
         run_solver=requested if isinstance(requested, bool) else None,
+        run_loop_detection=validation.get("run_loop_detection", True),
         reference_model=reference,
         conservation_exclusions=exclusions,
         propose_fixes=True,

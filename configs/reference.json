@@ -29,6 +29,7 @@
     "uncertainty_policy": "report"
   },
   "gapfill": {
+    "remove_infeasible_loops": false,
     "method": "greedy",
     "max_additions": 100,
     "allowed_connections": [],

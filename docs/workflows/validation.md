@@ -41,6 +41,44 @@ The registered workflow writes one canonical `validation-report.json`, a
 self-contained `validation-report.html` viewer, and `validation-summary.md`.
 The HTML is rendered from the JSON and does not rerun or reinterpret checks.
 
+### Obligatory loop detection and requested removal
+
+Validation detects obligatory infeasible loops by default. The detector filters
+blocked reactions, then repeatedly compacts linear pathways and proportional
+parallel reactions on a copy. Cycles that cancel completely are reported with
+their original reaction IDs. Boundary and objective reactions are protected.
+Findings are diagnostic warnings and never change the validated model. This
+method does not detect every conditional loop; a clean result is not proof that
+the model is loop-free.
+
+Blocked-reaction filtering uses a solver even with `run_solver: false` or the
+`structural-fast` profile. Disable this check with
+`validation.run_loop_detection: false`, or in direct model mode:
+
+```bash
+thg-run validate path/to/model.json --no-run-loop-detection
+```
+
+Disabled detection is recorded as not evaluated. Solver errors are recorded
+as infrastructure errors rather than a successful check with no findings.
+The detection setting is preserved when applying report decisions and
+revalidating the resulting model.
+
+Loop removal is a separate, explicit pipeline operation. Set
+`gapfill.remove_infeasible_loops: true` in a `reference` or standalone `gapfill`
+configuration, or `final_thg.remove_infeasible_loops: true` in `final-thg`.
+The default is false. The pipeline detects loops and removes only the reported
+original reactions after gapfilling or merging, before validation and configured
+metabolic tasks. It retains the input model, records removals in the change
+ledger, and exports the resulting candidate only if the existing gate passes.
+Detection errors stop requested removal.
+
+Both sections also accept `run_loop_detection` to control their validation
+checks. Requested removal always performs detection, even if subsequent
+validation detection is disabled. Removal evidence is in `loop_removal` in the
+validation report; the gapfill ledger contains both additions and removals, and
+`final-thg` exports a separate `loop-removal-ledger.jsonl`.
+
 Stoichiometric consistency is diagnostic in every profile, including
 `release-full`: failure produces a warning rather than blocking release.
 The check runs MEMOTE's consistency functions (Gevorgyan et al. 2008) with the

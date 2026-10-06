@@ -5,6 +5,7 @@
     "output_dir": "../runs/final-thg"
   },
   "final_thg": {
+    "remove_infeasible_loops": false,
     "beta2_upstream": {
       "run_dir": "../runs/beta2",
       "stage_id": "export-beta2",

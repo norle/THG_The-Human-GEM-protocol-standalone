@@ -148,7 +148,7 @@ class CellSpecificStage:
     def __init__(self, stage_id: str, dependencies: tuple[str, ...] = ()) -> None:
         self.id, self.dependencies = stage_id, dependencies
         if stage_id in {"validate-cell-specific", "export-cell-specific"}:
-            self.implementation_version = 3
+            self.implementation_version = 4
         self.kind = (
             "mutation"
             if self.id in {"apply-reduction", "configure-context-exchanges"}
@@ -1096,7 +1096,7 @@ class PathwayStage:
     def __init__(self, stage_id: str, dependencies: tuple[str, ...] = ()) -> None:
         self.id, self.dependencies = stage_id, dependencies
         if stage_id == "validate-pathway-model":
-            self.implementation_version = 2
+            self.implementation_version = 3
 
     def enabled(self, config: Any) -> bool:
         del config

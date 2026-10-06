@@ -568,11 +568,16 @@ def validate_merged_model(
     *,
     profile: str = "final-standard",
     task_suite: Any | None = None,
+    run_loop_detection: bool = True,
 ) -> dict[str, object]:
     """Run the maintained validation profile and optional versioned task suite."""
     from thg_protocol.validation import validate_model
 
-    report: dict[str, object] = {"validation": validate_model(model, profile)}
+    report: dict[str, object] = {
+        "validation": validate_model(
+            model, profile, run_loop_detection=run_loop_detection
+        )
+    }
     if task_suite is None:
         from thg_protocol.tasks import TaskSuite
 

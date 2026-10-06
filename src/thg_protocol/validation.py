@@ -672,6 +672,7 @@ def validate_model(
     profile: str = "structural-fast",
     *,
     run_solver: bool | None = None,
+    run_loop_detection: bool = True,
     workflow_invariants: Mapping[str, object] | None = None,
     ledger_diff: Mapping[str, object] | None = None,
     conservation_exclusions: Iterable[str] = (),
@@ -858,6 +859,28 @@ def validate_model(
             blocking=False,
         ),
     ]
+    if run_loop_detection:
+        from .analysis.compaction import detect_infeasible_loops
+
+        checks.append(
+            _check(
+                "obligatory-loops",
+                "topology",
+                lambda: detect_infeasible_loops(model, blocked_reactions=_blocked()),
+                blocking=False,
+            )
+        )
+    else:
+        checks.append(
+            CheckResult(
+                "obligatory-loops",
+                "topology",
+                "not-evaluated",
+                None,
+                {"reason": "loop detection disabled", "requested": False},
+                False,
+            )
+        )
     if solver:
         checks.extend(
             [
@@ -918,6 +941,7 @@ def validate_model(
     return {
         "schema_version": 1,
         "profile": profile,
+        "run_loop_detection": run_loop_detection,
         "passed": passed,
         "checks": records,
         "solver": {"requested": solver, "configuration": solver_configuration},

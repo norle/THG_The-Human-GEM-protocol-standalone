@@ -13,6 +13,13 @@ from html import escape
 
 #: Each check's title and concise description.
 CHECKS: dict[str, tuple[str, str]] = {
+    "obligatory-loops": (
+        "Obligatory infeasible loops",
+        "Compacts linear pathways and proportional parallel reactions on a copy, "
+        "excluding blocked, boundary and objective reactions. Lists original "
+        "reactions in cycles that cancel completely. This does not find every "
+        "possible loop and does not alter the model.",
+    ),
     "reference-integrity": (
         "Reaction metabolites exist",
         "Checks that all reaction metabolites exist in the model.",
@@ -92,7 +99,7 @@ FAMILIES: dict[str, tuple[str, str]] = {
 }
 
 PROFILES: dict[str, str] = {
-    "structural-fast": "Structure checks only, without a solver. Only structural errors block the release.",
+    "structural-fast": "Structural and diagnostic checks. Loop detection uses a solver by default. Only structural errors block the release.",
     "beta1-standard": "All checks with a solver. Structural errors and an infeasible objective block the release.",
     "beta2-standard": "All checks with a solver. Structural errors and an infeasible objective block the release.",
     "post-gapfill": "All checks with a solver, after gap-filling. Structural errors and an infeasible objective block the release.",

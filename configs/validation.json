@@ -8,6 +8,7 @@
     "input_model": "../inputs/models/final-thg.json",
     "profile": "final-standard",
     "run_solver": false,
+    "run_loop_detection": true,
     "run_memote": false
   }
 }

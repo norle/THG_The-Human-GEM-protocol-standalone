@@ -3,7 +3,9 @@
 from .compaction import (
     are_reactions_proportional,
     combine_identical_reactions,
+    detect_infeasible_loops,
     full_compaction,
+    remove_infeasible_loops,
 )
 from .compare import (
     compare_model_files_semantically,
@@ -36,6 +38,8 @@ __all__ = [
     "are_reactions_proportional",
     "combine_identical_reactions",
     "full_compaction",
+    "detect_infeasible_loops",
+    "remove_infeasible_loops",
     "dead_end_metabolites",
     "orphan_metabolites",
     "reaction_balance",

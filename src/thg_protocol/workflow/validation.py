@@ -17,7 +17,7 @@ from thg_protocol.runtime.stage import dependency_path as _dependency_path
 class ValidationScientificStage:
     """Run structural validation and optional MEMOTE checks."""
 
-    implementation_version = 7
+    implementation_version = 8
 
     def __init__(self, stage_id: str, dependencies: tuple[str, ...] = ()) -> None:
         self.id, self.dependencies = stage_id, dependencies
@@ -63,6 +63,7 @@ class ValidationScientificStage:
                 model,
                 str(section.get("profile", "structural-fast")),
                 run_solver=section.get("run_solver"),
+                run_loop_detection=section.get("run_loop_detection", True),
                 conservation_exclusions=section.get("conservation_exclusions", ()),
                 reference_model=None
                 if reference is None

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 from pathlib import Path
 from typing import Any
 
@@ -39,7 +40,28 @@ def save_sbml(model: Any, path: str | Path) -> Path:
 
     destination = Path(path)
     destination.parent.mkdir(parents=True, exist_ok=True)
-    write_sbml_model(model, str(destination))
+    exported = model.copy()
+    # COBRA annotations accept database identifiers, not nested provenance maps.
+    # Keep those maps as JSON notes in SBML without changing the source model.
+    for item in [
+        exported,
+        *exported.metabolites,
+        *exported.reactions,
+        *exported.genes,
+        *exported.groups,
+    ]:
+        item.annotation = dict(item.annotation)
+        item.notes = dict(item.notes)
+        for key, value in list(item.annotation.items()):
+            if isinstance(value, dict):
+                # JSON escapes also survive libSBML's XML entity normalization.
+                item.notes[f"thg.annotation.{key}"] = json.dumps(
+                    value, sort_keys=True
+                ).translate(
+                    str.maketrans({"&": r"\u0026", "<": r"\u003c", ">": r"\u003e"})
+                )
+                del item.annotation[key]
+    write_sbml_model(exported, str(destination))
     return destination
 
 

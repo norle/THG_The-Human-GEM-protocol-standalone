@@ -34,7 +34,7 @@ class HumanDatabaseStage:
     def __init__(self, stage_id: str, dependencies: tuple[str, ...] = ()) -> None:
         self.id, self.dependencies = stage_id, dependencies
         if stage_id == "human-database-validate":
-            self.implementation_version = 2
+            self.implementation_version = 3
         self.output_role = "model" if stage_id.endswith("reconstruct") else "artifact"
         self.kind = "mutation" if stage_id.endswith("reconstruct") else "collection"
 
@@ -204,7 +204,7 @@ class HumanDatabaseStage:
 
 
 class FinalTHGStage:
-    implementation_version = 1
+    implementation_version = 2
 
     def __init__(self, stage_id: str, dependencies: tuple[str, ...] = ()) -> None:
         self.id, self.dependencies = stage_id, dependencies
@@ -215,7 +215,7 @@ class FinalTHGStage:
         }:
             # Merge plans changed format: metabolites merge only on identical
             # chemistry and same-ID conflicts are renamed.
-            self.implementation_version = 2
+            self.implementation_version = 3
         self.output_role = (
             "model"
             if stage_id in {"final-thg-merge", "export-final-thg"}
@@ -396,12 +396,34 @@ class FinalTHGStage:
             )
             merged, report = apply_merge_plan(left, right, plan)
             from thg_protocol.io.models import save_json
+            from thg_protocol.workflow.proposals import write_jsonl
+
+            loop_report = {"status": "not-requested", "reactions": []}
+            loop_ledger = []
+            if section.get("remove_infeasible_loops", False):
+                from thg_protocol.analysis.compaction import remove_infeasible_loops
+
+                merged, loop_report, loop_ledger = remove_infeasible_loops(
+                    merged, stage=self.id
+                )
 
             model_path = work_dir / "merged-model.json"
             save_json(merged, model_path)
+            for item in loop_ledger:
+                item["result_model_checksum"] = sha256_file(model_path)
             return StageResult(
                 (
                     ("model", model_path),
+                    (
+                        "loop-removal",
+                        _dump(work_dir / "loop-removal.json", loop_report),
+                    ),
+                    (
+                        "loop-removal-ledger",
+                        write_jsonl(
+                            work_dir / "loop-removal-ledger.jsonl", loop_ledger
+                        ),
+                    ),
                     (
                         "merge-report",
                         _dump(work_dir / "merge-report.json", report.__dict__),
@@ -428,6 +450,10 @@ class FinalTHGStage:
                 model,
                 profile=str(section.get("validation_profile", "final-standard")),
                 task_suite=task_suite,
+                run_loop_detection=section.get("run_loop_detection", True),
+            )
+            report["loop_removal"] = json.loads(
+                _dependency_path(context, "final-thg-merge", "loop-removal").read_text()
             )
             return StageResult(
                 (("validation", _dump(work_dir / "validation-report.json", report)),),
@@ -460,6 +486,15 @@ class FinalTHGStage:
                 ("sbml", xml_model),
                 ("validation", validation),
                 ("provenance", provenance),
+                (
+                    "loop-removal-ledger",
+                    _copy_input(
+                        _dependency_path(
+                            context, "final-thg-merge", "loop-removal-ledger"
+                        ),
+                        work_dir / "loop-removal-ledger.jsonl",
+                    ),
+                ),
             ),
             {},
         )

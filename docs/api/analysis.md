@@ -9,7 +9,12 @@ documentation test suite.
 Use [`find_network_components`][thg_protocol.analysis.network.find_network_components]
 for connectivity, [`compare_models_from_files`][thg_protocol.analysis.compare.compare_models_from_files]
 for file comparisons, and [`full_compaction`][thg_protocol.analysis.compaction.full_compaction]
-for duplicate-reaction cleanup.
+for linear/parallel pathway compaction. Its second return value contains
+collapsed loop reactions, with original IDs in `annotation["compaction_members"]`.
+Use [`combine_identical_reactions`][thg_protocol.analysis.compaction.combine_identical_reactions]
+for duplicate-reaction cleanup, and
+[`detect_infeasible_loops`][thg_protocol.analysis.compaction.detect_infeasible_loops]
+for a non-mutating report of obligatory loops.
 
 Use [`model_signature`][thg_protocol.analysis.model_signature.model_signature]
 and [`diff_model_signatures`][thg_protocol.analysis.model_signature.diff_model_signatures]
@@ -86,6 +91,8 @@ for semantic model parity and artifact comparisons.
         - are_reactions_proportional
         - combine_identical_reactions
         - full_compaction
+        - detect_infeasible_loops
+        - remove_infeasible_loops
 
 ## Network analysis
 

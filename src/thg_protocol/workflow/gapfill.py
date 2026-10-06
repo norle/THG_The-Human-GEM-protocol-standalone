@@ -163,14 +163,28 @@ def _write_plan(path: Path, plan: Mapping[str, object]) -> None:
     )
 
 
-def _model_diff_is_clean(diff: Mapping[str, object]) -> bool:
-    return not diff.get("model", {}).get("changed", False) and not any(
-        values
-        for kind in ("removed", "changed")
-        for values in (
-            diff.get(kind, {}).values() if isinstance(diff.get(kind), Mapping) else ()
-        )
-    )
+def _model_diff_is_clean(
+    diff: Mapping[str, object], removed_reactions: set[str] | None = None
+) -> bool:
+    allowed = removed_reactions or set()
+    if diff.get("model", {}).get("changed", False):
+        return False
+    for kind in ("removed", "changed"):
+        for collection, values in diff.get(kind, {}).items():
+            if kind == "removed" and collection == "reactions":
+                if set(values) != allowed:
+                    return False
+            elif kind == "changed" and collection == "groups":
+                for item in values:
+                    expected = dict(item["a"])
+                    expected["members"] = [
+                        x for x in expected["members"] if x not in allowed
+                    ]
+                    if expected != item["b"]:
+                        return False
+            elif values:
+                return False
+    return True
 
 
 class Beta2GateStage:
@@ -235,15 +249,15 @@ class Beta2GateStage:
 
 
 class GapfillStage:
-    implementation_version = 1
+    implementation_version = 2
 
     def __init__(self, stage_id: str, dependencies: tuple[str, ...] = ()) -> None:
         self.id = stage_id
         self.dependencies = dependencies
         if stage_id == "characterize-gapfill-baseline":
-            self.implementation_version = 2
+            self.implementation_version = 3
         elif stage_id == "validate-gapfill":
-            self.implementation_version = 4
+            self.implementation_version = 5
 
     def enabled(self, config: Any) -> bool:
         del config
@@ -274,14 +288,20 @@ class GapfillStage:
             data["universal_model_sha256"] = _hash(section.get("universal_model"))
         elif self.id == "characterize-gapfill-baseline":
             data["validation_profile"] = section.get("validation_profile")
+            data["run_loop_detection"] = section.get("run_loop_detection", True)
             data["task_suite_sha256"] = _hash(section.get("task_suite"))
             data["task_mapping_sha256"] = _hash(section.get("task_mapping"))
         elif self.id in {
+            "apply-gapfill",
             "validate-gapfill",
             "gate-gapfill",
             "export-gapfilled-reference",
         }:
             data["validation_profile"] = section.get("validation_profile")
+            data["run_loop_detection"] = section.get("run_loop_detection", True)
+            data["remove_infeasible_loops"] = section.get(
+                "remove_infeasible_loops", False
+            )
             data["task_suite_sha256"] = _hash(section.get("task_suite"))
             data["task_mapping_sha256"] = _hash(section.get("task_mapping"))
         return data
@@ -357,7 +377,11 @@ class GapfillStage:
             from thg_protocol.validation import validate_model
 
             profile = str(section["validation_profile"])
-            validation = validate_model(model, profile)
+            validation = validate_model(
+                model,
+                profile,
+                run_loop_detection=section.get("run_loop_detection", True),
+            )
             payload = {
                 "schema_version": 1,
                 "source_model_checksum": sha256_file(model_path),
@@ -449,6 +473,17 @@ class GapfillStage:
             applied, ledger = apply_gapfill_plan(
                 source, plan, source_model_checksum=source_checksum
             )
+            loop_report = {"status": "not-requested", "reactions": []}
+            if section.get("remove_infeasible_loops", False):
+                from thg_protocol.analysis.compaction import remove_infeasible_loops
+
+                applied, loop_report, loop_ledger = remove_infeasible_loops(
+                    applied, stage=self.id
+                )
+                for item in loop_ledger:
+                    item["reaction_id"] = item["object_id"]
+                    item["source_model_checksum"] = source_checksum
+                ledger.extend(loop_ledger)
             before = model_signature(source)
             after = model_signature(applied)
             diff = diff_model_signatures(before, after)
@@ -468,10 +503,18 @@ class GapfillStage:
                     ("ledger", ledger_path),
                     ("diff", _dump(work_dir / "model-diff.json", diff)),
                     ("signature", _dump(work_dir / "model-signature.json", after)),
+                    (
+                        "loop-removal",
+                        _dump(work_dir / "loop-removal.json", loop_report),
+                    ),
                 ),
                 {
                     "added_reactions": len(diff["added"].get("reactions", [])),
-                    "clean_diff": _model_diff_is_clean(diff),
+                    "clean_diff": _model_diff_is_clean(
+                        diff,
+                        set(loop_report["reactions"])
+                        & {rxn.id for rxn in source.reactions},
+                    ),
                 },
             )
 
@@ -486,6 +529,7 @@ class GapfillStage:
             validation = validate_model(
                 result,
                 profile,
+                run_loop_detection=section.get("run_loop_detection", True),
                 propose_fixes=True,
                 ledger_diff={
                     "passed": _model_diff_is_clean(
@@ -493,7 +537,18 @@ class GapfillStage:
                             _dependency_path(
                                 context, "apply-gapfill", "diff"
                             ).read_text(encoding="utf-8")
-                        )
+                        ),
+                        {
+                            item["object_id"]
+                            for item in map(
+                                json.loads,
+                                _dependency_path(context, "apply-gapfill", "ledger")
+                                .read_text(encoding="utf-8")
+                                .splitlines(),
+                            )
+                            if item.get("operation") == "remove-reaction"
+                            and source.reactions.has_id(item["object_id"])
+                        },
                     )
                 },
             )
@@ -533,6 +588,11 @@ class GapfillStage:
                 "validation": _as_error_status(validation),
                 "tasks": _task_report(result, section),
                 "solver": validation.get("solver", {}),
+                "loop_removal": json.loads(
+                    _dependency_path(
+                        context, "apply-gapfill", "loop-removal"
+                    ).read_text()
+                ),
             }
             warnings = [
                 str(item.get("id"))
@@ -611,14 +671,31 @@ class GapfillStage:
             if isinstance(validation_warnings, list):
                 warnings.extend(str(item) for item in validation_warnings)
             proposals = {str(item.get("reaction_id")) for item in plan["proposals"]}
-            ledger_ids = {str(item.get("reaction_id")) for item in ledger}
+            ledger_ids = {
+                str(item.get("reaction_id"))
+                for item in ledger
+                if item.get("operation") == "add-reaction"
+            }
+            removed = {
+                str(item.get("object_id"))
+                for item in ledger
+                if item.get("operation") == "remove-reaction"
+            }
+            loop_report = json.loads(
+                _dependency_path(context, "apply-gapfill", "loop-removal").read_text()
+            )
+            if removed != set(loop_report["reactions"]) or (
+                removed and not section.get("remove_infeasible_loops", False)
+            ):
+                blocking.append("loop removals do not match the requested analysis")
             if proposals != ledger_ids:
                 blocking.append(
                     "plan and change ledger do not contain the same reactions"
                 )
             if (
-                not _model_diff_is_clean(diff)
-                or set(diff.get("added", {}).get("reactions", [])) != proposals
+                not _model_diff_is_clean(diff, removed - proposals)
+                or set(diff.get("added", {}).get("reactions", []))
+                != proposals - removed
             ):
                 blocking.append("output model contains undeclared or changed objects")
             raw_validation = validation.get("validation", {})
@@ -704,6 +781,10 @@ class GapfillStage:
             xml_model = work_dir / "thg-reference-gapfilled.xml"
             save_sbml(model, xml_model)
             copies = {
+                "loop-removal": (
+                    _dependency_path(context, "apply-gapfill", "loop-removal"),
+                    "loop-removal.json",
+                ),
                 "gapfill-plan": (
                     _dependency_path(context, "generate-gapfill-plan", "plan"),
                     "gapfill-plan.jsonl",

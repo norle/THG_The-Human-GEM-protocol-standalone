@@ -78,13 +78,22 @@ def _is_validation_config(path: Path) -> bool:
 
 
 def _direct_validation(
-    path: Path, profile: str, run_solver: bool | None, as_json: bool
+    path: Path,
+    profile: str,
+    run_solver: bool | None,
+    as_json: bool,
+    run_loop_detection: bool = True,
 ) -> int:
     from thg_protocol.validation import load_model, validate_model
 
     # Solvers print licence banners (Gurobi) on stdout; keep stdout for the report.
     with contextlib.redirect_stdout(sys.stderr):
-        report = validate_model(load_model(path), profile, run_solver=run_solver)
+        report = validate_model(
+            load_model(path),
+            profile,
+            run_solver=run_solver,
+            run_loop_detection=run_loop_detection,
+        )
     if as_json:
         print(json.dumps(report, indent=2, sort_keys=True))
     else:
@@ -211,6 +220,12 @@ def build_parser() -> argparse.ArgumentParser:
             workflow_parser.add_argument(
                 "--json", action="store_true", help="print the direct report as JSON"
             )
+            workflow_parser.add_argument(
+                "--run-loop-detection",
+                action=argparse.BooleanOptionalAction,
+                default=True,
+                help="detect obligatory loops in direct model mode (default: on)",
+            )
         _add_verbosity_argument(
             workflow_parser,
             default=argparse.SUPPRESS,
@@ -293,12 +308,17 @@ def main(argv: list[str] | None = None) -> int:
             )
             if args.command == "validate" and not _is_validation_config(config_path):
                 return _direct_validation(
-                    config_path, args.profile, args.run_solver, args.json
+                    config_path,
+                    args.profile,
+                    args.run_solver,
+                    args.json,
+                    args.run_loop_detection,
                 )
             if args.command == "validate" and (
                 args.profile != "structural-fast"
                 or args.run_solver is not None
                 or args.json
+                or not args.run_loop_detection
             ):
                 raise ConfigError(
                     "validation CLI overrides require a model path, not a config"

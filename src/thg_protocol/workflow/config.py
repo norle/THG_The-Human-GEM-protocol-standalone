@@ -30,6 +30,8 @@ WORKFLOW_SECTION_KEYS = {
         "rate_limit",
     },
     "final_thg": {
+        "run_loop_detection",
+        "remove_infeasible_loops",
         "beta2_model",
         "reference_upstream",
         "database_model",
@@ -111,6 +113,7 @@ WORKFLOW_SECTION_KEYS = {
         "solver",
     },
     "validation": {
+        "run_loop_detection",
         "input_model",
         "upstream",
         "run_memote",
@@ -161,6 +164,8 @@ WORKFLOW_SECTION_KEYS = {
         "validation_profile",
     },
     "gapfill": {
+        "run_loop_detection",
+        "remove_infeasible_loops",
         "input_model",
         "external_input",
         "method",
@@ -310,6 +315,9 @@ def _parse_workflow(
             allowed_keys = WORKFLOW_SECTION_KEYS.get(section)
             if allowed_keys is not None:
                 _keys(value, allowed_keys, section)
+            for key in ("run_loop_detection", "remove_infeasible_loops"):
+                if key in value and not isinstance(value[key], bool):
+                    raise ConfigError(f"'{section}.{key}' must be a boolean")
             if "n_jobs" in value:
                 value = dict(value)
                 value["n_jobs"] = _positive_integer(
