@@ -710,16 +710,6 @@ def validate_model(
             )
         )
 
-    def _not_produced() -> list[str]:
-        return list(
-            _cached("not-produced", lambda: consistency.metabolites_not_produced(model))
-        )
-
-    def _not_consumed() -> list[str]:
-        return list(
-            _cached("not-consumed", lambda: consistency.metabolites_not_consumed(model))
-        )
-
     def _blocked() -> list[str]:
         return list(
             _cached("blocked-reactions", lambda: consistency.blocked_reactions(model))
@@ -814,24 +804,6 @@ def validate_model(
                 "metabolites": _dead_ends(),
                 "by_compartment": by_compartment(model, "metabolites", _dead_ends()),
                 "passed": not _dead_ends(),
-            },
-            blocking=False,
-        ),
-        _check(
-            "unconserved-metabolites",
-            "topology",
-            lambda: {
-                "not-produced": _not_produced(),
-                "not-consumed": _not_consumed(),
-                "by_compartment": {
-                    "not-produced": by_compartment(
-                        model, "metabolites", _not_produced()
-                    ),
-                    "not-consumed": by_compartment(
-                        model, "metabolites", _not_consumed()
-                    ),
-                },
-                "passed": not (_not_produced() or _not_consumed()),
             },
             blocking=False,
         ),

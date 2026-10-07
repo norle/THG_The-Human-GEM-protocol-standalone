@@ -60,10 +60,6 @@ CHECKS: dict[str, tuple[str, str]] = {
         "Dead-end metabolites",
         "Lists metabolites that are only produced or only consumed.",
     ),
-    "unconserved-metabolites": (
-        "Metabolites never produced or consumed",
-        "Lists metabolites no reaction can produce, and metabolites no reaction can consume.",
-    ),
     "stoichiometric-consistency": (
         "Stoichiometric consistency",
         "Uses MEMOTE to test whether all internal reactions conserve a shared set of positive metabolite masses, without formulas. Reports metabolites with no conserved mass assignment.",
@@ -737,11 +733,10 @@ EVIDENCE = {
     "charge-balance": _balance_evidence,
     "formula-disagreement": _formula_evidence,
     "dead-end-topology": _compartment_evidence,
-    "unconserved-metabolites": _compartment_evidence,
     "flux-consistency": _compartment_evidence,
 }
 #: Checks older reports hold that are no longer shown.
-_RETIRED = {"blocked-reaction-singletons"}
+_RETIRED = {"blocked-reaction-singletons", "unconserved-metabolites"}
 
 
 def _headline(check: Mapping[str, object]) -> str:
@@ -781,11 +776,6 @@ def _headline(check: Mapping[str, object]) -> str:
         if unconserved:
             return f"{unconserved:,} metabolites cannot be assigned a conserved mass."
         return "The network is not stoichiometrically consistent."
-    if check_id == "unconserved-metabolites":
-        return (
-            f"{_count(details.get('not-produced')) or 0:,} never produced, "
-            f"{_count(details.get('not-consumed')) or 0:,} never consumed."
-        )
     if check.get("passed") is True:
         return "No problems found."
     nouns = {

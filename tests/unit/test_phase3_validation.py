@@ -66,7 +66,6 @@ def test_topology_checks_report_failures_when_findings_exist():
     checks = {item["id"]: item for item in report["checks"]}
     assert checks["dead-end-topology"]["details"]["metabolites"]
     assert checks["dead-end-topology"]["passed"] is False
-    assert checks["unconserved-metabolites"]["passed"] is False
 
 
 def test_solver_profile_reports_singleton_inconsistent_sets():
