@@ -30,7 +30,7 @@ from ..proposals import (
     write_proposals,
 )
 
-DETAILED_BETA1_STAGE_IDS = (
+BETA1_STAGE_IDS = (
     "beta1-input",
     "beta1-inventory",
     "collect-metabolite-evidence",
@@ -294,8 +294,8 @@ def _run_provenance(
     }
 
 
-class DetailedBeta1Stage:
-    """One stage in the explicit Phase 1 scientific DAG."""
+class Beta1Stage:
+    """One stage in the explicit β1 scientific DAG."""
 
     implementation_version = 4
 
@@ -1378,7 +1378,7 @@ def _semantic_ledger_entries(
     return tuple(entries)
 
 
-def detailed_beta1_stages() -> tuple[DetailedBeta1Stage, ...]:
+def beta1_stages() -> tuple[Beta1Stage, ...]:
     dependencies = {
         "beta1-input": (),
         "beta1-inventory": ("beta1-input",),
@@ -1398,9 +1398,8 @@ def detailed_beta1_stages() -> tuple[DetailedBeta1Stage, ...]:
         "export-beta1": ("validate-beta1",),
     }
     return tuple(
-        DetailedBeta1Stage(stage_id, dependencies[stage_id])
-        for stage_id in DETAILED_BETA1_STAGE_IDS
+        Beta1Stage(stage_id, dependencies[stage_id]) for stage_id in BETA1_STAGE_IDS
     )
 
 
-__all__ = ["DETAILED_BETA1_STAGE_IDS", "DetailedBeta1Stage", "detailed_beta1_stages"]
+__all__ = ["BETA1_STAGE_IDS", "Beta1Stage", "beta1_stages"]

@@ -1,7 +1,7 @@
 """Canonical β1 → β2 → gate → reference-gapfill composition."""
 
-from .beta1._stages import detailed_beta1_stages
-from .beta2._stages import detailed_beta2_stages
+from .beta1._stages import beta1_stages
+from .beta2._stages import beta2_stages
 from .gapfill import Beta2GateStage, gapfill_stages
 from .human_database import human_database_stages
 from .human_database_integration import HumanDatabaseIntegrationStage
@@ -9,8 +9,8 @@ from .reference_reporting import ReferenceReportStage
 from .registry import WorkflowDefinition
 
 REFERENCE_STAGES = (
-    *detailed_beta1_stages(),
-    *detailed_beta2_stages(),
+    *beta1_stages(),
+    *beta2_stages(),
     Beta2GateStage(),
     *human_database_stages(),
     HumanDatabaseIntegrationStage(

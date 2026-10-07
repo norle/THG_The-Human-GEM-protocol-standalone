@@ -249,7 +249,7 @@ def test_sanctioned_fixture_passes_candidate_release_gate(tmp_path):
     assert Path(release["sbml"]).name == "thg-beta1.xml"
 
 
-def test_detailed_beta1_force_rerun_invalidates_only_descendants(tmp_path):
+def test_beta1_force_rerun_invalidates_only_descendants(tmp_path):
     fixture = ROOT / "tests/fixtures/beta1/sanctioned_human_reference.json"
     run_dir = tmp_path / "rerun"
     config = tmp_path / "rerun-config.json"

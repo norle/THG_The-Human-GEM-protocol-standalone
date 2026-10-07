@@ -36,7 +36,7 @@ from thg_protocol.runtime.stage import (
 
 LOGGER = logging.getLogger("thg_protocol.workflow")
 
-DETAILED_BETA2_STAGE_IDS = (
+BETA2_STAGE_IDS = (
     "load-beta1",
     "collect-catalysis-evidence",
     "collect-gpr-evidence",
@@ -182,7 +182,7 @@ def _reference_beta1_upstream(context: StageContext) -> dict[str, object] | None
     }
 
 
-class DetailedBeta2Stage:
+class Beta2Stage:
     implementation_version = 2
     kind = "scientific"
 
@@ -2427,7 +2427,7 @@ class DetailedBeta2Stage:
             raise ValueError(f"stage '{self.id}' did not produce complete artifacts")
 
 
-def detailed_beta2_stages() -> tuple[DetailedBeta2Stage, ...]:
+def beta2_stages() -> tuple[Beta2Stage, ...]:
     dependencies = {
         "load-beta1": (),
         "collect-catalysis-evidence": ("load-beta1",),
@@ -2452,7 +2452,4 @@ def detailed_beta2_stages() -> tuple[DetailedBeta2Stage, ...]:
         "validate-beta2": ("consolidate-expanded-model",),
         "export-beta2": ("validate-beta2",),
     }
-    return tuple(
-        DetailedBeta2Stage(stage, dependencies[stage])
-        for stage in DETAILED_BETA2_STAGE_IDS
-    )
+    return tuple(Beta2Stage(stage, dependencies[stage]) for stage in BETA2_STAGE_IDS)

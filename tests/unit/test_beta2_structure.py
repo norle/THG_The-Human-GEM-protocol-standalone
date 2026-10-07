@@ -1,11 +1,11 @@
-from thg_protocol.workflow.beta2 import BETA2_WORKFLOW, DETAILED_BETA2_STAGE_IDS
-from thg_protocol.workflow.beta2._stages import detailed_beta2_stages
+from thg_protocol.workflow.beta2 import BETA2_STAGE_IDS, BETA2_WORKFLOW
+from thg_protocol.workflow.beta2._stages import beta2_stages
 
 
 def test_beta2_workflow_contract_is_unchanged():
-    stages = detailed_beta2_stages()
+    stages = beta2_stages()
     assert BETA2_WORKFLOW.id == "beta2"
-    assert tuple(stage.id for stage in stages) == DETAILED_BETA2_STAGE_IDS
+    assert tuple(stage.id for stage in stages) == BETA2_STAGE_IDS
     assert {stage.id: stage.dependencies for stage in stages} == {
         "load-beta1": (),
         "collect-catalysis-evidence": ("load-beta1",),
