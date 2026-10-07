@@ -1,0 +1,13 @@
+{
+  "run": {
+    "name": "thg-reference-validation-20261006T094131Z",
+    "output_dir": "/home/reinism/THG_The-Human-GEM-protocol-standalone/runs/thg-reference-validation-20261006T094131Z"
+  },
+  "validation": {
+    "input_model": "/home/reinism/THG_The-Human-GEM-protocol-standalone/runs/thg-reference/artifacts/export-reference/attempt-0001/thg-reference.json",
+    "profile": "final-standard",
+    "run_memote": false,
+    "run_solver": true
+  },
+  "workflow": "validate"
+}
