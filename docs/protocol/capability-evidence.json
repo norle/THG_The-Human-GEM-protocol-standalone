@@ -169,7 +169,7 @@
       "legacy_relationship": "Intentional difference",
       "published_reproduction": "Not yet verified",
       "legacy_sources": ["generate_data-base/generate_db.py"],
-      "current_sources": ["src/thg_protocol/database_workflow.py", "src/thg_protocol/workflow/_phase4.py"],
+      "current_sources": ["src/thg_protocol/database_workflow.py", "src/thg_protocol/workflow/human_database.py"],
       "tests": ["tests/unit/test_human_database_final_thg.py"],
       "known_differences": ["A paper-specific pathway-list adapter is not bundled; live access is injected and credential-owned"],
       "evidence_commit": "0c91fdec325df12f25ef13819525e830a4cec1e8"
