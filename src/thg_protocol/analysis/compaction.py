@@ -6,6 +6,33 @@ from collections import defaultdict
 from typing import Any
 
 
+def _scratch_copy(model: Any) -> Any:
+    """Copy a model onto GLPK for structural edits that never solve.
+
+    ``Model.copy`` rebuilds the whole solver problem; with Gurobi that goes
+    through sympy and takes minutes on a genome-scale model.
+    """
+    import copy
+
+    from cobra import Model
+
+    result = Model(model.id)
+    result.solver = "glpk"
+    result.add_metabolites([metabolite.copy() for metabolite in model.metabolites])
+    reactions = []
+    for reaction in model.reactions:
+        clone = reaction.copy()
+        clone.annotation = copy.deepcopy(reaction.annotation)
+        reactions.append(clone)
+    result.add_reactions(reactions)
+    result.objective = {
+        result.reactions.get_by_id(reaction.id): reaction.objective_coefficient
+        for reaction in model.reactions
+        if reaction.objective_coefficient
+    }
+    return result
+
+
 def are_reactions_proportional(
     reaction1: Any, reaction2: Any, *, tolerance: float = 1e-9
 ) -> tuple[bool, float, bool]:
@@ -161,7 +188,7 @@ def full_compaction(
     Blocked-reaction filtering is solver-dependent and imported only when
     explicitly requested. The default operation is deterministic and offline.
     """
-    result = model.copy()
+    result = _scratch_copy(model)
     if not no_blocked_reactions:
         try:
             from cobra.flux_analysis import find_blocked_reactions
@@ -193,9 +220,12 @@ def detect_infeasible_loops(
         from cobra.flux_analysis import find_blocked_reactions
 
         blocked_reactions = find_blocked_reactions(model)
-    working = model.copy()
+    working = _scratch_copy(model)
     for reaction in working.reactions:
         reaction.annotation["compaction_members"] = [reaction.id]
+        # Merging concatenates GPRs, which cobra re-parses on every edit; the
+        # rules grow without bound and detection only needs reaction members.
+        reaction.gene_reaction_rule = ""
     working.remove_reactions(blocked_reactions)
     _, collapsed = full_compaction(working)
     loops = sorted(_members(rxn) for rxn in collapsed)
