@@ -34,9 +34,11 @@ writers below.
         - PROFILES
         - CheckResult
         - annotation_conflict
+        - energy_cycles
         - formula_disagreement
         - fractional_coefficients
         - load_model
+        - metabolite_leakage
         - minimal_inconsistent_sets
         - stoichiometric_consistency
         - unusual_protons

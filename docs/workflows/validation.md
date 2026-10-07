@@ -125,9 +125,31 @@ identities. All are diagnostic in every profile:
   reactions with the same proton coefficients there are not listed, so
   inherited transport chains (63 in Human-GEM) do not drown new cases.
 
-The closed-medium FVA formerly reported as `energy-generating-cycles` was
-removed: it found internal loops rather than energy-generating cycles, and a
-second full FVA was too slow at β1 scale.
+Solver profiles also close every boundary reaction and run two
+non-blocking flux tests. Internal reactions are bounded to `[0, 1]` or
+`[-1, 1]` by reversibility (MEMOTE's `close_boundaries_sensibly`), so fixed
+bounds cannot make them infeasible. Both depend on the optional `memote`
+dependency.
+
+- `metabolite-leaks` lists metabolites the network can make or destroy
+  with nothing coming in or going out, split by compartment. Unlike
+  `stoichiometric-consistency` it respects reaction directions, so it reports
+  only leaks that flux can actually reach. Each LP maximises the summed drain
+  of the metabolites not yet found, so a leak-free model needs one LP per
+  direction.
+- `energy-generating-cycles` follows MEMOTE (Fritzemeier et al. 2017): for
+  each cytosolic energy couple (ATP, GTP, NADH, NADPH, FADH2, acetyl-CoA, ...)
+  it adds a dissipation reaction such as ATP + H2O → ADP + Pi + H+ and
+  maximises it. Any flux is a cycle; the check lists the reactions of a
+  least-flux (pFBA) cycle rather than every reaction carrying flux. MEMOTE's
+  metabolite lookup finds both water and hydroxide in Human-GEM (MetaNetX
+  merges protonation states), so ties go to the candidate sharing the most
+  cross-references with MEMOTE's shortlist. Couples the model lacks are listed
+  as not found.
+
+The closed-medium FVA formerly reported under the `energy-generating-cycles`
+ID found internal loops rather than energy-generating cycles and was removed;
+reports that still hold it hide it.
 
 Blocked reactions (`flux-consistency`) are diagnostic in every profile. A
 genome-scale reconstruction always has reactions that carry no flux under its

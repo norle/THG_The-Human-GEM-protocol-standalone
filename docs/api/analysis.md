@@ -67,6 +67,14 @@ for semantic model parity and artifact comparisons.
         - apply_conservation_fixes
         - compare_detections
 
+## Leaks and energy-generating cycles
+
+::: thg_protocol.analysis.leakage
+    options:
+      members:
+        - metabolite_leaks
+        - energy_generating_cycles
+
 ## Comparison
 
 ::: thg_protocol.analysis.compare

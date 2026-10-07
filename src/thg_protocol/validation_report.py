@@ -64,6 +64,14 @@ CHECKS: dict[str, tuple[str, str]] = {
         "Stoichiometric consistency",
         "Uses MEMOTE to test whether all internal reactions conserve a shared set of positive metabolite masses, without formulas. Reports metabolites with no conserved mass assignment.",
     ),
+    "metabolite-leaks": (
+        "Metabolite leaks",
+        "Closes every boundary reaction and finds metabolites internal flux can still make or destroy. Unlike stoichiometric consistency, reaction directions are respected.",
+    ),
+    "energy-generating-cycles": (
+        "Energy-generating cycles",
+        "Uses MEMOTE to add a dissipation reaction for each cytosolic energy metabolite (ATP, NADH, ...) and maximise it with every boundary closed. Lists the reactions of a least-flux cycle for each one charged without uptake.",
+    ),
     "workflow-specific-invariants": (
         "Workflow invariants",
         "Checks stage-specific invariants; not configured if none were supplied.",
@@ -733,10 +741,20 @@ EVIDENCE = {
     "charge-balance": _balance_evidence,
     "formula-disagreement": _formula_evidence,
     "dead-end-topology": _compartment_evidence,
+    "metabolite-leaks": _compartment_evidence,
     "flux-consistency": _compartment_evidence,
 }
 #: Checks older reports hold that are no longer shown.
 _RETIRED = {"blocked-reaction-singletons", "unconserved-metabolites"}
+
+
+def _retired(check: Mapping[str, object]) -> bool:
+    """Retired checks, and the closed-medium FVA once reported as
+    ``energy-generating-cycles`` (a solver check, unlike its successor)."""
+    check_id = check.get("id")
+    return check_id in _RETIRED or (
+        check_id == "energy-generating-cycles" and check.get("family") == "solver"
+    )
 
 
 def _headline(check: Mapping[str, object]) -> str:
@@ -776,6 +794,16 @@ def _headline(check: Mapping[str, object]) -> str:
         if unconserved:
             return f"{unconserved:,} metabolites cannot be assigned a conserved mass."
         return "The network is not stoichiometrically consistent."
+    if check_id == "metabolite-leaks":
+        return (
+            f"{_count(details.get('produced')) or 0:,} made from nothing, "
+            f"{_count(details.get('consumed')) or 0:,} destroyed."
+        )
+    if check_id == "energy-generating-cycles":
+        return (
+            f"{_count(details.get('cycles')) or 0:,} of {_count(details.get('tested')) or 0:,} "
+            "energy metabolites can be charged without uptake."
+        )
     if check.get("passed") is True:
         return "No problems found."
     nouns = {
@@ -1663,11 +1691,7 @@ def render_validation_html(report: Mapping[str, object]) -> str:
     validation = _validation(report)
     checks = validation.get("checks", [])
     checks = (
-        [
-            item
-            for item in checks
-            if isinstance(item, Mapping) and item.get("id") not in _RETIRED
-        ]
+        [item for item in checks if isinstance(item, Mapping) and not _retired(item)]
         if isinstance(checks, list)
         else []
     )

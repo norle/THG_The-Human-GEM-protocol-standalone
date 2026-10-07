@@ -641,6 +641,58 @@ def stoichiometric_consistency(
         return {"status": "infrastructure-error", "error": str(error), "passed": None}
 
 
+def metabolite_leakage(model: Any) -> dict[str, object]:
+    """Metabolites made or destroyed with every boundary closed.
+
+    Without MEMOTE installed the check is reported as not evaluated.
+    """
+    try:
+        import memote.support.helpers  # noqa: F401
+    except ImportError:
+        return {
+            "status": "not-evaluated",
+            "reason": "requires the optional 'memote' dependency",
+            "passed": None,
+        }
+    from .analysis.leakage import metabolite_leaks
+
+    leaks = metabolite_leaks(model)
+    return {
+        **leaks,
+        "by_compartment": {
+            direction: by_compartment(model, "metabolites", ids)
+            for direction, ids in leaks.items()
+        },
+        "passed": not any(leaks.values()),
+    }
+
+
+def energy_cycles(model: Any) -> dict[str, object]:
+    """Energy metabolites charged without uptake (MEMOTE's EGC test).
+
+    Not evaluated without MEMOTE or when no energy couple is in the model.
+    """
+    try:
+        import memote.support.consistency  # noqa: F401
+    except ImportError:
+        return {
+            "status": "not-evaluated",
+            "reason": "requires the optional 'memote' dependency",
+            "passed": None,
+        }
+    from .analysis.leakage import energy_generating_cycles
+
+    result = energy_generating_cycles(model)
+    if not result["tested"]:
+        return {
+            **result,
+            "status": "not-evaluated",
+            "reason": "no energy metabolite was found in the cytosol",
+            "passed": None,
+        }
+    return {**result, "passed": not result["cycles"]}
+
+
 def minimal_inconsistent_sets(
     model: Any, *, maximum: int | None = None
 ) -> dict[str, object]:
@@ -874,6 +926,18 @@ def validate_model(
                     lambda: _objective(model),
                     blocking="objective-feasibility" in blocking,
                 ),
+                _check(
+                    "metabolite-leaks",
+                    "stoichiometry",
+                    lambda: metabolite_leakage(model),
+                    blocking="metabolite-leaks" in blocking,
+                ),
+                _check(
+                    "energy-generating-cycles",
+                    "stoichiometry",
+                    lambda: energy_cycles(model),
+                    blocking="energy-generating-cycles" in blocking,
+                ),
             ]
         )
     passed = all(item.passed is True for item in checks if item.release_blocking)
@@ -928,9 +992,11 @@ __all__ = [
     "PROTON_LIMIT",
     "CheckResult",
     "annotation_conflict",
+    "energy_cycles",
     "formula_disagreement",
     "fractional_coefficients",
     "load_model",
+    "metabolite_leakage",
     "minimal_inconsistent_sets",
     "stoichiometric_consistency",
     "unusual_protons",

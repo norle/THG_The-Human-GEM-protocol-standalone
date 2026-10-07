@@ -307,3 +307,59 @@ def test_fix_controls_offer_accept_and_reject_only():
     html = render_validation_html(_report_with_fixes())
     assert "Accept this option" in html and "Reject all options" in html
     assert 'value="defer"' not in html and "Undecided" not in html
+
+
+def test_leak_and_energy_cycle_checks_have_titles_and_headlines():
+    html = render_validation_html(
+        {
+            "validation": {
+                "passed": True,
+                "compartments": {
+                    "names": {"c": "Cytosol", "m": "Mitochondria"},
+                    "metabolites": {"c": 10, "m": 5},
+                },
+                "checks": [
+                    _check(
+                        "metabolite-leaks",
+                        {
+                            "produced": ["h_c", "h_m"],
+                            "consumed": [],
+                            "by_compartment": {
+                                "produced": {"c": ["h_c"], "m": ["h_m"]},
+                                "consumed": {},
+                            },
+                        },
+                    ),
+                    _check(
+                        "energy-generating-cycles",
+                        {
+                            "cycles": {"nadh_c": ["R1", "R2"]},
+                            "tested": ["atp_c", "nadh_c"],
+                            "not_found": {"MNXM51": "missing"},
+                        },
+                    ),
+                ],
+            }
+        }
+    )
+    assert "Metabolite leaks" in html
+    assert "2 made from nothing, 0 destroyed." in html
+    assert "Energy-generating cycles" in html
+    assert "1 of 2 energy metabolites can be charged without uptake." in html
+
+
+def test_closed_medium_fva_from_older_reports_is_hidden():
+    html = render_validation_html(
+        {
+            "validation": {
+                "passed": True,
+                "checks": [
+                    {
+                        **_check("energy-generating-cycles", {"reactions": ["R1"]}),
+                        "family": "solver",
+                    }
+                ],
+            }
+        }
+    )
+    assert "check-energy-generating-cycles" not in html
