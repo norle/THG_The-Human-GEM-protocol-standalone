@@ -40,7 +40,7 @@ capabilities:
     entry_point: thg-run start CONFIG
     scientific_status: Reconstructs models from normalized records.
     implementation_status: verified
-    verification: tests/integration/test_phase4_workflows.py
+    verification: tests/integration/test_human_database_registered_workflow.py
     workflow_coverage: human-database
     configuration_contract: workflow/config.py
     provenance_output: provenance.json
@@ -53,7 +53,7 @@ capabilities:
     entry_point: thg-run start CONFIG
     scientific_status: Merges branches and runs configured validation.
     implementation_status: verified
-    verification: tests/unit/test_phase4_workflows.py
+    verification: tests/unit/test_human_database_final_thg.py
     workflow_coverage: final-thg
     configuration_contract: workflow/config.py
     provenance_output: provenance.json
@@ -66,7 +66,7 @@ capabilities:
     entry_point: thg-run validate CONFIG
     scientific_status: Runs reusable structural and optional solver-backed checks.
     implementation_status: verified
-    verification: tests/unit/test_phase3_validation.py
+    verification: tests/unit/test_validation.py
     workflow_coverage: validate
     known_limitations: MEMOTE and solver stages are optional external dependencies.
   - id: workflow-cell-specific

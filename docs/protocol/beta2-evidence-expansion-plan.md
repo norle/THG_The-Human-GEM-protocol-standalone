@@ -107,7 +107,7 @@ Do not restore or read the legacy Excel/pickle compartment mappings at runtime.
 
 ## 2. Add a GPR-evidence stage
 
-Add `collect-gpr-evidence` between `collect-catalysis-evidence` and `resolve-gprs` in `src/thg_protocol/workflow/beta2_stages.py`.
+Add `collect-gpr-evidence` between `collect-catalysis-evidence` and `resolve-gprs` in `src/thg_protocol/workflow/beta2/_stages.py`.
 
 The revised early DAG becomes:
 

@@ -170,7 +170,7 @@
       "published_reproduction": "Not yet verified",
       "legacy_sources": ["generate_data-base/generate_db.py"],
       "current_sources": ["src/thg_protocol/database_workflow.py", "src/thg_protocol/workflow/_phase4.py"],
-      "tests": ["tests/unit/test_phase4_workflows.py"],
+      "tests": ["tests/unit/test_human_database_final_thg.py"],
       "known_differences": ["A paper-specific pathway-list adapter is not bundled; live access is injected and credential-owned"],
       "evidence_commit": "0c91fdec325df12f25ef13819525e830a4cec1e8"
     },
@@ -249,7 +249,7 @@
       "legacy_sources": [],
       "current_sources": ["src/thg_protocol/workflow/runner.py", "src/thg_protocol/runtime/stage.py"],
       "tests": [
-        "tests/integration/test_phase0_registered_workflow.py",
+        "tests/integration/test_workflow_resume.py",
         "tests/unit/test_workflow_cli.py",
         "tests/unit/test_workflow_lock.py"
       ],
@@ -267,7 +267,7 @@
       "published_reproduction": "N/A",
       "legacy_sources": [],
       "current_sources": ["src/thg_protocol/memote.py", "src/thg_protocol/workflow/validation.py"],
-      "tests": ["tests/unit/test_phase3_validation.py"],
+      "tests": ["tests/unit/test_validation.py"],
       "known_differences": ["The executable and report semantics belong to the separately installed MEMOTE tool"],
       "evidence_commit": "0c91fdec325df12f25ef13819525e830a4cec1e8"
     },

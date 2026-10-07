@@ -26,7 +26,7 @@ from thg_protocol.workflow.runner import start
 
 
 def model():
-    result = cobra.Model("phase3")
+    result = cobra.Model("validation")
     source = cobra.Metabolite("source_c", formula="H2O", charge=0, compartment="c")
     product = cobra.Metabolite("product_c", formula="H2O", charge=0, compartment="c")
     reaction = cobra.Reaction("convert")
@@ -361,7 +361,7 @@ def test_registered_validation_workflow_writes_check_and_memote_artifacts(tmp_pa
         json.dumps(
             {
                 "workflow": "validate",
-                "run": {"name": "phase3", "output_dir": str(tmp_path / "run")},
+                "run": {"name": "validation", "output_dir": str(tmp_path / "run")},
                 "validation": {
                     "input_model": str(source),
                     "profile": "structural-fast",
