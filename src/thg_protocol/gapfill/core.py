@@ -222,6 +222,12 @@ _DEFAULTS = {
         "candidate_types": ["A", "B"],
     },
     "milp": {"minimum_flux": 0.05, "penalties": {}, "max_additions": 100},
+    "sink-milp": {
+        "max_additions": 1000,
+        "candidate_types": ["A", "B", "C"],
+        "tradeoff_lambda": 0.01,
+        "min_component_size": 4,
+    },
 }
 
 
@@ -355,7 +361,7 @@ def _transport_candidates(
 def _resolved_parameters(
     method: str, parameters: dict[str, Any] | None
 ) -> dict[str, Any]:
-    if method not in {*_TRANSPORT_METHODS, "milp"}:
+    if method not in _DEFAULTS:
         raise ValueError(f"unknown gapfill method: {method}")
     values = {**_DEFAULTS[method], **(parameters or {})}
     unsupported = {"allow_exchange", "allow_demand"} & set(values)
@@ -364,9 +370,15 @@ def _resolved_parameters(
             f"unsupported gapfill parameters: {', '.join(sorted(unsupported))}"
         )
     foreign = (
-        {"universal_model", "objective", "minimum_flux", "penalties"}
-        if method in _TRANSPORT_METHODS
-        else {"allowed_connections", "candidate_types"}
+        {"allowed_connections", "candidate_types", "tradeoff_lambda"}
+        | {"min_component_size"}
+        if method == "milp"
+        else {"universal_model", "objective", "minimum_flux", "penalties"}
+        | (
+            set()
+            if method == "sink-milp"
+            else {"tradeoff_lambda", "min_component_size"}
+        )
     ) & set(values)
     if foreign:
         raise ValueError(
@@ -374,7 +386,16 @@ def _resolved_parameters(
         )
     if not isinstance(values.get("max_additions"), int) or values["max_additions"] <= 0:
         raise ValueError("max_additions must be positive")
-    if method in _TRANSPORT_METHODS:
+    if method == "sink-milp":
+        if "allowed_connections" not in values:
+            raise ValueError("allowed_connections is required for sink-milp")
+        lam = values["tradeoff_lambda"]
+        if isinstance(lam, bool) or not isinstance(lam, (int, float)) or lam <= 0:
+            raise ValueError("tradeoff_lambda must be a positive number")
+        size = values["min_component_size"]
+        if isinstance(size, bool) or not isinstance(size, int) or size < 1:
+            raise ValueError("min_component_size must be a positive integer")
+    if method != "milp":
         values["allowed_connections"] = [
             tuple(pair) for pair in values["allowed_connections"]
         ]
@@ -659,6 +680,10 @@ def gapfill_model(
     """Gap-fill a copied COBRApy or JSON model with one standalone method."""
     try:
         values = _resolved_parameters(method, dict(parameters or {}))
+        if method == "sink-milp":
+            from .ptr import run_sink_milp
+
+            return run_sink_milp(model, values)
         return (
             _run_milp(model, values)
             if method == "milp"
@@ -720,9 +745,15 @@ def generate_gapfill_plan(
     method: str,
     parameters: dict[str, Any] | None = None,
     source_model_checksum: str | None = None,
+    result: GapfillResult | None = None,
 ) -> dict[str, Any]:
-    """Generate an auditable proposal without mutating ``model``."""
-    result = gapfill_model(model, method=method, parameters=parameters)
+    """Generate an auditable proposal without mutating ``model``.
+
+    ``result`` is a gapfill already run on ``model`` (e.g. from workflow
+    stages); without it the method runs here.
+    """
+    if result is None:
+        result = gapfill_model(model, method=method, parameters=parameters)
     selected = set(result.selected)
     result_reactions = {
         str(reaction.id if hasattr(reaction, "id") else reaction["id"]): reaction
@@ -778,7 +809,9 @@ def generate_gapfill_plan(
             if reaction_id in source_reactions
             else None,
         }
-        if method in _TRANSPORT_METHODS:
+        if method == "sink-milp" and isinstance(annotation, dict):
+            proposal["phase"] = annotation.get("phase")
+        if method != "milp":
             proposal["transport"] = {
                 "source_metabolites": sorted(payload["metabolites"]),
                 "source_compartments": {
@@ -793,7 +826,9 @@ def generate_gapfill_plan(
                     result.parameters.get("allowed_connections", [])
                 ),
                 "candidate_generation_algorithm": (
-                    "same-base cross-compartment transport"
+                    "putative transport: spanning-tree connectors and sink MILP"
+                    if method == "sink-milp"
+                    else "same-base cross-compartment transport"
                 ),
             }
         proposals.append(proposal)

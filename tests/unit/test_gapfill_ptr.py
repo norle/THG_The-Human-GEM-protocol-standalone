@@ -7,12 +7,14 @@ import re
 import cobra
 import pytest
 
+from thg_protocol.gapfill import apply_gapfill_plan, generate_gapfill_plan
 from thg_protocol.gapfill.ptr import (
     ComponentCoverage,
     PtrCandidate,
     compute_coverage,
     generate_ptr_candidates,
     network_components,
+    run_sink_milp,
     select_connectors,
     select_unblockers,
     unblockable,
@@ -365,3 +367,87 @@ def test_solver_failure_is_reported(monkeypatch):
     assert selection.status == "failed"
     assert selection.selected == []
     assert "infeasible" in selection.failure
+
+
+def three_components():
+    """Main (c), island e (Ae surplus cycle), island m (Ym surplus cycle).
+
+    Kruskal joins e-m through the type-A pair Ke/Km and main-e through Ac/Ae.
+    Ke -> Km only feeds island m, so its Ym surplus stays blocked until phase
+    3 adds Yc/Ym.
+    """
+    return build(
+        {
+            "EXA": {"Ac": -1},
+            "R1": {"Ac": -1, "Dc": 1},
+            "EXD": {"Dc": -1},
+            "EXY": {"Yc": -1},
+            "R2": {"Yc": -1, "Dc": 1},
+            "I1": {"Ae": -1, "Be": 1},
+            "I2": {"Be": -1, "Ae": 2},
+            "I3": {"Be": -1, "Ke": 1},
+            "J1": {"Ym": -1, "Wm": 1},
+            "J2": {"Wm": -1, "Ym": 2},
+            "J3": {"Km": -1, "Wm": 1},
+        },
+        reversible={"EXA", "EXY"},
+    )
+
+
+SINK_MILP = {
+    "allowed_connections": [["c", "e"], ["c", "m"], ["e", "m"]],
+    "max_additions": 10,
+}
+
+
+def test_sink_milp_end_to_end_adds_connector_and_unblocker():
+    model = three_components()
+    plan = generate_gapfill_plan(model, method="sink-milp", parameters=SINK_MILP)
+    assert plan["header"]["status"] == "solved"
+    phases = {item["reaction_id"]: item["phase"] for item in plan["proposals"]}
+    assert phases == {
+        "GAPFILL_PTR_Ac_Ae": 2,
+        "GAPFILL_PTR_Ke_Km": 2,
+        "GAPFILL_PTR_Yc_Ym": 3,
+    }
+    assert all("transport" in item for item in plan["proposals"])
+    verification = plan["header"]["solver"]["verification"]
+    assert {"J1", "J2", "J3"} <= set(verification["verified_unblocked"])
+    assert verification["inactive_connectors"] == []
+    result = plan["result"]["candidate_coverage"]
+    assert result["GAPFILL_PTR_Ke_Km"] == "connector"
+    assert result["GAPFILL_PTR_Yc_Ym"] == "selected"
+    applied, ledger = apply_gapfill_plan(model, plan)
+    added = {reaction.id for reaction in applied.reactions} - {
+        reaction.id for reaction in model.reactions
+    }
+    assert added == set(phases)
+    assert len(ledger) == 3
+
+
+def test_verification_reports_inactive_connectors():
+    result = run_sink_milp(
+        three_components(),
+        {**SINK_MILP, "allowed_connections": [("c", "e"), ("e", "m")]},
+    )
+    assert result.status == "solved"
+    assert result.selected == ["GAPFILL_PTR_Ke_Km", "GAPFILL_PTR_Ac_Ae"]
+    assert result.solver["verification"]["inactive_connectors"] == ["GAPFILL_PTR_Ke_Km"]
+
+
+def test_already_present_component_gets_no_proposal():
+    model = main_with_dead_ends()
+    reaction = cobra.Reaction("T", lower_bound=-1000.0, upper_bound=1000.0)
+    model.add_reactions([reaction])
+    reaction.add_metabolites({model.metabolites.Ac: -1, model.metabolites.Ae: 1})
+    result = run_sink_milp(model, {**SINK_MILP, "allowed_connections": [("c", "e")]})
+    assert result.status == "solved"
+    assert result.selected == []
+    assert result.candidate_coverage == {"GAPFILL_PTR_Ac_Ae": "already-present"}
+
+
+def test_no_candidates_is_solved_with_no_proposals():
+    result = run_sink_milp(
+        main_with_dead_ends(), {**SINK_MILP, "allowed_connections": [("c", "m")]}
+    )
+    assert (result.status, result.selected) == ("solved", [])

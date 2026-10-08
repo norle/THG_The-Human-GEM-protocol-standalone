@@ -1,5 +1,6 @@
 from thg_protocol.gapfill import (
     gapfill_model,
+    generate_gapfill_plan,
     run_gapfill,
 )
 from thg_protocol.gapfill.cli import main
@@ -98,3 +99,31 @@ def test_transport_gapfill_rejects_empty_allowed_connections():
     )
     assert result.status == "failed"
     assert "allowed_connections" in result.failure
+
+
+def test_sink_milp_requires_allowed_connections():
+    for parameters in ({}, {"allowed_connections": []}):
+        result = gapfill_model(toy_model(), method="sink-milp", parameters=parameters)
+        assert result.status == "failed"
+        assert "allowed_connections" in result.failure
+
+
+def test_sink_milp_rejects_milp_only_parameters():
+    result = gapfill_model(
+        toy_model(),
+        method="sink-milp",
+        parameters={"allowed_connections": [["c", "e"]], "objective": "R1"},
+    )
+    assert result.status == "failed"
+    assert "objective" in result.failure
+
+
+def test_generate_plan_accepts_precomputed_result():
+    model = toy_model()
+    parameters = {"max_additions": 1, "allowed_connections": [["c", "e"]]}
+    result = gapfill_model(model, method="greedy", parameters=parameters)
+    result.selected = []
+    plan = generate_gapfill_plan(
+        model, method="greedy", parameters=parameters, result=result
+    )
+    assert plan["proposals"] == []

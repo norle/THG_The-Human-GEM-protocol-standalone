@@ -18,7 +18,16 @@ from collections.abc import Callable, Mapping
 from dataclasses import asdict, dataclass, field, replace
 from typing import Any
 
-from .core import GapfillCandidate, _as_mapping, _suffix, _TransportSearch
+from .core import (
+    GapfillCandidate,
+    GapfillResult,
+    _add_candidate,
+    _as_mapping,
+    _metrics,
+    _resolved_parameters,
+    _suffix,
+    _TransportSearch,
+)
 
 _RANK = {"A": 0, "B": 1, "C": 2}
 # Flux a reaction must reach to count as unblocked (FASTCC's default). Legacy
@@ -109,14 +118,17 @@ class PtrCandidate:
             }
         )
 
-    def as_gapfill_candidate(self) -> GapfillCandidate:
+    def as_gapfill_candidate(self, phase: int | None = None) -> GapfillCandidate:
+        annotation: dict[str, Any] = {"type": self.type, "base": self.base}
+        if phase is not None:
+            annotation["phase"] = phase
         return GapfillCandidate(
             self.reaction_id,
             {self.met1: -1.0, self.met2: 1.0},
             -1000.0,
             1000.0,
             source="putative-transport",
-            annotation={"type": self.type, "base": self.base},
+            annotation=annotation,
         )
 
 
@@ -595,4 +607,161 @@ def select_unblockers(
     partial = len(selected) >= budget and len(covered) < len(covering)
     return Selection(
         selected, covered, "partial" if partial else "solved", solver=solver
+    )
+
+
+def verify_selection(
+    model: Any,
+    connectors: list[PtrCandidate],
+    selected: list[PtrCandidate],
+    targets: set[str],
+) -> dict[str, list[str]]:
+    """Check the final model without sinks; report, never act.
+
+    ``verified_unblocked`` are the targets that now carry flux and
+    ``inactive_connectors`` the phase-2 reactions that carry none. Connectors
+    and selected PTRs missing from ``model`` are added for the check only.
+    """
+    with model:
+        for candidate in [*connectors, *selected]:
+            if candidate.reaction_id not in model.reactions:
+                _add_ptr(model, candidate)
+        connector_ids = {candidate.reaction_id for candidate in connectors}
+        active = unblockable(model, set(targets) | connector_ids, EPSILON)
+    return {
+        "verified_unblocked": sorted(active & set(targets)),
+        "inactive_connectors": [
+            candidate.reaction_id
+            for candidate in connectors
+            if candidate.reaction_id not in active
+        ],
+    }
+
+
+def _failed(
+    model: Any, parameters: dict[str, Any], before: dict[str, Any], reason: str
+) -> GapfillResult:
+    return GapfillResult(
+        model,
+        [],
+        {},
+        "failed",
+        reason,
+        {"strategy": "sink-milp"},
+        "sink-milp",
+        parameters,
+        before,
+        before,
+        reason,
+    )
+
+
+def run_sink_milp(
+    model: Any,
+    parameters: dict[str, Any],
+    *,
+    candidates: list[PtrCandidate] | None = None,
+    connectors: list[PtrCandidate] | None = None,
+    coverage: list[ComponentCoverage] | None = None,
+) -> GapfillResult:
+    """Run candidates, connectors, coverage and MILP on a copy of ``model``.
+
+    Phases already computed (by workflow stages) are passed in and reused.
+    The result selects the connectors (phase 2) and then the MILP's PTRs
+    (phase 3); ``solver`` carries MILP metadata and the verification report.
+    """
+    parameters = _resolved_parameters("sink-milp", parameters)
+    if isinstance(model, dict):
+        from cobra.io.dict import model_from_dict
+
+        model = model_from_dict(model)
+    result_model = model.copy()
+    before = _metrics(result_model)
+    components = network_components(model)
+    if candidates is None:
+        candidates = generate_ptr_candidates(
+            model,
+            parameters["allowed_connections"],
+            parameters["candidate_types"],
+            components,
+        )
+    if connectors is None:
+        connectors = select_connectors(candidates)
+    budget = parameters["max_additions"] - len(connectors)
+    if budget < 0:
+        return _failed(
+            result_model,
+            parameters,
+            before,
+            f"{len(connectors)} connectors exceed max_additions",
+        )
+    collisions = sorted(
+        candidate.reaction_id
+        for candidate in candidates
+        if not candidate.present and candidate.reaction_id in result_model.reactions
+    )
+    if collisions:
+        return _failed(
+            result_model,
+            parameters,
+            before,
+            f"reaction-ID collision: {', '.join(collisions)}",
+        )
+    for candidate in connectors:
+        _add_candidate(result_model, candidate.as_gapfill_candidate(phase=2))
+    if coverage is None:
+        coverage = compute_coverage(
+            result_model,
+            candidates,
+            components,
+            min_component_size=parameters["min_component_size"],
+        )
+    selection = select_unblockers(
+        coverage,
+        tradeoff_lambda=parameters["tradeoff_lambda"],
+        budget=budget,
+        interface=result_model.solver.interface,
+    )
+    if selection.status == "failed":
+        failed = _failed(model.copy(), parameters, before, "milp-failed")
+        failed.failure = selection.failure
+        failed.solver = {**failed.solver, **selection.solver}
+        return failed
+    by_id = {candidate.reaction_id: candidate for candidate in candidates}
+    chosen = [by_id[reaction_id] for reaction_id in selection.selected]
+    for candidate in chosen:
+        _add_candidate(result_model, candidate.as_gapfill_candidate(phase=3))
+    targets = {target for item in coverage for target in item.targets}
+    verification = verify_selection(result_model, connectors, chosen, targets)
+    connector_ids = {candidate.reaction_id for candidate in connectors}
+    chosen_ids = set(selection.selected)
+    candidate_coverage = {
+        candidate.reaction_id: "already-present"
+        if candidate.present
+        else "connector"
+        if candidate.reaction_id in connector_ids
+        else "selected"
+        if candidate.reaction_id in chosen_ids
+        else "available"
+        for candidate in candidates
+    }
+    return GapfillResult(
+        result_model,
+        [candidate.reaction_id for candidate in [*connectors, *chosen]],
+        candidate_coverage,
+        selection.status,
+        solver={
+            **selection.solver,
+            "connectors": len(connectors),
+            "targets": len(targets),
+            "sink_only": sum(len(item.sink_only) for item in coverage),
+            "verification": verification,
+        },
+        method="sink-milp",
+        parameters=parameters,
+        before_metrics=before,
+        after_metrics=_metrics(result_model),
+        stop_reason="max-additions"
+        if selection.status == "partial"
+        else "milp-optimal",
     )
