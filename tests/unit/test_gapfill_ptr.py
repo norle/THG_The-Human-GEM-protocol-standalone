@@ -14,6 +14,7 @@ from thg_protocol.gapfill.ptr import (
     generate_ptr_candidates,
     network_components,
     select_connectors,
+    select_unblockers,
     unblockable,
 )
 
@@ -301,3 +302,66 @@ def test_done_components_are_not_recomputed():
 def test_small_components_are_skipped():
     _, coverages = coverage_of(surplus_island(), min_component_size=5)
     assert [item.component for item in coverages] == [1]
+
+
+def overlapping_coverage():
+    return [
+        ComponentCoverage(
+            2,
+            ["a", "b", "c", "d"],
+            [],
+            {"P1": ["a", "b"], "P2": ["b", "c"], "P3": ["c", "d"]},
+        )
+    ]
+
+
+INTERFACE = cobra.Model("solver").solver.interface
+
+
+def test_milp_picks_fewest_candidates_for_full_coverage():
+    selection = select_unblockers(
+        overlapping_coverage(), tradeoff_lambda=0.01, budget=10, interface=INTERFACE
+    )
+    assert selection.status == "solved"
+    assert selection.selected == ["P1", "P3"]
+    assert selection.covered == ["a", "b", "c", "d"]
+
+
+def test_lambda_drops_candidates_worth_less_than_their_cost():
+    coverage = [
+        ComponentCoverage(2, ["a", "b", "c"], [], {"P1": ["a", "b"], "P2": ["c"]})
+    ]
+    selection = select_unblockers(
+        coverage, tradeoff_lambda=1.5, budget=10, interface=INTERFACE
+    )
+    assert selection.status == "solved"
+    assert selection.selected == ["P1"]
+
+
+def test_budget_binding_gives_partial():
+    selection = select_unblockers(
+        overlapping_coverage(), tradeoff_lambda=0.01, budget=1, interface=INTERFACE
+    )
+    assert selection.status == "partial"
+    assert len(selection.selected) == 1
+    assert len(selection.covered) == 2
+
+
+def test_empty_coverage_is_solved_with_no_selection():
+    selection = select_unblockers(
+        [ComponentCoverage(2, ["a"], [], {})],
+        tradeoff_lambda=0.01,
+        budget=10,
+        interface=INTERFACE,
+    )
+    assert (selection.status, selection.selected) == ("solved", [])
+
+
+def test_solver_failure_is_reported(monkeypatch):
+    monkeypatch.setattr(INTERFACE.Model, "optimize", lambda self: "infeasible")
+    selection = select_unblockers(
+        overlapping_coverage(), tradeoff_lambda=0.01, budget=10, interface=INTERFACE
+    )
+    assert selection.status == "failed"
+    assert selection.selected == []
+    assert "infeasible" in selection.failure

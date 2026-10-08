@@ -511,3 +511,88 @@ def compute_coverage(
                 if on_component is not None:
                     on_component(entry)
     return [done.get(number) or computed[number] for number in numbers]
+
+
+@dataclass
+class Selection:
+    """MILP choice of unblocking PTRs; ``failed`` carries the solver status."""
+
+    selected: list[str]
+    covered: list[str]
+    status: str
+    failure: str | None = None
+    solver: dict[str, Any] = field(default_factory=dict)
+
+
+def select_unblockers(
+    coverage: list[ComponentCoverage],
+    *,
+    tradeoff_lambda: float,
+    budget: int,
+    interface: Any,
+) -> Selection:
+    """Maximize covered targets minus ``tradeoff_lambda`` per selected PTR.
+
+    One global problem on an optlang ``interface``: binary y per candidate,
+    z_r <= sum of y over the candidates covering target r, sum y <= budget.
+    Status is ``partial`` when the budget binds with coverable targets left.
+    """
+    from optlang.symbolics import add
+
+    covering: dict[str, list[str]] = {}
+    for component in coverage:
+        for candidate, targets in component.coverage.items():
+            for target in targets:
+                covering.setdefault(target, []).append(candidate)
+    candidates = sorted({item for items in covering.values() for item in items})
+    budget = max(budget, 0)
+    solver = {
+        "strategy": "sink-milp",
+        "tradeoff_lambda": tradeoff_lambda,
+        "budget": budget,
+        "candidates": len(candidates),
+        "coverable_targets": len(covering),
+    }
+    if not candidates:
+        return Selection([], [], "solved", solver={**solver, "milp_status": "empty"})
+    problem = interface.Model()
+    y = {
+        name: interface.Variable(f"y_{index}", type="binary")
+        for index, name in enumerate(candidates)
+    }
+    targets = sorted(covering)
+    z = {
+        target: interface.Variable(f"z_{index}", lb=0, ub=1)
+        for index, target in enumerate(targets)
+    }
+    problem.add([*y.values(), *z.values()])
+    problem.add(
+        [
+            interface.Constraint(
+                z[target] - add([y[name] for name in covering[target]]),
+                ub=0,
+                name=f"cover_{index}",
+            )
+            for index, target in enumerate(targets)
+        ]
+        + [interface.Constraint(add(list(y.values())), ub=budget, name="budget")]
+    )
+    problem.objective = interface.Objective(
+        add(list(z.values())) - tradeoff_lambda * add(list(y.values())), direction="max"
+    )
+    status = problem.optimize()
+    solver["milp_status"] = status
+    if status != "optimal":
+        return Selection(
+            [], [], "failed", f"sink MILP ended with status {status}", solver
+        )
+    solver["objective"] = problem.objective.value
+    selected = sorted(name for name, variable in y.items() if variable.primal > 0.5)
+    chosen = set(selected)
+    covered = sorted(
+        target for target, names in covering.items() if chosen.intersection(names)
+    )
+    partial = len(selected) >= budget and len(covered) < len(covering)
+    return Selection(
+        selected, covered, "partial" if partial else "solved", solver=solver
+    )
