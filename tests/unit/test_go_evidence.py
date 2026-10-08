@@ -1,5 +1,8 @@
 import gzip
 import hashlib
+import json
+
+import pytest
 
 from thg_protocol.curation.go import parse_obo, resolve_go_compartment
 from thg_protocol.services import biocyc, goa, reactome, rhea, uniprot
@@ -196,9 +199,10 @@ def test_uniprot_search_deduplicates_and_batches_identifiers(monkeypatch):
 
     identifiers = [f"GENE{index}" for index in range(101)] + ["GENE0"]
     assert uniprot.UniProtClient(session=object()).annotations_for(identifiers) == []
-    assert [query.count("gene:") for query in calls] == [100, 1]
+    assert [query.count("gene_exact:") for query in calls] == [100, 1]
     assert " OR " in calls[0]
-    assert calls[0].split(" OR ").count("gene:GENE0") == 1
+    assert calls[0].count("gene_exact:GENE0 ") == 1
+    assert all(query.endswith(") AND organism_id:9606") for query in calls)
 
 
 def test_uniprot_search_uses_cross_references_for_ensembl_identifiers(monkeypatch):
@@ -218,7 +222,9 @@ def test_uniprot_search_uses_cross_references_for_ensembl_identifiers(monkeypatc
 
     uniprot.UniProtClient(session=object()).annotations_for(["ENSG00000000419", "DPM1"])
 
-    assert calls == ["gene:DPM1 OR xref:ensembl-ENSG00000000419"]
+    assert calls == [
+        "(gene_exact:DPM1 OR xref:ensembl-ENSG00000000419) AND organism_id:9606"
+    ]
 
 
 def test_uniprot_search_preserves_matched_ensembl_gene_identifier(monkeypatch):
@@ -262,7 +268,7 @@ def test_uniprot_search_preserves_matched_ensembl_gene_identifier(monkeypatch):
 
     monkeypatch.setattr(uniprot, "request", lambda *_args, **_kwargs: Response())
 
-    annotations = uniprot.UniProtClient(session=object()).annotations_for(
+    annotations = uniprot.UniProtClient(session=object(), sl_to_go={}).annotations_for(
         ["ENSG00000000419"]
     )
     assert [item.gene_id for item in annotations] == ["ENSG00000000419"]
@@ -284,6 +290,105 @@ def test_uniprot_sl_to_go_mapping_is_location_specific():
         ]
     ).annotations_for(["GENE1"])
     assert [(item.sl_id, item.go_id) for item in result] == [("SL-001", "GO:0005739")]
+
+
+def _uniprot_record(accession, gene, location, sl_id):
+    return {
+        "primaryAccession": accession,
+        "genes": [{"geneName": {"value": gene}}],
+        "comments": [
+            {
+                "commentType": "SUBCELLULAR LOCATION",
+                "subcellularLocations": [
+                    {"location": {"value": location, "id": sl_id}}
+                ],
+            }
+        ],
+    }
+
+
+class _UniProtResponse:
+    def __init__(self, payload=None, text="", headers=None, next_url=None):
+        self._payload = payload
+        self.text = text
+        self.content = (text or json.dumps(payload)).encode()
+        self.headers = headers or {}
+        self.links = {"next": {"url": next_url}} if next_url else {}
+
+    def json(self):
+        return self._payload
+
+
+def test_uniprot_live_locations_get_go_ids_from_location_endpoint(monkeypatch):
+    # A real API record carries only the SL id; the GO term comes from
+    # UniProt's subcellular-location vocabulary, fetched separately.
+    def fake_request(_session, _method, url, **_kwargs):
+        if url == uniprot.UniProtClient.locations_url:
+            return _UniProtResponse(
+                text="Subcellular location ID\tGene Ontologies\n"
+                "SL-0170\tGO:0005759:mitochondrial matrix\n"
+                "SL-0091\tGO:0005829:cytosol\n",
+                headers={"X-UniProt-Release": "2026_03"},
+            )
+        return _UniProtResponse(
+            {
+                "results": [
+                    _uniprot_record("O75390", "CS", "Mitochondrion matrix", "SL-0170")
+                ]
+            }
+        )
+
+    monkeypatch.setattr(uniprot, "request", fake_request)
+    client = uniprot.UniProtClient(session=object())
+
+    annotations = client.annotations_for(["CS"])
+
+    assert [(item.gene_id, item.sl_id, item.go_id) for item in annotations] == [
+        ("CS", "SL-0170", "GO:0005759")
+    ]
+    assert client.metadata["location_go_mapping"]["release"] == "2026_03"
+
+
+def test_uniprot_live_search_follows_next_page_links(monkeypatch):
+    calls = []
+    pages = {
+        uniprot.UniProtClient.base_url: _UniProtResponse(
+            {"results": [_uniprot_record("P1", "GENE1", "Cytosol", "SL-0091")]},
+            headers={"X-Total-Results": "2"},
+            next_url="https://rest.uniprot.org/next-page",
+        ),
+        "https://rest.uniprot.org/next-page": _UniProtResponse(
+            {"results": [_uniprot_record("P2", "GENE2", "Cytosol", "SL-0091")]},
+            headers={"X-Total-Results": "2"},
+        ),
+    }
+
+    def fake_request(_session, _method, url, **kwargs):
+        calls.append((url, kwargs["params"]))
+        return pages[url]
+
+    monkeypatch.setattr(uniprot, "request", fake_request)
+
+    annotations = uniprot.UniProtClient(
+        session=object(), sl_to_go={"SL-0091": ["GO:0005829"]}
+    ).annotations_for(["GENE1", "GENE2"])
+
+    assert [item.gene_id for item in annotations] == ["GENE1", "GENE2"]
+    assert calls[1] == ("https://rest.uniprot.org/next-page", None)
+
+
+def test_uniprot_live_search_rejects_truncated_results(monkeypatch):
+    monkeypatch.setattr(
+        uniprot,
+        "request",
+        lambda *_args, **_kwargs: _UniProtResponse(
+            {"results": [_uniprot_record("P1", "GENE1", "Cytosol", "SL-0091")]},
+            headers={"X-Total-Results": "5"},
+        ),
+    )
+
+    with pytest.raises(RuntimeError, match="1 of 5"):
+        uniprot.UniProtClient(session=object(), sl_to_go={}).annotations_for(["GENE1"])
 
 
 def test_live_provider_metadata_records_release_and_raw_checksum(monkeypatch):

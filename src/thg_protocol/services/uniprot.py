@@ -88,6 +88,8 @@ class StaticUniProtClient:
 
 class UniProtClient(StaticUniProtClient):
     base_url = "https://rest.uniprot.org/uniprotkb/search"
+    locations_url = "https://rest.uniprot.org/locations/stream"
+    organism_id = "9606"
 
     def __init__(
         self,
@@ -95,13 +97,46 @@ class UniProtClient(StaticUniProtClient):
         session: object | None = None,
         timeout: float = 30.0,
         release: str = "",
+        sl_to_go: Mapping[str, list[str]] | None = None,
         **kwargs: object,
     ):
         super().__init__(**kwargs)
         self.session = session or (requests.Session() if requests is not None else None)
         self.timeout = timeout
         self.source_release = release
+        self.sl_to_go = dict(sl_to_go) if sl_to_go is not None else None
         self.metadata: dict[str, object] = {}
+
+    def _location_go_terms(self) -> tuple[dict[str, list[str]], dict[str, object]]:
+        """Load UniProt's own subcellular-location (SL) to GO cross-references."""
+        if self.sl_to_go is not None:
+            return self.sl_to_go, {"source": "provided"}
+        response = request(
+            self.session,
+            "get",
+            self.locations_url,
+            timeout=self.timeout,
+            retries=2,
+            backoff=0.5,
+            params={"query": "*", "format": "tsv", "fields": "id,gene_ontologies"},
+        )
+        mapping: dict[str, list[str]] = {}
+        for line in response.text.splitlines()[1:]:
+            sl_id, _, terms = line.partition("\t")
+            go_ids = [
+                term.strip()[:10]
+                for term in terms.split(";")
+                if term.strip().startswith("GO:")
+            ]
+            if sl_id and go_ids:
+                mapping[sl_id] = go_ids
+        self.sl_to_go = mapping
+        headers = getattr(response, "headers", {}) or {}
+        return mapping, {
+            "url": self.locations_url,
+            "release": headers.get("X-UniProt-Release", ""),
+            "raw_response_sha256": hashlib.sha256(response.content).hexdigest(),
+        }
 
     def annotations_for(
         self, identifiers: Iterable[str], *, progress: bool = False
@@ -114,35 +149,68 @@ class UniProtClient(StaticUniProtClient):
             raise RuntimeError("UniProtClient requires the 'requests' dependency")
         records = []
         raw_response = hashlib.sha256()
+        api_release = ""
         for start in tqdm(
             range(0, len(wanted), 100),
             desc="UniProt locations",
             unit="batch",
             disable=not progress,
         ):
-            query = " OR ".join(
-                (f"xref:ensembl-{item}" if item.startswith("ENS") else f"gene:{item}")
+            terms = " OR ".join(
+                (
+                    f"xref:ensembl-{item}"
+                    if item.startswith("ENS")
+                    else f"gene_exact:{item}"
+                )
                 for item in wanted[start : start + 100]
             )
-            response = request(
-                self.session,
-                "get",
-                self.base_url,
-                timeout=self.timeout,
-                retries=2,
-                backoff=0.5,
-                params={"query": query, "format": "json", "size": 500},
-            )
-            raw_response.update(response.content)
-            payload = response.json()
-            if isinstance(payload, Mapping):
-                records.extend(payload.get("results", []))
+            url: str | None = self.base_url
+            params: dict[str, object] | None = {
+                "query": f"({terms}) AND organism_id:{self.organism_id}",
+                "format": "json",
+                "size": 500,
+            }
+            batch: list[object] = []
+            expected = None
+            while url:
+                response = request(
+                    self.session,
+                    "get",
+                    url,
+                    timeout=self.timeout,
+                    retries=2,
+                    backoff=0.5,
+                    params=params,
+                )
+                raw_response.update(response.content)
+                payload = response.json()
+                if isinstance(payload, Mapping):
+                    batch.extend(payload.get("results", []))
+                headers = getattr(response, "headers", {}) or {}
+                if headers.get("X-Total-Results") is not None:
+                    expected = int(headers["X-Total-Results"])
+                api_release = headers.get("X-UniProt-Release", api_release)
+                # The next-page link already carries the query and cursor.
+                links = getattr(response, "links", {}) or {}
+                url = links.get("next", {}).get("url")
+                params = None
+            if expected is not None and len(batch) != expected:
+                raise RuntimeError(
+                    f"UniProt returned {len(batch)} of {expected} records "
+                    "for a location batch; refusing to continue with a "
+                    "truncated result"
+                )
+            records.extend(batch)
+        sl_to_go, location_metadata = self._location_go_terms() if records else ({}, {})
         self.metadata = {
             "source": "UniProt",
             "release": self.source_release,
+            "api_release": api_release,
             "url": self.base_url,
+            "organism_id": self.organism_id,
             "raw_response_sha256": raw_response.hexdigest(),
-            "parser_version": "1",
+            "location_go_mapping": location_metadata,
+            "parser_version": "2",
         }
         parsed = []
         for record in records:
@@ -175,10 +243,7 @@ class UniProtClient(StaticUniProtClient):
                 for value in location.get("subcellularLocations", []):
                     name = value.get("location", {}).get("value", "")
                     sl_id = str(value.get("location", {}).get("id", ""))
-                    mappings = record.get("sl_to_go", {})
-                    mapped = (
-                        mappings.get(sl_id, []) if isinstance(mappings, Mapping) else []
-                    )
+                    mapped = sl_to_go.get(sl_id, [])
                     for gene_id in gene_ids:
                         parsed.extend(
                             UniProtAnnotation(
@@ -189,9 +254,7 @@ class UniProtClient(StaticUniProtClient):
                                 source_release=self.source_release,
                                 sl_id=sl_id,
                             )
-                            for go_id in (
-                                mapped if isinstance(mapped, list) else [mapped]
-                            )
+                            for go_id in mapped
                         )
                         if not mapped:
                             parsed.append(
