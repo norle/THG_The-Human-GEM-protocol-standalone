@@ -52,8 +52,13 @@ complex branches are retained in the evidence report rather than assigned to
 an implicit cytosol. When same-precedence sources disagree about sGPR
 structure, all candidates are retained and the more conservative structure is
 selected while the conflict is reported. An existing model GPR remains
-preferred. `fallback_location` and `uncertainty_policy` are explicit
-configuration choices. Exchange, demand, sink, biomass, pseudo, spontaneous,
+preferred. `fallback_location` and `uncertainty_policy` (`reject-conflicts`
+or `allow-conflicts`) are explicit configuration choices. A gene resolved to
+several compartments keeps all of them; that is dual localization, not a
+conflict. `compartment_go_aliases` maps a GO term to a compartment only when
+an annotation names exactly that term (the shipped config maps cytoplasm to
+cytosol), and `goa_excluded_evidence_codes` drops GOA annotations by evidence
+code (empty by default). Exchange, demand, sink, biomass, pseudo, spontaneous,
 transport, and multi-compartment reactions are reported and excluded from
 generic cloning. Set `n_jobs` above 1 to parallelize GPR and localization
 resolution; expansion application and solver work remain serial.

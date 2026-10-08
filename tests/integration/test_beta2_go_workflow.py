@@ -198,3 +198,82 @@ def test_beta2_go_alias_resolves_cytoplasm_to_cytosol_only_at_the_exact_term(
     # A child of cytoplasm does not inherit the alias through the upward walk.
     assert by_gene["G_GRAN"]["status"] == "rejected"
     assert by_gene["G_GRAN"]["reason"] == "location-not-in-registry"
+
+
+def test_beta2_keeps_every_compartment_of_a_dual_localized_gene(tmp_path):
+    model = Model("go-dual")
+    left = Metabolite("left_c", formula="C", compartment="c")
+    right = Metabolite("right_c", formula="C", compartment="c")
+    reaction = Reaction("R_DUAL")
+    reaction.add_metabolites({left: -1, right: 1})
+    reaction.gene_reaction_rule = "G_DUAL"
+    model.add_reactions([reaction])
+    source = tmp_path / "beta1.json"
+    save_json_model(model, source)
+    goa = tmp_path / "goa.gaf"
+    goa.write_text(
+        "".join(
+            "\t".join(
+                ["UniProt", "P1", "G_DUAL", "", go_id, "PMID:1", code, "", "C"]
+                + [""] * 5
+                + ["GOA"]
+            )
+            + "\n"
+            for go_id, code in (
+                ("GO:0005829", "IDA"),
+                ("GO:0005739", "IDA"),
+                ("GO:0005634", "HDA"),
+            )
+        ),
+        encoding="utf-8",
+    )
+    run = tmp_path / "run"
+    config = tmp_path / "config.json"
+    config.write_text(
+        json.dumps(
+            {
+                "workflow": "beta2",
+                "run": {"name": "go-dual", "output_dir": str(run)},
+                "beta2": {
+                    "input_model": str(source),
+                    "external_beta1_equivalent": True,
+                    "compartments": {
+                        "c": "cytosol",
+                        "m": "mitochondria",
+                        "n": "nucleus",
+                    },
+                    "compartment_go_terms": {
+                        "c": "GO:0005829",
+                        "m": "GO:0005739",
+                        "n": "GO:0005634",
+                    },
+                    "go_graph": {
+                        "GO:0005829": {"name": "cytosol", "parents": []},
+                        "GO:0005739": {"name": "mitochondrion", "parents": []},
+                        "GO:0005634": {"name": "nucleus", "parents": []},
+                    },
+                    "location_sources": ["goa"],
+                    "go_annotation_file": str(goa),
+                    "goa_excluded_evidence_codes": ["HDA"],
+                    "run_solver_checks": False,
+                },
+            }
+        ),
+        encoding="utf-8",
+    )
+    start(config)
+    assert get_status(run)["overall_status"] == "completed"
+    resolution = next(
+        item
+        for item in get_status(run)["steps"]["export-beta2"]["outputs"]
+        if item["role"] == "compartment-resolution-evidence"
+    )
+    payload = json.loads((run / resolution["path"]).read_text(encoding="utf-8"))
+    gene = payload["gene_locations"]["G_DUAL"]
+    # Two compartments are dual localization, not a conflict; the HDA-only
+    # nucleus annotation is excluded by configuration.
+    assert gene["locations"] == ["Cytosol", "Mitochondria"]
+    assert gene.get("status") != "conflicting"
+    assert not any(
+        item.get("status") == "location-conflict" for item in payload["evidence"]
+    )

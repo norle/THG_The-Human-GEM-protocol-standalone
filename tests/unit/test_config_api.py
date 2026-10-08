@@ -1,5 +1,6 @@
 import json
 import os
+from pathlib import Path
 
 import pytest
 
@@ -153,3 +154,32 @@ def test_beta2_go_aliases_are_validated_at_load_time(tmp_path, aliases, message)
     )
     with pytest.raises(ConfigError, match=message):
         load_workflow_config(path)
+
+
+@pytest.mark.parametrize(
+    ("setting", "message"),
+    [
+        ({"uncertainty_policy": "report"}, "uncertainty_policy"),
+        ({"goa_excluded_evidence_codes": "HDA"}, "goa_excluded_evidence_codes"),
+        ({"goa_excluded_evidence_codes": ["hda"]}, "goa_excluded_evidence_codes"),
+    ],
+)
+def test_beta2_location_policy_settings_are_validated(tmp_path, setting, message):
+    path = tmp_path / "beta2.json"
+    path.write_text(
+        json.dumps(
+            {
+                "workflow": "beta2",
+                "run": {"name": "check", "output_dir": str(tmp_path / "run")},
+                "beta2": setting,
+            }
+        ),
+        encoding="utf-8",
+    )
+    with pytest.raises(ConfigError, match=message):
+        load_workflow_config(path)
+
+
+def test_shipped_configs_pass_beta2_validation():
+    for name in ("beta2.json", "reference.json"):
+        load_workflow_config(Path(__file__).parents[2] / "configs" / name)

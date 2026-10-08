@@ -77,6 +77,6 @@
     },
     "mode": "apply-all",
     "fallback_location": null,
-    "uncertainty_policy": "report"
+    "uncertainty_policy": "reject-conflicts"
   }
 }

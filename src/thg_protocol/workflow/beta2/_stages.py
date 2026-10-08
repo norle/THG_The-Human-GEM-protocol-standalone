@@ -1111,9 +1111,14 @@ class Beta2Stage:
                     annotations = goa_client.annotations_for(model_genes)
                     if goa_client.metadata:
                         source_metadata["goa"] = dict(goa_client.metadata)
+                excluded_codes = {
+                    str(item) for item in section.get("goa_excluded_evidence_codes", [])
+                }
                 for annotation in StaticGOAClient(annotations).annotations_for(
                     model_genes
                 ):
+                    if annotation.evidence_code in excluded_codes:
+                        continue
                     gene = (
                         annotation.symbol
                         if annotation.symbol in model_genes
@@ -1658,18 +1663,9 @@ class Beta2Stage:
                 gene_locations[gene] = (
                     dict(record) if isinstance(record, Mapping) else {}
                 )
+                # Several compartments for one gene is dual localization, which
+                # is what β2 expands into, not a conflict between sources.
                 gene_locations[gene]["locations"] = sorted(set(targets))
-                if len(set(targets)) > 1:
-                    gene_locations[gene]["status"] = "conflicting"
-                    resolution_records.append(
-                        {
-                            "gene_id": gene,
-                            "status": "location-conflict",
-                            "reason": "same-precedence-evidence-disagree",
-                            "candidate_targets": sorted(set(targets)),
-                        }
-                    )
-                    unresolved.append(f"{gene}:same-precedence-evidence-disagree")
             reaction_resolutions = []
             recorded_reactions: dict[str, list[dict[str, object]]] = {}
             for item in _snapshot_records(section):

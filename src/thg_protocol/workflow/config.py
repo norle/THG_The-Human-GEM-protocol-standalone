@@ -109,6 +109,7 @@ WORKFLOW_SECTION_KEYS = {
         "compartment_ontology_version",
         "fallback_location",
         "uncertainty_policy",
+        "goa_excluded_evidence_codes",
         "subunit_stoichiometry",
         "run_solver_checks",
         "solver",
@@ -865,6 +866,23 @@ def _parse_workflow(
                             "'beta2.compartment_go_aliases' must not repeat a "
                             "compartment_go_terms target"
                         )
+                if value.get("uncertainty_policy", "reject-conflicts") not in {
+                    "reject-conflicts",
+                    "allow-conflicts",
+                }:
+                    raise ConfigError(
+                        "'beta2.uncertainty_policy' must be reject-conflicts or "
+                        "allow-conflicts"
+                    )
+                excluded_codes = value.get("goa_excluded_evidence_codes", [])
+                if not isinstance(excluded_codes, list) or not all(
+                    isinstance(item, str) and re.fullmatch(r"[A-Z]{2,4}", item)
+                    for item in excluded_codes
+                ):
+                    raise ConfigError(
+                        "'beta2.goa_excluded_evidence_codes' must be a list of GO "
+                        "evidence codes such as HDA"
+                    )
                 open_sources = value.get("location_sources", []) or value.get(
                     "reaction_sources", []
                 )

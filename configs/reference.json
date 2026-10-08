@@ -26,7 +26,7 @@
       "v": "vesicle",
       "x": "peroxisome"
     },
-    "uncertainty_policy": "report"
+    "uncertainty_policy": "reject-conflicts"
   },
   "gapfill": {
     "remove_infeasible_loops": false,
