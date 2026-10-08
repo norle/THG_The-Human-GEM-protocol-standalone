@@ -180,6 +180,10 @@ def test_beta2_location_policy_settings_are_validated(tmp_path, setting, message
         load_workflow_config(path)
 
 
+@pytest.mark.skipif(
+    not (Path(__file__).parents[2] / "inputs" / "models" / "Human2.xml").is_file(),
+    reason="shipped configs reference gitignored inputs absent from a clean checkout",
+)
 def test_shipped_configs_pass_beta2_validation():
     for name in ("beta2.json", "reference.json"):
         load_workflow_config(Path(__file__).parents[2] / "configs" / name)
