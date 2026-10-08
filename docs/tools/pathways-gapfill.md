@@ -32,7 +32,11 @@ Transport methods accept `max_additions`, `allowed_connections`, and
 `c:e,c:m` and all types for greedy, or 1000 with `c:e` and `A,B` for deadends.
 MILP requires `universal_model` and `objective`, and accepts `minimum_flux`
 (0.05), `penalties`, and `max_additions` (100). Exchange and demand generation
-are deliberately unsupported. For canonical construction, select parameters
+are deliberately unsupported. The putative-transport method `sink-milp`, the
+reference workflow default described in [gapfill workflows](../workflows/gapfill.md),
+is available through `gapfill_model(method="sink-milp")` and the `gapfill`
+workflow; it requires `allowed_connections` and accepts `candidate_types`,
+`tradeoff_lambda` (0.01), `min_component_size` (4) and `max_additions` (1000). For canonical construction, select parameters
 that satisfy the configured post-gapfill checks and preserve them as release
 evidence.
 

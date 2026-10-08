@@ -81,23 +81,33 @@
   },
   "gapfill": {
     "remove_infeasible_loops": false,
-    "method": "greedy",
-    "max_additions": 100,
+    "method": "sink-milp",
+    "max_additions": 1000,
+    "tradeoff_lambda": 0.01,
     "allowed_connections": [
-      [
-        "c",
-        "e"
-      ],
-      [
-        "c",
-        "m"
-      ]
+      ["a", "c"],
+      ["a", "ci"],
+      ["a", "ck"],
+      ["a", "e"],
+      ["a", "r"],
+      ["a", "v"],
+      ["c", "ci"],
+      ["c", "ck"],
+      ["c", "g"],
+      ["c", "l"],
+      ["c", "m"],
+      ["c", "n"],
+      ["c", "r"],
+      ["c", "v"],
+      ["c", "x"],
+      ["ci", "ck"],
+      ["ci", "e"],
+      ["e", "l"],
+      ["g", "i"],
+      ["m", "n"],
+      ["r", "v"]
     ],
-    "candidate_types": [
-      "A",
-      "B",
-      "C"
-    ],
+    "candidate_types": ["A", "B", "C"],
     "validation_profile": "structural-fast"
   }
 }
