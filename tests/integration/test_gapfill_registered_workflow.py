@@ -382,3 +382,122 @@ def test_reference_blocks_gapfill_without_candidates_for_dead_ends(tmp_path):
         ).read_text()
     )
     assert any("no candidate" in item for item in gate["blocking_findings"])
+
+
+def _three_components(path: Path) -> None:
+    """Main (c) plus two islands; phase 3 must drain island m's Ym surplus."""
+    model = Model("sink-milp-fixture")
+    reactions = {
+        "EXA": {"Ac": -1},
+        "R1": {"Ac": -1, "Dc": 1},
+        "EXD": {"Dc": -1},
+        "EXY": {"Yc": -1},
+        "R2": {"Yc": -1, "Dc": 1},
+        "I1": {"Ae": -1, "Be": 1},
+        "I2": {"Be": -1, "Ae": 2},
+        "I3": {"Be": -1, "Ke": 1},
+        "J1": {"Ym": -1, "Wm": 1},
+        "J2": {"Wm": -1, "Ym": 2},
+        "J3": {"Km": -1, "Wm": 1},
+    }
+    metabolites = {
+        identifier: Metabolite(identifier, compartment=identifier[-1])
+        for stoichiometry in reactions.values()
+        for identifier in stoichiometry
+    }
+    for reaction_id, stoichiometry in reactions.items():
+        reaction = Reaction(
+            reaction_id, lower_bound=-1000 if reaction_id in {"EXA", "EXY"} else 0
+        )
+        reaction.add_metabolites(
+            {metabolites[key]: value for key, value in stoichiometry.items()}
+        )
+        model.add_reactions([reaction])
+    save_json_model(model, path)
+
+
+def _sink_milp_config(tmp_path: Path, source: Path) -> Path:
+    config = _config(tmp_path, source)
+    payload = json.loads(config.read_text(encoding="utf-8"))
+    payload["gapfill"].update(
+        method="sink-milp",
+        allowed_connections=[["c", "e"], ["c", "m"], ["e", "m"]],
+    )
+    config.write_text(json.dumps(payload), encoding="utf-8")
+    return config
+
+
+_PHASE_STAGES = (
+    "generate-gapfill-candidates",
+    "select-gapfill-connectors",
+    "compute-gapfill-coverage",
+)
+
+
+def _plan(run: Path) -> list[dict]:
+    status = get_status(run)
+    path = run / next(
+        item["path"]
+        for item in status["steps"]["generate-gapfill-plan"]["outputs"]
+        if item["role"] == "plan"
+    )
+    return [json.loads(line) for line in path.read_text().splitlines()]
+
+
+def test_sink_milp_workflow_runs_phase_stages(tmp_path):
+    source = tmp_path / "model.json"
+    _three_components(source)
+    start(_sink_milp_config(tmp_path, source))
+    status = get_status(tmp_path / "run")
+    assert status["overall_status"] == "completed"
+    for stage_id in _PHASE_STAGES:
+        assert status["steps"][stage_id]["status"] == "completed"
+    phases = {
+        line["reaction_id"]: line["phase"]
+        for line in _plan(tmp_path / "run")
+        if "reaction_id" in line
+    }
+    assert phases == {
+        "GAPFILL_PTR_Ac_Ae": 2,
+        "GAPFILL_PTR_Ke_Km": 2,
+        "GAPFILL_PTR_Yc_Ym": 3,
+    }
+
+
+def test_phase_stages_are_skipped_for_greedy(tmp_path):
+    source = tmp_path / "model.json"
+    _model(source)
+    start(_config(tmp_path, source))
+    steps = get_status(tmp_path / "run")["steps"]
+    for stage_id in _PHASE_STAGES:
+        assert steps[stage_id]["status"] == "skipped"
+
+
+def test_coverage_resumes_from_partial_attempt(tmp_path, monkeypatch):
+    from thg_protocol.gapfill import ptr
+
+    original = ptr.compute_coverage
+    calls: list[list[int]] = []
+
+    def interrupting(*args, on_component=None, **kwargs):
+        seen: list[int] = []
+        calls.append(seen)
+
+        def record(entry):
+            on_component(entry)
+            seen.append(entry.component)
+            if len(calls) == 1 and len(seen) == 2:
+                raise RuntimeError("stopped mid-coverage")
+
+        return original(*args, on_component=record, **kwargs)
+
+    monkeypatch.setattr(ptr, "compute_coverage", interrupting)
+    source = tmp_path / "model.json"
+    _three_components(source)
+    with pytest.raises(RuntimeError, match="compute-gapfill-coverage"):
+        start(_sink_milp_config(tmp_path, source))
+    resume(tmp_path / "run")
+    assert calls == [[1, 2], [3]]
+    status = get_status(tmp_path / "run")
+    assert status["overall_status"] == "completed"
+    assert {line.get("phase") for line in _plan(tmp_path / "run")} >= {2, 3}

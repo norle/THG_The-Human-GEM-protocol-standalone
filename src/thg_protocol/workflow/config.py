@@ -179,6 +179,8 @@ WORKFLOW_SECTION_KEYS = {
         "objective",
         "minimum_flux",
         "penalties",
+        "tradeoff_lambda",
+        "min_component_size",
         "validation_profile",
         "task_suite",
         "task_mapping",
@@ -681,9 +683,9 @@ def _parse_workflow(
             if section == "gapfill":
                 value = dict(value)
                 method = value.get("method")
-                if method not in {"greedy", "deadends", "milp"}:
+                if method not in {"greedy", "deadends", "milp", "sink-milp"}:
                     raise ConfigError(
-                        "'gapfill.method' must be greedy, deadends, or milp"
+                        "'gapfill.method' must be greedy, deadends, milp, or sink-milp"
                     )
                 profile = value.get("validation_profile")
                 if not isinstance(profile, str) or not profile.strip():
@@ -720,9 +722,20 @@ def _parse_workflow(
                             MODEL_SUFFIXES,
                         )
                     )
-                transport = {"greedy", "deadends"}
+                transport = {"greedy", "deadends", "sink-milp"}
+                sink_keys = {"tradeoff_lambda", "min_component_size"}
+                if method != "sink-milp" and sink_keys & set(value):
+                    raise ConfigError(
+                        f"gapfill {method} does not accept: "
+                        + ", ".join(sorted(sink_keys & set(value)))
+                    )
                 if method in transport:
-                    for key in ("allowed_connections", "candidate_types"):
+                    required = (
+                        ("allowed_connections",)
+                        if method == "sink-milp"
+                        else ("allowed_connections", "candidate_types")
+                    )
+                    for key in required:
                         if key not in value:
                             raise ConfigError(
                                 f"'gapfill.{key}' is required for {method}"
@@ -744,7 +757,7 @@ def _parse_workflow(
                             "'gapfill.allowed_connections' must contain at least "
                             "one compartment pair"
                         )
-                    types = value["candidate_types"]
+                    types = value.get("candidate_types", ["A", "B", "C"])
                     if (
                         not isinstance(types, list)
                         or not types
@@ -752,6 +765,20 @@ def _parse_workflow(
                     ):
                         raise ConfigError(
                             "'gapfill.candidate_types' must contain only A, B, or C"
+                        )
+                    lam = value.get("tradeoff_lambda", 0.01)
+                    if (
+                        isinstance(lam, bool)
+                        or not isinstance(lam, (int, float))
+                        or not 0 < lam < 1
+                    ):
+                        raise ConfigError(
+                            "'gapfill.tradeoff_lambda' must be between 0 and 1"
+                        )
+                    size = value.get("min_component_size", 4)
+                    if isinstance(size, bool) or not isinstance(size, int) or size < 1:
+                        raise ConfigError(
+                            "'gapfill.min_component_size' must be a positive integer"
                         )
                     incompatible = {
                         "universal_model",

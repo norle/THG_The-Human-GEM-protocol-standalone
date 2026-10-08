@@ -10,7 +10,7 @@ from pathlib import Path
 from typing import Any
 
 from thg_protocol.io.models import load_model as _load_cobra_model
-from thg_protocol.runtime.hashing import sha256_file, verify_artifact
+from thg_protocol.runtime.hashing import sha256_file, sha256_json, verify_artifact
 from thg_protocol.runtime.stage import (
     StageContext,
     StageResult,
@@ -257,6 +257,80 @@ class Beta2GateStage:
             raise ValueError("β2 release gate did not pass")
 
 
+# Sink-MILP phases, each its own resumable stage; skipped for other methods.
+_PTR_STAGES = {
+    "generate-gapfill-candidates",
+    "select-gapfill-connectors",
+    "compute-gapfill-coverage",
+}
+
+
+def _read_jsonl(path: Path) -> list[dict[str, Any]]:
+    return [
+        json.loads(line)
+        for line in path.read_text(encoding="utf-8").splitlines()
+        if line.strip()
+    ]
+
+
+def _write_jsonl(path: Path, items: list[Mapping[str, object]]) -> Path:
+    path.write_text(
+        "".join(json.dumps(item, sort_keys=True) + "\n" for item in items),
+        encoding="utf-8",
+    )
+    return path
+
+
+def _ptr_candidates(context: StageContext) -> list[Any]:
+    from thg_protocol.gapfill.ptr import PtrCandidate
+
+    path = _dependency_path(context, "generate-gapfill-candidates", "candidates")
+    return [PtrCandidate.from_dict(item) for item in _read_jsonl(path)]
+
+
+def _ptr_connectors(context: StageContext) -> list[Any]:
+    from thg_protocol.gapfill.ptr import PtrCandidate
+
+    path = _dependency_path(context, "select-gapfill-connectors", "connectors")
+    return [PtrCandidate.from_dict(item) for item in _read_jsonl(path)]
+
+
+def _coverage_lines(path: Path) -> tuple[str | None, list[dict[str, Any]]]:
+    """Header fingerprint and component lines; a torn last line is dropped."""
+    fingerprint = None
+    lines = []
+    for line in path.read_text(encoding="utf-8").splitlines():
+        try:
+            item = json.loads(line)
+        except json.JSONDecodeError:
+            continue
+        if "fingerprint" in item:
+            fingerprint = item["fingerprint"]
+        else:
+            lines.append(item)
+    return fingerprint, lines
+
+
+def _parameters(section: Mapping[str, object]) -> dict[str, Any]:
+    """Algorithm parameters: the gapfill section without workflow-only keys."""
+    return {
+        key: value
+        for key, value in section.items()
+        if key
+        not in {
+            "method",
+            "validation_profile",
+            "task_suite",
+            "task_mapping",
+            "candidate_universe",
+            "external_input",
+            "input_model",
+            "run_loop_detection",
+            "remove_infeasible_loops",
+        }
+    }
+
+
 class GapfillStage:
     implementation_version = 2
 
@@ -267,12 +341,16 @@ class GapfillStage:
             self.implementation_version = 3
         elif stage_id == "validate-gapfill":
             self.implementation_version = 5
-        elif stage_id == "gate-gapfill":
+        elif stage_id in {"gate-gapfill", "generate-gapfill-plan"}:
             self.implementation_version = 3
+        elif stage_id in _PTR_STAGES:
+            self.implementation_version = 1
 
     def enabled(self, config: Any) -> bool:
-        del config
-        return True
+        if self.id not in _PTR_STAGES:
+            return True
+        section = config.sections.get("gapfill", {})
+        return isinstance(section, Mapping) and section.get("method") == "sink-milp"
 
     def fingerprint_data(self, context: StageContext) -> Mapping[str, object]:
         section = _section(context)
@@ -297,6 +375,11 @@ class GapfillStage:
             }
             data["candidate_universe_sha256"] = _hash(section.get("candidate_universe"))
             data["universal_model_sha256"] = _hash(section.get("universal_model"))
+        elif self.id == "generate-gapfill-candidates":
+            data["allowed_connections"] = section.get("allowed_connections")
+            data["candidate_types"] = section.get("candidate_types")
+        elif self.id == "compute-gapfill-coverage":
+            data["min_component_size"] = section.get("min_component_size")
         elif self.id == "characterize-gapfill-baseline":
             data["validation_profile"] = section.get("validation_profile")
             data["run_loop_detection"] = section.get("run_loop_detection", True)
@@ -408,30 +491,160 @@ class GapfillStage:
                 payload["metrics"] if isinstance(payload["metrics"], Mapping) else {},
             )
 
+        if self.id == "generate-gapfill-candidates":
+            from thg_protocol.gapfill.core import _resolved_parameters
+            from thg_protocol.gapfill.ptr import (
+                generate_ptr_candidates,
+                network_components,
+            )
+
+            parameters = _resolved_parameters("sink-milp", _parameters(section))
+            model = _load_cobra_model(
+                _dependency_path(context, "load-gapfill-source", "model")
+            )
+            components = network_components(model)
+            candidates = generate_ptr_candidates(
+                model,
+                parameters["allowed_connections"],
+                parameters["candidate_types"],
+                components,
+            )
+            return StageResult(
+                (
+                    (
+                        "candidates",
+                        _write_jsonl(
+                            work_dir / "ptr-candidates.jsonl",
+                            [item.to_dict() for item in candidates],
+                        ),
+                    ),
+                    (
+                        "components",
+                        _dump(
+                            work_dir / "ptr-components.json",
+                            {
+                                "schema_version": 1,
+                                "of": components.of,
+                                "sizes": {
+                                    str(key): value
+                                    for key, value in components.sizes.items()
+                                },
+                            },
+                        ),
+                    ),
+                ),
+                {
+                    "candidates": len(candidates),
+                    "already_present": sum(item.present for item in candidates),
+                    "components": len(components.sizes),
+                },
+            )
+
+        if self.id == "select-gapfill-connectors":
+            from thg_protocol.gapfill.ptr import select_connectors
+
+            connectors = select_connectors(_ptr_candidates(context))
+            return StageResult(
+                (
+                    (
+                        "connectors",
+                        _write_jsonl(
+                            work_dir / "ptr-connectors.jsonl",
+                            [item.to_dict() for item in connectors],
+                        ),
+                    ),
+                ),
+                {"connectors": len(connectors)},
+            )
+
+        if self.id == "compute-gapfill-coverage":
+            from thg_protocol.gapfill import ptr
+            from thg_protocol.gapfill.core import _add_candidate, _resolved_parameters
+
+            parameters = _resolved_parameters("sink-milp", _parameters(section))
+            model = _load_cobra_model(
+                _dependency_path(context, "load-gapfill-source", "model")
+            )
+            for connector in _ptr_connectors(context):
+                _add_candidate(model, connector.as_gapfill_candidate(phase=2))
+            stored = json.loads(
+                _dependency_path(
+                    context, "generate-gapfill-candidates", "components"
+                ).read_text(encoding="utf-8")
+            )
+            components = ptr.Components(
+                stored["of"],
+                {int(key): value for key, value in stored["sizes"].items()},
+            )
+            fingerprint = sha256_json(self.fingerprint_data(context))
+            done = {}
+            # A failed or interrupted attempt keeps its finished components.
+            for path in sorted(
+                (context.run_dir / "failed" / self.id).glob(
+                    "attempt-*/ptr-coverage.jsonl"
+                )
+            ):
+                previous, lines = _coverage_lines(path)
+                if previous == fingerprint:
+                    for line in lines:
+                        entry = ptr.ComponentCoverage.from_dict(line)
+                        done[entry.component] = entry
+            path = work_dir / "ptr-coverage.jsonl"
+            with path.open("w", encoding="utf-8") as handle:
+                handle.write(json.dumps({"fingerprint": fingerprint}) + "\n")
+                for entry in done.values():
+                    handle.write(json.dumps(entry.to_dict(), sort_keys=True) + "\n")
+                handle.flush()
+
+                def checkpoint(entry: Any) -> None:
+                    handle.write(json.dumps(entry.to_dict(), sort_keys=True) + "\n")
+                    handle.flush()
+
+                coverage = ptr.compute_coverage(
+                    model,
+                    _ptr_candidates(context),
+                    components,
+                    min_component_size=parameters["min_component_size"],
+                    done=done,
+                    on_component=checkpoint,
+                )
+            return StageResult(
+                (("coverage", path),),
+                {
+                    "components": len(coverage),
+                    "reused_components": len(done),
+                    "targets": sum(len(item.targets) for item in coverage),
+                    "sink_only": sum(len(item.sink_only) for item in coverage),
+                },
+            )
+
         if self.id == "generate-gapfill-plan":
             from thg_protocol.gapfill import generate_gapfill_plan
 
             source = _dependency_path(context, "load-gapfill-source", "model")
             method = str(section["method"])
-            parameters = {
-                key: value
-                for key, value in section.items()
-                if key
-                not in {
-                    "method",
-                    "validation_profile",
-                    "task_suite",
-                    "task_mapping",
-                    "candidate_universe",
-                    "external_input",
-                    "input_model",
-                }
-            }
+            parameters = _parameters(section)
+            model = _load_cobra_model(source)
+            result = None
+            if method == "sink-milp":
+                from thg_protocol.gapfill.ptr import ComponentCoverage, run_sink_milp
+
+                _, lines = _coverage_lines(
+                    _dependency_path(context, "compute-gapfill-coverage", "coverage")
+                )
+                result = run_sink_milp(
+                    model,
+                    parameters,
+                    candidates=_ptr_candidates(context),
+                    connectors=_ptr_connectors(context),
+                    coverage=[ComponentCoverage.from_dict(line) for line in lines],
+                )
             plan = generate_gapfill_plan(
-                _load_cobra_model(source),
+                model,
                 method=method,
                 parameters=parameters,
                 source_model_checksum=sha256_file(source),
+                result=result,
             )
             external_checksums = {
                 key: sha256_file(str(section[key]))
@@ -909,9 +1122,25 @@ def gapfill_stages(*, reference: bool = False) -> tuple[GapfillStage, ...]:
             ("gate-beta2", "integrate-human-database") if reference else (),
         ),
         GapfillStage("characterize-gapfill-baseline", ("load-gapfill-source",)),
+        GapfillStage("generate-gapfill-candidates", ("load-gapfill-source",)),
+        GapfillStage("select-gapfill-connectors", ("generate-gapfill-candidates",)),
+        GapfillStage(
+            "compute-gapfill-coverage",
+            (
+                "load-gapfill-source",
+                "generate-gapfill-candidates",
+                "select-gapfill-connectors",
+            ),
+        ),
         GapfillStage(
             "generate-gapfill-plan",
-            ("load-gapfill-source", "characterize-gapfill-baseline"),
+            (
+                "load-gapfill-source",
+                "characterize-gapfill-baseline",
+                "generate-gapfill-candidates",
+                "select-gapfill-connectors",
+                "compute-gapfill-coverage",
+            ),
         ),
         GapfillStage("apply-gapfill", ("load-gapfill-source", "generate-gapfill-plan")),
         GapfillStage(

@@ -194,7 +194,9 @@ _SANCTIONED_FIXTURE = (
 )
 
 
-def _reference_config(tmp_path, *, beta2, allowed_connections=(("c", "e"),)):
+def _reference_config(
+    tmp_path, *, beta2, allowed_connections=(("c", "e"),), gapfill=None
+):
     path = tmp_path / "reference.json"
     path.write_text(
         json.dumps(
@@ -203,7 +205,8 @@ def _reference_config(tmp_path, *, beta2, allowed_connections=(("c", "e"),)):
                 "run": {"name": "check", "output_dir": str(tmp_path / "run")},
                 "beta1": {"input_model": str(_SANCTIONED_FIXTURE)},
                 "beta2": beta2,
-                "gapfill": {
+                "gapfill": gapfill
+                or {
                     "method": "greedy",
                     "max_additions": 1,
                     "allowed_connections": [list(pair) for pair in allowed_connections],
@@ -251,3 +254,62 @@ def test_shipped_reference_config_uses_the_beta2_evidence_settings():
     assert {key: reference.get(key) for key in shared} == {
         key: standalone[key] for key in shared
     }
+
+
+_SINK_MILP = {
+    "method": "sink-milp",
+    "max_additions": 10,
+    "allowed_connections": [["c", "e"]],
+    "validation_profile": "structural-fast",
+}
+
+
+def _sink_milp_config(tmp_path, **changes):
+    section = {**_SINK_MILP, **changes}
+    return _reference_config(
+        tmp_path,
+        beta2={"gene_locations": {"ENSG000001": ["cytosol"]}},
+        gapfill={key: value for key, value in section.items() if value is not None},
+    )
+
+
+def test_sink_milp_accepts_its_parameters(tmp_path):
+    config = load_workflow_config(
+        _sink_milp_config(
+            tmp_path,
+            candidate_types=["A", "B"],
+            tradeoff_lambda=0.5,
+            min_component_size=2,
+        )
+    )
+    assert config.sections["gapfill"]["method"] == "sink-milp"
+
+
+@pytest.mark.parametrize(
+    ("changes", "message"),
+    [
+        ({"allowed_connections": None}, "allowed_connections"),
+        ({"allowed_connections": []}, "allowed_connections"),
+        ({"tradeoff_lambda": 0}, "tradeoff_lambda"),
+        ({"tradeoff_lambda": 1}, "tradeoff_lambda"),
+        ({"tradeoff_lambda": True}, "tradeoff_lambda"),
+        ({"min_component_size": 0}, "min_component_size"),
+        ({"min_component_size": 1.5}, "min_component_size"),
+        ({"candidate_types": ["D"]}, "candidate_types"),
+        ({"objective": "R1"}, "objective"),
+        ({"universal_model": "u.json"}, "universal_model"),
+    ],
+)
+def test_sink_milp_rejects_invalid_parameters(tmp_path, changes, message):
+    with pytest.raises(ConfigError, match=message):
+        load_workflow_config(_sink_milp_config(tmp_path, **changes))
+
+
+@pytest.mark.parametrize("key", ["tradeoff_lambda", "min_component_size"])
+def test_greedy_rejects_sink_milp_parameters(tmp_path, key):
+    with pytest.raises(ConfigError, match=key):
+        load_workflow_config(
+            _sink_milp_config(
+                tmp_path, method="greedy", candidate_types=["A"], **{key: 0.5}
+            )
+        )
