@@ -9,6 +9,7 @@ from thg_protocol.gapfill.ptr import (
     PtrCandidate,
     generate_ptr_candidates,
     network_components,
+    select_connectors,
 )
 
 
@@ -144,3 +145,41 @@ def test_metabolite_without_suffix_uses_compartment_attribute():
 def test_candidate_types_filter(types):
     found = candidates_of(two_islands(), types=types)
     assert [item.type for item in found] == [t for t in ["C"] if t in types]
+
+
+def ptr(base, components, kind, compartments=("c", "e")):
+    met1, met2 = (f"{base}{compartment}" for compartment in compartments)
+    return PtrCandidate(
+        met1,
+        met2,
+        base,
+        compartments,
+        components,
+        kind,
+        f"GAPFILL_PTR_{met1}_{met2}",
+    )
+
+
+def test_connectors_join_every_component_once():
+    candidates = [
+        ptr("X", (1, 2), "C"),
+        ptr("Y", (1, 2), "A"),
+        ptr("Z", (2, 3), "B"),
+        ptr("W", (1, 3), "C"),
+    ]
+    assert [item.base for item in select_connectors(candidates)] == ["Y", "Z"]
+
+
+def test_connector_prefers_type_a_then_base():
+    candidates = [
+        ptr("Q", (1, 2), "B"),
+        ptr("N", (1, 2), "A"),
+        ptr("M", (1, 2), "A", ("c", "m")),
+        ptr("M", (1, 2), "A"),
+    ]
+    (connector,) = select_connectors(candidates)
+    assert (connector.met1, connector.met2) == ("Mc", "Me")
+
+
+def test_main_only_candidates_are_never_connectors():
+    assert select_connectors([ptr("A", (1, 1), "A")]) == []

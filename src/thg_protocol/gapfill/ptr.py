@@ -186,3 +186,39 @@ def generate_ptr_candidates(
                     candidate = replace(candidate, present=True)
                 result.append(candidate)
     return sorted(result, key=lambda candidate: candidate.reaction_id)
+
+
+def select_connectors(candidates: list[PtrCandidate]) -> list[PtrCandidate]:
+    """Join every component with one PTR per spanning-tree edge (Kruskal).
+
+    Each component pair is represented by its best candidate (type A before B
+    before C, then base and metabolite IDs); edges are taken in that order.
+    """
+    representatives: dict[tuple[int, int], PtrCandidate] = {}
+    for candidate in candidates:
+        if candidate.present or candidate.components[0] == candidate.components[1]:
+            continue
+        pair = tuple(sorted(candidate.components))
+        best = representatives.get(pair)
+        if best is None or _connector_key(candidate) < _connector_key(best):
+            representatives[pair] = candidate
+    parent: dict[int, int] = {}
+
+    def find(item: int) -> int:
+        parent.setdefault(item, item)
+        while parent[item] != item:
+            parent[item] = parent[parent[item]]
+            item = parent[item]
+        return item
+
+    selected = []
+    for candidate in sorted(representatives.values(), key=_connector_key):
+        left, right = (find(component) for component in candidate.components)
+        if left != right:
+            parent[right] = left
+            selected.append(candidate)
+    return selected
+
+
+def _connector_key(candidate: PtrCandidate) -> tuple[int, str, str, str]:
+    return (_RANK[candidate.type], candidate.base, candidate.met1, candidate.met2)
