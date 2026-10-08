@@ -31,35 +31,85 @@ name: mitochondrion
         {"x": "GO:0005739"},
         {"x": "Mitochondria"},
     )
-    assert result["target_compartment_id"] == "x"
-    assert result["resolution_path"][1]["relation"] == "part_of"
+    assert result["target_compartment_ids"] == ["x"]
+    assert result["target_compartment_names"] == ["Mitochondria"]
+    assert result["resolution_paths"][0][1]["relation"] == "part_of"
 
 
-def test_go_resolution_rejects_equal_distance_targets():
+def test_go_resolution_keeps_every_compartment_that_does_not_contain_another():
     graph = parse_obo(
         """
 [Term]
-id: GO:0000001
-name: ambiguous location
-is_a: GO:0000002
-is_a: GO:0000003
+id: GO:0005879
+name: axonemal microtubule
+is_a: GO:0005874
+relationship: part_of GO:0005930 ! axoneme
 
 [Term]
-id: GO:0000002
-name: first
+id: GO:0005874
+name: microtubule
+relationship: part_of GO:0005856 ! cytoskeleton
 
 [Term]
-id: GO:0000003
-name: second
+id: GO:0005930
+name: axoneme
+relationship: part_of GO:0005929 ! cilium
+
+[Term]
+id: GO:0005856
+name: cytoskeleton
+
+[Term]
+id: GO:0005929
+name: cilium
 """
     )
     result = resolve_go_compartment(
-        "ambiguous location",
-        None,
-        graph,
-        {"a": "GO:0000002", "b": "GO:0000003"},
+        "", "GO:0005879", graph, {"ck": "GO:0005856", "ci": "GO:0005929"}
     )
-    assert result["reason"] == "ambiguous-compartment-resolution"
+    # Different distances (2 vs 3 steps) do not matter: both places are kept.
+    assert result["status"] == "resolved"
+    assert result["target_compartment_ids"] == ["ci", "ck"]
+    assert result["target_go_ids"] == ["GO:0005929", "GO:0005856"]
+    assert [path[-1]["id"] for path in result["resolution_paths"]] == [
+        "GO:0005929",
+        "GO:0005856",
+    ]
+
+
+def test_go_resolution_drops_a_compartment_that_contains_another_reached_one():
+    graph = parse_obo(
+        """
+[Term]
+id: GO:0005758
+name: mitochondrial intermembrane space
+relationship: part_of GO:0005740 ! mitochondrial envelope
+
+[Term]
+id: GO:0005743
+name: mitochondrial inner membrane
+relationship: part_of GO:0005740 ! mitochondrial envelope
+
+[Term]
+id: GO:0005740
+name: mitochondrial envelope
+relationship: part_of GO:0005739 ! mitochondrion
+
+[Term]
+id: GO:0005739
+name: mitochondrion
+relationship: part_of GO:0005737 ! cytoplasm
+
+[Term]
+id: GO:0005737
+name: cytoplasm
+"""
+    )
+    targets = {"m": "GO:0005739", "i": "GO:0005743"}
+    inner = resolve_go_compartment("", "GO:0005743", graph, targets)
+    space = resolve_go_compartment("", "GO:0005758", graph, targets)
+    assert inner["target_compartment_ids"] == ["i"]
+    assert space["target_compartment_ids"] == ["m"]
 
 
 def test_go_alias_applies_only_to_the_exact_start_term():
@@ -88,9 +138,9 @@ relationship: part_of GO:0005737 ! cytoplasm
     child = resolve_go_compartment("", "GO:0036464", graph, targets, None, aliases)
     without = resolve_go_compartment("Cytoplasm", None, graph, targets)
 
-    assert by_text["target_compartment_id"] == "c"
+    assert by_text["target_compartment_ids"] == ["c"]
     assert by_text["resolution_method"] == "configured-alias"
-    assert by_id["target_go_id"] == "GO:0005829"
+    assert by_id["target_go_ids"] == ["GO:0005829"]
     assert child["reason"] == "location-not-in-registry"
     assert without["reason"] == "location-not-in-registry"
 

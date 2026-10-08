@@ -104,8 +104,8 @@ def test_beta2_uses_go_targets_with_arbitrary_model_ids(tmp_path):
     resolved = next(
         item for item in payload["evidence"] if item.get("gene_id") == "G_A"
     )
-    assert resolved["target_compartment_id"] == "x"
-    assert resolved["target_compartment_name"] == "Mitochondria"
+    assert resolved["target_compartment_ids"] == ["x"]
+    assert resolved["target_compartment_names"] == ["Mitochondria"]
     gpr_output = next(
         item
         for item in get_status(run)["steps"]["export-beta2"]["outputs"]
@@ -193,7 +193,7 @@ def test_beta2_go_alias_resolves_cytoplasm_to_cytosol_only_at_the_exact_term(
     payload = json.loads((run / resolution["path"]).read_text(encoding="utf-8"))
     by_gene = {item.get("gene_id"): item for item in payload["evidence"]}
     assert by_gene["G_CYT"]["status"] == "resolved"
-    assert by_gene["G_CYT"]["target_compartment_id"] == "c"
+    assert by_gene["G_CYT"]["target_compartment_ids"] == ["c"]
     assert by_gene["G_CYT"]["resolution_method"] == "configured-alias"
     # A child of cytoplasm does not inherit the alias through the upward walk.
     assert by_gene["G_GRAN"]["status"] == "rejected"
@@ -277,3 +277,89 @@ def test_beta2_keeps_every_compartment_of_a_dual_localized_gene(tmp_path):
     assert not any(
         item.get("status") == "location-conflict" for item in payload["evidence"]
     )
+
+
+def test_beta2_one_go_term_can_place_a_gene_in_two_compartments(tmp_path):
+    model = Model("go-two-places")
+    left = Metabolite("left_c", formula="C", compartment="c")
+    right = Metabolite("right_c", formula="C", compartment="c")
+    reaction = Reaction("R_AXO")
+    reaction.add_metabolites({left: -1, right: 1})
+    reaction.gene_reaction_rule = "G_AXO"
+    model.add_reactions([reaction])
+    source = tmp_path / "beta1.json"
+    save_json_model(model, source)
+    goa = tmp_path / "goa.gaf"
+    goa.write_text(
+        "\t".join(
+            ["UniProt", "P1", "G_AXO", "", "GO:0005879", "PMID:1", "IDA", "", "C"]
+            + [""] * 5
+            + ["GOA"]
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    run = tmp_path / "run"
+    config = tmp_path / "config.json"
+    config.write_text(
+        json.dumps(
+            {
+                "workflow": "beta2",
+                "run": {"name": "go-two-places", "output_dir": str(run)},
+                "beta2": {
+                    "input_model": str(source),
+                    "external_beta1_equivalent": True,
+                    "compartments": {
+                        "c": "cytosol",
+                        "ci": "cilium",
+                        "ck": "cytoskeleton",
+                    },
+                    "compartment_go_terms": {
+                        "c": "GO:0005829",
+                        "ci": "GO:0005929",
+                        "ck": "GO:0005856",
+                    },
+                    "go_graph": {
+                        "GO:0005879": {
+                            "name": "axonemal microtubule",
+                            "parents": [
+                                {"relation": "is_a", "id": "GO:0005874"},
+                                {"relation": "part_of", "id": "GO:0005930"},
+                            ],
+                        },
+                        "GO:0005874": {
+                            "name": "microtubule",
+                            "parents": [{"relation": "part_of", "id": "GO:0005856"}],
+                        },
+                        "GO:0005930": {
+                            "name": "axoneme",
+                            "parents": [{"relation": "part_of", "id": "GO:0005929"}],
+                        },
+                        "GO:0005829": {"name": "cytosol", "parents": []},
+                        "GO:0005856": {"name": "cytoskeleton", "parents": []},
+                        "GO:0005929": {"name": "cilium", "parents": []},
+                    },
+                    "location_sources": ["goa"],
+                    "go_annotation_file": str(goa),
+                    "run_solver_checks": False,
+                },
+            }
+        ),
+        encoding="utf-8",
+    )
+    start(config)
+    assert get_status(run)["overall_status"] == "completed"
+    resolution = next(
+        item
+        for item in get_status(run)["steps"]["export-beta2"]["outputs"]
+        if item["role"] == "compartment-resolution-evidence"
+    )
+    payload = json.loads((run / resolution["path"]).read_text(encoding="utf-8"))
+    record = next(
+        item for item in payload["evidence"] if item.get("gene_id") == "G_AXO"
+    )
+    assert record["target_compartment_ids"] == ["ci", "ck"]
+    assert payload["gene_locations"]["G_AXO"]["locations"] == [
+        "cilium",
+        "cytoskeleton",
+    ]

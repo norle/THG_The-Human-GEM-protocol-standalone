@@ -80,8 +80,8 @@ extended or split rather than duplicated.
 
 The first open-evidence slice is implemented in the current β2 workflow:
 
-- GO Cellular Component parsing and nearest-target resolution use only `is_a`
-  and `part_of` edges.
+- GO Cellular Component parsing and most-specific-target resolution use only
+  `is_a` and `part_of` edges.
 - GOA, UniProt, Rhea, Reactome, and BioCyc evidence enter through injectable
   snapshot/live boundaries.
 - Explicit configuration remains authoritative; ambiguous or conflicting
@@ -449,35 +449,53 @@ The resolver returns:
   "raw_location": "mitochondrial inner membrane",
   "canonical_go_id": "GO:0005743",
   "status": "resolved",
-  "target_compartment_id": "m",
-  "target_compartment_name": "Mitochondria",
-  "target_go_id": "GO:0005739",
-  "resolution_path": [
-    {
-      "id": "GO:0005743",
-      "name": "mitochondrial inner membrane"
-    },
-    {
-      "relation": "part_of",
-      "id": "GO:0005739",
-      "name": "mitochondrion"
-    }
+  "target_compartment_ids": ["m"],
+  "target_compartment_names": ["Mitochondria"],
+  "target_go_ids": ["GO:0005739"],
+  "resolution_paths": [
+    [
+      {
+        "id": "GO:0005743",
+        "name": "mitochondrial inner membrane"
+      },
+      {
+        "relation": "part_of",
+        "id": "GO:0005739",
+        "name": "mitochondrion"
+      }
+    ]
   ]
 }
 ```
 
+The target fields are lists because one GO term can lie in more than one
+configured compartment (see section 8).
+
 ---
 
-## 8. Resolve to the nearest configured GO target
+## 8. Resolve to every most-specific configured GO target
+
+*Changed 2026-10-08.* The first version chose the single nearest target by
+number of steps and rejected equal-distance ties as
+`ambiguous-compartment-resolution`. The number of steps reflects how GO
+curators structured a branch, not where a protein is, so it no longer decides
+anything.
 
 For each evidence GO term:
 
-1. Check exact configured GO target.
-2. Traverse upward through `is_a` and `part_of`.
-3. Find all configured target GO terms reachable from the evidence term.
-4. Choose the nearest valid target.
+1. Traverse upward through `is_a` and `part_of`.
+2. Find all configured target GO terms reachable from the evidence term
+   (including the term itself).
+3. Drop any reached target whose GO term is an ancestor of another reached
+   target's GO term. A target that contains another reached target is less
+   specific (mitochondrion when mitochondrial inner membrane was reached).
+4. Keep every remaining target. Targets that are not ancestors of each other
+   are different places the term lies in: an axonemal microtubule is part of
+   the cytoskeleton and part of the cilium, so it resolves to both.
 5. If no target is reachable, reject as `location-not-in-registry`.
-6. If multiple equally valid nearest targets exist, reject as `ambiguous-compartment-resolution`.
+
+Several targets from one annotation are treated the same way as several
+annotations for one gene: the gene is placed in all of them.
 
 Example:
 
@@ -533,7 +551,7 @@ must resolve to:
 im
 ```
 
-because it is the nearest configured target.
+because `m` is an ancestor of `im` and is therefore dropped as less specific.
 
 Do not automatically collapse to the broader mitochondrion if a more specific legal model target exists.
 
@@ -950,7 +968,7 @@ Example:
   "source": "reactome",
   "reactome_id": "R-HSA-...",
   "go_id": "GO:0005829",
-  "target_compartment_id": "c"
+  "target_compartment_ids": ["c"]
 }
 ```
 
@@ -1547,11 +1565,11 @@ Also test:
 - GO synonym match;
 - `is_a` traversal;
 - `part_of` traversal;
-- nearest configured target;
+- every most-specific configured target is kept;
 - overlapping configured targets;
 - arbitrary model compartment IDs;
 - no reachable target;
-- equal-distance ambiguity;
+- several unrelated targets from one term;
 - obsolete GO term handling;
 - no `has_part` traversal;
 - no downward guessing.
@@ -1643,13 +1661,11 @@ Evidence for an unconfigured compartment must produce:
 location-not-in-registry
 ```
 
-### Ambiguous target
+### Several targets
 
-Multiple equally valid configured targets must produce:
-
-```text
-ambiguous-compartment-resolution
-```
+*Changed 2026-10-08.* Several configured targets that are not ancestors of each
+other are all kept. `ambiguous-compartment-resolution` is no longer produced by
+the GO resolver (the BioCyc CCO resolver still uses it).
 
 ---
 
@@ -1666,7 +1682,7 @@ compartment_go_terms
 go-basic loader
 GO DAG
 is_a / part_of traversal
-nearest configured target
+most-specific configured targets
 resolution artifacts
 ```
 

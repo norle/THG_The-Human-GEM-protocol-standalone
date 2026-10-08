@@ -100,6 +100,20 @@ def _record_kind(record: Mapping[str, object]) -> str:
     ).lower()
 
 
+def _target_names(record: Mapping[str, object]) -> list[str]:
+    """Compartment names of a resolved location record.
+
+    GO resolution can place one annotation in several compartments
+    (``target_compartment_names``); CCO resolution and older snapshot records
+    carry a single ``target_compartment_name``.
+    """
+    names = record.get("target_compartment_names")
+    if isinstance(names, (list, tuple)):
+        return [str(name) for name in names if name]
+    name = record.get("target_compartment_name")
+    return [str(name)] if name else []
+
+
 def _source_release(section: Mapping[str, object], source: str) -> str:
     releases = section.get("source_releases", {})
     item = releases.get(source, {}) if isinstance(releases, Mapping) else {}
@@ -1618,10 +1632,10 @@ class Beta2Stage:
                 if recorded:
                     targets = sorted(
                         {
-                            str(item.get("target_compartment_name"))
+                            name
                             for item in recorded
                             if item.get("status") == "resolved"
-                            and item.get("target_compartment_name")
+                            for name in _target_names(item)
                         }
                     )
                     gene_locations[gene] = dict(record)
@@ -1655,7 +1669,7 @@ class Beta2Stage:
                     )
                     resolution_records.append(resolved)
                     if resolved.get("status") == "resolved":
-                        targets.append(str(resolved["target_compartment_name"]))
+                        targets.extend(_target_names(resolved))
                     else:
                         unresolved.append(
                             f"{gene}:{resolved.get('reason', 'unresolved-location')}"
@@ -1707,7 +1721,7 @@ class Beta2Stage:
                 if item.get("status") == "resolved":
                     reaction_targets.setdefault(
                         str(item.get("reaction_id")), set()
-                    ).add(str(item.get("target_compartment_name")))
+                    ).update(_target_names(item))
             gene_targets = {
                 gene: set(record.get("locations", []))
                 for gene, record in gene_locations.items()
@@ -1842,16 +1856,18 @@ class Beta2Stage:
             )
             for item in compartment_payload.get("reaction_locations", []):
                 reaction_id = str(item.get("reaction_id", ""))
-                target = str(item.get("target_compartment_name", ""))
+                targets = _target_names(item)
                 if (
                     item.get("status") == "resolved"
                     and reaction_id in resolved
-                    and target
+                    and targets
                     and not resolved[reaction_id]["rules"]
                 ):
                     gpr = str(gprs["records"].get(reaction_id, {}).get("gpr", ""))
                     if gpr:
-                        resolved[reaction_id]["rules"] = {target: gpr}
+                        resolved[reaction_id]["rules"] = {
+                            target: gpr for target in targets
+                        }
                         evidence.append(
                             {
                                 "reaction_id": reaction_id,

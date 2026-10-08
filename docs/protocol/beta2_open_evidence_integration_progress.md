@@ -5,8 +5,9 @@ Date: 2026-08-17
 ## Delivered
 
 - Added a pure GO Cellular Component parser/resolver with exact matching,
-  synonym support, nearest configured targets, ambiguity rejection, and only
-  `is_a`/`part_of` upward traversal.
+  synonym support, and only `is_a`/`part_of` upward traversal. *Updated
+  2026-10-08:* it now returns every most-specific configured target the term
+  reaches, instead of the nearest one with equal-distance ties rejected.
 - Added injectable GOA, UniProt, Rhea, Reactome, and GO ontology boundaries with
   static snapshot adapters and live clients where configured.
 - Extended strict β2 configuration for GO targets, source selection, ontology

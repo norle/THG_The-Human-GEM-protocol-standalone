@@ -24,7 +24,7 @@ Stage code is in `src/thg_protocol/workflow/beta2/_stages.py`.
 2. **Map each location to a compartment** (`resolve-compartment-evidence`).
    - With a GO ID: start at that term.
    - Without one: match the text exactly against GO term names and synonyms. One match is used. Several give `ambiguous-go-term`, none gives `location-not-in-ontology`.
-   - From the start term, walk up the GO tree through `is_a` and `part_of` links to the nearest configured compartment term (`src/thg_protocol/curation/go.py:168-198`).
+   - From the start term, walk up the GO tree through `is_a` and `part_of` links and collect **every** configured compartment term reached. Drop any compartment whose GO term is an ancestor of another one reached (mitochondrion when mitochondrial inner membrane was also reached). All remaining compartments are kept (`src/thg_protocol/curation/go.py:160`). *(Changed 2026-10-08; it used to pick the single nearest one, see Edge case 1.)*
    - Exception: if the start term is listed in `compartment_go_aliases` (currently only cytoplasm → `c`), it resolves straight to that compartment without walking the tree.
    - BioCyc's location ontology (CCO) is used instead only when no GO compartment terms are configured and the annotation has no GO ID (`_stages.py:1562-1576`; the CCO resolver itself is `resolve_compartment` at `src/thg_protocol/curation/beta2.py:42`).
 3. **Combine per gene.** Each gene ends up with a set of compartments.
@@ -36,37 +36,51 @@ Stage code is in `src/thg_protocol/workflow/beta2/_stages.py`.
 
 ## Edge cases
 
-### 1. Two compartments the same distance away
+### 1. One location that reaches several compartments
 
-- The location is **rejected**, never guessed. The record gets `status: "rejected"`, reason `ambiguous-compartment-resolution`, and the list of candidates (`curation/go.py:206-216`, `curation/beta2.py:127-138`).
-- The GO resolver has no tie-break: `is_a` and `part_of` links count the same.
-- The CCO resolver breaks one kind of tie first: a "contained in" link (`component_of`) beats an "is a kind of" link (`superclasses`). It rejects only if both the distance and the link type are tied.
-- If two paths of equal length reach the **same** compartment, that isn't a conflict. The path that sorts first alphabetically is recorded; this only affects the audit trail.
-- **How often it happens:** rarely. No saved run has any compartment-resolution records (the β2 run in `runs/thg-reference` produced an empty `beta2-compartment-resolution-evidence.json`), so there's no observed case. As an offline check on 2026-10-07, every cellular-component term in GO release 2026-06-19 was put through the resolver with the 13 compartments in `configs/beta2.json`:
+*Changed 2026-10-08.* A GO term often has several parents, so walking up from it can reach more than one configured compartment.
 
-  | Outcome | GO terms |
-  |---|---|
-  | resolved | 1,835 |
-  | doesn't reach any configured compartment | 2,232 |
-  | **tie between two compartments** | **8** |
+- **Now:** every compartment reached is kept, except those that contain another compartment reached. The record lists them in `target_compartment_ids`, `target_compartment_names` and `target_go_ids`, with one entry in `resolution_paths` per compartment. The GO resolver no longer produces `ambiguous-compartment-resolution`.
+  - "axonemal microtubule" is a kind of microtubule (part of the cytoskeleton) and part of the axoneme (part of the cilium), so it resolves to `ci` and `ck`.
+  - "mitochondrial inner membrane" reaches `i` and `m`. `m` contains `i`, so only `i` is kept.
+  - "mitochondrial matrix" can never reach `c`: walking up passes cytoplasm (GO:0005737), but the `c` target is cytosol (GO:0005829), which sits beside the mitochondrion in GO, not above it.
+- **Before:** the resolver picked the single compartment with the fewest steps, and rejected the annotation as `ambiguous-compartment-resolution` when two were the same number of steps away. The number of steps reflects how GO's curators split a branch, not where the protein is. So in the 93 terms that reach several unrelated compartments, it chose one of them for no biological reason, and in the 8 terms where the step counts happened to be equal, it threw the annotation away.
+- **Why several compartments from one term are fine:** they all say true things about where the protein is. They appear because some configured compartments overlap rather than being separate places: the cytoskeleton (`ck`) runs through the cytosol, cilium and nucleus, and vesicle (`v`) is a general GO class that lysosomes, endosomes and Golgi vesicles fall under. An enzyme on an axonemal microtubule is in both `ci` and `ck` by the model's own definitions, so β2 copies the reaction into both.
+- **The CCO resolver is unchanged.** It still picks the nearest compartment, prefers a "contained in" link (`component_of`) over an "is a kind of" link (`superclasses`), and rejects remaining ties as `ambiguous-compartment-resolution` (`curation/beta2.py:127-138`). It is used only when no GO compartment terms are configured.
+- **Effect on GO release 2026-06-19** with the 13 compartments in `configs/beta2.json` (every cellular-component term put through the resolver, offline):
 
-  The 8 tied terms:
+  | Outcome | Nearest compartment (before) | Most specific compartments (now) |
+  |---|---|---|
+  | doesn't reach any configured compartment | 2,231 | 2,231 |
+  | one compartment | 1,836 | 1,744 |
+  | two compartments | 0 | 99 |
+  | three compartments | 0 | 1 |
+  | rejected as a tie | 8 | 0 |
 
-  | Tied compartments | GO terms |
-  |---|---|
-  | cilium (`ci`) + cytoskeleton (`ck`) | GO:0035253 ciliary rootlet; GO:0120260 ciliary microtubule quartet |
-  | lysosome (`l`) + vesicle (`v`) | GO:0106174 phagolysosome vesicle lumen; GO:0106175 phagolysosome vesicle membrane |
-  | inner mitochondria (`i`) + mitochondria (`m`) | GO:0001405 PAM complex, Tim23 associated import motor |
-  | cytoskeleton (`ck`) + nucleus (`n`) | GO:0005638 lamin filament |
-  | cell membrane (`a`) + ER (`r`) | GO:0009510 plasmodesmatal desmotubule (plant structure, irrelevant for human) |
-  | cell membrane (`a`) + cilium (`ci`) | GO:0097538 ciliary necklace |
+  "Before" includes the cytoplasm alias, so it differs by one term from the 2026-10-07 check (2,232 / 1,835). The 100 multi-compartment terms are the 93 that the old rule narrowed to one, plus 7 of the 8 old ties. The 8th old tie (GO:0001405 PAM complex, `i` + `m`) now resolves to `i` alone, because `m` contains `i`.
 
-  None of these are typical locations for metabolic enzymes. When one occurs, only that annotation is rejected; the gene keeps its other locations. Whether any human gene actually carries one of these terms wasn't checked (that needs the human GOA annotation file). To find ties in a future run, search its output for the reason:
+  | Compartments | GO terms | Example |
+  |---|---|---|
+  | cilium (`ci`) + cytoskeleton (`ck`) | 54 | axonemal microtubule, ciliary rootlet |
+  | lysosome (`l`) + vesicle (`v`) | 16 | phagolysosome, azurophil granule |
+  | Golgi (`g`) + vesicle (`v`) | 8 | COPI vesicle coat, GARP complex |
+  | cell membrane (`a`) + cilium (`ci`) | 6 | ciliary pocket membrane |
+  | cell membrane (`a`) + cytoskeleton (`ck`) | 4 | filopodium membrane |
+  | cell membrane (`a`) + ER (`r`) | 3 | plasmodesmatal desmotubule (plant) |
+  | cytoskeleton (`ck`) + nucleus (`n`) | 2 | lamin filament |
+  | cell membrane (`a`) + vesicle (`v`) | 2 | AP-2 adaptor complex |
+  | cilium (`ci`) + vesicle (`v`) | 2 | rod photoreceptor disc membrane |
+  | mitochondria (`m`) + ER (`r`) | 1 | ERMES complex |
+  | cytosol (`c`) + mitochondria (`m`) | 1 | mitochondrial [2Fe-2S] assembly complex |
+  | `a` + `ck` + `v` | 1 | contractile vacuole pore |
+
+  Few of these are typical locations for metabolic enzymes. Whether any human gene actually carries one wasn't checked (that needs the human GOA annotation file). To find multi-compartment annotations in a run's output:
 
   ```bash
-  grep -c ambiguous-compartment-resolution runs/<run>/artifacts/resolve-compartment-evidence/*/beta2-compartment-resolution-evidence.json
+  jq '[.evidence[] | select((.target_compartment_ids // []) | length > 1)] | length' runs/<run>/artifacts/resolve-compartment-evidence/*/beta2-compartment-resolution-evidence.json
   ```
 
+- If two paths reach the **same** compartment, the shortest one is recorded; this only affects the audit trail.
 - **A related case:** one gene has several annotations that each resolve cleanly, but to different compartments. *(Changed 2026-10-08, see Status.)* This used to mark the gene `status: "conflicting"` (reason `same-precedence-evidence-disagree`), and under the default `reject-conflicts` policy the gene then contributed **no compartments at all**. Now the gene keeps every compartment, because several compartments means the enzyme is in more than one place, which is what β2 expands into.
 
 ### 2. A reaction with no compartment evidence
@@ -127,7 +141,7 @@ Both were confirmed on 2026-10-07 by running the real `UniProtClient` against th
 
 ## Status (2026-10-08)
 
-Fixes 1 and 2 are implemented in `src/thg_protocol/services/uniprot.py`. Also added: a cytoplasm → cytosol alias, a fix so dual-located genes are no longer dropped as conflicting, an opt-in GOA evidence-code filter, and validation of `uncertainty_policy` (all below). Fix 3 (disagreement reports) is not done yet.
+Fixes 1 and 2 are implemented in `src/thg_protocol/services/uniprot.py`. Also added: a cytoplasm → cytosol alias, a fix so dual-located genes are no longer dropped as conflicting, resolution of one GO term to every compartment it lies in, an opt-in GOA evidence-code filter, and validation of `uncertainty_policy` (all below). Fix 3 (disagreement reports) is not done yet.
 
 ### What changed
 
@@ -194,6 +208,17 @@ No locations from other species remain (no Periplasm, Glyoxysome and so on). The
   2. **New opt-in filter `goa_excluded_evidence_codes`** (a list of codes, empty by default). GOA annotations with these codes are skipped when evidence is collected. The shipped configs leave it empty, so high-throughput annotations (HDA, HTP and so on) are **kept**. For reference, across these 50 genes 84 of the 96 annotations that resolve to vesicle (`v`) are HDA, mostly "extracellular exosome" proteomics. CS, for example, gets `n` and `v` only from HDA. Setting `["HTP", "HDA", "HMP", "HGI", "HEP"]` would drop them.
   3. **`uncertainty_policy` is validated.** It must be `reject-conflicts` or `allow-conflicts`, and anything else is a config error. `configs/beta2.json` and `configs/reference.json` now say `reject-conflicts`, which is what `"report"` already behaved as.
 - **Tests:** a β2 run where a gene annotated to cytosol and mitochondria keeps both, with an HDA-only nucleus annotation excluded by the filter (`tests/integration/test_beta2_go_workflow.py`); validation of both settings; and a check that both shipped configs pass validation (`tests/unit/test_config_api.py`). Full suite: 2217 passed. The only failures are the two docs tests, which need `mkdocs`.
+
+### One GO term can resolve to several compartments
+
+- **The problem.** The GO resolver chose the compartment the fewest steps away and rejected equal-distance ties. Step counts aren't biological, so this narrowed 93 terms to an arbitrary single compartment and rejected 8 others (see Edge case 1).
+- **What changed.**
+  - `resolve_go_compartment` (`curation/go.py:160`) collects every configured compartment reached through `is_a` and `part_of`, drops those that are GO ancestors of another one reached (`go.py:238`), and keeps the rest. The walk is a separate helper, `_walk_up` (`go.py:105`).
+  - The result now uses list fields: `target_compartment_ids`, `target_compartment_names`, `target_go_ids` and `resolution_paths`. The single-value fields are gone from GO records. CCO records and older snapshot records still use `target_compartment_name`, and the stage reads both through `_target_names` (`_stages.py:103`).
+  - Gene locations, reaction locations and the Reactome gap-filling (step 5) all take every compartment of a record. When Reactome evidence fills a gap with a multi-compartment record, the reaction gets a rule for each compartment.
+  - The configured-alias path (cytoplasm → `c`) is unchanged and returns a one-element list.
+- **Tests.** Resolver: two unrelated compartments at different distances are both kept, and a compartment that contains another is dropped (`tests/unit/test_go_evidence.py:39`, `:80`). End to end: one axonemal-microtubule annotation places the gene in both cilium and cytoskeleton (`tests/integration/test_beta2_go_workflow.py:282`). The old equal-distance rejection test was replaced. Full suite: 2219 passed. The only failures are the two docs tests, which need `mkdocs`.
+- **Docs.** `docs/protocol/beta2_open_evidence_integration_plan.md` (sections 7–9 and the test list) and `beta2_open_evidence_integration_progress.md` now describe the new rule.
 
 ### Still open
 

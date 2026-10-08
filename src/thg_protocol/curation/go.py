@@ -102,6 +102,61 @@ def _start_term(
     return "", "location-not-in-ontology"
 
 
+def _walk_up(
+    graph: Mapping[str, Mapping[str, object]], start: str
+) -> dict[str, list[dict[str, object]]]:
+    """Return every term reachable from ``start`` through ``is_a`` and
+    ``part_of``, each with the shortest path that reached it."""
+    queue = deque([(start, [])])
+    paths: dict[str, list[dict[str, object]]] = {}
+    while queue:
+        identifier, path = queue.popleft()
+        if identifier in paths:
+            continue
+        value = _term(graph, identifier)
+        current = path + [{"id": identifier, "name": value.get("name", identifier)}]
+        paths[identifier] = current
+        parents = list(value.get("parents", []) or [])
+        for relation, parent_value in [
+            (str(item.get("relation", "")), item.get("id"))
+            for item in parents
+            if isinstance(item, Mapping)
+        ] + [
+            (str(item[0]), item[1])
+            for item in parents
+            if isinstance(item, (list, tuple)) and len(item) == 2
+        ]:
+            parent_id = normalize_go_id(parent_value)
+            if relation in {"is_a", "part_of"} and parent_id in graph:
+                queue.append(
+                    (parent_id, current + [{"relation": relation, "id": parent_id}])
+                )
+    return paths
+
+
+def _resolved(
+    raw_location: str,
+    go_id: str,
+    keys: list[str],
+    targets: Mapping[str, str],
+    paths: list[list[dict[str, object]]],
+    compartments: Mapping[str, str] | None,
+) -> dict[str, object]:
+    result: dict[str, object] = {
+        "raw_location": raw_location,
+        "go_id": go_id,
+        "status": "resolved",
+        "target_compartment_ids": keys,
+        "target_go_ids": [targets[key] for key in keys],
+        "resolution_paths": paths,
+    }
+    if compartments:
+        result["target_compartment_names"] = [
+            compartments[key] for key in keys if key in compartments
+        ]
+    return result
+
+
 def resolve_go_compartment(
     raw_location: str,
     go_id: str | None,
@@ -110,7 +165,15 @@ def resolve_go_compartment(
     compartments: Mapping[str, str] | None = None,
     compartment_go_aliases: Mapping[str, str] | None = None,
 ) -> dict[str, object]:
-    """Resolve a GO term to the nearest configured β2 GO target.
+    """Resolve a GO term to every configured β2 compartment it lies in.
+
+    The walk goes up through ``is_a`` and ``part_of`` and collects every
+    configured compartment term it reaches. A compartment is then dropped if
+    its GO term is an ancestor of another reached compartment's term (e.g.
+    mitochondrion when mitochondrial inner membrane was also reached), so
+    only the most specific places remain. Compartments that are not
+    ancestors of each other are all kept: an axonemal microtubule is both
+    cytoskeleton and cilium. Distance in the graph plays no role.
 
     ``compartment_go_aliases`` maps a GO term to a compartment only when the
     location starts at exactly that term; the upward walk never uses aliases,
@@ -128,18 +191,15 @@ def resolve_go_compartment(
     }
     by_go = {value: key for key, value in targets.items()}
     supplied_go_id = normalize_go_id(go_id)
-    if supplied_go_id in by_go:
-        result = {
-            "raw_location": raw_location,
-            "go_id": supplied_go_id,
-            "status": "resolved",
-            "target_compartment_id": by_go[supplied_go_id],
-            "target_go_id": supplied_go_id,
-            "resolution_path": [{"id": supplied_go_id}],
-        }
-        if compartments and by_go[supplied_go_id] in compartments:
-            result["target_compartment_name"] = compartments[by_go[supplied_go_id]]
-        return result
+    if supplied_go_id in by_go and supplied_go_id not in graph:
+        return _resolved(
+            raw_location,
+            supplied_go_id,
+            [by_go[supplied_go_id]],
+            targets,
+            [[{"id": supplied_go_id}]],
+            compartments,
+        )
     start, error = _start_term(raw_location, go_id, graph)
     if error:
         return {
@@ -150,82 +210,41 @@ def resolve_go_compartment(
         }
     if start in aliases and start not in by_go:
         key = aliases[start]
-        result = {
-            "raw_location": raw_location,
-            "go_id": start,
-            "status": "resolved",
-            "target_compartment_id": key,
-            "target_go_id": targets[key],
-            "resolution_path": [
-                {"id": start, "name": _term(graph, start).get("name", start)},
-                {"relation": "configured_alias", "id": targets[key]},
+        result = _resolved(
+            raw_location,
+            start,
+            [key],
+            targets,
+            [
+                [
+                    {"id": start, "name": _term(graph, start).get("name", start)},
+                    {"relation": "configured_alias", "id": targets[key]},
+                ]
             ],
-            "resolution_method": "configured-alias",
-        }
-        if compartments and key in compartments:
-            result["target_compartment_name"] = compartments[key]
+            compartments,
+        )
+        result["resolution_method"] = "configured-alias"
         return result
-    queue = deque([(start, 0, [])])
-    seen: set[str] = set()
-    candidates: list[tuple[int, str, list[dict[str, object]]]] = []
-    while queue:
-        identifier, distance, path = queue.popleft()
-        if identifier in seen:
-            continue
-        seen.add(identifier)
-        value = _term(graph, identifier)
-        current = path + [{"id": identifier, "name": value.get("name", identifier)}]
-        if identifier in by_go:
-            candidates.append((distance, by_go[identifier], current))
-        parents = list(value.get("parents", []) or [])
-        for relation, parent_value in [
-            (str(item.get("relation", "")), item.get("id"))
-            for item in parents
-            if isinstance(item, Mapping)
-        ] + [
-            (str(item[0]), item[1])
-            for item in parents
-            if isinstance(item, (list, tuple)) and len(item) == 2
-        ]:
-            parent_id = normalize_go_id(parent_value)
-            if relation in {"is_a", "part_of"} and parent_id in graph:
-                queue.append(
-                    (
-                        parent_id,
-                        distance + 1,
-                        current + [{"relation": relation, "id": parent_id}],
-                    )
-                )
-    if not candidates:
+    paths = _walk_up(graph, start)
+    reached = {by_go[term]: path for term, path in paths.items() if term in by_go}
+    if not reached:
         return {
             "raw_location": raw_location,
             "go_id": start,
             "status": "rejected",
             "reason": "location-not-in-registry",
         }
-    nearest_distance = min(item[0] for item in candidates)
-    nearest = [item for item in candidates if item[0] == nearest_distance]
-    target_ids = sorted({item[1] for item in nearest})
-    if len(target_ids) != 1:
-        return {
-            "raw_location": raw_location,
-            "go_id": start,
-            "status": "rejected",
-            "reason": "ambiguous-compartment-resolution",
-            "candidate_compartments": target_ids,
-        }
-    key = target_ids[0]
-    result = {
-        "raw_location": raw_location,
-        "go_id": start,
-        "status": "resolved",
-        "target_compartment_id": key,
-        "target_go_id": targets[key],
-        "resolution_path": sorted(item[2] for item in nearest if item[1] == key)[0],
+    # A reached compartment that contains another reached one is less specific.
+    above = {
+        key
+        for other in reached
+        for key in reached
+        if key != other and targets[key] in _walk_up(graph, targets[other])
     }
-    if compartments and key in compartments:
-        result["target_compartment_name"] = compartments[key]
-    return result
+    keys = sorted(key for key in reached if key not in above)
+    return _resolved(
+        raw_location, start, keys, targets, [reached[key] for key in keys], compartments
+    )
 
 
 __all__ = ["load_obo", "normalize_go_id", "parse_obo", "resolve_go_compartment"]
