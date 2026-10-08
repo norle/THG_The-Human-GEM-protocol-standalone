@@ -108,12 +108,23 @@ def resolve_go_compartment(
     graph: Mapping[str, Mapping[str, object]],
     compartment_go_terms: Mapping[str, str],
     compartments: Mapping[str, str] | None = None,
+    compartment_go_aliases: Mapping[str, str] | None = None,
 ) -> dict[str, object]:
-    """Resolve a GO term to the nearest configured β2 GO target."""
+    """Resolve a GO term to the nearest configured β2 GO target.
+
+    ``compartment_go_aliases`` maps a GO term to a compartment only when the
+    location starts at exactly that term; the upward walk never uses aliases,
+    so a broad alias (e.g. cytoplasm -> cytosol) cannot capture descendants.
+    """
     targets = {
         str(key): normalize_go_id(value)
         for key, value in compartment_go_terms.items()
         if normalize_go_id(value)
+    }
+    aliases = {
+        normalize_go_id(term): str(key)
+        for term, key in (compartment_go_aliases or {}).items()
+        if normalize_go_id(term) and str(key) in targets
     }
     by_go = {value: key for key, value in targets.items()}
     supplied_go_id = normalize_go_id(go_id)
@@ -137,6 +148,23 @@ def resolve_go_compartment(
             "status": "rejected",
             "reason": error,
         }
+    if start in aliases and start not in by_go:
+        key = aliases[start]
+        result = {
+            "raw_location": raw_location,
+            "go_id": start,
+            "status": "resolved",
+            "target_compartment_id": key,
+            "target_go_id": targets[key],
+            "resolution_path": [
+                {"id": start, "name": _term(graph, start).get("name", start)},
+                {"relation": "configured_alias", "id": targets[key]},
+            ],
+            "resolution_method": "configured-alias",
+        }
+        if compartments and key in compartments:
+            result["target_compartment_name"] = compartments[key]
+        return result
     queue = deque([(start, 0, [])])
     seen: set[str] = set()
     candidates: list[tuple[int, str, list[dict[str, object]]]] = []

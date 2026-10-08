@@ -94,6 +94,7 @@ WORKFLOW_SECTION_KEYS = {
         "cco_graph",
         "go_graph",
         "compartment_go_terms",
+        "compartment_go_aliases",
         "location_sources",
         "reaction_sources",
         "go_ontology_file",
@@ -837,6 +838,32 @@ def _parse_workflow(
                     ):
                         raise ConfigError(
                             "'beta2.compartment_go_terms' values must be unique"
+                        )
+                go_aliases = value.get("compartment_go_aliases")
+                if go_aliases is not None:
+                    if not isinstance(go_aliases, dict):
+                        raise ConfigError(
+                            "'beta2.compartment_go_aliases' must be an object"
+                        )
+                    if any(
+                        not isinstance(item, str)
+                        or not re.fullmatch(r"GO:\d{7}", item, re.IGNORECASE)
+                        for item in go_aliases
+                    ):
+                        raise ConfigError(
+                            "'beta2.compartment_go_aliases' keys must be valid GO IDs"
+                        )
+                    if not set(go_aliases.values()) <= set(go_targets or {}):
+                        raise ConfigError(
+                            "'beta2.compartment_go_aliases' values must be keys of "
+                            "compartment_go_terms"
+                        )
+                    if {item.upper() for item in go_aliases} & {
+                        str(item).upper() for item in (go_targets or {}).values()
+                    }:
+                        raise ConfigError(
+                            "'beta2.compartment_go_aliases' must not repeat a "
+                            "compartment_go_terms target"
                         )
                 open_sources = value.get("location_sources", []) or value.get(
                     "reaction_sources", []

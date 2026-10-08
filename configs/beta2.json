@@ -44,6 +44,9 @@
       "v": "GO:0031982",
       "x": "GO:0005777"
     },
+    "compartment_go_aliases": {
+      "GO:0005737": "c"
+    },
     "location_sources": [
       "goa",
       "uniprot"

@@ -1264,6 +1264,14 @@ class Beta2Stage:
                     else ()
                 )
             }
+            go_aliases = {
+                str(key): str(value)
+                for key, value in (
+                    section.get("compartment_go_aliases", {}).items()
+                    if isinstance(section.get("compartment_go_aliases"), Mapping)
+                    else ()
+                )
+            }
             go_graph = (
                 dict(section.get("go_graph", {}))
                 if isinstance(section.get("go_graph"), Mapping)
@@ -1315,6 +1323,10 @@ class Beta2Stage:
                     metadata.get("compartment_go_terms"), Mapping
                 ):
                     go_terms = dict(metadata["compartment_go_terms"])
+                if not go_aliases and isinstance(
+                    metadata.get("compartment_go_aliases"), Mapping
+                ):
+                    go_aliases = dict(metadata["compartment_go_aliases"])
             for source_key in (
                 "go_ontology_file",
                 "go_annotation_file",
@@ -1349,6 +1361,7 @@ class Beta2Stage:
                 ),
                 "compartments": registry,
                 "compartment_go_terms": go_terms,
+                "compartment_go_aliases": go_aliases,
                 "go_graph": go_graph,
                 "source_releases": source_releases,
             }
@@ -1525,6 +1538,7 @@ class Beta2Stage:
             registry = registry_payload["compartments"]
             go_graph = registry_payload.get("go_graph", {})
             go_terms = registry_payload.get("compartment_go_terms", {})
+            go_aliases = registry_payload.get("compartment_go_aliases", {})
             graph = section.get("cco_graph", {})
             if str(section.get("evidence_mode", "provided")) == "snapshot":
                 for item in _snapshot_records(section):
@@ -1570,6 +1584,7 @@ class Beta2Stage:
                         go_graph,
                         go_terms,
                         registry,
+                        go_aliases if isinstance(go_aliases, Mapping) else None,
                     )
                 return resolve_compartment(
                     raw_location,
@@ -2235,6 +2250,9 @@ class Beta2Stage:
                     "compartment_go_terms": registry_payload.get(
                         "compartment_go_terms", {}
                     ),
+                    "compartment_go_aliases": registry_payload.get(
+                        "compartment_go_aliases", {}
+                    ),
                     "graph": registry_payload.get("go_graph", {}),
                 },
             )
@@ -2294,6 +2312,9 @@ class Beta2Stage:
                     "go_graph": registry_payload.get("go_graph", {}),
                     "compartment_go_terms": registry_payload.get(
                         "compartment_go_terms", {}
+                    ),
+                    "compartment_go_aliases": registry_payload.get(
+                        "compartment_go_aliases", {}
                     ),
                     "source_releases": source_releases,
                 }

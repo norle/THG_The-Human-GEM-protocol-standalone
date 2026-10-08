@@ -62,6 +62,39 @@ name: second
     assert result["reason"] == "ambiguous-compartment-resolution"
 
 
+def test_go_alias_applies_only_to_the_exact_start_term():
+    graph = parse_obo(
+        """
+[Term]
+id: GO:0005737
+name: cytoplasm
+
+[Term]
+id: GO:0005829
+name: cytosol
+relationship: part_of GO:0005737 ! cytoplasm
+
+[Term]
+id: GO:0036464
+name: cytoplasmic ribonucleoprotein granule
+relationship: part_of GO:0005737 ! cytoplasm
+"""
+    )
+    targets = {"c": "GO:0005829"}
+    aliases = {"GO:0005737": "c"}
+
+    by_text = resolve_go_compartment("Cytoplasm", None, graph, targets, None, aliases)
+    by_id = resolve_go_compartment("", "GO:0005737", graph, targets, None, aliases)
+    child = resolve_go_compartment("", "GO:0036464", graph, targets, None, aliases)
+    without = resolve_go_compartment("Cytoplasm", None, graph, targets)
+
+    assert by_text["target_compartment_id"] == "c"
+    assert by_text["resolution_method"] == "configured-alias"
+    assert by_id["target_go_id"] == "GO:0005829"
+    assert child["reason"] == "location-not-in-registry"
+    assert without["reason"] == "location-not-in-registry"
+
+
 def test_goa_parser_keeps_cellular_component_evidence_and_drops_negation():
     row = "\t".join(
         [

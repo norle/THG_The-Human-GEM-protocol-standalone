@@ -122,3 +122,34 @@ def test_beta2_go_targets_are_validated_at_load_time(tmp_path):
     )
     with pytest.raises(ConfigError, match="must be unique"):
         load_workflow_config(path)
+
+
+@pytest.mark.parametrize(
+    ("aliases", "message"),
+    [
+        ({"cytoplasm": "y"}, "keys must be valid GO IDs"),
+        ({"GO:0005737": "z"}, "values must be keys of compartment_go_terms"),
+        ({"GO:0005739": "y"}, "must not repeat a compartment_go_terms target"),
+    ],
+)
+def test_beta2_go_aliases_are_validated_at_load_time(tmp_path, aliases, message):
+    path = tmp_path / "beta2.json"
+    path.write_text(
+        json.dumps(
+            {
+                "workflow": "beta2",
+                "run": {"name": "check", "output_dir": str(tmp_path / "run")},
+                "beta2": {
+                    "compartments": {"x": "Mitochondria", "y": "Cytosol"},
+                    "compartment_go_terms": {
+                        "x": "GO:0005739",
+                        "y": "GO:0005829",
+                    },
+                    "compartment_go_aliases": aliases,
+                },
+            }
+        ),
+        encoding="utf-8",
+    )
+    with pytest.raises(ConfigError, match=message):
+        load_workflow_config(path)
