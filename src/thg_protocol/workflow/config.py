@@ -255,6 +255,20 @@ def _directory_path(value: str, base: Path) -> Path:
     return path.resolve()
 
 
+def _has_beta2_evidence_source(section: object) -> bool:
+    """Whether a β2 section names any gene-location evidence to apply."""
+    if not isinstance(section, dict):
+        return False
+    return (
+        bool(section.get("gene_locations"))
+        or "evidence_file" in section
+        or (
+            section.get("evidence_mode") in {"live", "snapshot"}
+            and bool(section.get("location_sources"))
+        )
+    )
+
+
 def load_workflow_config(path: str | Path) -> WorkflowConfig:
     """Load a workflow config and validate sections against its workflow DAG."""
     source = Path(path).resolve()
@@ -295,6 +309,11 @@ def _parse_workflow(
     if workflow == "reference" and not {"beta1", "beta2", "gapfill"} <= set(payload):
         raise ConfigError(
             "reference workflow requires beta1, beta2, and gapfill sections"
+        )
+    if workflow == "reference" and not _has_beta2_evidence_source(payload["beta2"]):
+        raise ConfigError(
+            "reference workflow requires a β2 evidence source: gene_locations, "
+            "an evidence_file, or live/snapshot location_sources"
         )
     if (
         workflow == "reference"
@@ -709,17 +728,21 @@ def _parse_workflow(
                                 f"'gapfill.{key}' is required for {method}"
                             )
                     connections = value["allowed_connections"]
-                    if not isinstance(connections, list) or any(
-                        not isinstance(pair, list)
-                        or len(pair) != 2
-                        or not all(
-                            isinstance(item, str) and item.strip() for item in pair
+                    if (
+                        not isinstance(connections, list)
+                        or not connections
+                        or any(
+                            not isinstance(pair, list)
+                            or len(pair) != 2
+                            or not all(
+                                isinstance(item, str) and item.strip() for item in pair
+                            )
+                            for pair in connections
                         )
-                        for pair in connections
                     ):
                         raise ConfigError(
-                            "'gapfill.allowed_connections' must contain "
-                            "compartment pairs"
+                            "'gapfill.allowed_connections' must contain at least "
+                            "one compartment pair"
                         )
                     types = value["candidate_types"]
                     if (

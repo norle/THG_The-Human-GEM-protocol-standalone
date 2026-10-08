@@ -188,7 +188,7 @@ def _model_diff_is_clean(
 
 
 class Beta2GateStage:
-    implementation_version = 2
+    implementation_version = 3
     id = "gate-beta2"
     dependencies = ("export-beta2",)
 
@@ -221,11 +221,20 @@ class Beta2GateStage:
             # public β1 release gate belongs at the promotion boundary.
             require_beta1_release=context.config.workflow != "reference",
         )
+        reasons = list(gate.get("reasons", []))
+        locations = model_path.parent / "gene-location-evidence.jsonl"
+        if context.config.workflow == "reference" and (
+            not locations.is_file() or not locations.read_text(encoding="utf-8").strip()
+        ):
+            # Without gene locations β2 cannot localize anything, so a passing
+            # gate would hand gapfill an unchanged β1 model.
+            reasons.append("β2 found no gene-location evidence")
+        passed = bool(gate.get("passed")) and not reasons
         result = {
             "schema_version": 1,
-            "status": "passed" if gate.get("passed") else "blocked",
-            "passed": bool(gate.get("passed")),
-            "reasons": gate.get("reasons", []),
+            "status": "passed" if passed else "blocked",
+            "passed": passed,
+            "reasons": reasons,
             "artifact": {
                 "workflow": "beta2",
                 "run": context.config.run.name,
@@ -258,6 +267,8 @@ class GapfillStage:
             self.implementation_version = 3
         elif stage_id == "validate-gapfill":
             self.implementation_version = 5
+        elif stage_id == "gate-gapfill":
+            self.implementation_version = 3
 
     def enabled(self, config: Any) -> bool:
         del config
@@ -667,6 +678,17 @@ class GapfillStage:
                 warnings.append("partial result preserved as candidate")
             elif status != "solved":
                 blocking.append("gapfill algorithm did not complete")
+            before_metrics = report.get("before_metrics")
+            if (
+                context.config.workflow == "reference"
+                and not report.get("candidate_coverage")
+                and isinstance(before_metrics, Mapping)
+                and before_metrics.get("dead_ends", 0) > 0
+            ):
+                blocking.append(
+                    "no candidate reactions were available for the remaining "
+                    "dead ends; check allowed_connections"
+                )
             validation_warnings = validation.get("warnings", [])
             if isinstance(validation_warnings, list):
                 warnings.extend(str(item) for item in validation_warnings)

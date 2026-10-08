@@ -88,3 +88,13 @@ def test_standalone_gapfill_is_non_mutating_and_reuses_reversible_transport():
         reaction["id"] != "GAPFILL_MAM00002c_MAM00002e"
         for reaction in model["reactions"]
     )
+
+
+def test_transport_gapfill_rejects_empty_allowed_connections():
+    result = gapfill_model(
+        toy_model(),
+        method="greedy",
+        parameters={"max_additions": 1, "allowed_connections": []},
+    )
+    assert result.status == "failed"
+    assert "allowed_connections" in result.failure

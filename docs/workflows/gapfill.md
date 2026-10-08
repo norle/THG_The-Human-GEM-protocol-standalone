@@ -13,6 +13,11 @@ same gapfill implementation. Its gapfill section omits `input_model` and
 The β2 candidate remains ungapfilled and is never overwritten. Human Database
 integration, when selected, enriches β2 before this required canonical stage.
 
+Transport methods (`greedy`, `deadends`) only propose transports between the
+compartment pairs in `allowed_connections`, so that list must name at least one
+pair. In the reference workflow, `gate-gapfill` blocks when no candidate exists
+while dead ends remain.
+
 The canonical pipeline always runs gapfill before producing a **THG candidate**.
 The final gapfill stage writes `thg-reference-gapfilled.json` and `.xml` only after
 `gapfill-gate.json` is `passed` or a non-blocking `warning`. Plans, ledgers,

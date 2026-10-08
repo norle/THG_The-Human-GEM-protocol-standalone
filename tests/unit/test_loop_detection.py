@@ -190,6 +190,9 @@ def test_pipeline_removal_requires_explicit_option_and_revalidates(
     tmp_path, workflow, remove
 ):
     model = loop_model(parallel=True)
+    if workflow == "gapfill":
+        # A second compartment gives gapfill a connection with no candidates.
+        model.add_metabolites([cobra.Metabolite("z_e", compartment="e")])
     source = tmp_path / "model.json"
     save_json_model(model, source)
     source_bytes = source.read_bytes()
@@ -200,7 +203,7 @@ def test_pipeline_removal_requires_explicit_option_and_revalidates(
             "external_input": True,
             "method": "greedy",
             "max_additions": 1,
-            "allowed_connections": [],
+            "allowed_connections": [["c", "e"]],
             "candidate_types": ["A", "B", "C"],
             "validation_profile": "final-standard",
         }

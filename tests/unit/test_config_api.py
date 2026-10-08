@@ -187,3 +187,67 @@ def test_beta2_location_policy_settings_are_validated(tmp_path, setting, message
 def test_shipped_configs_pass_beta2_validation():
     for name in ("beta2.json", "reference.json"):
         load_workflow_config(Path(__file__).parents[2] / "configs" / name)
+
+
+_SANCTIONED_FIXTURE = (
+    Path(__file__).parents[1] / "fixtures" / "beta1" / "sanctioned_human_reference.json"
+)
+
+
+def _reference_config(tmp_path, *, beta2, allowed_connections=(("c", "e"),)):
+    path = tmp_path / "reference.json"
+    path.write_text(
+        json.dumps(
+            {
+                "workflow": "reference",
+                "run": {"name": "check", "output_dir": str(tmp_path / "run")},
+                "beta1": {"input_model": str(_SANCTIONED_FIXTURE)},
+                "beta2": beta2,
+                "gapfill": {
+                    "method": "greedy",
+                    "max_additions": 1,
+                    "allowed_connections": [list(pair) for pair in allowed_connections],
+                    "candidate_types": ["A", "B", "C"],
+                    "validation_profile": "structural-fast",
+                },
+            }
+        ),
+        encoding="utf-8",
+    )
+    return path
+
+
+def test_transport_gapfill_requires_an_allowed_connection(tmp_path):
+    path = _reference_config(
+        tmp_path,
+        beta2={"gene_locations": {"ENSG000001": ["cytosol"]}},
+        allowed_connections=(),
+    )
+    with pytest.raises(ConfigError, match="allowed_connections"):
+        load_workflow_config(path)
+
+
+def test_reference_requires_a_beta2_evidence_source(tmp_path):
+    path = _reference_config(
+        tmp_path, beta2={"compartments": {"c": "cytosol", "e": "extracellular"}}
+    )
+    with pytest.raises(ConfigError, match="evidence source"):
+        load_workflow_config(path)
+
+
+def test_reference_accepts_configured_gene_locations(tmp_path):
+    path = _reference_config(
+        tmp_path, beta2={"gene_locations": {"ENSG000001": ["cytosol"]}}
+    )
+    assert load_workflow_config(path).workflow == "reference"
+
+
+def test_shipped_reference_config_uses_the_beta2_evidence_settings():
+    configs = Path(__file__).parents[2] / "configs"
+    standalone = json.loads((configs / "beta2.json").read_text())["beta2"]
+    reference = json.loads((configs / "reference.json").read_text())["beta2"]
+    # Only the run wiring may differ: the reference run builds β1 itself.
+    shared = set(standalone) - {"upstream", "n_jobs"}
+    assert {key: reference.get(key) for key in shared} == {
+        key: standalone[key] for key in shared
+    }

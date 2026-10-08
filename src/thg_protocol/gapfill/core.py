@@ -378,6 +378,10 @@ def _resolved_parameters(
         values["allowed_connections"] = [
             tuple(pair) for pair in values["allowed_connections"]
         ]
+        if not values["allowed_connections"]:
+            raise ValueError(
+                "allowed_connections must name at least one compartment pair"
+            )
         if any(len(pair) != 2 for pair in values["allowed_connections"]):
             raise ValueError(
                 "allowed_connections entries must contain two compartments"
@@ -387,32 +391,103 @@ def _resolved_parameters(
     return values
 
 
+class _TransportSearch:
+    """Running dead-end, component and transport state for greedy scoring.
+
+    A two-metabolite transport only changes the produced/consumed status of its
+    own metabolites and merges at most two components, so a trial is scored in
+    constant time instead of on a full model copy.
+    """
+
+    def __init__(self, mapped: dict[str, Any]) -> None:
+        self.produced, self.consumed = _produced_consumed(mapped)
+        self.parent = {met["id"]: met["id"] for met in mapped.get("metabolites", [])}
+        self.transports: dict[tuple[str, str], list[frozenset[str]]] = {}
+        for reaction in mapped.get("reactions", []):
+            ids = [mid for mid in reaction.get("metabolites", {}) if mid in self.parent]
+            for metabolite_id in ids[1:]:
+                self._union(ids[0], metabolite_id)
+            self._record_transport(reaction)
+
+    def _find(self, item: str) -> str:
+        while self.parent[item] != item:
+            self.parent[item] = self.parent[self.parent[item]]
+            item = self.parent[item]
+        return item
+
+    def _union(self, left: str, right: str) -> None:
+        left, right = self._find(left), self._find(right)
+        if left != right:
+            self.parent[right] = left
+
+    def _record_transport(self, reaction: dict[str, Any]) -> None:
+        key = _transport_key(reaction)
+        if key:
+            self.transports.setdefault(key[0], []).append(key[1])
+
+    def dead_end_ids(self) -> set[str]:
+        return self.produced ^ self.consumed
+
+    def improvement(self, candidate: GapfillCandidate) -> tuple[int, int]:
+        """Dead ends and components removed by adding ``candidate``."""
+        dead_ends = 0
+        for metabolite_id, coefficient in candidate.metabolites.items():
+            produced = metabolite_id in self.produced
+            consumed = metabolite_id in self.consumed
+            dead_ends += produced != consumed
+            if coefficient > 0:
+                produced = True
+            else:
+                consumed = True
+            dead_ends -= produced != consumed
+        roots = {self._find(mid) for mid in candidate.metabolites if mid in self.parent}
+        return dead_ends, max(len(roots) - 1, 0)
+
+    def covers(self, candidate: GapfillCandidate) -> bool:
+        wanted = _transport_key(_candidate_reaction(candidate))
+        return wanted is not None and any(
+            present >= wanted[1] for present in self.transports.get(wanted[0], [])
+        )
+
+    def add(self, candidate: GapfillCandidate) -> None:
+        for metabolite_id, coefficient in candidate.metabolites.items():
+            (self.produced if coefficient > 0 else self.consumed).add(metabolite_id)
+        ids = [mid for mid in candidate.metabolites if mid in self.parent]
+        for metabolite_id in ids[1:]:
+            self._union(ids[0], metabolite_id)
+        self._record_transport(_candidate_reaction(candidate))
+
+
+def _candidate_reaction(candidate: GapfillCandidate) -> dict[str, Any]:
+    return {
+        "metabolites": candidate.metabolites,
+        "lower_bound": candidate.lower_bound,
+        "upper_bound": candidate.upper_bound,
+    }
+
+
 def _run_transport(
     model: Any, method: str, parameters: dict[str, Any]
 ) -> GapfillResult:
     result_model = _candidate_model_copy(model)
-    before = _metrics(result_model)
+    mapped = _as_mapping(result_model)
+    before = _metrics(mapped)
     candidates = _transport_candidates(
-        result_model, parameters["allowed_connections"], parameters["candidate_types"]
+        mapped, parameters["allowed_connections"], parameters["candidate_types"]
     )
-    known_compartments = {
-        met.get("compartment") for met in _as_mapping(result_model)["metabolites"]
-    }
+    known_compartments = {met.get("compartment") for met in mapped["metabolites"]}
     for pair in parameters["allowed_connections"]:
         if not set(pair) <= known_compartments:
             raise ValueError(f"unknown compartment pair: {pair}")
+    search = _TransportSearch(mapped)
     coverage = {
-        candidate.id: "already-present"
-        if _covered_transport(result_model, candidate)
-        else "available"
+        candidate.id: "already-present" if search.covers(candidate) else "available"
         for candidate in candidates
     }
     candidates = [
         candidate for candidate in candidates if coverage[candidate.id] == "available"
     ]
-    existing_ids = {
-        reaction["id"] for reaction in _as_mapping(result_model)["reactions"]
-    }
+    existing_ids = {reaction["id"] for reaction in mapped["reactions"]}
     collisions = [
         candidate.id for candidate in candidates if candidate.id in existing_ids
     ]
@@ -430,23 +505,16 @@ def _run_transport(
             before,
             "reaction-id-collision",
         )
-    selected: list[str] = []
+    selected: list[GapfillCandidate] = []
     rank = {"A": 0, "B": 1, "C": 2}
     stop_reason = "no-improving-candidate"
     while len(selected) < parameters["max_additions"]:
-        current = _metrics(result_model)
         scored = []
         for candidate in candidates:
-            if _covered_transport(result_model, candidate):
+            if search.covers(candidate):
                 coverage[candidate.id] = "already-present"
                 continue
-            trial = _candidate_model_copy(result_model)
-            _add_candidate(trial, candidate)
-            after = _metrics(trial)
-            improvement = (
-                current["dead_ends"] - after["dead_ends"],
-                current["components"] - after["components"],
-            )
+            improvement = search.improvement(candidate)
             if improvement != (0, 0):
                 scored.append(
                     (
@@ -462,23 +530,20 @@ def _run_transport(
         if not scored:
             break
         _, best = min(scored)
-        _add_candidate(result_model, best)
-        selected.append(best.id)
+        search.add(best)
+        selected.append(best)
         coverage[best.id] = "selected"
         candidates.remove(best)
+    for candidate in selected:
+        _add_candidate(result_model, candidate)
     after = _metrics(result_model)
     remaining_improvement = False
     targetable = False
-    current_deadends = _metrics(result_model)["dead_ends"]
+    dead_ends = search.dead_end_ids()
     for candidate in candidates:
-        trial = _candidate_model_copy(result_model)
-        _add_candidate(trial, candidate)
-        trial_metrics = _metrics(trial)
-        remaining_improvement |= (
-            trial_metrics["dead_ends"] < current_deadends
-            or trial_metrics["components"] < after["components"]
-        )
-        targetable |= bool(set(candidate.metabolites) & _deadend_ids(result_model))
+        removed_dead_ends, merged = search.improvement(candidate)
+        remaining_improvement |= removed_dead_ends > 0 or merged > 0
+        targetable |= bool(set(candidate.metabolites) & dead_ends)
     at_limit = len(selected) == parameters["max_additions"]
     if at_limit:
         stop_reason = "max-additions"
@@ -489,7 +554,7 @@ def _run_transport(
     )
     return GapfillResult(
         result_model,
-        selected,
+        [candidate.id for candidate in selected],
         coverage,
         status,
         solver={"strategy": method},

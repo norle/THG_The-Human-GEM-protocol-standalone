@@ -123,7 +123,7 @@ def test_reference_workflow_hands_off_beta2_and_keeps_it_unchanged(tmp_path):
                 "gapfill": {
                     "method": "greedy",
                     "max_additions": 1,
-                    "allowed_connections": [],
+                    "allowed_connections": [["c", "e"]],
                     "candidate_types": ["A", "B", "C"],
                     "validation_profile": "structural-fast",
                 },
@@ -158,11 +158,14 @@ def test_reference_workflow_accepts_an_intermediate_beta1_candidate(tmp_path):
                 "workflow": "reference",
                 "run": {"name": "reference", "output_dir": str(tmp_path / "run")},
                 "beta1": {"input_model": str(source.resolve())},
-                "beta2": {"compartments": {"c": "cytosol", "e": "extracellular"}},
+                "beta2": {
+                    "compartments": {"c": "cytosol", "e": "extracellular"},
+                    "gene_locations": {"ENSG000001": ["cytosol"]},
+                },
                 "gapfill": {
                     "method": "greedy",
-                    "max_additions": 1,
-                    "allowed_connections": [],
+                    "max_additions": 10,
+                    "allowed_connections": [["c", "e"]],
                     "candidate_types": ["A", "B", "C"],
                     "validation_profile": "structural-fast",
                 },
@@ -245,7 +248,10 @@ def test_reference_gapfill_uses_human_database_integration(tmp_path):
                     "input_model": str(fixture.resolve()),
                     "sanctioned_model": True,
                 },
-                "beta2": {"compartments": {"c": "cytosol", "m": "mitochondria"}},
+                "beta2": {
+                    "compartments": {"c": "cytosol", "m": "mitochondria"},
+                    "gene_locations": {"ENSG000001": ["cytosol"]},
+                },
                 "human_database": {"records": str(records)},
                 "reference": {
                     "human_database_integration": {"source_precedence": "base"}
@@ -253,7 +259,7 @@ def test_reference_gapfill_uses_human_database_integration(tmp_path):
                 "gapfill": {
                     "method": "greedy",
                     "max_additions": 1,
-                    "allowed_connections": [],
+                    "allowed_connections": [["c", "e"]],
                     "candidate_types": ["A", "B", "C"],
                     "validation_profile": "structural-fast",
                 },
@@ -292,3 +298,87 @@ def test_reference_gapfill_uses_human_database_integration(tmp_path):
     assert {
         item["sha256"] for item in exported if item["role"] in {"model", "sbml"}
     } <= set(checksums["export-reference"])
+
+
+def _reference_config(tmp_path: Path, source: Path, beta2: dict) -> Path:
+    config = tmp_path / "reference.json"
+    config.write_text(
+        json.dumps(
+            {
+                "workflow": "reference",
+                "run": {"name": "reference", "output_dir": str(tmp_path / "run")},
+                "beta1": {"input_model": str(source.resolve())},
+                "beta2": {
+                    "compartments": {"c": "cytosol", "e": "extracellular"},
+                    **beta2,
+                },
+                "gapfill": {
+                    "method": "greedy",
+                    "max_additions": 1,
+                    "allowed_connections": [["c", "e"]],
+                    "candidate_types": ["A", "B", "C"],
+                    "validation_profile": "structural-fast",
+                },
+            }
+        ),
+        encoding="utf-8",
+    )
+    return config
+
+
+def test_reference_blocks_beta2_without_gene_location_evidence(tmp_path):
+    source = tmp_path / "model.json"
+    _model(source)
+    snapshot = tmp_path / "evidence.jsonl"
+    snapshot.write_text("", encoding="utf-8")
+    config = _reference_config(
+        tmp_path,
+        source,
+        {"evidence_mode": "snapshot", "evidence_file": str(snapshot)},
+    )
+
+    with pytest.raises(RuntimeError, match="gate-beta2"):
+        start(config)
+
+    gate = json.loads(
+        (tmp_path / "run/failed/gate-beta2/attempt-0001/beta2-gate.json").read_text()
+    )
+    assert gate["status"] == "blocked"
+    assert "β2 found no gene-location evidence" in gate["reasons"]
+
+
+def test_reference_blocks_gapfill_without_candidates_for_dead_ends(tmp_path):
+    source = tmp_path / "model.json"
+    model = Model("no-shared-metabolites")
+    metabolites = {
+        identifier: Metabolite(identifier, compartment=compartment)
+        for identifier, compartment in (
+            ("A_c", "c"),
+            ("B_c", "c"),
+            ("C_e", "e"),
+            ("D_e", "e"),
+        )
+    }
+    for reaction_id, stoichiometry in (
+        ("R_c", {"A_c": -1, "B_c": 1}),
+        ("R_e", {"C_e": -1, "D_e": 1}),
+    ):
+        reaction = Reaction(reaction_id)
+        reaction.add_metabolites(
+            {metabolites[key]: value for key, value in stoichiometry.items()}
+        )
+        model.add_reactions([reaction])
+    save_json_model(model, source)
+    config = _reference_config(
+        tmp_path, source, {"gene_locations": {"ENSG000001": ["cytosol"]}}
+    )
+
+    with pytest.raises(RuntimeError, match="gate-gapfill"):
+        start(config)
+
+    gate = json.loads(
+        (
+            tmp_path / "run/failed/gate-gapfill/attempt-0001/gapfill-gate.json"
+        ).read_text()
+    )
+    assert any("no candidate" in item for item in gate["blocking_findings"])
