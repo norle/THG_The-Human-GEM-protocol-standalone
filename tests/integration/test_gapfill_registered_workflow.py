@@ -501,3 +501,42 @@ def test_coverage_resumes_from_partial_attempt(tmp_path, monkeypatch):
     status = get_status(tmp_path / "run")
     assert status["overall_status"] == "completed"
     assert {line.get("phase") for line in _plan(tmp_path / "run")} >= {2, 3}
+
+
+def test_coverage_resumes_after_a_hard_kill(tmp_path, monkeypatch):
+    from thg_protocol.gapfill import ptr
+
+    original = ptr.compute_coverage
+    calls: list[list[int]] = []
+
+    def interrupting(*args, on_component=None, **kwargs):
+        seen: list[int] = []
+        calls.append(seen)
+
+        def record(entry):
+            on_component(entry)
+            seen.append(entry.component)
+            if len(calls) == 1 and len(seen) == 2:
+                raise RuntimeError("stopped mid-coverage")
+
+        return original(*args, on_component=record, **kwargs)
+
+    monkeypatch.setattr(ptr, "compute_coverage", interrupting)
+    source = tmp_path / "model.json"
+    _three_components(source)
+    with pytest.raises(RuntimeError, match="compute-gapfill-coverage"):
+        start(_sink_milp_config(tmp_path, source))
+    # A killed process leaves its partial attempt in .tmp, still "running".
+    run = tmp_path / "run"
+    stage = "compute-gapfill-coverage"
+    (run / ".tmp").mkdir(exist_ok=True)
+    (run / "failed" / stage / "attempt-0001").rename(
+        run / ".tmp" / f"{stage}-attempt-0001"
+    )
+    manifest = json.loads((run / "manifest.json").read_text())
+    manifest["steps"][stage]["status"] = "running"
+    manifest["overall_status"] = "running"
+    (run / "manifest.json").write_text(json.dumps(manifest))
+    resume(run)
+    assert calls == [[1, 2], [3]]
+    assert get_status(run)["overall_status"] == "completed"

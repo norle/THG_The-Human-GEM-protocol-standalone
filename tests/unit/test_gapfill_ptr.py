@@ -193,18 +193,21 @@ def test_main_only_candidates_are_never_connectors():
     assert select_connectors([ptr("A", (1, 1), "A")]) == []
 
 
-def _carries_flux(model, reaction, epsilon):
-    """Oracle: can ``reaction`` carry at least ``epsilon`` either way? (2 LPs)"""
-    for bound, value in (("lower_bound", epsilon), ("upper_bound", -epsilon)):
-        if (value > 0 and reaction.upper_bound < value) or (
-            value < 0 and reaction.lower_bound > value
-        ):
-            continue
-        with model:
-            setattr(reaction, bound, value)
-            if not math.isnan(model.slim_optimize(error_value=math.nan)):
-                return True
-    return False
+def _fva_unblocked(model, epsilon):
+    """Oracle: cobra's FVA, counting a reaction that reaches epsilon either way.
+
+    Forcing a bound to epsilon is not used: GLPK accepts lb = 1e-4 on
+    reactions whose maximum flux is exactly 0.
+    """
+    from cobra.flux_analysis import flux_variability_analysis
+
+    ranges = flux_variability_analysis(model, fraction_of_optimum=0)
+    threshold = 0.99 * epsilon
+    return {
+        rid
+        for rid, row in ranges.iterrows()
+        if row["maximum"] >= threshold or row["minimum"] <= -threshold
+    }
 
 
 @pytest.mark.parametrize("seed", range(12))
@@ -219,11 +222,7 @@ def test_unblockable_matches_per_reaction_fba(seed):
         reactions, reversible={rid for rid in reactions if rng.random() < 0.4}
     )
     epsilon = 1e-4
-    expected = {
-        reaction.id
-        for reaction in model.reactions
-        if _carries_flux(model, reaction, epsilon)
-    }
+    expected = _fva_unblocked(model, epsilon)
     assert unblockable(model, set(reactions), epsilon) == expected
 
 
@@ -451,3 +450,32 @@ def test_no_candidates_is_solved_with_no_proposals():
         main_with_dead_ends(), {**SINK_MILP, "allowed_connections": [("c", "m")]}
     )
     assert (result.status, result.selected) == ("solved", [])
+
+
+def test_ids_without_a_base_never_pair():
+    model = build(
+        {
+            "R1": {"atp": -1, "Yc": 1},
+            "R2": {"Yc": -1, "atp": 1},
+            "R3": {"coa": -1, "We": 1},
+            "R4": {"We": -1, "coa": 1},
+        },
+        compartments={"atp": "c", "coa": "e"},
+    )
+    assert candidates_of(model) == []
+
+
+def test_unblockable_fails_loudly_on_unbounded_lp():
+    model = build(
+        {
+            "EX": {"Ac": 1},
+            "S": {"Ac": -1},
+            "F": {"Ac": -1, "Bc": 1},
+            "G": {"Bc": -1, "Ac": 1},
+        },
+        reversible={"F", "G"},
+    )
+    for reaction_id in ("F", "G"):
+        model.reactions.get_by_id(reaction_id).bounds = (-math.inf, math.inf)
+    with pytest.raises(RuntimeError, match="unbounded"):
+        unblockable(model, {"F", "G"}, 1e-4)

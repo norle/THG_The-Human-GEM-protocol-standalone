@@ -171,6 +171,9 @@ def generate_ptr_candidates(
     search = _TransportSearch(_as_mapping(model))
     result = []
     for base, members in buckets.items():
+        if not base:
+            # An all-lowercase ID has no base left; pairing on it is nonsense.
+            continue
         members.sort()
         for index, (met1, compartment1) in enumerate(members):
             for met2, compartment2 in members[index + 1 :]:
@@ -252,6 +255,20 @@ def _fluxes(model: Any, reactions: dict[str, Any]) -> dict[str, float]:
     }
 
 
+def _solve(model: Any) -> float | None:
+    """Optimum, ``None`` if infeasible; any other non-optimal status raises.
+
+    Unbounded or numerically troubled LPs would otherwise read as "blocked".
+    """
+    value = model.slim_optimize(error_value=math.nan)
+    if not math.isnan(value):
+        return value
+    status = model.solver.status
+    if status == "infeasible":
+        return None
+    raise RuntimeError(f"flux LP ended with status {status}")
+
+
 def _lp7(
     model: Any, signs: dict[str, int], epsilon: float, watched: dict[str, Any]
 ) -> tuple[float, dict[str, float]] | None:
@@ -287,8 +304,8 @@ def _lp7(
             )
         model.objective = model.problem.Objective(Zero, direction="max")
         model.objective.set_linear_coefficients({variable: 1 for variable in z})
-        value = model.slim_optimize(error_value=math.nan)
-        if math.isnan(value):
+        value = _solve(model)
+        if value is None:
             return None
         return value, _fluxes(model, watched)
 
@@ -307,8 +324,8 @@ def _optimize_direction(
     with model:
         model.objective = model.problem.Objective(Zero, direction=direction)
         model.objective.set_linear_coefficients(coefficients)
-        value = model.slim_optimize(error_value=math.nan)
-        if math.isnan(value):
+        value = _solve(model)
+        if value is None:
             return None
         return value, _fluxes(model, watched)
 
@@ -398,7 +415,8 @@ def _max_flux(model: Any, reaction_id: str, sign: int) -> float:
         model.objective = model.problem.Objective(
             sign * reaction.flux_expression, direction="max"
         )
-        return model.slim_optimize(error_value=0.0)
+        value = _solve(model)
+        return 0.0 if value is None else value
 
 
 @dataclass

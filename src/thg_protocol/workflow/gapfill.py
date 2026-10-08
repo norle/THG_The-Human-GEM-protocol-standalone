@@ -578,11 +578,19 @@ class GapfillStage:
             )
             fingerprint = sha256_json(self.fingerprint_data(context))
             done = {}
-            # A failed or interrupted attempt keeps its finished components.
-            for path in sorted(
-                (context.run_dir / "failed" / self.id).glob(
+            # A failed or interrupted attempt keeps its finished components: in
+            # failed/ after an exception, still in .tmp/ after a hard kill.
+            previous_attempts = [
+                *(context.run_dir / "failed" / self.id).glob(
                     "attempt-*/ptr-coverage.jsonl"
-                )
+                ),
+                *(context.run_dir / ".tmp").glob(
+                    f"{self.id}-attempt-*/ptr-coverage.jsonl"
+                ),
+            ]
+            for path in sorted(
+                (item for item in previous_attempts if item.parent != work_dir),
+                key=lambda item: item.parent.name[-4:],
             ):
                 previous, lines = _coverage_lines(path)
                 if previous == fingerprint:
