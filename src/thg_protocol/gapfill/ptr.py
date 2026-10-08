@@ -11,13 +11,20 @@ The legacy three-phase pipeline, as pure functions over COBRApy models:
 
 from __future__ import annotations
 
+import math
+import random
 import re
-from dataclasses import asdict, dataclass, replace
+from collections.abc import Callable, Mapping
+from dataclasses import asdict, dataclass, field, replace
 from typing import Any
 
 from .core import GapfillCandidate, _as_mapping, _suffix, _TransportSearch
 
 _RANK = {"A": 0, "B": 1, "C": 2}
+# Flux a reaction must reach to count as unblocked (FASTCC's default). Legacy
+# used 10x the solver tolerance, which equals Gurobi's feasibility tolerance,
+# so forcing that flux "succeeded" on fully blocked networks.
+EPSILON = 1e-4
 
 
 def _base(metabolite_id: str) -> str:
@@ -222,3 +229,285 @@ def select_connectors(candidates: list[PtrCandidate]) -> list[PtrCandidate]:
 
 def _connector_key(candidate: PtrCandidate) -> tuple[int, str, str, str]:
     return (_RANK[candidate.type], candidate.base, candidate.met1, candidate.met2)
+
+
+def _fluxes(model: Any, reactions: dict[str, Any]) -> dict[str, float]:
+    primal = model.solver.primal_values
+    return {
+        rid: primal[reaction.forward_variable.name]
+        - primal[reaction.reverse_variable.name]
+        for rid, reaction in reactions.items()
+    }
+
+
+def _lp7(
+    model: Any, signs: dict[str, int], epsilon: float, watched: dict[str, Any]
+) -> tuple[float, dict[str, float]] | None:
+    """FASTCC LP7: maximize sum z, 0 <= z_r <= epsilon, z_r <= sign_r * v_r.
+
+    Only for reactions whose sign the bounds already fix, so the coupling
+    removes no flux. Returns the optimum and the fluxes of ``watched``, or
+    ``None`` if infeasible.
+    """
+    from optlang.symbolics import Zero
+
+    reactions = [model.reactions.get_by_id(rid) for rid in sorted(signs)]
+    with model:
+        z = [
+            model.problem.Variable(f"_ptr_lp7_z_{index}", lb=0, ub=epsilon)
+            for index in range(len(reactions))
+        ]
+        constraints = [
+            model.problem.Constraint(Zero, ub=0, name=f"_ptr_lp7_c_{index}")
+            for index in range(len(reactions))
+        ]
+        model.add_cons_vars([*z, *constraints])
+        for variable, constraint, reaction in zip(
+            z, constraints, reactions, strict=True
+        ):
+            sign = signs[reaction.id]
+            constraint.set_linear_coefficients(
+                {
+                    variable: 1,
+                    reaction.forward_variable: -sign,
+                    reaction.reverse_variable: sign,
+                }
+            )
+        model.objective = model.problem.Objective(Zero, direction="max")
+        model.objective.set_linear_coefficients({variable: 1 for variable in z})
+        value = model.slim_optimize(error_value=math.nan)
+        if math.isnan(value):
+            return None
+        return value, _fluxes(model, watched)
+
+
+def _optimize_direction(
+    model: Any, weights: dict[str, float], direction: str, watched: dict[str, Any]
+) -> tuple[float, dict[str, float]] | None:
+    """Optimize ``sum weight_r * v_r``; ``watched`` fluxes, ``None`` if infeasible."""
+    from optlang.symbolics import Zero
+
+    coefficients = {}
+    for rid, weight in weights.items():
+        reaction = model.reactions.get_by_id(rid)
+        coefficients[reaction.forward_variable] = weight
+        coefficients[reaction.reverse_variable] = -weight
+    with model:
+        model.objective = model.problem.Objective(Zero, direction=direction)
+        model.objective.set_linear_coefficients(coefficients)
+        value = model.slim_optimize(error_value=math.nan)
+        if math.isnan(value):
+            return None
+        return value, _fluxes(model, watched)
+
+
+def unblockable(model: Any, reaction_ids: set[str], epsilon: float) -> set[str]:
+    """Reactions of ``reaction_ids`` that can carry at least ``epsilon`` flux.
+
+    Every LP solution is a witness: a reaction it shows at ``epsilon`` or more
+    is unblockable. Irreversible reactions go through FASTCC's LP7 loop, whose
+    optimum below ``epsilon`` proves none of them can reach it. Reversible
+    reactions are pushed both ways along one random direction ``c``; when
+    ``c . v`` cannot vary, none of them can, and the witness settles them.
+    When neither LP proves anything new, the varying reactions are maximized
+    one at a time, so the result matches two LPs per reaction up to tolerance.
+    """
+    threshold = 0.99 * epsilon
+    reactions = {
+        rid: model.reactions.get_by_id(rid)
+        for rid in reaction_ids
+        if rid in model.reactions
+    }
+    found: set[str] = set()
+
+    def harvest(fluxes: dict[str, float], pending: set[str]) -> set[str]:
+        new = {rid for rid in pending if abs(fluxes[rid]) >= threshold}
+        found.update(new)
+        return new
+
+    signs = {}
+    for rid, reaction in reactions.items():
+        if reaction.lower_bound >= 0 and reaction.upper_bound >= threshold:
+            signs[rid] = 1
+        elif reaction.upper_bound <= 0 and reaction.lower_bound <= -threshold:
+            signs[rid] = -1
+    reversible = {
+        rid
+        for rid, reaction in reactions.items()
+        if reaction.lower_bound < 0 < reaction.upper_bound
+    }
+    while signs:
+        solved = _lp7(model, signs, epsilon, reactions)
+        if solved is None:
+            return found
+        value, fluxes = solved
+        harvest(fluxes, reversible)
+        reversible -= found
+        if value < threshold:
+            break
+        new = harvest(fluxes, set(signs))
+        if not new:
+            # Flux spread too thin to reach epsilon anywhere: settle singly.
+            tried = {rid for rid in signs if abs(fluxes[rid]) > 0} or set(signs)
+            for rid in tried:
+                if _max_flux(model, rid, signs[rid]) >= threshold:
+                    found.add(rid)
+            new = tried
+        signs = {rid: sign for rid, sign in signs.items() if rid not in new}
+    rng = random.Random(0)
+    while reversible:
+        weights = {
+            rid: rng.choice((-1, 1)) * rng.uniform(0.5, 1.0)
+            for rid in sorted(reversible)
+        }
+        high = _optimize_direction(model, weights, "max", reactions)
+        low = _optimize_direction(model, weights, "min", reactions)
+        if high is None or low is None:
+            return found
+        new = harvest(high[1], reversible) | harvest(low[1], reversible)
+        reversible -= new
+        if new:
+            continue
+        if high[0] - low[0] < threshold:
+            break
+        tried = {
+            rid for rid in reversible if abs(high[1][rid] - low[1][rid]) > 0
+        } or set(reversible)
+        for rid in tried:
+            if max(_max_flux(model, rid, 1), _max_flux(model, rid, -1)) >= threshold:
+                found.add(rid)
+        reversible -= tried
+    return found
+
+
+def _max_flux(model: Any, reaction_id: str, sign: int) -> float:
+    reaction = model.reactions.get_by_id(reaction_id)
+    with model:
+        model.objective = model.problem.Objective(
+            sign * reaction.flux_expression, direction="max"
+        )
+        return model.slim_optimize(error_value=0.0)
+
+
+@dataclass
+class ComponentCoverage:
+    """Blocked reactions of one original component and what each PTR unblocks.
+
+    ``targets`` are reactions originally in the component that are blocked
+    without sinks; ``sink_only`` are those the temporary sinks unblock alone,
+    which no candidate is credited for. ``coverage`` lists, per candidate
+    reaction ID with any coverage, the targets it newly unblocks.
+    """
+
+    component: int
+    targets: list[str]
+    sink_only: list[str]
+    coverage: dict[str, list[str]] = field(default_factory=dict)
+
+    def to_dict(self) -> dict[str, Any]:
+        return asdict(self)
+
+    @classmethod
+    def from_dict(cls, payload: Mapping[str, Any]) -> ComponentCoverage:
+        return cls(
+            int(payload["component"]),
+            list(payload["targets"]),
+            list(payload["sink_only"]),
+            {key: list(value) for key, value in payload["coverage"].items()},
+        )
+
+
+def _add_temporary_exchanges(model: Any) -> None:
+    """Source every dead-end substrate and sink every dead-end product.
+
+    Dead ends account for bounds (legacy ``get_deadend_info``); metabolites
+    that can be neither produced nor consumed get nothing.
+    """
+    from cobra import Reaction
+
+    exchanges = []
+    for metabolite in model.metabolites:
+        produced = consumed = False
+        for reaction in metabolite.reactions:
+            coefficient = reaction.metabolites[metabolite]
+            forward, backward = reaction.upper_bound > 0, reaction.lower_bound < 0
+            produced |= (coefficient > 0 and forward) or (coefficient < 0 and backward)
+            consumed |= (coefficient < 0 and forward) or (coefficient > 0 and backward)
+        if produced != consumed:
+            exchange = Reaction(f"_PTR_TEMP_{metabolite.id}", lower_bound=0.0)
+            exchange.add_metabolites({metabolite: 1.0 if consumed else -1.0})
+            exchanges.append(exchange)
+    model.add_reactions(exchanges)
+
+
+def _add_ptr(model: Any, candidate: PtrCandidate) -> None:
+    from cobra import Reaction
+
+    reaction = Reaction(candidate.reaction_id, lower_bound=-1000.0, upper_bound=1000.0)
+    reaction.add_metabolites(
+        {
+            model.metabolites.get_by_id(candidate.met1): -1.0,
+            model.metabolites.get_by_id(candidate.met2): 1.0,
+        }
+    )
+    model.add_reactions([reaction])
+
+
+def compute_coverage(
+    model: Any,
+    candidates: list[PtrCandidate],
+    components: Components,
+    *,
+    min_component_size: int = 4,
+    done: Mapping[int, ComponentCoverage] | None = None,
+    on_component: Callable[[ComponentCoverage], None] | None = None,
+) -> list[ComponentCoverage]:
+    """Per original component, the blocked reactions each candidate unblocks.
+
+    ``model`` is the phase-2 model (connectors added); ``components`` are those
+    of the model before phase 2. Components below ``min_component_size`` nodes
+    are skipped. A component in ``done`` is reused, and ``on_component`` is
+    called after each newly computed one. ``model`` is left unchanged.
+    """
+    done = dict(done or {})
+    epsilon = EPSILON
+    numbers = sorted(
+        number
+        for number, size in components.sizes.items()
+        if size >= min_component_size
+    )
+    members: dict[int, set[str]] = {}
+    for reaction in model.reactions:
+        number = components.of.get(reaction.id)
+        if number is not None:
+            members.setdefault(number, set()).add(reaction.id)
+    testable: dict[int, list[PtrCandidate]] = {}
+    for candidate in candidates:
+        if not candidate.present and candidate.reaction_id not in model.reactions:
+            for number in set(candidate.components):
+                testable.setdefault(number, []).append(candidate)
+    todo = [number for number in numbers if number not in done]
+    computed: dict[int, ComponentCoverage] = {}
+    if todo:
+        reactions = set().union(*(members.get(number, set()) for number in todo))
+        blocked = reactions - unblockable(model, reactions, epsilon)
+        with model:
+            _add_temporary_exchanges(model)
+            for number in todo:
+                targets = blocked & members.get(number, set())
+                sink_only = unblockable(model, targets, epsilon)
+                remaining = targets - sink_only
+                coverage = {}
+                for candidate in testable.get(number, []) if remaining else []:
+                    with model:
+                        _add_ptr(model, candidate)
+                        unblocked = unblockable(model, remaining, epsilon)
+                    if unblocked:
+                        coverage[candidate.reaction_id] = sorted(unblocked)
+                entry = ComponentCoverage(
+                    number, sorted(targets), sorted(sink_only), coverage
+                )
+                computed[number] = entry
+                if on_component is not None:
+                    on_component(entry)
+    return [done.get(number) or computed[number] for number in numbers]

@@ -1,15 +1,20 @@
 """Putative-transport (sink-MILP) gapfill phases on small COBRApy models."""
 
+import math
+import random
 import re
 
 import cobra
 import pytest
 
 from thg_protocol.gapfill.ptr import (
+    ComponentCoverage,
     PtrCandidate,
+    compute_coverage,
     generate_ptr_candidates,
     network_components,
     select_connectors,
+    unblockable,
 )
 
 
@@ -183,3 +188,116 @@ def test_connector_prefers_type_a_then_base():
 
 def test_main_only_candidates_are_never_connectors():
     assert select_connectors([ptr("A", (1, 1), "A")]) == []
+
+
+def _carries_flux(model, reaction, epsilon):
+    """Oracle: can ``reaction`` carry at least ``epsilon`` either way? (2 LPs)"""
+    for bound, value in (("lower_bound", epsilon), ("upper_bound", -epsilon)):
+        if (value > 0 and reaction.upper_bound < value) or (
+            value < 0 and reaction.lower_bound > value
+        ):
+            continue
+        with model:
+            setattr(reaction, bound, value)
+            if not math.isnan(model.slim_optimize(error_value=math.nan)):
+                return True
+    return False
+
+
+@pytest.mark.parametrize("seed", range(12))
+def test_unblockable_matches_per_reaction_fba(seed):
+    rng = random.Random(seed)
+    metabolites = [f"M{index}c" for index in range(7)]
+    reactions = {}
+    for index in range(12):
+        chosen = rng.sample(metabolites, rng.choice([1, 2, 2, 3]))
+        reactions[f"R{index}"] = {mid: rng.choice([-2, -1, 1, 1, 2]) for mid in chosen}
+    model = build(
+        reactions, reversible={rid for rid in reactions if rng.random() < 0.4}
+    )
+    epsilon = 1e-4
+    expected = {
+        reaction.id
+        for reaction in model.reactions
+        if _carries_flux(model, reaction, epsilon)
+    }
+    assert unblockable(model, set(reactions), epsilon) == expected
+
+
+def surplus_island():
+    """Main exports Ac; the island cycle Ae -> Be -> 2 Ae only runs with a drain.
+
+    The island has no dead ends, so temporary sinks cannot unblock it.
+    """
+    return build(
+        {
+            "EXA": {"Ac": -1},
+            "R1": {"Ac": -1, "Dc": 1},
+            "EXD": {"Dc": -1},
+            "I1": {"Ae": -1, "Be": 1},
+            "I2": {"Be": -1, "Ae": 2},
+        },
+        reversible={"EXA"},
+    )
+
+
+def coverage_of(model, **kwargs):
+    components = network_components(model)
+    candidates = generate_ptr_candidates(
+        model, [("c", "e")], ["A", "B", "C"], components
+    )
+    return candidates, compute_coverage(model, candidates, components, **kwargs)
+
+
+def by_component(coverages):
+    return {item.component: item for item in coverages}
+
+
+def test_candidate_covers_reactions_it_unblocks():
+    (candidate,), coverages = coverage_of(surplus_island())
+    island = by_component(coverages)[2]
+    assert island.targets == ["I1", "I2"]
+    assert island.sink_only == []
+    assert island.coverage == {candidate.reaction_id: ["I1", "I2"]}
+
+
+def test_sink_only_unblocked_reactions_are_not_credited():
+    model = build(
+        {
+            "EXA": {"Ac": -1},
+            "R1": {"Ac": -1, "Dc": 1},
+            "EXD": {"Dc": -1},
+            "I1": {"Ae": -1, "Be": 1},
+            "I2": {"Be": -1, "Ce": 1},
+        },
+        reversible={"EXA"},
+    )
+    _, coverages = coverage_of(model)
+    island = by_component(coverages)[2]
+    assert island.targets == island.sink_only == ["I1", "I2"]
+    assert island.coverage == {}
+
+
+def test_temporary_sinks_do_not_leak_into_model():
+    model = surplus_island()
+    before = sorted(reaction.id for reaction in model.reactions)
+    objective = str(model.objective.expression)
+    coverage_of(model)
+    assert sorted(reaction.id for reaction in model.reactions) == before
+    assert str(model.objective.expression) == objective
+
+
+def test_done_components_are_not_recomputed():
+    finished = ComponentCoverage(2, ["I1"], [], {"X": ["I1"]})
+    seen = []
+    _, coverages = coverage_of(
+        surplus_island(), done={2: finished}, on_component=seen.append
+    )
+    assert [item.component for item in seen] == [1]
+    assert by_component(coverages)[2] == finished
+    assert ComponentCoverage.from_dict(finished.to_dict()) == finished
+
+
+def test_small_components_are_skipped():
+    _, coverages = coverage_of(surplus_island(), min_component_size=5)
+    assert [item.component for item in coverages] == [1]
