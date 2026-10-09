@@ -256,6 +256,7 @@ def test_snapshot_keeps_each_source_and_prefers_reactome_structure(tmp_path):
                     "source": "reactome",
                     "candidate_gpr": "A and B",
                     "status": "resolved",
+                    "confidence": "strong",
                 },
             )
         )

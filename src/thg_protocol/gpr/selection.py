@@ -136,8 +136,11 @@ def select_reaction_gpr(
         except (TypeError, ValueError):
             continue
         mergeable.append(record)
+    accepted_mergeable = [
+        record for record in mergeable if _accepted_external_gpr(record)
+    ]
     if mergeable:
-        sgpr_resolution = merge_sgpr_evidence(mergeable)
+        sgpr_resolution = merge_sgpr_evidence(accepted_mergeable or mergeable)
 
     selected = selected_model_gpr
     selected_genes = selected_model_genes or [str(gene) for gene in model_genes]
@@ -146,7 +149,7 @@ def select_reaction_gpr(
     selected_external = False
     if candidates and sgpr_resolution and sgpr_resolution.status == "conflict":
         conflicts.extend(item[2] for item in candidates)
-    if not selected and sgpr_resolution and sgpr_resolution.sgpr:
+    if not selected and accepted_mergeable and sgpr_resolution and sgpr_resolution.sgpr:
         selected = to_gpr(sgpr_resolution.sgpr)
         selected_genes = list(genes_in_sgpr(sgpr_resolution.sgpr))
         selected_source = "external-sgpr"
@@ -173,7 +176,8 @@ def select_reaction_gpr(
         sgpr_status = sgpr_resolution.status
         sgpr_sources = tuple(str(item) for item in resolution["sources"])
         sgpr_warnings = tuple(str(item) for item in resolution["warnings"])
-        if not stoichiometry:
+        # Only the GPR built from this sGPR may inherit its subunit counts.
+        if not stoichiometry and selected_source == "external-sgpr":
             derived = unambiguous_stoichiometry(sgpr_resolution.sgpr)
             if derived is not None:
                 stoichiometry = derived

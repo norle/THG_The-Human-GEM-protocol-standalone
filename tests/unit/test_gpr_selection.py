@@ -81,7 +81,45 @@ def test_unresolved_candidate_remains_available_for_sgpr_resolution():
         ],
     )
 
-    assert result.gpr == "A"
-    assert result.genes == ("A",)
-    assert result.status == "resolved"
+    assert result.gpr == ""
+    assert result.genes == ("MODEL_GENE",)
+    assert result.status == "unresolved"
+    assert result.candidate_sgpr is not None
     assert result.sgpr_status == "unresolved"
+
+
+def test_structured_candidates_obey_same_acceptance_policy_as_plain_gpr():
+    for status, confidence in (
+        ("resolved", "supporting"),
+        ("candidate", "strong"),
+        ("unresolved", "strong"),
+    ):
+        record = {
+            **_evidence("reactome", "A and B", status=status, confidence=confidence),
+            "candidate_sgpr": "A*2 and B*1",
+        }
+        result = select_reaction_gpr(model_gpr="", model_genes=(), evidence=[record])
+        assert result.gpr == ""
+        assert result.status == "unresolved"
+        assert result.subunit_stoichiometry == ()
+        assert result.candidate_sgpr is not None
+        accepted = select_reaction_gpr(
+            model_gpr="",
+            model_genes=(),
+            evidence=[{**record, "confidence": "reaction-matched"}],
+        )
+        assert accepted.gpr == "A and B"
+        assert accepted.subunit_stoichiometry == (("A", 2), ("B", 1))
+
+
+def test_selected_plain_gpr_does_not_inherit_rejected_sgpr_stoichiometry():
+    accepted = _evidence("reactome", "A or B")
+    rejected = {
+        **_evidence("uniprot", "C and D", status="candidate"),
+        "candidate_sgpr": "C*2 and D*1",
+    }
+    result = select_reaction_gpr(
+        model_gpr="", model_genes=(), evidence=[accepted, rejected]
+    )
+    assert result.gpr == "A or B"
+    assert result.subunit_stoichiometry == ()
