@@ -3,7 +3,8 @@ from thg_protocol.gapfill import (
     generate_gapfill_plan,
     run_gapfill,
 )
-from thg_protocol.gapfill.cli import main
+from thg_protocol.gapfill.cli import build_parser, main
+from thg_protocol.gapfill.core import _transport_candidates
 
 
 def toy_model():
@@ -127,3 +128,40 @@ def test_generate_plan_accepts_precomputed_result():
         model, method="greedy", parameters=parameters, result=result
     )
     assert plan["proposals"] == []
+
+
+def test_sink_milp_rejects_lambda_outside_unit_interval():
+    for lam in (0, 1, 1.5):
+        result = gapfill_model(
+            toy_model(),
+            method="sink-milp",
+            parameters={"allowed_connections": [["c", "e"]], "tradeoff_lambda": lam},
+        )
+        assert result.status == "failed"
+        assert "tradeoff_lambda" in result.failure
+
+
+def test_cli_accepts_sink_milp():
+    args = build_parser().parse_args(
+        ["--model", "m.json", "--method", "sink-milp", "--output-dir", "out"]
+    )
+    assert args.method == "sink-milp"
+
+
+def test_transport_candidates_pair_every_metabolite_once_in_any_order():
+    model = toy_model()
+    model["compartments"]["m"] = "mitochondrion"
+    model["metabolites"] = [
+        {"id": "MAM00001m", "compartment": "m"},
+        {"id": "MAM00001c", "compartment": "c"},
+        {"id": "MAM00001e", "compartment": "e"},
+    ]
+    model["reactions"] = []
+    candidates = _transport_candidates(
+        model, [("c", "e"), ("c", "m"), ("e", "m")], ["A", "B", "C"]
+    )
+    assert [candidate.id for candidate in candidates] == [
+        "GAPFILL_MAM00001c_MAM00001e",
+        "GAPFILL_MAM00001c_MAM00001m",
+        "GAPFILL_MAM00001e_MAM00001m",
+    ]

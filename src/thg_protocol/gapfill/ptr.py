@@ -23,10 +23,14 @@ from .core import (
     GapfillResult,
     _add_candidate,
     _as_mapping,
+    _metabolite_kind,
     _metrics,
+    _pair_type,
+    _produced_consumed,
     _resolved_parameters,
     _suffix,
     _TransportSearch,
+    _UnionFind,
 )
 
 _RANK = {"A": 0, "B": 1, "C": 2}
@@ -53,25 +57,28 @@ class Components:
 
 
 def network_components(model: Any) -> Components:
-    """Number components by size; metabolites in no reaction get no entry."""
-    parent: dict[str, str] = {}
+    """Number components by size; metabolites in no reaction get no entry.
 
-    def find(item: str) -> str:
-        while parent[item] != item:
-            parent[item] = parent[parent[item]]
-            item = parent[item]
-        return item
-
+    Reactions and metabolites share one ID space here, so a reaction ID that
+    is also a metabolite ID raises instead of silently merging two nodes.
+    """
+    shared = sorted(
+        {reaction.id for reaction in model.reactions}
+        & {metabolite.id for metabolite in model.metabolites}
+    )
+    if shared:
+        raise ValueError(
+            f"IDs used by both a reaction and a metabolite: {', '.join(shared)}"
+        )
+    sets = _UnionFind()
     for reaction in model.reactions:
-        parent.setdefault(reaction.id, reaction.id)
+        sets.add(reaction.id)
         for metabolite in reaction.metabolites:
-            parent.setdefault(metabolite.id, metabolite.id)
-            left, right = find(reaction.id), find(metabolite.id)
-            if left != right:
-                parent[right] = left
+            sets.add(metabolite.id)
+            sets.union(reaction.id, metabolite.id)
     groups: dict[str, list[str]] = {}
-    for node in parent:
-        groups.setdefault(find(node), []).append(node)
+    for node in sets:
+        groups.setdefault(sets.find(node), []).append(node)
     ordered = sorted(groups.values(), key=lambda nodes: (-len(nodes), min(nodes)))
     of = {node: number for number, nodes in enumerate(ordered, 1) for node in nodes}
     return Components(
@@ -132,14 +139,6 @@ class PtrCandidate:
         )
 
 
-def _kind(metabolite_id: str, produced: set[str], consumed: set[str]) -> str:
-    if metabolite_id in produced - consumed:
-        return "product"
-    if metabolite_id in consumed - produced:
-        return "substrate"
-    return "none"
-
-
 def generate_ptr_candidates(
     model: Any,
     allowed_connections: list[tuple[str, str]],
@@ -151,16 +150,13 @@ def generate_ptr_candidates(
     A pair across components qualifies with any type. A pair inside the main
     component qualifies only as type A or B, i.e. when it links dead ends.
     Candidates sorted by ``reaction_id``.
+
+    Dead ends here are sign-only, as in legacy typing (agreed spec); the
+    temporary sinks of :func:`compute_coverage` are bounds-aware instead.
     """
     allowed = {tuple(sorted(pair)) for pair in allowed_connections}
-    produced: set[str] = set()
-    consumed: set[str] = set()
-    for reaction in model.reactions:
-        for metabolite, coefficient in reaction.metabolites.items():
-            if coefficient > 0:
-                produced.add(metabolite.id)
-            elif coefficient < 0:
-                consumed.add(metabolite.id)
+    mapped = _as_mapping(model)
+    produced, consumed = _produced_consumed(mapped)
     buckets: dict[str, list[tuple[str, str]]] = {}
     for metabolite in model.metabolites:
         if metabolite.id in components.of:
@@ -168,7 +164,7 @@ def generate_ptr_candidates(
             buckets.setdefault(_base(metabolite.id), []).append(
                 (metabolite.id, compartment)
             )
-    search = _TransportSearch(_as_mapping(model))
+    search = _TransportSearch(mapped)
     result = []
     for base, members in buckets.items():
         if not base:
@@ -179,16 +175,9 @@ def generate_ptr_candidates(
             for met2, compartment2 in members[index + 1 :]:
                 if tuple(sorted((compartment1, compartment2))) not in allowed:
                     continue
-                kinds = {
-                    _kind(met1, produced, consumed),
-                    _kind(met2, produced, consumed),
-                }
-                kind = (
-                    "A"
-                    if kinds == {"product", "substrate"}
-                    else "B"
-                    if len(kinds) == 1 and kinds != {"none"}
-                    else "C"
+                kind = _pair_type(
+                    _metabolite_kind(met1, produced, consumed),
+                    _metabolite_kind(met2, produced, consumed),
                 )
                 pair = (components.of[met1], components.of[met2])
                 if kind not in candidate_types or (
@@ -224,20 +213,10 @@ def select_connectors(candidates: list[PtrCandidate]) -> list[PtrCandidate]:
         best = representatives.get(pair)
         if best is None or _connector_key(candidate) < _connector_key(best):
             representatives[pair] = candidate
-    parent: dict[int, int] = {}
-
-    def find(item: int) -> int:
-        parent.setdefault(item, item)
-        while parent[item] != item:
-            parent[item] = parent[parent[item]]
-            item = parent[item]
-        return item
-
+    sets = _UnionFind(component for pair in representatives for component in pair)
     selected = []
     for candidate in sorted(representatives.values(), key=_connector_key):
-        left, right = (find(component) for component in candidate.components)
-        if left != right:
-            parent[right] = left
+        if sets.union(*candidate.components):
             selected.append(candidate)
     return selected
 
@@ -656,6 +635,15 @@ def verify_selection(
     }
 
 
+def ptr_collisions(model: Any, candidates: list[PtrCandidate]) -> list[str]:
+    """Reaction IDs of addable candidates that ``model`` already uses."""
+    return sorted(
+        candidate.reaction_id
+        for candidate in candidates
+        if not candidate.present and candidate.reaction_id in model.reactions
+    )
+
+
 def _failed(
     model: Any, parameters: dict[str, Any], before: dict[str, Any], reason: str
 ) -> GapfillResult:
@@ -713,11 +701,7 @@ def run_sink_milp(
             before,
             f"{len(connectors)} connectors exceed max_additions",
         )
-    collisions = sorted(
-        candidate.reaction_id
-        for candidate in candidates
-        if not candidate.present and candidate.reaction_id in result_model.reactions
-    )
+    collisions = ptr_collisions(result_model, candidates)
     if collisions:
         return _failed(
             result_model,

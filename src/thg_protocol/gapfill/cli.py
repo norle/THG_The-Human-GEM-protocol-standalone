@@ -17,7 +17,7 @@ def build_parser() -> argparse.ArgumentParser:
         "--model", required=True, type=Path, help="Input COBRA JSON or SBML model."
     )
     parser.add_argument(
-        "--method", required=True, choices=("milp", "greedy", "deadends")
+        "--method", required=True, choices=("milp", "greedy", "deadends", "sink-milp")
     )
     parser.add_argument(
         "--output-dir", required=True, type=Path, help="Standalone result directory."

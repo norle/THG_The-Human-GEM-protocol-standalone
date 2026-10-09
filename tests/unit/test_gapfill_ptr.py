@@ -479,3 +479,9 @@ def test_unblockable_fails_loudly_on_unbounded_lp():
         model.reactions.get_by_id(reaction_id).bounds = (-math.inf, math.inf)
     with pytest.raises(RuntimeError, match="unbounded"):
         unblockable(model, {"F", "G"}, 1e-4)
+
+
+def test_components_reject_ids_shared_by_reaction_and_metabolite():
+    model = build({"Xc": {"Xc": -1, "Yc": 1}})
+    with pytest.raises(ValueError, match="Xc"):
+        network_components(model)

@@ -341,8 +341,10 @@ class GapfillStage:
             self.implementation_version = 3
         elif stage_id == "validate-gapfill":
             self.implementation_version = 5
-        elif stage_id in {"gate-gapfill", "generate-gapfill-plan"}:
+        elif stage_id == "gate-gapfill":
             self.implementation_version = 3
+        elif stage_id == "generate-gapfill-plan":
+            self.implementation_version = 4
         elif stage_id in _PTR_STAGES:
             self.implementation_version = 1
 
@@ -565,6 +567,19 @@ class GapfillStage:
             model = _load_cobra_model(
                 _dependency_path(context, "load-gapfill-source", "model")
             )
+            candidates = _ptr_candidates(context)
+            fingerprint = sha256_json(self.fingerprint_data(context))
+            path = work_dir / "ptr-coverage.jsonl"
+            if ptr.ptr_collisions(model, candidates):
+                # Coverage on a model whose connectors cannot all be added is
+                # wasted; generate-gapfill-plan reports the collision as failed.
+                path.write_text(
+                    json.dumps({"fingerprint": fingerprint}) + "\n", encoding="utf-8"
+                )
+                return StageResult(
+                    (("coverage", path),),
+                    {"components": 0, "skipped": "reaction-id-collision"},
+                )
             for connector in _ptr_connectors(context):
                 _add_candidate(model, connector.as_gapfill_candidate(phase=2))
             stored = json.loads(
@@ -576,7 +591,6 @@ class GapfillStage:
                 stored["of"],
                 {int(key): value for key, value in stored["sizes"].items()},
             )
-            fingerprint = sha256_json(self.fingerprint_data(context))
             done = {}
             # A failed or interrupted attempt keeps its finished components: in
             # failed/ after an exception, still in .tmp/ after a hard kill.
@@ -588,16 +602,15 @@ class GapfillStage:
                     f"{self.id}-attempt-*/ptr-coverage.jsonl"
                 ),
             ]
-            for path in sorted(
+            for attempt in sorted(
                 (item for item in previous_attempts if item.parent != work_dir),
                 key=lambda item: item.parent.name[-4:],
             ):
-                previous, lines = _coverage_lines(path)
+                previous, lines = _coverage_lines(attempt)
                 if previous == fingerprint:
                     for line in lines:
                         entry = ptr.ComponentCoverage.from_dict(line)
                         done[entry.component] = entry
-            path = work_dir / "ptr-coverage.jsonl"
             with path.open("w", encoding="utf-8") as handle:
                 handle.write(json.dumps({"fingerprint": fingerprint}) + "\n")
                 for entry in done.values():
@@ -610,7 +623,7 @@ class GapfillStage:
 
                 coverage = ptr.compute_coverage(
                     model,
-                    _ptr_candidates(context),
+                    candidates,
                     components,
                     min_component_size=parameters["min_component_size"],
                     done=done,
@@ -635,18 +648,23 @@ class GapfillStage:
             model = _load_cobra_model(source)
             result = None
             if method == "sink-milp":
+                from thg_protocol.gapfill.core import _error_result
                 from thg_protocol.gapfill.ptr import ComponentCoverage, run_sink_milp
 
                 _, lines = _coverage_lines(
                     _dependency_path(context, "compute-gapfill-coverage", "coverage")
                 )
-                result = run_sink_milp(
-                    model,
-                    parameters,
-                    candidates=_ptr_candidates(context),
-                    connectors=_ptr_connectors(context),
-                    coverage=[ComponentCoverage.from_dict(line) for line in lines],
-                )
+                try:
+                    result = run_sink_milp(
+                        model,
+                        parameters,
+                        candidates=_ptr_candidates(context),
+                        connectors=_ptr_connectors(context),
+                        coverage=[ComponentCoverage.from_dict(line) for line in lines],
+                    )
+                except Exception as error:
+                    # As gapfill_model: a solver error becomes a failed plan.
+                    result = _error_result(model, method, parameters, error)
             plan = generate_gapfill_plan(
                 model,
                 method=method,

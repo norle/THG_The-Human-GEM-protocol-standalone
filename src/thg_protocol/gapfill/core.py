@@ -163,30 +163,47 @@ def run_gapfill(
     )
 
 
-def _components(model: dict[str, Any]) -> dict[str, int]:
-    parent: dict[str, str] = {
-        met["id"]: met["id"] for met in model.get("metabolites", [])
-    }
+class _UnionFind:
+    """Disjoint sets with path halving; ``union`` keeps the left root."""
 
-    def find(item: str) -> str:
+    def __init__(self, items: Any = ()) -> None:
+        self.parent: dict[Any, Any] = {item: item for item in items}
+
+    def __contains__(self, item: Any) -> bool:
+        return item in self.parent
+
+    def __iter__(self) -> Any:
+        return iter(self.parent)
+
+    def add(self, item: Any) -> None:
+        self.parent.setdefault(item, item)
+
+    def find(self, item: Any) -> Any:
+        parent = self.parent
         while parent[item] != item:
             parent[item] = parent[parent[item]]
             item = parent[item]
         return item
 
-    def union(left: str, right: str) -> None:
-        left, right = find(left), find(right)
-        if left != right:
-            parent[right] = left
+    def union(self, left: Any, right: Any) -> bool:
+        """Merge two sets; ``False`` if they were already one."""
+        left, right = self.find(left), self.find(right)
+        if left == right:
+            return False
+        self.parent[right] = left
+        return True
 
+
+def _components(model: dict[str, Any]) -> dict[str, int]:
+    sets = _UnionFind(met["id"] for met in model.get("metabolites", []))
     for reaction in model.get("reactions", []):
-        ids = [mid for mid in reaction.get("metabolites", {}) if mid in parent]
+        ids = [mid for mid in reaction.get("metabolites", {}) if mid in sets]
         for metabolite_id in ids[1:]:
-            union(ids[0], metabolite_id)
+            sets.union(ids[0], metabolite_id)
     roots: dict[str, int] = {}
     result: dict[str, int] = {}
-    for metabolite_id in parent:
-        root = find(metabolite_id)
+    for metabolite_id in sets:
+        root = sets.find(metabolite_id)
         roots.setdefault(root, len(roots) + 1)
         result[metabolite_id] = roots[root]
     return result
@@ -204,12 +221,32 @@ def _produced_consumed(model: dict[str, Any]) -> tuple[set[str], set[str]]:
     produced, consumed = set(), set()
     for reaction in model.get("reactions", []):
         for metabolite_id, coefficient in reaction.get("metabolites", {}).items():
-            (produced if coefficient > 0 else consumed).add(metabolite_id)
+            if coefficient > 0:
+                produced.add(metabolite_id)
+            elif coefficient < 0:
+                consumed.add(metabolite_id)
     return produced, consumed
 
 
+def _metabolite_kind(metabolite_id: str, produced: set[str], consumed: set[str]) -> str:
+    """Sign-only dead-end kind, as legacy candidate typing (bounds ignored)."""
+    if metabolite_id in produced - consumed:
+        return "product"
+    if metabolite_id in consumed - produced:
+        return "substrate"
+    return "none"
+
+
+def _pair_type(left_kind: str, right_kind: str) -> str:
+    """A: product with substrate; B: two of one dead-end kind; C: otherwise."""
+    if {left_kind, right_kind} == {"product", "substrate"}:
+        return "A"
+    if left_kind == right_kind != "none":
+        return "B"
+    return "C"
+
+
 # Standalone API.
-_TRANSPORT_METHODS = {"greedy", "deadends"}
 _DEFAULTS = {
     "greedy": {
         "max_additions": 500,
@@ -309,8 +346,9 @@ def _transport_candidates(
         buckets.setdefault(re.sub(r"[a-z]+$", "", met["id"]), []).append(met)
     result = []
     for base, metabolites in sorted(buckets.items()):
-        for index, left in enumerate(sorted(metabolites, key=lambda item: item["id"])):
-            for right in sorted(metabolites[index + 1 :], key=lambda item: item["id"]):
+        ordered = sorted(metabolites, key=lambda item: item["id"])
+        for index, left in enumerate(ordered):
+            for right in ordered[index + 1 :]:
                 compartments = tuple(
                     sorted(
                         (
@@ -321,26 +359,9 @@ def _transport_candidates(
                 )
                 if compartments not in allowed:
                     continue
-                left_kind = (
-                    "product"
-                    if left["id"] in produced - consumed
-                    else "substrate"
-                    if left["id"] in consumed - produced
-                    else "none"
-                )
-                right_kind = (
-                    "product"
-                    if right["id"] in produced - consumed
-                    else "substrate"
-                    if right["id"] in consumed - produced
-                    else "none"
-                )
-                kind = (
-                    "A"
-                    if {left_kind, right_kind} == {"product", "substrate"}
-                    else "B"
-                    if left_kind == right_kind and left_kind != "none"
-                    else "C"
+                kind = _pair_type(
+                    _metabolite_kind(left["id"], produced, consumed),
+                    _metabolite_kind(right["id"], produced, consumed),
                 )
                 if kind not in candidate_types:
                     continue
@@ -390,8 +411,13 @@ def _resolved_parameters(
         if "allowed_connections" not in values:
             raise ValueError("allowed_connections is required for sink-milp")
         lam = values["tradeoff_lambda"]
-        if isinstance(lam, bool) or not isinstance(lam, (int, float)) or lam <= 0:
-            raise ValueError("tradeoff_lambda must be a positive number")
+        # At lambda >= 1 a PTR costs at least the targets it covers: none selected.
+        if (
+            isinstance(lam, bool)
+            or not isinstance(lam, (int, float))
+            or not 0 < lam < 1
+        ):
+            raise ValueError("tradeoff_lambda must be between 0 and 1")
         size = values["min_component_size"]
         if isinstance(size, bool) or not isinstance(size, int) or size < 1:
             raise ValueError("min_component_size must be a positive integer")
@@ -422,24 +448,13 @@ class _TransportSearch:
 
     def __init__(self, mapped: dict[str, Any]) -> None:
         self.produced, self.consumed = _produced_consumed(mapped)
-        self.parent = {met["id"]: met["id"] for met in mapped.get("metabolites", [])}
+        self.sets = _UnionFind(met["id"] for met in mapped.get("metabolites", []))
         self.transports: dict[tuple[str, str], list[frozenset[str]]] = {}
         for reaction in mapped.get("reactions", []):
-            ids = [mid for mid in reaction.get("metabolites", {}) if mid in self.parent]
+            ids = [mid for mid in reaction.get("metabolites", {}) if mid in self.sets]
             for metabolite_id in ids[1:]:
-                self._union(ids[0], metabolite_id)
+                self.sets.union(ids[0], metabolite_id)
             self._record_transport(reaction)
-
-    def _find(self, item: str) -> str:
-        while self.parent[item] != item:
-            self.parent[item] = self.parent[self.parent[item]]
-            item = self.parent[item]
-        return item
-
-    def _union(self, left: str, right: str) -> None:
-        left, right = self._find(left), self._find(right)
-        if left != right:
-            self.parent[right] = left
 
     def _record_transport(self, reaction: dict[str, Any]) -> None:
         key = _transport_key(reaction)
@@ -461,7 +476,9 @@ class _TransportSearch:
             else:
                 consumed = True
             dead_ends -= produced != consumed
-        roots = {self._find(mid) for mid in candidate.metabolites if mid in self.parent}
+        roots = {
+            self.sets.find(mid) for mid in candidate.metabolites if mid in self.sets
+        }
         return dead_ends, max(len(roots) - 1, 0)
 
     def covers(self, candidate: GapfillCandidate) -> bool:
@@ -473,9 +490,9 @@ class _TransportSearch:
     def add(self, candidate: GapfillCandidate) -> None:
         for metabolite_id, coefficient in candidate.metabolites.items():
             (self.produced if coefficient > 0 else self.consumed).add(metabolite_id)
-        ids = [mid for mid in candidate.metabolites if mid in self.parent]
+        ids = [mid for mid in candidate.metabolites if mid in self.sets]
         for metabolite_id in ids[1:]:
-            self._union(ids[0], metabolite_id)
+            self.sets.union(ids[0], metabolite_id)
         self._record_transport(_candidate_reaction(candidate))
 
 
@@ -690,17 +707,24 @@ def gapfill_model(
             else _run_transport(model, method, values)
         )
     except Exception as error:
-        return GapfillResult(
-            _candidate_model_copy(model),
-            [],
-            {},
-            "failed",
-            str(error),
-            {"strategy": method},
-            method,
-            dict(parameters or {}),
-            stop_reason="validation-or-execution-error",
-        )
+        return _error_result(model, method, parameters, error)
+
+
+def _error_result(
+    model: Any, method: str, parameters: dict[str, Any] | None, error: Exception
+) -> GapfillResult:
+    """A ``failed`` result for a validation or execution error."""
+    return GapfillResult(
+        _candidate_model_copy(model),
+        [],
+        {},
+        "failed",
+        str(error),
+        {"strategy": method},
+        method,
+        dict(parameters or {}),
+        stop_reason="validation-or-execution-error",
+    )
 
 
 def _json_parameters(value: Any) -> Any:

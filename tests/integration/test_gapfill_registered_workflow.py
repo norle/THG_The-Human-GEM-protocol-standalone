@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 from cobra import Metabolite, Model, Reaction
-from cobra.io import save_json_model
+from cobra.io import load_json_model, save_json_model
 
 from thg_protocol.workflow.runner import get_status, resume, start
 
@@ -540,3 +540,57 @@ def test_coverage_resumes_after_a_hard_kill(tmp_path, monkeypatch):
     resume(run)
     assert calls == [[1, 2], [3]]
     assert get_status(run)["overall_status"] == "completed"
+
+
+def _failed_plan_header(run: Path) -> dict:
+    path = run / "failed/generate-gapfill-plan/attempt-0001/gapfill-plan.jsonl"
+    return json.loads(path.read_text().splitlines()[0])
+
+
+def test_collision_skips_coverage_and_fails_the_plan(tmp_path, monkeypatch):
+    from thg_protocol.gapfill import ptr
+
+    def unexpected(*args, **kwargs):
+        raise AssertionError("coverage computed despite a reaction-ID collision")
+
+    monkeypatch.setattr(ptr, "compute_coverage", unexpected)
+    source = tmp_path / "model.json"
+    _model(source)
+    model = load_json_model(source)
+    clash = Reaction("GAPFILL_PTR_A_c_A_e")
+    clash.add_metabolites({model.metabolites.A_c: -1, model.metabolites.B_c: 1})
+    model.add_reactions([clash])
+    save_json_model(model, source)
+    config = _reference_config(
+        tmp_path, source, {"gene_locations": {"ENSG000001": ["cytosol"]}}
+    )
+    payload = json.loads(config.read_text(encoding="utf-8"))
+    payload["gapfill"].update(method="sink-milp", max_additions=10)
+    config.write_text(json.dumps(payload), encoding="utf-8")
+
+    with pytest.raises(RuntimeError, match="generate-gapfill-plan"):
+        start(config)
+
+    run = tmp_path / "run"
+    assert get_status(run)["steps"]["compute-gapfill-coverage"]["status"] == (
+        "completed"
+    )
+    header = _failed_plan_header(run)
+    assert header["status"] == "failed"
+    assert "reaction-ID collision" in header["failure"]
+
+
+def test_plan_stage_records_solver_errors_in_a_failed_plan(tmp_path, monkeypatch):
+    from thg_protocol.gapfill import ptr
+
+    def broken(*args, **kwargs):
+        raise RuntimeError("flux LP ended with status time_limit")
+
+    monkeypatch.setattr(ptr, "verify_selection", broken)
+    source = tmp_path / "model.json"
+    _three_components(source)
+    with pytest.raises(RuntimeError, match="gapfill algorithm failed"):
+        start(_sink_milp_config(tmp_path, source))
+    header = _failed_plan_header(tmp_path / "run")
+    assert header["status"] == "failed"
+    assert "time_limit" in header["failure"]
