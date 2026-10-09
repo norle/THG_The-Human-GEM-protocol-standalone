@@ -204,6 +204,7 @@ class CellSpecificStage:
 
         if self.id == "collect-expression-evidence":
             source = Path(str(section["expression_file"]))
+            source_checksum = sha256_file(source)
             rows: list[dict[str, object]] = []
             strategy = section.get(
                 "reduction_strategy", section.get("activity_strategy", "gpr-threshold")
@@ -273,7 +274,7 @@ class CellSpecificStage:
                                 item.get("units", "pre-normalized"),
                             )
                         ),
-                        "source_file_checksum": sha256_file(source),
+                        "source_file_checksum": source_checksum,
                         "mapping_status": "unmapped",
                         "warnings": (
                             list(warnings)
