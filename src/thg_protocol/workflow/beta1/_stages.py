@@ -297,7 +297,7 @@ def _run_provenance(
 class Beta1Stage:
     """One stage in the explicit β1 scientific DAG."""
 
-    implementation_version = 4
+    implementation_version = 5
 
     def __init__(self, stage_id: str, dependencies: tuple[str, ...] = ()) -> None:
         self.id = stage_id

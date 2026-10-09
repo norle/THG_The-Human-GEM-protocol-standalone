@@ -1931,7 +1931,12 @@ def consolidate_model(
             removed_genes.append(alias)
             copied.genes.remove(copied.genes.get_by_id(alias))
     reaction_groups: dict[tuple[object, ...], list[Any]] = defaultdict(list)
+    # Any objective, linear or not, is defined over these solver variables.
+    objective_symbols = copied.objective.expression.free_symbols
     for reaction in copied.reactions:
+        # Objective-bearing reactions keep their independent fluxes and capacity.
+        if objective_symbols & {reaction.forward_variable, reaction.reverse_variable}:
+            continue
         reaction_groups[
             (
                 reaction_identity_key(reaction),
@@ -1966,35 +1971,6 @@ def consolidate_model(
             )
             if names:
                 keep.name = names[0]
-            # Preserve objective semantics when duplicate reactions carry
-            # separate non-zero objective coefficients.
-            try:
-                coefficients = copied.objective.get_linear_coefficients(
-                    [
-                        keep.forward_variable,
-                        keep.reverse_variable,
-                        duplicate.forward_variable,
-                        duplicate.reverse_variable,
-                    ]
-                )
-                keep_coefficient = float(
-                    coefficients.get(keep.forward_variable, 0.0)
-                ) - float(coefficients.get(keep.reverse_variable, 0.0))
-                duplicate_coefficient = float(
-                    coefficients.get(duplicate.forward_variable, 0.0)
-                ) - float(coefficients.get(duplicate.reverse_variable, 0.0))
-                if keep_coefficient or duplicate_coefficient:
-                    copied.objective.set_linear_coefficients(
-                        {
-                            keep.forward_variable: keep_coefficient
-                            + duplicate_coefficient,
-                            keep.reverse_variable: 0.0,
-                            duplicate.forward_variable: 0.0,
-                            duplicate.reverse_variable: 0.0,
-                        }
-                    )
-            except (AttributeError, TypeError):
-                pass
             for group_object in getattr(copied, "groups", ()):
                 members = getattr(group_object, "members", ())
                 if duplicate in members:
@@ -2004,7 +1980,7 @@ def consolidate_model(
                     except AttributeError:
                         pass
             removed_reactions.append(str(duplicate.id))
-            copied.reactions.remove(duplicate)
+            copied.remove_reactions([duplicate])
     removed_orphans: list[str] = []
     if remove_isolated:
         for metabolite in list(copied.metabolites):

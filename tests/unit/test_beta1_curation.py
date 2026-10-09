@@ -535,3 +535,51 @@ def test_contradicted_candidate_is_not_merged_as_a_cross_reference():
         model, metabolite_identities={"a_c": resolution}
     )
     assert proposal.after == {"kegg": ["C11713"]}
+
+
+def test_consolidation_removes_solver_variables_and_metabolite_backlinks(tmp_path):
+    model = _model()
+    duplicate = model.reactions.R_A.copy()
+    duplicate.id = "R_DUP"
+    model.add_reactions([duplicate])
+    consolidated, _ = consolidate_model(model)
+    assert "R_DUP" not in consolidated.reactions
+    assert duplicate.forward_variable.name not in consolidated.variables
+    assert duplicate.reverse_variable.name not in consolidated.variables
+    for metabolite in consolidated.metabolites:
+        assert {r.id for r in metabolite.reactions} == {"R_A"}
+    source = Reaction("source")
+    source.add_metabolites({consolidated.metabolites.a_c: 1})
+    sink = Reaction("sink")
+    sink.add_metabolites({consolidated.metabolites.b_c: -1})
+    consolidated.add_reactions([source, sink])
+    consolidated.reactions.R_A.upper_bound = 10
+    consolidated.objective = sink
+    path = tmp_path / "consolidated.json"
+    save_json_model(consolidated, str(path))
+    assert (
+        consolidated.slim_optimize() == load_json_model(str(path)).slim_optimize() == 10
+    )
+    assert "R_DUP" in model.reactions
+
+
+def test_consolidation_preserves_independent_objective_fluxes(tmp_path):
+    model = _model()
+    model.reactions.R_A.upper_bound = 10
+    duplicate = model.reactions.R_A.copy()
+    duplicate.id = "R_DUP"
+    model.add_reactions([duplicate])
+    source = Reaction("source")
+    source.add_metabolites({model.metabolites.a_c: 1})
+    sink = Reaction("sink")
+    sink.add_metabolites({model.metabolites.b_c: -1})
+    model.add_reactions([source, sink])
+    model.objective = {model.reactions.R_A: 1, model.reactions.R_DUP: 2}
+    consolidated, report = consolidate_model(model)
+    assert "R_DUP" in consolidated.reactions
+    assert consolidated.reactions.R_A.objective_coefficient == 1
+    assert consolidated.reactions.R_DUP.objective_coefficient == 2
+    assert consolidated.slim_optimize() == model.slim_optimize() == 30
+    path = tmp_path / "objective.json"
+    save_json_model(consolidated, str(path))
+    assert load_json_model(str(path)).slim_optimize() == 30
