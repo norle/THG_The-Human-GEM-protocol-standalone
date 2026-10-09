@@ -18,6 +18,8 @@ from collections.abc import Callable, Mapping
 from dataclasses import asdict, dataclass, field, replace
 from typing import Any
 
+from thg_protocol.workflow.ids import metabolite_base_ids
+
 from .core import (
     GapfillCandidate,
     GapfillResult,
@@ -38,10 +40,6 @@ _RANK = {"A": 0, "B": 1, "C": 2}
 # used 10x the solver tolerance, which equals Gurobi's feasibility tolerance,
 # so forcing that flux "succeeded" on fully blocked networks.
 EPSILON = 1e-4
-
-
-def _base(metabolite_id: str) -> str:
-    return re.sub(r"[a-z]+$", "", metabolite_id)
 
 
 @dataclass(frozen=True)
@@ -158,18 +156,16 @@ def generate_ptr_candidates(
     mapped = _as_mapping(model)
     produced, consumed = _produced_consumed(mapped)
     buckets: dict[str, list[tuple[str, str]]] = {}
+    bases = metabolite_base_ids({met["id"]: met for met in mapped["metabolites"]})
     for metabolite in model.metabolites:
         if metabolite.id in components.of:
             compartment = metabolite.compartment or _suffix(metabolite.id)
-            buckets.setdefault(_base(metabolite.id), []).append(
+            buckets.setdefault(bases[metabolite.id], []).append(
                 (metabolite.id, compartment)
             )
     search = _TransportSearch(mapped)
     result = []
     for base, members in buckets.items():
-        if not base:
-            # An all-lowercase ID has no base left; pairing on it is nonsense.
-            continue
         members.sort()
         for index, (met1, compartment1) in enumerate(members):
             for met2, compartment2 in members[index + 1 :]:

@@ -197,7 +197,7 @@ def _reference_beta1_upstream(context: StageContext) -> dict[str, object] | None
 
 
 class Beta2Stage:
-    implementation_version = 2
+    implementation_version = 3
     kind = "scientific"
 
     def __init__(self, stage_id: str, dependencies: tuple[str, ...] = ()):

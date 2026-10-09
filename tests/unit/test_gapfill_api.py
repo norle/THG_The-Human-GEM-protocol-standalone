@@ -219,3 +219,14 @@ def test_run_gapfill_ignores_collisions_outside_the_selection():
     assert result.status == "solved"
     assert result.selected == ["valid"]
     assert result.candidate_coverage["R1"] == "invalid-collision"
+
+
+def test_transport_candidates_fall_back_to_suffix_without_compartments():
+    mapped = toy_model()
+    for metabolite in mapped["metabolites"]:
+        del metabolite["compartment"]
+    candidates = _transport_candidates(mapped, [("c", "e")], ["A", "B", "C"])
+    assert [candidate.id for candidate in candidates] == [
+        "GAPFILL_MAM00001c_MAM00001e",
+        "GAPFILL_MAM00002c_MAM00002e",
+    ]

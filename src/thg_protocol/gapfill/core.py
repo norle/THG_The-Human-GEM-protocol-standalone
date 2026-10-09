@@ -9,6 +9,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
+from thg_protocol.workflow.ids import metabolite_base_ids
+
 __all__ = [
     "GapfillCandidate",
     "GapfillResult",
@@ -369,8 +371,9 @@ def _transport_candidates(
     allowed = {tuple(sorted(pair)) for pair in allowed_connections}
     produced, consumed = _produced_consumed(mapped)
     buckets: dict[str, list[dict[str, Any]]] = {}
+    bases = metabolite_base_ids({met["id"]: met for met in mapped["metabolites"]})
     for met in mapped["metabolites"]:
-        buckets.setdefault(re.sub(r"[a-z]+$", "", met["id"]), []).append(met)
+        buckets.setdefault(bases[met["id"]], []).append(met)
     result = []
     for base, metabolites in sorted(buckets.items()):
         ordered = sorted(metabolites, key=lambda item: item["id"])

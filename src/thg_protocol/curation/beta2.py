@@ -19,7 +19,7 @@ from cobra import Metabolite, Reaction
 
 from thg_protocol.curation.beta1 import classify_reaction
 from thg_protocol.runtime.hashing import sha256_file
-from thg_protocol.workflow.ids import DeterministicIdRegistry
+from thg_protocol.workflow.ids import DeterministicIdRegistry, metabolite_base_ids
 from thg_protocol.workflow.proposals import proposal_id
 
 LOCATION_ALIASES = {
@@ -342,11 +342,17 @@ def generate_expansion_plan(
     names = {name: key for key, name in compartment_registry.items()}
     plans: list[dict[str, object]] = []
     ordered_reactions = sorted(model.reactions, key=lambda item: str(item.id))
+    bases = metabolite_base_ids(
+        {
+            item.id: {"compartment": item.compartment, "annotation": item.annotation}
+            for item in model.metabolites
+        }
+    )
 
     def chemistry_key(
         reaction: Any,
         compartment_override: str | None = None,
-    ) -> tuple[str, tuple[tuple[str, object, float], ...]]:
+    ) -> tuple[object, ...]:
         compartments = {
             str(getattr(metabolite, "compartment", ""))
             for metabolite in reaction.metabolites
@@ -354,6 +360,7 @@ def generate_expansion_plan(
         stoichiometry = tuple(
             sorted(
                 (
+                    bases[metabolite.id],
                     str(getattr(metabolite, "formula", "") or ""),
                     getattr(metabolite, "charge", None),
                     float(coefficient),
@@ -368,14 +375,10 @@ def generate_expansion_plan(
             if len(compartments) == 1
             else ""
         )
-        return compartment, stoichiometry
+        return compartment, stoichiometry, reaction.bounds
 
-    # Equivalence is independent of metabolite IDs, but depends on the target
-    # compartment and normalized chemistry. Index once instead of scanning all
-    # reactions for every localized expansion proposal.
-    equivalent_index: dict[
-        tuple[str, tuple[tuple[str, object, float], ...]], list[str]
-    ] = {}
+    # Formula agreement cannot distinguish isomers; source identity must agree.
+    equivalent_index: dict[tuple[object, ...], list[str]] = {}
     for existing in ordered_reactions:
         equivalent_index.setdefault(chemistry_key(existing), []).append(
             str(existing.id)
@@ -540,6 +543,7 @@ def apply_expansion_plan(
             decision = str(detail)
         apply = (
             action in {"create", "update"}
+            and mode != "report-only"
             and decision != "reject"
             and (mode == "apply-all" or pid in approved or decision == "approve")
         )

@@ -318,21 +318,21 @@ def _parameters(section: Mapping[str, object]) -> dict[str, Any]:
 
 
 class GapfillStage:
-    implementation_version = 2
+    implementation_version = 3
 
     def __init__(self, stage_id: str, dependencies: tuple[str, ...] = ()) -> None:
         self.id = stage_id
         self.dependencies = dependencies
         if stage_id == "characterize-gapfill-baseline":
-            self.implementation_version = 3
+            self.implementation_version = 4
         elif stage_id == "validate-gapfill":
-            self.implementation_version = 5
+            self.implementation_version = 6
         elif stage_id == "gate-gapfill":
             self.implementation_version = 3
         elif stage_id == "generate-gapfill-plan":
-            self.implementation_version = 4
+            self.implementation_version = 5
         elif stage_id in _PTR_STAGES:
-            self.implementation_version = 1
+            self.implementation_version = 2
 
     def enabled(self, config: Any) -> bool:
         if self.id not in _PTR_STAGES:

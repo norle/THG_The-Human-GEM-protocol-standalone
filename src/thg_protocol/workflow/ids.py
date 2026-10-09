@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import re
+from collections.abc import Mapping
 from pathlib import Path
 
 from thg_protocol.runtime.hashing import sha256_json
@@ -14,6 +15,49 @@ class IdRegistryError(ValueError):
 
 
 ID_POLICY_VERSION = 1
+
+
+def _strip_compartment(identifier: str, compartment: object) -> str:
+    """Drop a compartment suffix; without a known compartment, a trailing a-z run."""
+    if compartment:
+        suffixes: tuple[str, ...] = (
+            f"[{compartment}]",
+            f"_{compartment}",
+            str(compartment),
+        )
+    else:
+        match = re.search(r"[a-z]+$", identifier)
+        suffixes = (match.group(0),) if match else ()
+    for suffix in suffixes:
+        if identifier.endswith(suffix) and len(identifier) > len(suffix):
+            return identifier[: -len(suffix)]
+    return identifier
+
+
+def metabolite_base_ids(
+    metabolites: Mapping[str, Mapping[str, object]],
+) -> dict[str, str]:
+    """Strip known compartments from source identities, including β2 copies."""
+    bases = {}
+    for identifier in metabolites:
+        source = identifier
+        # A parent removed from the model leaves its compartment unknown.
+        compartment: object = None
+        visited = set()
+        while source in metabolites:
+            if source in visited:
+                raise IdRegistryError(f"cyclic metabolite provenance: {identifier}")
+            visited.add(source)
+            record = metabolites[source]
+            parent = (record.get("annotation") or {}).get("thg_source_metabolite")
+            if not parent:
+                compartment = record.get("compartment")
+                break
+            if not isinstance(parent, str):
+                raise IdRegistryError(f"invalid metabolite provenance: {identifier}")
+            source = parent
+        bases[identifier] = _strip_compartment(source, compartment)
+    return bases
 
 
 def _slug(value: str) -> str:
