@@ -10,14 +10,14 @@ from typing import Any
 
 from thg_protocol.io.models import load_model as _load_cobra_model
 from thg_protocol.runtime.hashing import sha256_file
-from thg_protocol.runtime.stage import StageContext, StageResult
+from thg_protocol.runtime.stage import StageContext, StageResult, dependency_hashes
 from thg_protocol.runtime.stage import dependency_path as _dependency_path
 
 
 class ValidationScientificStage:
     """Run structural validation and optional MEMOTE checks."""
 
-    implementation_version = 8
+    implementation_version = 9
 
     def __init__(self, stage_id: str, dependencies: tuple[str, ...] = ()) -> None:
         self.id, self.dependencies = stage_id, dependencies
@@ -35,7 +35,10 @@ class ValidationScientificStage:
             "stage": self.id,
             "version": self.implementation_version,
             "configuration": section,
+            "dependencies": dependency_hashes(context, self.dependencies),
         }
+        if self.id == "validate-input":
+            data["input_model_sha256"] = sha256_file(Path(str(section["input_model"])))
         reference = section.get("reference_model")
         if self.id == "validate-checks" and reference is not None:
             data["reference_model_sha256"] = sha256_file(Path(str(reference)))
@@ -153,8 +156,13 @@ def validation_stages() -> tuple[ValidationScientificStage, ...]:
     return (
         ValidationScientificStage("validate-input"),
         ValidationScientificStage("validate-checks", ("validate-input",)),
-        ValidationScientificStage("validate-memote", ("validate-checks",)),
-        ValidationScientificStage("assemble-validation-report", ("validate-memote",)),
+        ValidationScientificStage(
+            "validate-memote", ("validate-input", "validate-checks")
+        ),
+        ValidationScientificStage(
+            "assemble-validation-report",
+            ("validate-input", "validate-checks", "validate-memote"),
+        ),
     )
 
 

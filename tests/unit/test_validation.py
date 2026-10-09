@@ -346,7 +346,8 @@ def test_validation_fingerprint_tracks_reference_model_contents(tmp_path):
     context = SimpleNamespace(
         config=SimpleNamespace(
             sections={"validation": {"reference_model": str(reference)}}
-        )
+        ),
+        manifest={"steps": {"validate-input": {"outputs": [{"sha256": "input"}]}}},
     )
     stage = ValidationScientificStage("validate-checks", ("validate-input",))
     before = stage.fingerprint_data(context)
@@ -461,6 +462,50 @@ def test_release_cannot_pass_unavailable_energy_check(monkeypatch, status):
     assert check["release_blocking"] is True
     assert check["passed"] is None
     assert report["passed"] is False
+
+
+def test_validation_resume_recomputes_changed_model_and_all_dependents(tmp_path):
+    from cobra.io import save_json_model
+
+    from thg_protocol.workflow.runner import resume
+
+    source = tmp_path / "model.json"
+    original = model()
+    save_json_model(original, str(source))
+    config = tmp_path / "config.json"
+    config.write_text(
+        json.dumps(
+            {
+                "workflow": "validate",
+                "run": {"name": "validation", "output_dir": str(tmp_path / "run")},
+                "validation": {
+                    "input_model": str(source),
+                    "profile": "structural-fast",
+                },
+            }
+        )
+    )
+    run = start(config)
+    before = json.loads((run / "manifest.json").read_text())
+    extra = cobra.Reaction("extra")
+    extra.add_metabolites({original.metabolites.source_c: -1})
+    original.add_reactions([extra])
+    save_json_model(original, str(source))
+    resume(run)
+    after = json.loads((run / "manifest.json").read_text())
+    for stage_id in before["steps"]:
+        assert (
+            before["steps"][stage_id]["fingerprint"]
+            != after["steps"][stage_id]["fingerprint"]
+        )
+    output = next(
+        item
+        for item in after["steps"]["validate-input"]["outputs"]
+        if item["role"] == "model"
+    )
+    assert (
+        "extra" in json.loads((run / output["path"]).read_text())["reactions"][-1]["id"]
+    )
 
 
 def test_biomass_reaction_missing_charge_does_not_block_charge_balance():

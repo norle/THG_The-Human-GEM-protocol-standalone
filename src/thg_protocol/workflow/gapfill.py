@@ -14,6 +14,7 @@ from thg_protocol.runtime.hashing import sha256_file, sha256_json, verify_artifa
 from thg_protocol.runtime.stage import (
     StageContext,
     StageResult,
+    dependency_hashes,
 )
 from thg_protocol.runtime.stage import (
     dependency_path as _dependency_path,
@@ -59,21 +60,6 @@ def _hash(path: object) -> str | None:
         if isinstance(path, str) and Path(path).is_file()
         else None
     )
-
-
-def _dependency_hashes(
-    context: StageContext, dependencies: tuple[str, ...]
-) -> dict[str, list[str]]:
-    steps = context.manifest.get("steps", {})
-    return {
-        stage_id: (
-            [str(item.get("sha256")) for item in _dependency_records(context, stage_id)]
-            if isinstance(steps, Mapping)
-            and steps.get(stage_id, {}).get("status") == "completed"
-            else []
-        )
-        for stage_id in dependencies
-    }
 
 
 def _model_counts(model: Any) -> dict[str, int]:
@@ -360,7 +346,7 @@ class GapfillStage:
             "stage": self.id,
             "implementation_version": self.implementation_version,
             "dependencies": (
-                _dependency_hashes(context, self.dependencies)
+                dependency_hashes(context, self.dependencies)
                 if self.dependencies
                 else {}
             ),

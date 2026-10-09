@@ -60,6 +60,22 @@ def dependency_records(
     return [item for item in outputs if isinstance(item, Mapping)]
 
 
+def dependency_hashes(
+    context: StageContext, dependencies: tuple[str, ...]
+) -> dict[str, list[str]]:
+    """Output hashes per completed dependency, for stage fingerprints."""
+    steps = context.manifest.get("steps", {})
+    return {
+        stage_id: (
+            [str(item.get("sha256")) for item in dependency_records(context, stage_id)]
+            if isinstance(steps, Mapping)
+            and steps.get(stage_id, {}).get("status") == "completed"
+            else []
+        )
+        for stage_id in dependencies
+    }
+
+
 def dependency_path(context: StageContext, stage_id: str, role: str) -> Path:
     for record in dependency_records(context, stage_id):
         if record.get("role") == role and isinstance(record.get("path"), str):
@@ -72,6 +88,7 @@ __all__ = [
     "StageContext",
     "StageResult",
     "dump_json",
+    "dependency_hashes",
     "dependency_records",
     "dependency_path",
 ]
