@@ -104,7 +104,10 @@ def test_stoichiometric_consistency_excludes_boundary_reactions():
     sink.add_metabolites({source.metabolites.product_c: -1})
     source.add_reactions([uptake, sink])
     source.objective = "sink"
-    assert validate_model(source, "release-full")["passed"] is True
+    report = validate_model(source, "release-full")
+    check = next(c for c in report["checks"] if c["id"] == "stoichiometric-consistency")
+    assert check["passed"] is True
+    assert report["passed"] is False  # No energy couple is available to evaluate.
 
 
 @pytest.mark.memote
@@ -130,7 +133,7 @@ def test_stoichiometric_inconsistency_is_a_nonblocking_warning(monkeypatch):
     assert check["release_blocking"] is False
     # Without solver checks only the LP runs; MEMOTE's MILP names nothing.
     assert check["details"]["unconserved"] is None
-    assert report["passed"] is True
+    assert report["passed"] is False  # Disabled energy-cycle checks block release.
 
 
 def test_tasks_copy_model_and_classify_solver_status(tmp_path):
@@ -423,3 +426,54 @@ def test_model_metrics_reuse_the_validation_fva_and_report_failures(monkeypatch)
     metrics = _model_metrics(model(), profile="structural-fast")
     assert metrics["blocked_reactions"] is None
     assert metrics["blocked_reactions_error"] == "RuntimeError: solver down"
+
+
+@pytest.mark.parametrize("formula", [None, "invalid", "alsoinvalid"])
+def test_invalid_or_missing_formula_cannot_pass_release_balance(formula):
+    source = model()
+    for metabolite in source.metabolites:
+        metabolite.formula = formula
+    report = validate_model(source, "release-full", run_solver=False)
+    check = next(c for c in report["checks"] if c["id"] == "mass-balance")
+    assert check["passed"] is False
+    assert check["release_blocking"] is True
+    assert report["passed"] is False
+    assert check["details"]["statuses"]["convert"].startswith("not-evaluable-")
+
+
+def test_release_requires_energy_check_when_solver_disabled():
+    report = validate_model(model(), "release-full", run_solver=False)
+    check = next(c for c in report["checks"] if c["id"] == "energy-generating-cycles")
+    assert check["status"] == "not-evaluated"
+    assert check["passed"] is None
+    assert check["release_blocking"] is True
+    assert report["passed"] is False
+
+
+@pytest.mark.parametrize("status", ["not-evaluated", "error"])
+def test_release_cannot_pass_unavailable_energy_check(monkeypatch, status):
+    monkeypatch.setattr(
+        "thg_protocol.validation.energy_cycles",
+        lambda model: {"status": status, "passed": None, "reason": "unavailable"},
+    )
+    report = validate_model(model(), "release-full", run_solver=True)
+    check = next(c for c in report["checks"] if c["id"] == "energy-generating-cycles")
+    assert check["release_blocking"] is True
+    assert check["passed"] is None
+    assert report["passed"] is False
+
+
+def test_biomass_reaction_missing_charge_does_not_block_charge_balance():
+    source = model()
+    biomass = cobra.Reaction("biomass_human")
+    biomass.add_metabolites(
+        {
+            source.metabolites.source_c: -1,
+            cobra.Metabolite("protein_c", formula="H2O", compartment="c"): 1,
+        }
+    )
+    source.add_reactions([biomass])
+    report = validate_model(source, "release-full", run_solver=False)
+    check = next(c for c in report["checks"] if c["id"] == "charge-balance")
+    assert "biomass_human" not in check["details"]["not_evaluable"]
+    assert check["passed"] is True

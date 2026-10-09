@@ -177,3 +177,14 @@ def test_structural_profile_skips_leak_and_energy_checks():
         for item in validate_model(conserved_model(), "structural-fast")["checks"]
     }
     assert not checks & {"metabolite-leaks", "energy-generating-cycles"}
+
+
+@pytest.mark.solver
+@pytest.mark.memote
+@pytest.mark.parametrize("cycle", [False, True])
+def test_release_energy_cycle_gate_uses_evaluated_result(cycle):
+    report = validate_model(energy_model(cycle=cycle), "release-full")
+    check = next(c for c in report["checks"] if c["id"] == "energy-generating-cycles")
+    assert check["passed"] is (not cycle)
+    assert check["release_blocking"] is True
+    assert report["passed"] is (not cycle)

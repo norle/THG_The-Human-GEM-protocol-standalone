@@ -79,6 +79,12 @@ validation detection is disabled. Removal evidence is in `loop_removal` in the
 validation report; the gapfill ledger contains both additions and removals, and
 `final-thg` exports a separate `loop-removal-ledger.jsonl`.
 
+`release-full` requires evaluable mass and charge balance for non-excluded internal
+reactions and a passing energy-generating-cycle check. Missing or invalid chemistry,
+detected energy cycles, disabled solver checks, unavailable MEMOTE, or the absence
+of an identifiable energy couple prevent release. Other profiles retain energy
+cycle results as diagnostic evidence.
+
 Stoichiometric consistency is diagnostic in every profile, including
 `release-full`: failure produces a warning rather than blocking release.
 The check runs MEMOTE's consistency functions (Gevorgyan et al. 2008) with the

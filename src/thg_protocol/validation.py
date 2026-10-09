@@ -45,7 +45,12 @@ PROFILES: dict[str, dict[str, object]] = {
     "release-full": {
         "solver": True,
         "blocking": _STRUCTURAL
-        | {"mass-balance", "charge-balance", "objective-feasibility"},
+        | {
+            "mass-balance",
+            "charge-balance",
+            "objective-feasibility",
+            "energy-generating-cycles",
+        },
     },
 }
 
@@ -176,16 +181,24 @@ def _balance_result(
     by_design = {key: pseudo[key] for key in unbalanced if key in pseudo}
     for key in by_design:
         statuses[key] = "unbalanced-by-design"
+    not_evaluable = {
+        key: value
+        for key, value in statuses.items()
+        if value.startswith("not-evaluable") and key not in pseudo
+    }
     return {
         "statuses": statuses,
         "unbalanced": real,
         "unbalanced_by_design": by_design,
         "imbalance": {key: imbalance[key] for key in unbalanced},
-        "passed": not real,
+        "not_evaluable": not_evaluable,
+        "passed": not real and not not_evaluable,
     }
 
 
 def _mass_balance(model: Any, pseudo: Mapping[str, str]) -> dict[str, object]:
+    from .model_build.mass_balance import formula_atoms
+
     statuses: dict[str, str] = {}
     imbalance: dict[str, object] = {}
     for reaction in model.reactions:
@@ -206,6 +219,9 @@ def _mass_balance(model: Any, pseudo: Mapping[str, str]) -> dict[str, object]:
         ]
         if any(not formula for formula in formulas):
             statuses[reaction.id] = "not-evaluable-missing-formula"
+            continue
+        if any(not formula_atoms(formula) for formula in formulas):
+            statuses[reaction.id] = "not-evaluable-invalid-formula"
             continue
         residual = consistency.reaction_balance(reaction)
         statuses[reaction.id] = "balanced" if not residual else "unbalanced"
@@ -939,6 +955,17 @@ def validate_model(
                     blocking="energy-generating-cycles" in blocking,
                 ),
             ]
+        )
+    if not solver and "energy-generating-cycles" in blocking:
+        checks.append(
+            CheckResult(
+                "energy-generating-cycles",
+                "stoichiometry",
+                "not-evaluated",
+                None,
+                {"reason": "solver checks disabled"},
+                True,
+            )
         )
     passed = all(item.passed is True for item in checks if item.release_blocking)
     records = [item.to_dict() for item in checks]

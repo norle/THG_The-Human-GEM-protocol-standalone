@@ -30,7 +30,7 @@ class HumanDatabaseStage:
     def __init__(self, stage_id: str, dependencies: tuple[str, ...] = ()) -> None:
         self.id, self.dependencies = stage_id, dependencies
         if stage_id == "human-database-validate":
-            self.implementation_version = 3
+            self.implementation_version = 4
         self.output_role = "model" if stage_id.endswith("reconstruct") else "artifact"
         self.kind = "mutation" if stage_id.endswith("reconstruct") else "collection"
 

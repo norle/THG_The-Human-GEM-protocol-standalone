@@ -38,6 +38,8 @@ class FinalTHGStage:
             # Merge plans changed format: metabolites merge only on identical
             # chemistry and same-ID conflicts are renamed.
             self.implementation_version = 3
+        if stage_id == "validate-final-thg":
+            self.implementation_version = 4
         self.output_role = (
             "model"
             if stage_id in {"final-thg-merge", "export-final-thg"}
