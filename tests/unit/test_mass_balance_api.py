@@ -65,3 +65,9 @@ def test_nullity_preserves_independent_rows() -> None:
 def test_inverse_and_gcd_helpers_are_available_without_solver() -> None:
     assert np.allclose(inv([[2.0, 0.0], [0.0, 4.0]]), [[0.5, 0.0], [0.0, 0.25]])
     assert maximumGCD(["2*K", "4*K", "6*K"], "K", 3) == 6
+
+
+def test_balance_equation_finds_positive_multidimensional_solution():
+    assert balance_equation("C + O2 -> CO + CO2") == ([3, 2], [2, 1])
+    assert balance_equation("2H2 + O2 -> 2H2O") == ([2, 1], [2])
+    assert balance_equation("H2 -> O2") == ([], [])

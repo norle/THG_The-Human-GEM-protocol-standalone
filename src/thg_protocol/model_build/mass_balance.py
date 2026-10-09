@@ -6,7 +6,6 @@ import ast
 import math
 import re
 from collections import defaultdict
-from fractions import Fraction
 from typing import Any
 
 try:  # Keep package and CLI help imports safe in a no-dependencies wheel check.
@@ -156,37 +155,63 @@ def equation_matrix(equation: str) -> np.ndarray:
 def balance_equation(equation: str) -> tuple[list[float], list[float]]:
     """Return the smallest positive elemental-balance coefficients.
 
-    The equation syntax is the same as
-    [`equation_matrix`][thg_protocol.model_build.mass_balance.equation_matrix];
-    coefficients
-    already present in the input are treated as part of the formula token and
-    are therefore best supplied as ``2 H2`` rather than ``H2`` with a
-    separately fixed coefficient.  A positive null-space vector is required:
-    equations that cannot be balanced without adding compounds return two
-    empty lists instead of silently changing their chemistry.
+    Uses the same syntax as ``equation_matrix`` and replaces existing input
+    coefficients. Minimizes the sum of positive integer coefficients; equations
+    that cannot be balanced without adding compounds return two empty lists.
     """
-    matrix = equation_matrix(equation)
-    if matrix.shape[1] == 0:
-        return [], []
-    numpy = _numpy()
-    _, _, vh = numpy.linalg.svd(matrix)
-    vector = vh[-1]
-    if numpy.all(vector < 0):
-        vector = -vector
-    if numpy.any(vector <= 1e-10) or not numpy.allclose(matrix @ vector, 0, atol=1e-8):
-        return [], []
+    from cobra import Configuration
+    from optlang.symbolics import add
 
-    fractions = [Fraction(float(value)).limit_denominator(10000) for value in vector]
-    denominator = math.lcm(*(fraction.denominator for fraction in fractions))
-    integers = [
-        fraction.numerator * denominator // fraction.denominator
-        for fraction in fractions
+    if equation.count("->") != 1:
+        raise ValueError("equation must contain exactly one '->'")
+    sides = [
+        [
+            re.sub(r"^\d+(?:\.\d+)?\s*", "", term.strip())
+            for term in side.split("+")
+            if term.strip()
+        ]
+        for side in equation.split("->")
     ]
-    divisor = math.gcd(*[abs(value) for value in integers if value])
-    if not divisor:
+    if not all(sides):
         return [], []
-    values = [float(value // divisor) for value in integers]
-    left_count = len(equation.split("->", 1)[0].split("+"))
+    matrix = equation_matrix(" -> ".join(" + ".join(side) for side in sides))
+    numpy = _numpy()
+    # Same optlang interface cobra models solve with (Gurobi when configured).
+    interface = Configuration().solver
+    problem = interface.Model()
+    variables = [
+        interface.Variable(f"x_{index}", lb=1, type="integer")
+        for index in range(matrix.shape[1])
+    ]
+    problem.add(variables)
+    problem.add(
+        [
+            interface.Constraint(
+                add(
+                    [
+                        float(value) * variable
+                        for value, variable in zip(row, variables, strict=True)
+                        if value
+                    ]
+                ),
+                lb=0,
+                ub=0,
+                name=f"element_{index}",
+            )
+            for index, row in enumerate(matrix)
+        ]
+    )
+    problem.objective = interface.Objective(add(variables), direction="min")
+    status = problem.optimize()
+    if status == "infeasible":
+        return [], []
+    if status != "optimal":
+        raise RuntimeError(f"mass-balance optimization failed: {status}")
+    values = numpy.rint([variable.primal for variable in variables])
+    if numpy.any(values < 1) or not numpy.allclose(matrix @ values, 0, atol=1e-8):
+        raise RuntimeError("mass-balance optimization returned invalid coefficients")
+    values = values.tolist()
+    left_count = len(sides[0])
     return values[:left_count], values[left_count:]
 
 
