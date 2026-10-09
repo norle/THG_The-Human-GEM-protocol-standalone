@@ -135,3 +135,31 @@ def test_final_thg_validation_rejects_failed_nested_report(tmp_path):
                 {"validation": {"passed": False}, "tasks": {"passed": True}},
             )
         )
+
+
+def test_failed_release_refresh_cannot_return_previous_release_payload(tmp_path):
+    class ChangingAdapter:
+        release = "A"
+        failing = False
+        calls = 0
+
+        def fetch(self, key):
+            self.calls += 1
+            if self.failing:
+                raise RuntimeError("refresh failed")
+            return {"release": self.release}
+
+    adapter = ChangingAdapter()
+    cache = tmp_path / "cache"
+    assert harvest_snapshot(["key"], adapter, cache)[0] == {"key": {"release": "A"}}
+    adapter.release = "B"
+    adapter.failing = True
+    for _ in range(2):
+        responses, errors = harvest_snapshot(["key"], adapter, cache, retries=0)
+        assert responses == {}
+        assert len(errors) == 1
+    adapter.failing = False
+    assert harvest_snapshot(["key"], adapter, cache)[0] == {"key": {"release": "B"}}
+    assert adapter.calls == 4
+    harvest_snapshot(["key"], adapter, cache)
+    assert adapter.calls == 4

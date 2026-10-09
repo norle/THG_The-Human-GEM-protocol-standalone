@@ -118,7 +118,7 @@ def harvest_snapshot(
     responses: dict[str, Mapping[str, Any]] = {}
     errors: list[HarvestError] = []
     for key in sorted(set(str(item) for item in keys)):
-        digest = hashlib.sha256(key.encode()).hexdigest()
+        digest = hashlib.sha256(json.dumps([adapter_release, key]).encode()).hexdigest()
         path = root / f"{digest}.json"
         if cache_compatible and path.is_file():
             payload = json.loads(path.read_text(encoding="utf-8"))
