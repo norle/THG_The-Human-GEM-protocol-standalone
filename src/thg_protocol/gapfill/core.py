@@ -128,8 +128,32 @@ def run_gapfill(
     ordered = sorted(normalized, key=lambda item: (item.cost, item.id))
     limit = len(ordered) if max_additions is None else max(0, max_additions)
     selected = ordered[:limit]
+    existing = (
+        {reaction["id"] for reaction in model.get("reactions", [])}
+        if isinstance(model, dict)
+        else {reaction.id for reaction in model.reactions}
+    )
+    # Only additions can collide; unselected candidates are never added.
+    collisions = sorted(existing & {candidate.id for candidate in selected})
+    if collisions:
+        return GapfillResult(
+            _candidate_model_copy(model),
+            [],
+            {
+                candidate.id: "invalid-collision"
+                if candidate.id in existing
+                else "available"
+                for candidate in normalized
+            },
+            "failed",
+            "reaction-ID collision: " + ", ".join(collisions),
+            {"strategy": "deterministic"},
+        )
     result_model = _candidate_model_copy(model)
-    coverage = {candidate.id: "available" for candidate in ordered}
+    coverage = {
+        candidate.id: "invalid-collision" if candidate.id in existing else "available"
+        for candidate in ordered
+    }
     try:
         for candidate in selected:
             if isinstance(result_model, dict):
@@ -144,9 +168,12 @@ def run_gapfill(
             coverage[candidate.id] = "selected"
     except (KeyError, ValueError, TypeError) as error:
         return GapfillResult(
-            result_model,
+            _candidate_model_copy(model),
             [],
-            coverage,
+            {
+                key: "available" if value == "selected" else value
+                for key, value in coverage.items()
+            },
             "failed",
             str(error),
             {"strategy": "deterministic"},

@@ -165,3 +165,57 @@ def test_transport_candidates_pair_every_metabolite_once_in_any_order():
         "GAPFILL_MAM00001c_MAM00001m",
         "GAPFILL_MAM00001e_MAM00001m",
     ]
+
+
+def test_run_gapfill_rejects_existing_ids_for_dict_and_cobra_models():
+    from cobra.io import model_from_dict
+
+    mapped = toy_model()
+    for source in (mapped, model_from_dict({**mapped, "genes": []})):
+        result = run_gapfill(
+            source, [{"id": "R1", "metabolites": {"MAM00001c": -1, "MAM00001e": 1}}]
+        )
+        assert result.status == "failed"
+        assert result.selected == []
+        assert result.candidate_coverage["R1"] == "invalid-collision"
+        assert (
+            len(
+                result.model["reactions"]
+                if isinstance(result.model, dict)
+                else result.model.reactions
+            )
+            == 2
+        )
+
+
+def test_run_gapfill_failure_rolls_back_earlier_valid_candidates():
+    from cobra.io import model_from_dict
+
+    mapped = toy_model()
+    candidates = [
+        {"id": "valid", "metabolites": {"MAM00001c": -1, "MAM00001e": 1}},
+        {"id": "invalid", "metabolites": {"missing": -1}},
+    ]
+    for source in (mapped, model_from_dict({**mapped, "genes": []})):
+        result = run_gapfill(source, candidates)
+        assert result.status == "failed"
+        assert result.selected == []
+        assert (
+            len(
+                result.model["reactions"]
+                if isinstance(result.model, dict)
+                else result.model.reactions
+            )
+            == 2
+        )
+
+
+def test_run_gapfill_ignores_collisions_outside_the_selection():
+    candidates = [
+        {"id": "valid", "cost": 1, "metabolites": {"MAM00001c": -1, "MAM00001e": 1}},
+        {"id": "R1", "cost": 2, "metabolites": {"MAM00002c": -1, "MAM00002e": 1}},
+    ]
+    result = run_gapfill(toy_model(), candidates, max_additions=1)
+    assert result.status == "solved"
+    assert result.selected == ["valid"]
+    assert result.candidate_coverage["R1"] == "invalid-collision"
