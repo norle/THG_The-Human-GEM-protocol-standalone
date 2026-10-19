@@ -52,16 +52,52 @@ complex branches are retained in the evidence report rather than assigned to
 an implicit cytosol. When same-precedence sources disagree about sGPR
 structure, all candidates are retained and the more conservative structure is
 selected while the conflict is reported. An existing model GPR remains
-preferred. `fallback_location` and `uncertainty_policy` (`reject-conflicts`
-or `allow-conflicts`) are explicit configuration choices. A gene resolved to
-several compartments keeps all of them; that is dual localization, not a
-conflict. `compartment_go_aliases` maps a GO term to a compartment only when
-an annotation names exactly that term (the shipped config maps cytoplasm to
-cytosol), and `goa_excluded_evidence_codes` drops GOA annotations by evidence
-code (empty by default). Exchange, demand, sink, biomass, pseudo, spontaneous,
-transport, and multi-compartment reactions are reported and excluded from
-generic cloning. Set `n_jobs` above 1 to parallelize GPR and localization
-resolution; expansion application and solver work remain serial.
+preferred; database evidence supplies a GPR only when the model has none and
+the evidence is `authoritative`, `strong` or `reaction-matched`.
+`fallback_location` is an explicit configuration choice. Exchange, demand,
+sink, biomass, pseudo, spontaneous, transport, and multi-compartment reactions
+are reported and excluded from generic cloning. Set `n_jobs` above 1 to
+parallelize GPR and localization resolution; expansion application and solver
+work remain serial.
+
+## Compartment expansion
+
+1. **Gene locations.** Locations set by hand in `gene_locations` override every
+   other source. Otherwise each gene pools the annotations from
+   `location_sources` (GOA and UniProt in the shipped configs). Neither source
+   takes precedence. The gene record lists every contributor in `sources`,
+   each raw location keeps its own `source`, and `confidence` is `strong` when
+   GOA contributed. In live mode, genes with nothing from these sources fall
+   back to an older UniProt text lookup. `goa_excluded_evidence_codes` drops
+   GOA annotations by evidence code (empty by default).
+2. **Location to compartment.** When `compartment_go_terms` ties each
+   compartment to a GO term, an annotation starts at its GO ID, or at the GO
+   term whose name or synonym matches its text exactly. The resolver walks up
+   GO through `is_a` and `part_of` and keeps **every** configured compartment
+   it reaches, dropping a compartment that contains another one reached. For
+   example, axonemal microtubule resolves to cilium and cytoskeleton, and
+   mitochondrial inner membrane resolves to `i` rather than `m`.
+   `compartment_go_aliases` maps a term to a compartment only when an
+   annotation names exactly that term (the shipped config maps cytoplasm to
+   cytosol). Without `compartment_go_terms`, locations are matched against
+   compartment names and the BioCyc CCO graph, which picks the nearest single
+   compartment.
+3. **Per gene.** A gene keeps the union of its compartments. A gene in several
+   compartments is dual-located, not in conflict. `uncertainty_policy`
+   (`reject-conflicts` or `allow-conflicts`) applies only to gene records that
+   arrive already marked `conflicting`, for example from a snapshot.
+4. **Per reaction.** `A or B` takes the union of the genes' compartments, and
+   `A and B` the intersection, so a complex is placed only where every subunit
+   is present. If the genes give no compartment, the reaction's own location
+   from `reaction_sources` (for example Reactome) is used.
+5. **Expansion.** Only internal reactions with a GPR are eligible. Each
+   resolved compartment becomes a proposal to copy the reaction there with
+   compartment-specific metabolites. The original reaction is always kept, and
+   no copy is made when an equivalent reaction already exists in the target
+   compartment. A reaction with no compartment evidence keeps its original
+   compartment.
+
+## Stages
 
 The resumable DAG is:
 

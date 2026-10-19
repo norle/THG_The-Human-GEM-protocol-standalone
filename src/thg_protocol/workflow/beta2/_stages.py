@@ -1056,6 +1056,8 @@ class Beta2Stage:
                 str(gene.id) for reaction in model.reactions for gene in reaction.genes
             )
 
+            external_confidence = {"goa-uniprot": "strong", "uniprot": "supporting"}
+
             def add_external(
                 gene: str, location: Mapping[str, object], source: str
             ) -> None:
@@ -1068,20 +1070,31 @@ class Beta2Stage:
                         "locations": [],
                         "status": "candidate",
                         "source": source,
-                        "confidence": "strong"
-                        if source == "goa-uniprot"
-                        else "supporting",
+                        "sources": [],
+                        "confidence": external_confidence[source],
                         "evidence_id": f"gene-location:{gene}",
                     }
                     records[gene] = record
                 evidence = record.setdefault("supporting_evidence", [])
                 if isinstance(evidence, list):
-                    item = {"source": source, **dict(location)}
+                    item = {**dict(location), "source": source}
                     if item not in evidence:
                         evidence.append(item)
                 if record.get("source") == "configuration":
                     return
-                raw = dict(location)
+                # Sources are pooled, so the record names every contributor and
+                # each location keeps its own origin. A record seeded from a
+                # snapshot starts from the sources it already names.
+                pooled = record.setdefault(
+                    "sources",
+                    str(record["source"]).split("+") if record.get("source") else [],
+                )
+                if source not in pooled:
+                    record["sources"] = sorted([*pooled, source])
+                    record["source"] = "+".join(record["sources"])
+                    if external_confidence[source] == "strong":
+                        record["confidence"] = "strong"
+                raw = {**dict(location), "source": source}
                 record.setdefault("raw_locations", []).append(raw)
                 value = str(
                     raw.get("raw_location", raw.get("location", raw.get("go_id", "")))
@@ -1662,7 +1675,9 @@ class Beta2Stage:
                     resolved.update(
                         {
                             "gene_id": gene,
-                            "source": record.get("source", "configuration")
+                            "source": item.get(
+                                "source", record.get("source", "configuration")
+                            )
                             if isinstance(record, Mapping)
                             else "configuration",
                         }

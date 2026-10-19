@@ -283,3 +283,144 @@ def test_snapshot_keeps_each_source_and_prefers_reactome_structure(tmp_path):
     assert [item["source"] for item in records] == ["reactome", "rhea"]
     resolutions = json.loads(_stage_artifact(run, "resolve-gprs", "gprs").read_text())
     assert resolutions["records"]["R_SGPR"]["gpr"] == "A and B"
+
+
+def test_pooled_location_sources_keep_their_provenance(tmp_path):
+    model = Model("beta2-location-provenance")
+    metabolites = [
+        Metabolite("a_c", formula="C", compartment="c"),
+        Metabolite("b_c", formula="C", compartment="c"),
+    ]
+    for reaction_id, gpr in (("R_BOTH", "G_BOTH"), ("R_UNI", "G_UNI")):
+        reaction = Reaction(reaction_id)
+        reaction.add_metabolites({metabolites[0]: -1, metabolites[1]: 1})
+        reaction.gene_reaction_rule = gpr
+        model.add_reactions([reaction])
+    source = tmp_path / "beta1.json"
+    save_json_model(model, source)
+    gaf = tmp_path / "goa.gaf"
+    gaf.write_text(
+        "\t".join(
+            [
+                "UniProtKB",
+                "P_BOTH",
+                "G_BOTH",
+                "located_in",
+                "GO:0005739",
+                "PMID:1",
+                "IDA",
+                "",
+                "C",
+                "",
+                "",
+                "protein",
+                "taxon:9606",
+                "20260101",
+                "UniProt",
+            ]
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    uniprot = tmp_path / "uniprot.json"
+    uniprot.write_text(
+        json.dumps(
+            [
+                {"gene_id": "G_BOTH", "raw_location": "cytosol", "go_id": "GO:0005829"},
+                {"gene_id": "G_UNI", "raw_location": "cytosol", "go_id": "GO:0005829"},
+            ]
+        ),
+        encoding="utf-8",
+    )
+    config = tmp_path / "config.json"
+    run = tmp_path / "run"
+    _config(
+        config,
+        run,
+        source,
+        location_sources=["goa", "uniprot"],
+        go_annotation_file=str(gaf),
+        uniprot_snapshot=str(uniprot),
+    )
+    start(config)
+
+    records = json.loads(
+        _stage_artifact(run, "collect-location-evidence", "evidence").read_text()
+    )["gene_locations"]
+    both, uni = records["G_BOTH"], records["G_UNI"]
+    assert both["sources"] == ["goa-uniprot", "uniprot"]
+    assert both["source"] == "goa-uniprot+uniprot"
+    assert both["confidence"] == "strong"
+    assert {
+        (item["source"], item["raw_location"]) for item in both["raw_locations"]
+    } == {("goa-uniprot", "GO:0005739"), ("uniprot", "cytosol")}
+    assert uni["sources"] == ["uniprot"]
+    assert uni["source"] == "uniprot"
+    assert uni["confidence"] == "supporting"
+
+    resolutions = json.loads(
+        _stage_artifact(run, "resolve-compartment-evidence", "evidence").read_text()
+    )["evidence"]
+    assert {
+        item["source"] for item in resolutions if item.get("gene_id") == "G_BOTH"
+    } == {"goa-uniprot", "uniprot"}
+
+
+def test_snapshot_gene_locations_pool_external_sources(tmp_path):
+    model = Model("beta2-snapshot-location-pooling")
+    reaction = Reaction("R_SNAP")
+    reaction.add_metabolites(
+        {
+            Metabolite("a_c", formula="C", compartment="c"): -1,
+            Metabolite("b_c", formula="C", compartment="c"): 1,
+        }
+    )
+    reaction.gene_reaction_rule = "G_SNAP"
+    model.add_reactions([reaction])
+    source = tmp_path / "beta1.json"
+    save_json_model(model, source)
+    evidence = tmp_path / "evidence.jsonl"
+    evidence.write_text(
+        json.dumps(
+            {
+                "record_type": "gene-location",
+                "gene_id": "G_SNAP",
+                "raw_locations": ["cytosol"],
+            }
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    gaf = tmp_path / "goa.gaf"
+    gaf.write_text(
+        "\t".join(
+            ["UniProtKB", "P_SNAP", "G_SNAP", "located_in", "GO:0005739", "PMID:1"]
+            + ["IDA", "", "C", "", "", "protein", "taxon:9606", "20260101", "UniProt"]
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    config = tmp_path / "config.json"
+    run = tmp_path / "run"
+    _config(
+        config,
+        run,
+        source,
+        evidence_mode="snapshot",
+        evidence_file=str(evidence),
+        compartment_go_terms={"c": "GO:0005829", "m": "GO:0005739"},
+        go_graph={
+            "GO:0005829": {"name": "cytosol", "parents": []},
+            "GO:0005739": {"name": "mitochondrion", "parents": []},
+        },
+        location_sources=["goa"],
+        go_annotation_file=str(gaf),
+    )
+    start(config)
+
+    record = json.loads(
+        _stage_artifact(run, "collect-location-evidence", "evidence").read_text()
+    )["gene_locations"]["G_SNAP"]
+    assert record["sources"] == ["goa-uniprot", "snapshot"]
+    assert record["source"] == "goa-uniprot+snapshot"
+    assert record["confidence"] == "strong"
