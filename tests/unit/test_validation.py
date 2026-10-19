@@ -96,7 +96,9 @@ def test_release_full_applies_stricter_profile_policy():
     assert checks["stoichiometric-consistency"]["release_blocking"] is False
 
 
+@pytest.mark.memote
 def test_stoichiometric_consistency_excludes_boundary_reactions():
+    pytest.importorskip("memote")
     source = model()
     uptake = cobra.Reaction("uptake")
     uptake.add_metabolites({source.metabolites.source_c: 1})
