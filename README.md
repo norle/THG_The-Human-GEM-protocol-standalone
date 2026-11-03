@@ -66,7 +66,7 @@ thg-compare --help
 
 Supported package workflows are implemented and tested. External services and
 credentialed collection are opt-in through explicit clients or source adapters.
-The [current state](CURRENT_STATE.md) records the remaining release gate.
+The [current state](docs/contributing/release-status.md) records the remaining release gate.
 
 The scientific workflow is described in [the 2023 protocol
 paper](https://doi.org/10.3390/bioengineering10050576). Please cite

@@ -75,7 +75,8 @@ def test_documentation_build_has_no_unresolved_links_or_markup(tmp_path):
     assert (site / "examples" / "index.html").exists()
     assert not (site / "plans").exists()
     assert (site / "workflows" / "validation" / "index.html").exists()
-    assert not (site / "protocol").exists()
+    assert (site / "protocol" / "implementation-status" / "index.html").exists()
+    assert not (site / "protocol" / "beta2-evidence-expansion-plan").exists()
 
     unresolved: list[str] = []
     for current, parser in documents.items():
@@ -116,7 +117,6 @@ def test_navigation_uses_current_user_oriented_information_architecture():
     for obsolete in (
         "Individual operations",
         "Phase 0 foundations",
-        "Capability and evidence status",
         "Published protocol coverage",
     ):
         assert obsolete not in config

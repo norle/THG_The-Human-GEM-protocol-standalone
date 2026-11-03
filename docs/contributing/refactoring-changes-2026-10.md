@@ -55,7 +55,7 @@ uncommitted work of 2026-10-13/14.*
 - *Empty runs fail* (`cf0b827`). The reference workflow requires a β2
   location source, and `gate-beta2` blocks when β2 found no gene-location
   evidence.
-- Details are in `beta2-compartment-resolution-notes.md`, and (uncommitted)
+- Details are in `docs/protocol/beta2-compartment-resolution.md`, and (uncommitted)
   in a new "Compartment expansion" section in `docs/workflows/beta2.md`.
 
 **Gap-filling**
@@ -63,7 +63,7 @@ uncommitted work of 2026-10-13/14.*
   (`8caf07e` to `81f8f7e`, reviewed in `f6ec4d6` and `abb8cf4`). It adds
   putative transport reactions: spanning-tree connectors between network
   components, then those a MILP selects to unblock the most reactions. It
-  runs as four resumable stages. See `GAPFILL_SINK_MILP.md`.
+  runs as four resumable stages. See `docs/workflows/gapfill-sink-milp.md`.
 - A gap-fill run fails when a selected reaction reuses an existing reaction
   ID. A run that fails partway returns the unmodified model (`421eb22`).
 - Transport candidates pair β2 copies by source metabolite (`3e2acd5`).

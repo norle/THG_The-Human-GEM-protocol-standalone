@@ -172,7 +172,7 @@ Config: `sink-milp` is accepted as a method. It requires non-empty `allowed_conn
 
 ### Task 7: Reference default, docs, real-model run
 
-**Files:** Modify `configs/reference.json`, `docs/workflows/gapfill.md`, `docs/tools/pathways-gapfill.md`, `CURRENT_STATE.md`
+**Files:** Modify `configs/reference.json`, `docs/workflows/gapfill.md`, `docs/tools/pathways-gapfill.md`, `docs/contributing/release-status.md`
 
 - [ ] Set `reference.json` gapfill to `method: "sink-milp"`, `max_additions: 1000` and `tradeoff_lambda: 0.01`. Set `allowed_connections` to:
   `[["a","c"],["a","ci"],["a","ck"],["a","e"],["a","r"],["a","v"],["c","ci"],["c","ck"],["c","g"],["c","l"],["c","m"],["c","n"],["c","r"],["c","v"],["c","x"],["ci","ck"],["ci","e"],["e","l"],["g","i"],["m","n"],["r","v"]]`.

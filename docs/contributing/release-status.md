@@ -25,8 +25,8 @@ cleanup plans were consolidated into this state record; Git history retains the
 implementation detail.
 
 Implementation and verification claims are tracked in
-[`docs/protocol/capability-evidence.json`](docs/protocol/capability-evidence.json)
-and its [status matrix](docs/protocol/implementation-status.md). Exact
+[`docs/protocol/capability-evidence.json`](../protocol/capability-evidence.json)
+and its [status matrix](../protocol/implementation-status.md). Exact
 publication-artifact reproduction remains unverified.
 
 ## Latest validation

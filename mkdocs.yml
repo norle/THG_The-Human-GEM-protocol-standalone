@@ -8,7 +8,9 @@ exclude_docs: |
   history/**
   workflow-overview.md
   usage.md
-  protocol/**
+  protocol/beta2*
+  protocol/live-beta2-gpr-comparison.md
+  protocol/sgpr_evidence.md
   legacy-workflows.md
   service-boundary-audit.md
   api/index.md
@@ -104,4 +106,9 @@ nav:
       - Development and releases: contributing/development.md
       - Architecture: contributing/architecture.md
       - Repository and data management: contributing/repository.md
-  - About THG: about/history.md
+      - Release status: contributing/release-status.md
+      - Refactoring changes (2026-10): contributing/refactoring-changes-2026-10.md
+  - About THG:
+      - History: about/history.md
+      - Capability and evidence status: protocol/implementation-status.md
+      - Comparison with the legacy repository: about/legacy-comparison.md

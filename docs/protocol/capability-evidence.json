@@ -4,13 +4,13 @@
   "source_commits": {
     "maintained": {
       "repository": "https://github.com/norle/THG_The-Human-GEM-protocol-standalone",
-      "branch": "refactoring-cleanup",
-      "commit": "0c91fdec325df12f25ef13819525e830a4cec1e8"
+      "branch": "main",
+      "commit": "3e46b12a1408a03381a66628b1fc90a3a74d6dd4"
     },
     "legacy": {
       "repository": "https://github.com/MarindeMasLab/THG_The-Human-GEM-protocol",
       "commit": "b474d80a34ef3bda9754bad3e24a21dc6cf3e57f",
-      "status": "committed comparison snapshot recorded from the adjacent legacy checkout; its working tree is dirty and parity is not claimed"
+      "status": "committed comparison snapshot recorded from the adjacent legacy checkout (branch repo-reorg-temp); its working tree is dirty and parity is not claimed"
     },
     "publication_artifact": {
       "repository": "https://github.com/biosustain/THG",
@@ -32,12 +32,11 @@
       "current_sources": ["src/thg_protocol/annotation/reactions.py"],
       "tests": [
         "tests/unit/test_reaction_annotation_api.py",
-        "tests/characterization/test_reaction_identification_current.py"
+        "tests/characterization/test_reaction_identification_current.py",
+        "tests/integration/test_legacy_algorithm_apis.py"
       ],
-      "known_differences": [
-        "One basic identify_reaction fixture is compared; Jaccard, duplicate, and full-file cases remain unverified"
-      ],
-      "evidence_commit": "0c91fdec325df12f25ef13819525e830a4cec1e8"
+      "known_differences": ["Archived reaction-identification fixtures are replayed through the maintained API and checked against their recorded expectations; the legacy code was not run side by side. Jaccard, duplicate, and full-file cases remain unverified"],
+      "evidence_commit": "3e46b12a1408a03381a66628b1fc90a3a74d6dd4"
     },
     {
       "id": "reference.annotation.metabolites",
@@ -51,12 +50,11 @@
       "legacy_sources": ["functions/function_metabolite_identification.py"],
       "current_sources": ["src/thg_protocol/annotation/metabolites.py"],
       "tests": [
-        "tests/unit/test_metabolite_annotation_api.py"
+        "tests/unit/test_metabolite_annotation_api.py",
+        "tests/integration/test_legacy_algorithm_apis.py"
       ],
-      "known_differences": [
-        "One formula-valid hit fixture is compared; misses, service failures, synonym ties, and batch behavior remain unverified"
-      ],
-      "evidence_commit": "0c91fdec325df12f25ef13819525e830a4cec1e8"
+      "known_differences": ["Archived formula-valid hit fixtures are replayed through the maintained API against a static PubChem client; the legacy code was not run side by side. Misses, service failures, synonym ties, and batch behavior remain unverified"],
+      "evidence_commit": "3e46b12a1408a03381a66628b1fc90a3a74d6dd4"
     },
     {
       "id": "reference.model_build.annotation",
@@ -74,7 +72,7 @@
         "tests/integration/test_build_model_batch_boundary.py"
       ],
       "known_differences": ["Enriches an existing model; does not construct the full beta1/beta2 branch"],
-      "evidence_commit": "0c91fdec325df12f25ef13819525e830a4cec1e8"
+      "evidence_commit": "3e46b12a1408a03381a66628b1fc90a3a74d6dd4"
     },
     {
       "id": "reference.mass_balance",
@@ -88,8 +86,8 @@
       "legacy_sources": ["functions/equations_bm_gdb.py"],
       "current_sources": ["src/thg_protocol/model_build/mass_balance.py"],
       "tests": ["tests/unit/test_mass_balance_api.py"],
-      "known_differences": ["One atom10 vector fixture is compared; legacy substring handling for overlapping element symbols and broader equation/mass-balance behavior remain unverified"],
-      "evidence_commit": "0c91fdec325df12f25ef13819525e830a4cec1e8"
+      "known_differences": ["balance_equation now minimises integer coefficients with a MILP on the COBRA solver and returns a solution when several exist; the earlier atom10 vector comparison with legacy was not repeated. Legacy substring handling for overlapping element symbols and broader equation/mass-balance behavior remain unverified"],
+      "evidence_commit": "3e46b12a1408a03381a66628b1fc90a3a74d6dd4"
     },
     {
       "id": "reference.gpr.lookup",
@@ -104,15 +102,16 @@
       "legacy_relationship": "Intentional difference",
       "published_reproduction": "Not yet verified",
       "legacy_sources": ["functions/gpr/gpr_def.py"],
-      "current_sources": ["src/thg_protocol/gpr/lookup.py", "src/thg_protocol/gpr/ast_gpr.py"],
+      "current_sources": [
+        "src/thg_protocol/gpr/lookup.py",
+        "src/thg_protocol/gpr/ast_gpr.py"
+      ],
       "tests": [
         "tests/unit/test_gpr_lookup_api.py",
         "tests/unit/test_gpr_wrapper.py"
       ],
-      "known_differences": [
-        "One deterministic page-parser fixture is compared; full get_gpr source precedence, complexes, transferred ECs, and stoichiometric parity remain unverified"
-      ],
-      "evidence_commit": "0c91fdec325df12f25ef13819525e830a4cec1e8"
+      "known_differences": ["One deterministic page-parser fixture is compared; full get_gpr source precedence, complexes, transferred ECs, and stoichiometric parity remain unverified"],
+      "evidence_commit": "3e46b12a1408a03381a66628b1fc90a3a74d6dd4"
     },
     {
       "id": "reference.gpr.location",
@@ -126,8 +125,8 @@
       "legacy_sources": ["functions/gpr/get_location_def.py"],
       "current_sources": ["src/thg_protocol/gpr/location.py"],
       "tests": ["tests/unit/test_gpr_location_api.py"],
-      "known_differences": ["One basic Mitochondria branch is compared; the compatibility tuple intentionally keys its maintained gene map by the supplied identifier, while legacy rewrites that key to Ensembl; complex-rule preservation, unresolved-location semantics, and fallback behavior remain unverified"],
-      "evidence_commit": "0c91fdec325df12f25ef13819525e830a4cec1e8"
+      "known_differences": ["One basic Mitochondria branch is compared; the compatibility tuple intentionally keys its maintained gene map by the supplied identifier, while legacy rewrites that key to Ensembl; complex-rule preservation, unresolved-location semantics, and fallback behavior remain unverified. UniProt/GO compartment resolution used by the beta2 workflow is tracked under publication.reference_beta2"],
+      "evidence_commit": "3e46b12a1408a03381a66628b1fc90a3a74d6dd4"
     },
     {
       "id": "database.reconstruction.json",
@@ -140,9 +139,12 @@
       "published_reproduction": "Not yet verified",
       "legacy_sources": ["generate_data-base/generate_db.py"],
       "current_sources": ["src/thg_protocol/database.py"],
-      "tests": ["tests/unit/test_database_api.py", "tests/docs/test_practical_quickstart.py"],
+      "tests": [
+        "tests/unit/test_database_api.py",
+        "tests/docs/test_practical_quickstart.py"
+      ],
       "known_differences": ["Reconstructs normalized records and does not harvest live biological sources"],
-      "evidence_commit": "0c91fdec325df12f25ef13819525e830a4cec1e8"
+      "evidence_commit": "3e46b12a1408a03381a66628b1fc90a3a74d6dd4"
     },
     {
       "id": "database.reconstruction.pickle",
@@ -157,7 +159,7 @@
       "current_sources": ["src/thg_protocol/database.py"],
       "tests": ["tests/unit/test_database_api.py"],
       "known_differences": ["The recorded legacy commit contains no authentic pickle; ignored local 49 MB files are not reproducible fixtures, while a loader regression now prefers serialized subs/prods over generation-time methods"],
-      "evidence_commit": "0c91fdec325df12f25ef13819525e830a4cec1e8"
+      "evidence_commit": "3e46b12a1408a03381a66628b1fc90a3a74d6dd4"
     },
     {
       "id": "database.harvesting",
@@ -169,10 +171,16 @@
       "legacy_relationship": "Intentional difference",
       "published_reproduction": "Not yet verified",
       "legacy_sources": ["generate_data-base/generate_db.py"],
-      "current_sources": ["src/thg_protocol/database_workflow.py", "src/thg_protocol/workflow/human_database.py"],
-      "tests": ["tests/unit/test_human_database_final_thg.py"],
-      "known_differences": ["A paper-specific pathway-list adapter is not bundled; live access is injected and credential-owned"],
-      "evidence_commit": "0c91fdec325df12f25ef13819525e830a4cec1e8"
+      "current_sources": [
+        "src/thg_protocol/database_workflow.py",
+        "src/thg_protocol/workflow/human_database.py"
+      ],
+      "tests": [
+        "tests/unit/test_human_database_final_thg.py",
+        "tests/integration/test_human_database_registered_workflow.py"
+      ],
+      "known_differences": ["A paper-specific pathway-list adapter is not bundled; live access is injected and credential-owned. Cached responses are keyed by adapter release and are not served after a refresh failure from an earlier release"],
+      "evidence_commit": "3e46b12a1408a03381a66628b1fc90a3a74d6dd4"
     },
     {
       "id": "merge.identifier",
@@ -185,24 +193,37 @@
       "published_reproduction": "Not yet verified",
       "legacy_sources": ["functions/functions_merge_metabolic_networks.py"],
       "current_sources": ["src/thg_protocol/merge/__init__.py"],
-      "tests": ["tests/unit/test_merge_api.py"],
-      "known_differences": ["Matches identifiers and retains the base model's overlapping stoichiometry"],
-      "evidence_commit": "0c91fdec325df12f25ef13819525e830a4cec1e8"
+      "tests": [
+        "tests/unit/test_merge_api.py",
+        "tests/unit/test_human_database_final_thg.py"
+      ],
+      "known_differences": ["Metabolites, reactions and genes with the same ID are the same object; when overlapping reaction stoichiometry differs the base reaction is kept and the difference is reported. Incoming metabolites that share an ID but not a species are renamed with the __incoming suffix. Annotation-based linking is tracked under merge.publication_compatible"],
+      "evidence_commit": "3e46b12a1408a03381a66628b1fc90a3a74d6dd4"
     },
     {
       "id": "merge.publication_compatible",
-      "publication_concept": "Legacy similarity-aware model merge",
-      "current_entry_points": [],
-      "implementation": "Not implemented",
-      "verification": "Not yet verified",
-      "workflow_coverage": "N/A",
-      "legacy_relationship": "No replacement",
+      "publication_concept": "Similarity-aware model merge (cross-identifier and chemistry matching)",
+      "current_entry_points": [
+        "thg_protocol.merge.generate_merge_plan",
+        "thg_protocol.merge.apply_merge_plan"
+      ],
+      "implementation": "Implemented",
+      "verification": "Unit-tested",
+      "workflow_coverage": "Orchestrated stage",
+      "legacy_relationship": "Intentional difference",
       "published_reproduction": "Not yet verified",
       "legacy_sources": ["functions/functions_merge_metabolic_networks.py"],
-      "current_sources": [],
-      "tests": [],
-      "known_differences": ["No maintained API ports legacy cross-identifier and chemistry matching"],
-      "evidence_commit": "0c91fdec325df12f25ef13819525e830a4cec1e8"
+      "current_sources": [
+        "src/thg_protocol/merge/__init__.py",
+        "src/thg_protocol/workflow/final_thg.py",
+        "src/thg_protocol/workflow/human_database_integration.py"
+      ],
+      "tests": [
+        "tests/unit/test_merge_api.py",
+        "tests/unit/test_human_database_final_thg.py"
+      ],
+      "known_differences": ["Reviewable merge plan: metabolites with different IDs are linked by shared KEGG, ChEBI, HMDB or InChIKey annotations in the same compartment and merged only when formula and charge are identical; other linked pairs are kept separate with a named decision. Reactions with different IDs merge only on a shared annotation and identical stoichiometry. Legacy also compared names and tested consistency while adding reactions in groups (network_reactions_merge_3 to 7); neither is ported, and the legacy merge was not run side by side"],
+      "evidence_commit": "3e46b12a1408a03381a66628b1fc90a3a74d6dd4"
     },
     {
       "id": "analysis.consistency",
@@ -216,8 +237,8 @@
       "legacy_sources": ["functions/functions_network_consistency.py"],
       "current_sources": ["src/thg_protocol/analysis/consistency.py"],
       "tests": ["tests/unit/test_consistency_api.py"],
-      "known_differences": ["Current reports are a smaller structural subset and are not scientific convergence"],
-      "evidence_commit": "0c91fdec325df12f25ef13819525e830a4cec1e8"
+      "known_differences": ["Current reports are a smaller structural subset (components, orphan metabolites, formula balance) and are not scientific convergence; stoichiometric consistency, loop and leakage checks live in workflow.validation"],
+      "evidence_commit": "3e46b12a1408a03381a66628b1fc90a3a74d6dd4"
     },
     {
       "id": "analysis.model_signature",
@@ -235,26 +256,32 @@
       "current_sources": ["src/thg_protocol/analysis/model_signature.py"],
       "tests": ["tests/unit/test_model_signature.py"],
       "known_differences": ["Signature normalization is a maintained comparison contract, not proof of parity with the paper"],
-      "evidence_commit": "0c91fdec325df12f25ef13819525e830a4cec1e8"
+      "evidence_commit": "3e46b12a1408a03381a66628b1fc90a3a74d6dd4"
     },
     {
       "id": "workflow.resumable",
       "publication_concept": "Resumable registered engineering workflow DAG",
-      "current_entry_points": ["thg_protocol.workflow.runner.start", "thg_protocol.workflow.runner.resume"],
+      "current_entry_points": [
+        "thg_protocol.workflow.runner.start",
+        "thg_protocol.workflow.runner.resume"
+      ],
       "implementation": "Implemented",
       "verification": "Integration-tested",
       "workflow_coverage": "Workflow-complete for documented scope",
       "legacy_relationship": "No legacy target",
       "published_reproduction": "N/A",
       "legacy_sources": [],
-      "current_sources": ["src/thg_protocol/workflow/runner.py", "src/thg_protocol/runtime/stage.py"],
+      "current_sources": [
+        "src/thg_protocol/workflow/runner.py",
+        "src/thg_protocol/runtime/stage.py"
+      ],
       "tests": [
         "tests/integration/test_workflow_resume.py",
         "tests/unit/test_workflow_cli.py",
         "tests/unit/test_workflow_lock.py"
       ],
       "known_differences": ["The DAG composes maintained operations; it does not execute the paper's complete construction"],
-      "evidence_commit": "0c91fdec325df12f25ef13819525e830a4cec1e8"
+      "evidence_commit": "3e46b12a1408a03381a66628b1fc90a3a74d6dd4"
     },
     {
       "id": "workflow.memote",
@@ -266,25 +293,43 @@
       "legacy_relationship": "No legacy target",
       "published_reproduction": "N/A",
       "legacy_sources": [],
-      "current_sources": ["src/thg_protocol/memote.py", "src/thg_protocol/workflow/validation.py"],
+      "current_sources": [
+        "src/thg_protocol/memote.py",
+        "src/thg_protocol/workflow/validation.py"
+      ],
       "tests": ["tests/unit/test_validation.py"],
       "known_differences": ["The executable and report semantics belong to the separately installed MEMOTE tool"],
-      "evidence_commit": "0c91fdec325df12f25ef13819525e830a4cec1e8"
+      "evidence_commit": "3e46b12a1408a03381a66628b1fc90a3a74d6dd4"
     },
     {
       "id": "workflow.essential_tasks",
       "publication_concept": "Essential metabolic tasks",
-      "current_entry_points": [],
-      "implementation": "Archived",
-      "verification": "Not yet verified",
-      "workflow_coverage": "N/A",
-      "legacy_relationship": "No replacement",
+      "current_entry_points": [
+        "thg_protocol.tasks.run_task_suite",
+        "thg_protocol.raven_tasks.import_raven_tasks"
+      ],
+      "implementation": "Implemented",
+      "verification": "Integration-tested",
+      "workflow_coverage": "Orchestrated stage",
+      "legacy_relationship": "Intentional difference",
       "published_reproduction": "Not yet verified",
-      "legacy_sources": ["memote_and_task_analysis/metabolic_tasks/evaluation.py"],
-      "current_sources": [],
-      "tests": [],
-      "known_differences": ["Ordinary MEMOTE and structural checks do not establish essential-task success"],
-      "evidence_commit": "0c91fdec325df12f25ef13819525e830a4cec1e8"
+      "legacy_sources": [
+        "memote_and_task_analysis/metabolic_tasks/evaluation.py",
+        "memote_and_task_analysis/tests_extra/data/metabolicTasks_Essential.txt"
+      ],
+      "current_sources": [
+        "src/thg_protocol/tasks.py",
+        "src/thg_protocol/raven_tasks.py",
+        "src/thg_protocol/workflow/_scientific.py"
+      ],
+      "tests": [
+        "tests/unit/test_metabolic_tasks.py",
+        "tests/unit/test_raven_tasks.py",
+        "tests/unit/test_validation.py",
+        "tests/unit/test_human_database_final_thg.py"
+      ],
+      "known_differences": ["Versioned JSON task contract with RAVEN semantics (temporary source and sink reactions, closed medium by default) and an importer for RAVEN task tables, which includes the essential-task table. Validation and final-THG run a suite only when task_suite is configured. Legacy evaluation was not run side by side, and a release-level essential-task result for a THG model is not recorded"],
+      "evidence_commit": "3e46b12a1408a03381a66628b1fc90a3a74d6dd4"
     },
     {
       "id": "publication.reference_beta1",
@@ -296,25 +341,50 @@
       "legacy_relationship": "Not assessed",
       "published_reproduction": "Not yet verified",
       "legacy_sources": ["build_model/build_model.py"],
-      "current_sources": ["src/thg_protocol/curation/beta1.py", "src/thg_protocol/workflow/beta1/_stages.py"],
-      "tests": ["tests/unit/test_beta1_curation.py", "tests/integration/test_beta1_registered_workflow.py"],
-      "known_differences": ["The maintained release is fixture-sanctioned and policy-scoped; it is not a claim of reproducing the 2023 publication artifact"],
-      "evidence_commit": "0c91fdec325df12f25ef13819525e830a4cec1e8"
+      "current_sources": [
+        "src/thg_protocol/curation/beta1.py",
+        "src/thg_protocol/workflow/beta1/_stages.py"
+      ],
+      "tests": [
+        "tests/unit/test_beta1_curation.py",
+        "tests/integration/test_beta1_registered_workflow.py"
+      ],
+      "known_differences": ["The maintained release is fixture-sanctioned and policy-scoped; it is not a claim of reproducing the 2023 publication artifact. Objective reactions are kept out of duplicate merging, and unbalanced reactions are fixed automatically only when adding water and protons balances them"],
+      "evidence_commit": "3e46b12a1408a03381a66628b1fc90a3a74d6dd4"
     },
     {
       "id": "publication.reference_beta2",
       "publication_concept": "Complete THG beta2 construction",
-      "current_entry_points": [],
-      "implementation": "Not implemented",
-      "verification": "Not yet verified",
-      "workflow_coverage": "Operation",
+      "current_entry_points": [
+        "thg_protocol.workflow.beta2._stages.beta2_stages",
+        "thg_protocol.curation.beta2.generate_expansion_plan",
+        "thg_protocol.curation.beta2.apply_expansion_plan",
+        "thg_protocol.curation.beta2.beta2_release_gate"
+      ],
+      "implementation": "Implemented",
+      "verification": "Integration-tested",
+      "workflow_coverage": "Workflow-complete for documented scope",
       "legacy_relationship": "Not assessed",
       "published_reproduction": "Not yet verified",
-      "legacy_sources": ["test_algorithms/gpr_prediction/gpr_prediction.py", "functions/gpr/get_location_def.py"],
-      "current_sources": [],
-      "tests": [],
-      "known_differences": ["No complete maintained GPR/location and isoenzyme-expansion workflow"],
-      "evidence_commit": "0c91fdec325df12f25ef13819525e830a4cec1e8"
+      "legacy_sources": [
+        "test_algorithms/gpr_prediction/gpr_prediction.py",
+        "functions/gpr/get_location_def.py"
+      ],
+      "current_sources": [
+        "src/thg_protocol/curation/beta2.py",
+        "src/thg_protocol/workflow/beta2/_stages.py"
+      ],
+      "tests": [
+        "tests/unit/test_beta2_curation.py",
+        "tests/unit/test_beta2_evidence.py",
+        "tests/unit/test_beta2_structure.py",
+        "tests/unit/test_go_evidence.py",
+        "tests/integration/test_beta2_registered_workflow.py",
+        "tests/integration/test_beta2_go_workflow.py",
+        "tests/integration/test_beta2_live_snapshot_replay.py"
+      ],
+      "known_differences": ["Resolves GPR and location evidence (UniProt, GO, GOA, BioCyc and KEGG records), infers complex and isoenzyme locations, plans and applies compartment expansion, and gates the candidate (thg-run beta2). It consumes a verified beta1 artifact or a declared beta1-equivalent input and is research-supported. Its output has not been compared with legacy THG-beta2, and the archived HumanCyc/MetaCyc GPR comparison is incomplete because the BioCyc account lacks access (docs/protocol/live-beta2-gpr-comparison.md)"],
+      "evidence_commit": "3e46b12a1408a03381a66628b1fc90a3a74d6dd4"
     },
     {
       "id": "publication.final_artifact",
@@ -328,8 +398,113 @@
       "legacy_sources": [],
       "current_sources": [],
       "tests": [],
-      "known_differences": ["No frozen paper-stage input, artifact, or full workflow result is available"],
-      "evidence_commit": "0c91fdec325df12f25ef13819525e830a4cec1e8"
+      "known_differences": ["No frozen paper-stage input, artifact, or full workflow result is available; the reference workflow gapfills with sink-milp and has not been rerun end to end with it"],
+      "evidence_commit": "3e46b12a1408a03381a66628b1fc90a3a74d6dd4"
+    },
+    {
+      "id": "workflow.gapfill",
+      "publication_concept": "Gap-filling with putative transport reactions",
+      "current_entry_points": [
+        "thg_protocol.gapfill.core.run_gapfill",
+        "thg_protocol.gapfill.ptr.run_sink_milp"
+      ],
+      "implementation": "Implemented",
+      "verification": "Integration-tested",
+      "workflow_coverage": "Orchestrated stage",
+      "legacy_relationship": "Intentional difference",
+      "published_reproduction": "Not yet verified",
+      "legacy_sources": [
+        "cell_type_specific_model/ptr_one_round.py",
+        "cell_type_specific_model/ptr_multi_round.py"
+      ],
+      "current_sources": [
+        "src/thg_protocol/gapfill/core.py",
+        "src/thg_protocol/gapfill/ptr.py",
+        "src/thg_protocol/workflow/gapfill.py"
+      ],
+      "tests": [
+        "tests/unit/test_gapfill_api.py",
+        "tests/unit/test_gapfill_incremental.py",
+        "tests/unit/test_gapfill_ptr.py",
+        "tests/integration/test_gapfill_registered_workflow.py"
+      ],
+      "known_differences": ["sink-milp (default in configs/reference.json) ports the legacy putative-transport method as four resumable stages and changes how sink-only targets are credited and which flux threshold is used (docs/workflows/gapfill-sink-milp.md). The legacy gapfill scripts cited there are not in the recorded legacy checkout, so the listed sources are the nearest putative-transport scripts. It has been run once on an earlier beta2 attempt; the reference run has not been repeated with it"],
+      "evidence_commit": "3e46b12a1408a03381a66628b1fc90a3a74d6dd4"
+    },
+    {
+      "id": "workflow.cell_specific.gimme",
+      "publication_concept": "Cell-specific model construction (GIMME)",
+      "current_entry_points": ["thg_protocol.cell_specific.gimme.run_gimme"],
+      "implementation": "Implemented",
+      "verification": "Unit-tested",
+      "workflow_coverage": "Orchestrated stage",
+      "legacy_relationship": "Intentional difference",
+      "published_reproduction": "Not yet verified",
+      "legacy_sources": [
+        "cell_type_specific_model/gimme_parallel.py",
+        "cell_type_specific_model/create_reduced_model_from_gimme.py"
+      ],
+      "current_sources": [
+        "src/thg_protocol/cell_specific/gimme.py",
+        "src/thg_protocol/cell_specific/transcriptomics.py",
+        "src/thg_protocol/workflow/cell_specific.py"
+      ],
+      "tests": [
+        "tests/unit/test_cell_specific_gimme.py",
+        "tests/unit/test_cell_specific_api.py",
+        "tests/unit/test_expression_collection_checksum.py"
+      ],
+      "known_differences": ["No Troppo or Cobamp dependency and the input model is not mutated. One frozen small GIMME reference (tests/fixtures/gimme_legacy_reference.json) is the only legacy-derived target. iMAT, FASTCORE, tINIT and multi-round PTR from the legacy cell-specific folder have no maintained equivalent. Expression input must be pre-normalized"],
+      "evidence_commit": "3e46b12a1408a03381a66628b1fc90a3a74d6dd4"
+    },
+    {
+      "id": "workflow.validation",
+      "publication_concept": "Reusable validation checks and release gates",
+      "current_entry_points": ["thg_protocol.validation.validate_model"],
+      "implementation": "Implemented",
+      "verification": "Integration-tested",
+      "workflow_coverage": "Orchestrated stage",
+      "legacy_relationship": "Not assessed",
+      "published_reproduction": "N/A",
+      "legacy_sources": ["functions/functions_network_consistency.py"],
+      "current_sources": [
+        "src/thg_protocol/validation.py",
+        "src/thg_protocol/validation_report.py",
+        "src/thg_protocol/validation_apply.py",
+        "src/thg_protocol/validation_fixes.py",
+        "src/thg_protocol/workflow/validation.py"
+      ],
+      "tests": [
+        "tests/unit/test_validation.py",
+        "tests/unit/test_validation_report.py",
+        "tests/unit/test_validation_apply.py",
+        "tests/unit/test_validation_fixes.py",
+        "tests/unit/test_loop_detection.py"
+      ],
+      "known_differences": ["Mass and charge balance, stoichiometric consistency, identity and annotation conflicts, metabolite leakage, energy-generating cycles and loop detection, with a release-full profile that blocks on unevaluable balance and on energy cycles. Balance suggestions use a MILP in the model's own solver. Legacy checks were not compared"],
+      "evidence_commit": "3e46b12a1408a03381a66628b1fc90a3a74d6dd4"
+    },
+    {
+      "id": "analysis.conservation",
+      "publication_concept": "Unconserved-metabolite analysis and repair review",
+      "current_entry_points": ["thg_protocol.analysis.conservation.find_unconserved_metabolites"],
+      "implementation": "Implemented",
+      "verification": "Integration-tested",
+      "workflow_coverage": "Orchestrated stage",
+      "legacy_relationship": "No legacy target",
+      "published_reproduction": "N/A",
+      "legacy_sources": [],
+      "current_sources": [
+        "src/thg_protocol/analysis/conservation.py",
+        "src/thg_protocol/analysis/leakage.py",
+        "src/thg_protocol/workflow/conservation.py"
+      ],
+      "tests": [
+        "tests/unit/test_conservation.py",
+        "tests/unit/test_leakage.py"
+      ],
+      "known_differences": ["Finds, reviews and proposes fixes for unconserved metabolites using MEMOTE's consistency support; a maintained workflow, not part of the paper's protocol"],
+      "evidence_commit": "3e46b12a1408a03381a66628b1fc90a3a74d6dd4"
     }
   ]
 }
