@@ -8,6 +8,7 @@ import shutil
 from collections import defaultdict
 from collections.abc import Mapping
 from dataclasses import asdict
+from math import isfinite
 from pathlib import Path
 from statistics import mean, median
 from typing import Any
@@ -143,12 +144,12 @@ def _model_metrics(model: Any, *, profile: str) -> dict[str, object]:
 
 
 class CellSpecificStage:
-    implementation_version = 3
+    implementation_version = 4
 
     def __init__(self, stage_id: str, dependencies: tuple[str, ...] = ()) -> None:
         self.id, self.dependencies = stage_id, dependencies
         if stage_id in {"validate-cell-specific", "export-cell-specific"}:
-            self.implementation_version = 5
+            self.implementation_version = 6
         self.kind = (
             "mutation"
             if self.id in {"apply-reduction", "configure-context-exchanges"}
@@ -237,6 +238,7 @@ class CellSpecificStage:
                     raise ValueError(
                         "expression data must be a list or an object with records"
                     )
+            skipped_non_finite = 0
             for item in raw:
                 if not isinstance(item, Mapping):
                     raise ValueError("expression records must be objects")
@@ -255,6 +257,9 @@ class CellSpecificStage:
                 if section.get("sample") is not None and sample_id != str(
                     section["sample"]
                 ):
+                    continue
+                if not isfinite(float(value)):
+                    skipped_non_finite += 1
                     continue
                 warnings = item.get("warnings", [])
                 rows.append(
@@ -284,7 +289,10 @@ class CellSpecificStage:
                     }
                 )
             output = _jsonl(work_dir / "expression-evidence.jsonl", rows)
-            return StageResult((("evidence", output),), {"records": len(rows)})
+            return StageResult(
+                (("evidence", output),),
+                {"records": len(rows), "skipped_non_finite": skipped_non_finite},
+            )
 
         if self.id == "normalize-gene-identifiers":
             mapping = section.get("gene_mapping", {})
@@ -362,6 +370,14 @@ class CellSpecificStage:
                         "mapped_genes": sum(
                             len(item) for item in payload["samples"].values()
                         ),
+                        "unmapped_genes": len(
+                            {
+                                gene
+                                for genes in samples.values()
+                                for gene in genes
+                                if not model.genes.has_id(gene)
+                            }
+                        ),
                     },
                 )
             values: defaultdict[str, list[float]] = defaultdict(list)
@@ -381,7 +397,15 @@ class CellSpecificStage:
                 work_dir / "gene-activity.json",
                 {"schema_version": 1, "activity": activity},
             )
-            return StageResult((("activity", output),), {"mapped_genes": len(activity)})
+            return StageResult(
+                (("activity", output),),
+                {
+                    "mapped_genes": len(activity),
+                    "unmapped_genes": sum(
+                        not model.genes.has_id(gene) for gene in values
+                    ),
+                },
+            )
 
         if self.id == "compute-reaction-expression":
             if section.get("reduction_strategy") != "gimme":
@@ -440,6 +464,7 @@ class CellSpecificStage:
                         str(row["status"]),
                         tuple(row.get("genes_used", [])),
                         tuple(row.get("missing_genes", [])),
+                        row.get("exact"),
                     )
                 )
             results = [

@@ -15,6 +15,16 @@ class ReactionExpressionEvidence:
     status: Literal["measured", "partial", "unknown", "no-gpr"]
     genes_used: tuple[str, ...]
     missing_genes: tuple[str, ...]
+    #: Whether the expression data fixes ``score``. A partially observed OR
+    #: only bounds it from below. ``None`` (evidence serialized before this
+    #: field existed) means exact only when the status is ``measured``.
+    exact: bool | None = None
+
+    @property
+    def is_exact(self) -> bool:
+        if self.exact is None:
+            return self.status == "measured"
+        return self.exact and self.score is not None
 
 
 _TOKEN = re.compile(r"\s*(\(|\)|\band\b|\bor\b|[^\s()]+)", re.I)
@@ -69,13 +79,14 @@ def _parse(rule: str):
 
 
 def _evaluate(node, expression: Mapping[str, float | None]):
+    """Return ``(score, genes, missing, complete, exact)`` for a GPR node."""
     kind = node[0]
     if kind == "gene":
         gene = node[1]
         value = expression.get(gene)
         if value is None:
-            return None, (), (gene,), False
-        return float(value), (gene,), (), True
+            return None, (), (gene,), False, False
+        return float(value), (gene,), (), True, True
     left = _evaluate(node[1], expression)
     right = _evaluate(node[2], expression)
     scores = [value for value in (left[0], right[0]) if value is not None]
@@ -83,14 +94,17 @@ def _evaluate(node, expression: Mapping[str, float | None]):
     missing = tuple(sorted(set(left[2] + right[2])))
     complete = left[3] and right[3]
     if kind == "or":
-        return (max(scores) if scores else None), genes, missing, complete
+        # An unobserved isozyme can only raise the maximum: unless every
+        # branch is exact, the score is a lower bound.
+        exact = left[4] and right[4]
+        return (max(scores) if scores else None), genes, missing, complete, exact
     # An observed zero subunit proves an AND complex has zero support.  Other
     # partially observed complexes remain unknown rather than inventing a score.
     if complete:
-        return min(scores), genes, missing, True
+        return min(scores), genes, missing, True, True
     if any(value == 0 for value in scores):
-        return 0.0, genes, missing, False
-    return None, genes, missing, False
+        return 0.0, genes, missing, False, True
+    return None, genes, missing, False, False
 
 
 def reaction_expression_evidence(
@@ -99,13 +113,14 @@ def reaction_expression_evidence(
     """Score one GPR using AND=min and OR=max without executing the rule."""
     if not rule.strip():
         return ReactionExpressionEvidence(reaction_id, None, "no-gpr", (), ())
-    score, used, missing, complete = _evaluate(_parse(rule), expression)
+    score, used, missing, complete, exact = _evaluate(_parse(rule), expression)
     return ReactionExpressionEvidence(
         reaction_id,
         score,
         "measured" if complete else "partial" if score is not None else "unknown",
         used,
         missing,
+        exact and score is not None,
     )
 
 

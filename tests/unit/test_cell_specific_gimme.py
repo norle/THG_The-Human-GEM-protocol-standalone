@@ -6,7 +6,9 @@ import pytest
 
 from thg_protocol.cell_specific import (
     GimmeObjectiveRequirement,
+    ReactionExpressionEvidence,
     consensus_from_gimme,
+    expression_penalties,
     reaction_expression_evidence,
     reaction_expression_for_model,
     run_gimme,
@@ -156,3 +158,74 @@ def test_consensus_excludes_failed_samples_from_denominator():
     )
     assert consensus.support["high"] == 1
     assert consensus.failed_samples == ("bad",)
+
+
+def test_score_is_exact_only_when_the_expression_determines_it():
+    exact_or = reaction_expression_evidence("R", "A or B", {"A": 0.1, "B": 5})
+    assert exact_or.exact and exact_or.score == 5
+    lower_bound = reaction_expression_evidence("R", "A or B", {"A": 0.1})
+    assert not lower_bound.exact and lower_bound.score == 0.1
+    zero_complex = reaction_expression_evidence("R", "A and B", {"A": 0})
+    assert zero_complex.exact and zero_complex.score == 0
+    assert not reaction_expression_evidence("R", "A and B", {"A": 3}).exact
+
+
+def test_unmeasured_isozyme_is_not_penalized_as_if_absent():
+    partial_or = reaction_expression_evidence("R_or", "A or B", {"A": 0.1})
+    zero_and = reaction_expression_evidence("R_and", "A and B", {"A": 0})
+    measured = reaction_expression_evidence("R_ok", "A", {"A": 0.25})
+    assert expression_penalties([partial_or, zero_and, measured], 1.0) == {
+        "R_or": 0.0,
+        "R_and": 1.0,
+        "R_ok": 0.75,
+    }
+
+
+def test_serialized_evidence_without_exact_flag_penalizes_only_measured():
+    old_rows = [
+        ReactionExpressionEvidence("m", 0.0, "measured", ("A",), ()),
+        ReactionExpressionEvidence("p", 0.0, "partial", ("A",), ("B",)),
+    ]
+    assert expression_penalties(old_rows, 1.0) == {"m": 1.0, "p": 0.0}
+
+
+def test_gimme_returns_the_minimal_flux_solution_among_equally_consistent_ones():
+    model = cobra.Model("detour")
+    a, b, c, d, x, y = (cobra.Metabolite(name) for name in "abcdxy")
+    model.add_reactions(
+        [
+            _reaction("in", {a: 1}, (0, 10)),
+            _reaction("direct", {a: -1, b: 1}),
+            _reaction("d1", {a: -1, c: 1}),
+            _reaction("d2", {c: -1, d: 1}),
+            _reaction("d3", {d: -1, b: 1}),
+            _reaction("out", {b: -1}),
+            _reaction("loop1", {x: -1, y: 1}, (-1000, 1000)),
+            _reaction("loop2", {y: -1, x: 1}, (-1000, 1000)),
+        ]
+    )
+    result = run_gimme(
+        model,
+        reaction_expression_for_model(model, {}),
+        sample_id="unpenalized",
+        expression_threshold=1,
+        objectives=[GimmeObjectiveRequirement("out", {"out": 1}, 1.0)],
+    )
+    assert result.status == "passed"
+    assert result.reaction_fluxes["direct"] == pytest.approx(10)
+    for detour in ("d1", "d2", "d3", "loop1", "loop2"):
+        assert result.reaction_fluxes[detour] == pytest.approx(0, abs=1e-9)
+    assert not result.flux_active["d2"]
+
+
+def test_second_stage_does_not_trade_away_expression_consistency():
+    model = _alternatives()
+    result = run_gimme(
+        model,
+        reaction_expression_for_model(model, {"H": 10, "L": 0}),
+        sample_id="one",
+        expression_threshold=1,
+        objectives=[GimmeObjectiveRequirement("out", {"out": 1}, 0.5)],
+    )
+    assert result.inconsistency_score == pytest.approx(0)
+    assert result.reaction_fluxes["low"] == pytest.approx(0)

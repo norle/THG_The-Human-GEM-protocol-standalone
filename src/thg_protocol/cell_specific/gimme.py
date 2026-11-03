@@ -36,13 +36,18 @@ class GimmeResult:
 def expression_penalties(
     evidence: Sequence[ReactionExpressionEvidence], threshold: float
 ) -> dict[str, float]:
-    """Return GIMME penalties; unknown and no-GPR evidence is unpenalized."""
+    """Return GIMME penalties for scores the expression data fixes exactly.
+
+    Unknown and no-GPR evidence is unpenalized, and so is a score that only
+    bounds the truth from below (an OR with an unmeasured isozyme): that
+    isozyme might support the reaction fully.
+    """
     if not isfinite(threshold):
         raise ValueError("expression_threshold must be finite")
     return {
         item.reaction_id: (
             max(0.0, threshold - item.score)
-            if item.score is not None and item.status in {"measured", "partial"}
+            if item.score is not None and item.is_exact
             else 0.0
         )
         for item in evidence
@@ -156,6 +161,32 @@ def run_gimme(
                 maxima,
                 requirements,
             )
+        inconsistency = float(solution.objective_value or 0.0)
+        warnings: tuple[str, ...] = ()
+        # The penalty optimum is rarely unique, and reactions without a penalty
+        # may carry arbitrary flux (detours, loops). Hold the optimum and take
+        # the minimal-total-flux solution so "active" does not depend on the
+        # solver's starting basis.
+        working.add_cons_vars(
+            working.problem.Constraint(
+                objective,
+                ub=inconsistency + max(1e-7, 1e-6 * inconsistency),
+                name="gimme_penalty_optimum",
+            )
+        )
+        working.objective = sum(
+            reaction.forward_variable + reaction.reverse_variable
+            for reaction in working.reactions
+        )
+        working.objective_direction = "min"
+        parsimonious = working.optimize()
+        if str(parsimonious.status) == "optimal":
+            solution = parsimonious
+        else:
+            warnings = (
+                f"minimal-flux refinement is {parsimonious.status}; "
+                "reporting the unrefined GIMME solution",
+            )
         fluxes = {
             reaction.id: float(solution.fluxes[reaction.id])
             for reaction in working.reactions
@@ -192,7 +223,7 @@ def run_gimme(
         return GimmeResult(
             sample_id,
             "passed",
-            float(solution.objective_value or 0.0),
+            inconsistency,
             fluxes,
             flux_active,
             supported,
@@ -202,6 +233,7 @@ def run_gimme(
             requirements,
             achieved,
             solver,
+            warnings,
         )
     except Exception as error:
         return empty("solver-failed", f"{type(error).__name__}: {error}")
