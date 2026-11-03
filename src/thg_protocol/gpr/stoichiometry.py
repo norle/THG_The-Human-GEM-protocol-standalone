@@ -298,7 +298,19 @@ def sgpr_from_dict(value: object) -> SgprNode:
     if kind == "gene":
         coefficient = value.get("coefficient")
         if coefficient is not None:
-            coefficient = int(coefficient)
+            try:
+                integer = int(coefficient)
+            except (TypeError, ValueError, OverflowError) as error:
+                raise ValueError(
+                    "gene coefficients must be positive integers"
+                ) from error
+            if (
+                isinstance(coefficient, bool)
+                or (not isinstance(coefficient, str) and coefficient != integer)
+                or integer < 1
+            ):
+                raise ValueError("gene coefficients must be positive integers")
+            coefficient = integer
         evidence = value.get("evidence", ())
         return GeneNode(
             str(value.get("gene", "")),

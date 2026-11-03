@@ -18,6 +18,7 @@ import pandas as pd
 if TYPE_CHECKING:
     import cobra
 
+from thg_protocol.model_build.mass_balance import formula_atoms
 from thg_protocol.services.pubchem import PubChemClient, PubChemClientProtocol
 
 project_root = Path(__file__).resolve().parents[3]
@@ -36,8 +37,7 @@ __all__ = [
 ]
 
 LOGGER = logging.getLogger(__name__)
-H_PATTERN = re.compile(r"H[0-9]+")
-CHARGE_PATTERN = re.compile(r"[-\+][0-9]+")
+CHARGE_PATTERN = re.compile(r"[+-][0-9]*$")
 
 
 def global_met_annotation_file():
@@ -73,12 +73,15 @@ def gather_metabolites(model: cobra.Model) -> list[tuple[str, str, str, str]]:
 
 
 def formula_similarity(formula_left: str, formula_right: str) -> float:
-    """Compute similiratiy based on the stdlib SequenceMatcher."""
-    pruned_left = H_PATTERN.sub("H", CHARGE_PATTERN.sub("", atom(formula_left)))
-    pruned_right = H_PATTERN.sub("H", CHARGE_PATTERN.sub("", atom(formula_right)))
-    return difflib.SequenceMatcher(
-        lambda x: x == " ", pruned_left, pruned_right
-    ).ratio()
+    """Match elemental composition, allowing only hydrogen/charge differences."""
+    left = formula_atoms(CHARGE_PATTERN.sub("", formula_left or ""))
+    right = formula_atoms(CHARGE_PATTERN.sub("", formula_right or ""))
+    if not left or not right:
+        return 0.0
+    return float(
+        {element: count for element, count in left.items() if element != "H"}
+        == {element: count for element, count in right.items() if element != "H"}
+    )
 
 
 def identify_metabolite(
@@ -98,8 +101,8 @@ def identify_metabolite(
     formula: str
     iden: str
     threshold: float, default=0.82
-        minimum similarity ratio between the molecular formulas. The default (0.82)
-        was decided by performing sensibility tests of the metabolites in Human 1.
+        Minimum formula score. Compatible non-hydrogen composition scores 1;
+        incompatible or unparseable composition is always rejected.
     max_retries: int, default=3
         maximum number of retry attempts when PubChem server is busy
     use_proxy: bool, default=False
@@ -124,10 +127,10 @@ def identify_metabolite(
     except Exception as error:  # network failures are an unresolved match
         LOGGER.warning("PubChem lookup failed for %s: %s", name, error)
         return None
-    if (
-        compound is None
-        or formula_similarity(formula, compound.molecular_formula) < threshold
-    ):
+    if compound is None:
+        return None
+    similarity = formula_similarity(formula, compound.molecular_formula)
+    if not similarity or similarity < threshold:
         return None
 
     synonyms = compound.synonyms or (name,)
@@ -399,7 +402,10 @@ def process_annotation(annotation_file: str | Path) -> dict:
     """
     annotation_file = os.fspath(annotation_file)
     print(f"Processing annotation file: {annotation_file}")
-    variableFile = pd.read_csv(annotation_file, sep="\t", header=None)
+    try:
+        variableFile = pd.read_csv(annotation_file, sep="\t", header=None)
+    except pd.errors.EmptyDataError:
+        return {}
     variableFile[5] = variableFile[5].str.extract("(CHEBI:[0-9]+)", expand=True)
     variableFile = variableFile.rename(
         columns={
@@ -422,61 +428,6 @@ def process_annotation(annotation_file: str | Path) -> dict:
 
 
 def atom(Formula):
-    try:
-        if "C" in Formula:
-            C = re.findall(r"(C[0-9]+)", Formula)
-            if not C:
-                C = ["C1"]
-        else:
-            C = []
-        if "H" in Formula:
-            H = re.findall(r"(H\+*[0-9]+)", Formula)
-            if not H:
-                H = ["H1"]
-        else:
-            H = []
-        if "O" in Formula:
-            oxygen = re.findall(r"(O[0-9]+)", Formula)
-            if not oxygen:
-                oxygen = ["O1"]
-        else:
-            oxygen = []
-        if "N" in Formula:
-            N = re.findall(r"(N[0-9]+)", Formula)
-            if not N:
-                N = ["N1"]
-        else:
-            N = []
-        if "P" in Formula:
-            P = re.findall(r"(P[0-9]+)", Formula)
-            if not P:
-                P = ["P1"]
-        else:
-            P = []
-        if "S" in Formula:
-            S = re.findall(r"(Se?[0-9]+)", Formula)
-            if not S:
-                S = ["S1"]
-        else:
-            S = []
-        if "I" in Formula:
-            iodine = re.findall(r"(I[0-9]+)", Formula)
-            if not iodine:
-                iodine = ["I1"]
-        else:
-            iodine = []
-        if "F" in Formula:
-            F = re.findall(r"(Fe*[0-9]+)", Formula)
-            if not F:
-                F = ["F1"]
-        else:
-            F = []
-        if "R" in Formula:
-            R = re.findall(r"(R[0-9]+)", Formula)
-            if not R:
-                R = ["R1"]
-        else:
-            R = []
-        return "".join(str(i) for i in C + H + oxygen + N + P + S + iodine + F + R)
-    except Exception as e:
-        print(e)
+    """Return a canonical formula retaining every parsed element."""
+    atoms = formula_atoms(Formula)
+    return "".join(f"{element}{atoms[element]}" for element in sorted(atoms))

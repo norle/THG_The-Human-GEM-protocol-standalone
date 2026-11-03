@@ -1,0 +1,2981 @@
+[
+  {
+    "file": "src/thg_protocol/annotation/metabolite_reactions.py",
+    "line": 57,
+    "name": "retry_metabolite_annotations",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/annotation/metabolite_reactions.py",
+    "line": 148,
+    "name": "run_metabolite_reaction_identification",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/annotation/metabolites.py",
+    "line": 43,
+    "name": "global_met_annotation_file",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/annotation/metabolites.py",
+    "line": 58,
+    "name": "gather_metabolites",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/annotation/metabolites.py",
+    "line": 75,
+    "name": "formula_similarity",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Reviewed formula normalization and caller: compares incomplete atom strings and gives sulfur/selenium formulas similarity 1.0.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/annotation/metabolites.py",
+    "line": 84,
+    "name": "identify_metabolite",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Reviewed full PubChem path: accepts formula collision at the threshold and returns the wrong compound CID.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/annotation/metabolites.py",
+    "line": 173,
+    "name": "generate_met_annotation",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/annotation/metabolites.py",
+    "line": 384,
+    "name": "remove_null_value",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/annotation/metabolites.py",
+    "line": 392,
+    "name": "process_annotation",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Reviewed workflow caller and empty-file reproducer: pandas read_csv raises EmptyDataError when no candidate succeeds.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/annotation/metabolites.py",
+    "line": 424,
+    "name": "atom",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Reviewed formula parser and full annotation reproducer: incomplete element extraction conflates selenium and sulfur.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/annotation/metabolites.py",
+    "line": 225,
+    "name": "initial_state",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/annotation/metabolites.py",
+    "line": 235,
+    "name": "write_checkpoint",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/annotation/metabolites.py",
+    "line": 248,
+    "name": "read_checkpoint",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/annotation/metabolites.py",
+    "line": 276,
+    "name": "write_final",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/annotation/metabolites.py",
+    "line": 361,
+    "name": "percentage",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/annotation/model.py",
+    "line": 21,
+    "name": "annotate_cobra_model",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/annotation/model_annotations.py",
+    "line": 12,
+    "name": "_load_model_payload",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/annotation/model_annotations.py",
+    "line": 22,
+    "name": "analyze_model_annotations",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/annotation/model_annotations.py",
+    "line": 35,
+    "name": "extract_metabolite_annotations",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/annotation/reactions.py",
+    "line": 21,
+    "name": "process_reac",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Reviewed XML extraction and caller: every reaction is sent to identify_reaction, so a zero-sided reaction currently aborts the workflow.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/annotation/reactions.py",
+    "line": 44,
+    "name": "gather_kegg_metabolites",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/annotation/reactions.py",
+    "line": 59,
+    "name": "replace_met_id_by_met_kegg",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/annotation/reactions.py",
+    "line": 66,
+    "name": "execute_jaccard",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Reviewed full caller pipeline: compares species sets without pairing coefficients to species; permutation false-positive reproduced.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/annotation/reactions.py",
+    "line": 104,
+    "name": "process_jaccard",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Reviewed post-match filters: columns 8/21 are rounded total coefficients, not EC; total-list comparison permits coefficient/species permutation false positives.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/annotation/reactions.py",
+    "line": 148,
+    "name": "identify_reaction",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Reviewed parser fields/callers: rounds coefficients, stores the independent all-coefficient list, and indexes a nonempty reactant list without a guard.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/annotation/reactions.py",
+    "line": 237,
+    "name": "jaccard",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/capabilities.py",
+    "line": 23,
+    "name": "validate_capability_registry",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/config.py",
+    "line": 16,
+    "name": "_read_dotenv",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/config.py",
+    "line": 39,
+    "name": "load_environment_files",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/config.py",
+    "line": 68,
+    "name": "get_project_root",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/config.py",
+    "line": 82,
+    "name": "load_config",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/config.py",
+    "line": 124,
+    "name": "get_model_paths",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/config.py",
+    "line": 152,
+    "name": "get_compartments",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/config.py",
+    "line": 171,
+    "name": "resolve_compartment_abbreviation",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/config.py",
+    "line": 203,
+    "name": "resolve_all_compartments",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/curation/beta1.py",
+    "line": 89,
+    "name": "_json",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/curation/beta1.py",
+    "line": 100,
+    "name": "_annotation_values",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/curation/beta1.py",
+    "line": 113,
+    "name": "_merge_annotations",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/curation/beta1.py",
+    "line": 136,
+    "name": "_annotation_identity_exists",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/curation/beta1.py",
+    "line": 151,
+    "name": "classify_reaction",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/curation/beta1.py",
+    "line": 226,
+    "name": "inventory_model",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/curation/beta1.py",
+    "line": 351,
+    "name": "normalize_namespace",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/curation/beta1.py",
+    "line": 365,
+    "name": "resolve_metabolite_identity",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/curation/beta1.py",
+    "line": 545,
+    "name": "score_metabolite_candidate",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/curation/beta1.py",
+    "line": 589,
+    "name": "protonation_relation",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/curation/beta1.py",
+    "line": 634,
+    "name": "parse_gpr",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/curation/beta1.py",
+    "line": 655,
+    "name": "canonicalize_gpr",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/curation/beta1.py",
+    "line": 669,
+    "name": "with_subunit_stoichiometry",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/curation/beta1.py",
+    "line": 702,
+    "name": "serialize_s_gpr",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/curation/beta1.py",
+    "line": 715,
+    "name": "serialize_gpr",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/curation/beta1.py",
+    "line": 733,
+    "name": "rewrite_gpr",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/curation/beta1.py",
+    "line": 747,
+    "name": "normalize_gene_mapping",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/curation/beta1.py",
+    "line": 767,
+    "name": "generate_curation_proposals",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Reviewed proposal generation and reproducer: existing annotations are passed to serialize_s_gpr in place of the GPR rule, causing AttributeError.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/curation/beta1.py",
+    "line": 987,
+    "name": "normalized_stoichiometry",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/curation/beta1.py",
+    "line": 1002,
+    "name": "compare_reaction_identity",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/curation/beta1.py",
+    "line": 1032,
+    "name": "_compare_reaction_identity_payload",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/curation/beta1.py",
+    "line": 1049,
+    "name": "reaction_identity_key",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/curation/beta1.py",
+    "line": 1055,
+    "name": "duplicate_reaction_groups",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/curation/beta1.py",
+    "line": 1144,
+    "name": "is_unresolved_balance",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/curation/beta1.py",
+    "line": 1158,
+    "name": "formula_class",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/curation/beta1.py",
+    "line": 1187,
+    "name": "audit_reaction",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/curation/beta1.py",
+    "line": 1335,
+    "name": "_reaction_payload",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/curation/beta1.py",
+    "line": 1356,
+    "name": "_reaction_from_payload",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/curation/beta1.py",
+    "line": 1386,
+    "name": "_audit_reaction_payload",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/curation/beta1.py",
+    "line": 1395,
+    "name": "audit_model",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/curation/beta1.py",
+    "line": 1419,
+    "name": "_affected_audits",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/curation/beta1.py",
+    "line": 1429,
+    "name": "_reaction_audit_view",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/curation/beta1.py",
+    "line": 1446,
+    "name": "_corrected_model",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/curation/beta1.py",
+    "line": 1460,
+    "name": "generate_balance_proposals",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/curation/beta1.py",
+    "line": 1649,
+    "name": "_proton_water_correction",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/curation/beta1.py",
+    "line": 1747,
+    "name": "apply_model_proposals",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/curation/beta1.py",
+    "line": 1765,
+    "name": "_apply_model_proposal",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/curation/beta1.py",
+    "line": 1812,
+    "name": "consolidate_model",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/curation/beta1.py",
+    "line": 2007,
+    "name": "_empty_cleanup_report",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/curation/beta1.py",
+    "line": 2019,
+    "name": "generate_cleanup_proposals",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/curation/beta1.py",
+    "line": 2062,
+    "name": "apply_cleanup_proposals",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/curation/beta1.py",
+    "line": 2097,
+    "name": "run_beta1",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/curation/beta1.py",
+    "line": 2231,
+    "name": "_software_versions",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/curation/beta1.py",
+    "line": 2242,
+    "name": "beta1_release_gate",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/curation/beta1.py",
+    "line": 2368,
+    "name": "release_beta1",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/curation/beta1.py",
+    "line": 203,
+    "name": "to_dict",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/curation/beta1.py",
+    "line": 622,
+    "name": "to_dict",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/curation/beta1.py",
+    "line": 641,
+    "name": "convert",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/curation/beta1.py",
+    "line": 719,
+    "name": "render",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/curation/beta1.py",
+    "line": 1091,
+    "name": "status",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/curation/beta1.py",
+    "line": 1096,
+    "name": "to_dict",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/curation/beta1.py",
+    "line": 1113,
+    "name": "from_dict",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/curation/beta1.py",
+    "line": 1316,
+    "name": "__init__",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/curation/beta1.py",
+    "line": 2073,
+    "name": "apply",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/curation/beta1.py",
+    "line": 2174,
+    "name": "output_path",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/curation/beta1.py",
+    "line": 1114,
+    "name": "strings",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/curation/beta2.py",
+    "line": 42,
+    "name": "resolve_compartment",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Reviewed graph search and reproducer: relation rank is computed but not carried into terminal candidate score, erasing containment preference.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/curation/beta2.py",
+    "line": 163,
+    "name": "resolve_compartment_evidence",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/curation/beta2.py",
+    "line": 187,
+    "name": "normalize_location",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/curation/beta2.py",
+    "line": 192,
+    "name": "normalize_compartment_registry",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/curation/beta2.py",
+    "line": 209,
+    "name": "_parse",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/curation/beta2.py",
+    "line": 218,
+    "name": "_locations",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/curation/beta2.py",
+    "line": 229,
+    "name": "_possible_locations",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/curation/beta2.py",
+    "line": 238,
+    "name": "_render",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/curation/beta2.py",
+    "line": 257,
+    "name": "resolve_gpr_locations",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/curation/beta2.py",
+    "line": 310,
+    "name": "ast_names",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/curation/beta2.py",
+    "line": 314,
+    "name": "reaction_policy",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/curation/beta2.py",
+    "line": 331,
+    "name": "generate_expansion_plan",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/curation/beta2.py",
+    "line": 510,
+    "name": "apply_expansion_plan",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/curation/beta2.py",
+    "line": 620,
+    "name": "_feasibility",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/curation/beta2.py",
+    "line": 635,
+    "name": "validate_beta2",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/curation/beta2.py",
+    "line": 779,
+    "name": "beta2_release_gate",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/curation/beta2.py",
+    "line": 863,
+    "name": "release_beta2",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/curation/beta2.py",
+    "line": 352,
+    "name": "chemistry_key",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/curation/go.py",
+    "line": 13,
+    "name": "normalize_go_id",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/curation/go.py",
+    "line": 18,
+    "name": "_term",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/curation/go.py",
+    "line": 25,
+    "name": "load_obo",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/curation/go.py",
+    "line": 30,
+    "name": "parse_obo",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/curation/go.py",
+    "line": 84,
+    "name": "_start_term",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/curation/go.py",
+    "line": 105,
+    "name": "_walk_up",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/curation/go.py",
+    "line": 137,
+    "name": "_resolved",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/curation/go.py",
+    "line": 160,
+    "name": "resolve_go_compartment",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/curation/go.py",
+    "line": 34,
+    "name": "flush",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/database.py",
+    "line": 25,
+    "name": "summarize_biocyc_compartments",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/database.py",
+    "line": 118,
+    "name": "reconstruct_model",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/database.py",
+    "line": 233,
+    "name": "reconstruct_model_from_json",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/database.py",
+    "line": 290,
+    "name": "_record_value",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/database.py",
+    "line": 297,
+    "name": "_record_call",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/database.py",
+    "line": 302,
+    "name": "_pickle_items",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/database.py",
+    "line": 310,
+    "name": "reconstruct_model_from_pickle",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/database.py",
+    "line": 538,
+    "name": "reconstruct_model_with_services",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/database.py",
+    "line": 264,
+    "name": "records",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/database.py",
+    "line": 366,
+    "name": "compartment",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/database.py",
+    "line": 370,
+    "name": "with_compartment",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/database.py",
+    "line": 415,
+    "name": "compounds",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/database.py",
+    "line": 567,
+    "name": "values",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/database_parsing.py",
+    "line": 10,
+    "name": "parse_pathway_links",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/database_parsing.py",
+    "line": 58,
+    "name": "_pathway_id",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/database_parsing.py",
+    "line": 63,
+    "name": "parse_kegg_compound_entry_fields",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/database_parsing.py",
+    "line": 77,
+    "name": "parse_kegg_compound_entry",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/database_workflow.py",
+    "line": 55,
+    "name": "normalize_records",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/database_workflow.py",
+    "line": 83,
+    "name": "records_checksum",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/database_workflow.py",
+    "line": 88,
+    "name": "harvest_snapshot",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/database_workflow.py",
+    "line": 162,
+    "name": "reconstruct_snapshot",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/database_workflow.py",
+    "line": 39,
+    "name": "__post_init__",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/database_workflow.py",
+    "line": 43,
+    "name": "to_dict",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/database_workflow.py",
+    "line": 61,
+    "name": "items",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/gpr/__init__.py",
+    "line": 4,
+    "name": "__getattr__",
+    "functional": "reviewed",
+    "scientific": "N/A",
+    "functional_rationale": "Lazy public exports resolve requested symbols from their defining modules; no state or scientific interpretation.",
+    "scientific_rationale": "Transport, serialization, or compatibility plumbing; no biological/chemical inference is made here."
+  },
+  {
+    "file": "src/thg_protocol/gpr/ast_gpr.py",
+    "line": 12,
+    "name": "divide_gpr_in_ors",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Splits top-level alternatives while preserving conjunction clauses; scientific status follows Boolean-rule semantics.",
+    "scientific_rationale": "GPR And/Or structure is scientific rule content; standard Boolean semantics were checked. See operator-preservation findings."
+  },
+  {
+    "file": "src/thg_protocol/gpr/ast_gpr.py",
+    "line": 25,
+    "name": "compare_ast",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Compares AST nodes but ignores And/Or operator identity; reproduced as a rule-changing bug.",
+    "scientific_rationale": "GPR And/Or structure is scientific rule content; standard Boolean semantics were checked. See operator-preservation findings."
+  },
+  {
+    "file": "src/thg_protocol/gpr/ast_gpr.py",
+    "line": 46,
+    "name": "deduplicate_gpr",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Uses the preceding comparison to remove alternatives; the ignored operator makes this order-dependent and incorrect.",
+    "scientific_rationale": "GPR And/Or structure is scientific rule content; standard Boolean semantics were checked. See operator-preservation findings."
+  },
+  {
+    "file": "src/thg_protocol/gpr/ast_gpr.py",
+    "line": 66,
+    "name": "is_or",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Checks whether a syntax node is an OR operator; this predicate is sound.",
+    "scientific_rationale": "GPR And/Or structure is scientific rule content; standard Boolean semantics were checked. See operator-preservation findings."
+  },
+  {
+    "file": "src/thg_protocol/gpr/ast_gpr.py",
+    "line": 73,
+    "name": "naive_reduce_or",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Merges nested OR children without requiring the parent to be OR; reproduced as a Boolean-rule corruption.",
+    "scientific_rationale": "GPR And/Or structure is scientific rule content; standard Boolean semantics were checked. See operator-preservation findings."
+  },
+  {
+    "file": "src/thg_protocol/gpr/ast_gpr.py",
+    "line": 97,
+    "name": "remove_empty",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Removes placeholder empty-gene leaves in place; callers keep remaining Boolean nodes parseable.",
+    "scientific_rationale": "GPR And/Or structure is scientific rule content; standard Boolean semantics were checked. See operator-preservation findings."
+  },
+  {
+    "file": "src/thg_protocol/gpr/ast_gpr.py",
+    "line": 115,
+    "name": "reduce_gpr",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Removes sGPR coefficient syntax, prefixes numeric gene identifiers, and reduces Boolean AST; inherits confirmed OR-flattening defect.",
+    "scientific_rationale": "GPR And/Or structure is scientific rule content; standard Boolean semantics were checked. See operator-preservation findings."
+  },
+  {
+    "file": "src/thg_protocol/gpr/ast_gpr.py",
+    "line": 151,
+    "name": "sanitize_gpr",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Salvages legacy bracket syntax then reduces/deduplicates; inherits both confirmed AST logic defects.",
+    "scientific_rationale": "GPR And/Or structure is scientific rule content; standard Boolean semantics were checked. See operator-preservation findings."
+  },
+  {
+    "file": "src/thg_protocol/gpr/ast_gpr.py",
+    "line": 131,
+    "name": "prefix_numeric_genes",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Prefixes digit-leading identifiers so Python AST treats them as names; replacement is limited to token boundaries.",
+    "scientific_rationale": "GPR And/Or structure is scientific rule content; standard Boolean semantics were checked. See operator-preservation findings."
+  },
+  {
+    "file": "src/thg_protocol/gpr/evidence.py",
+    "line": 30,
+    "name": "__post_init__",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Normalizes provenance fields into immutable strings/tuples; source evidence and structure are retained.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/gpr/evidence.py",
+    "line": 39,
+    "name": "genes",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Projects unique gene symbols from the structured rule; it does not infer stoichiometry.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/gpr/evidence.py",
+    "line": 42,
+    "name": "to_dict",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Serializes both plain GPR and structured sGPR with provenance; fields map to the canonical evidence record.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/gpr/evidence.py",
+    "line": 61,
+    "name": "from_mapping",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Reads supported structure/string/legacy field aliases into an evidence record; malformed structure errors propagate to caller validation.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/gpr/location.py",
+    "line": 28,
+    "name": "_location_from_page",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Maps page text only to allowed configured locations, using an explicit fallback; page evidence is keyword-based.",
+    "scientific_rationale": "Location categories are explicit page-derived evidence and preserve per-location logical rules; unresolved data is not silently assigned."
+  },
+  {
+    "file": "src/thg_protocol/gpr/location.py",
+    "line": 37,
+    "name": "_ensembl_identifier",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Reads a normalized Ensembl identifier from object or mapping inputs.",
+    "scientific_rationale": "Location categories are explicit page-derived evidence and preserve per-location logical rules; unresolved data is not silently assigned."
+  },
+  {
+    "file": "src/thg_protocol/gpr/location.py",
+    "line": 45,
+    "name": "_parse_gpr",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Replaces complete known gene tokens before parsing operators; invalid syntax returns unresolved parse result.",
+    "scientific_rationale": "Location categories are explicit page-derived evidence and preserve per-location logical rules; unresolved data is not silently assigned."
+  },
+  {
+    "file": "src/thg_protocol/gpr/location.py",
+    "line": 68,
+    "name": "_render_gpr",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Renders Boolean AST while retaining AND/OR grouping and optional coefficient/identifier transforms.",
+    "scientific_rationale": "Location categories are explicit page-derived evidence and preserve per-location logical rules; unresolved data is not silently assigned."
+  },
+  {
+    "file": "src/thg_protocol/gpr/location.py",
+    "line": 101,
+    "name": "_sorted_rules",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Orders mapping keys to make emitted location rules deterministic.",
+    "scientific_rationale": "Location categories are explicit page-derived evidence and preserve per-location logical rules; unresolved data is not silently assigned."
+  },
+  {
+    "file": "src/thg_protocol/gpr/location.py",
+    "line": 105,
+    "name": "resolve_locations",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Keeps the input Boolean structure per returned location and leaves failed lookups unresolved unless fallback is explicit; this is location evidence routing, not proof of enzyme localization.",
+    "scientific_rationale": "Location categories are explicit page-derived evidence and preserve per-location logical rules; unresolved data is not silently assigned."
+  },
+  {
+    "file": "src/thg_protocol/gpr/lookup.py",
+    "line": 112,
+    "name": "parse_gene_pairs",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Extracts visible BioCyc gene links/text pairs; no complex/stoichiometry claim is inferred.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/gpr/lookup.py",
+    "line": 124,
+    "name": "_kegg_genes",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Extracts numeric gene-like tokens from a KEGG response as low-structure fallback evidence.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/gpr/lookup.py",
+    "line": 128,
+    "name": "_gpr_for_node",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Renders canonical AND/OR tree to a plain GPR without asserting biological subunit counts.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/gpr/lookup.py",
+    "line": 136,
+    "name": "_access_warning",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Recognizes known access/login page titles so they are not mistaken for gene evidence.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/gpr/lookup.py",
+    "line": 144,
+    "name": "get_gpr",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Preserves the historical tuple API and converts structured evidence to the legacy representation.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/gpr/lookup.py",
+    "line": 183,
+    "name": "get_gpr_evidence",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Uses BioCyc structure first, marks unstructured fallback weak/candidate, and retains source/warning metadata; EC lookup alone is not treated as reaction identity.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/gpr/lookup.py",
+    "line": 312,
+    "name": "get_sgpr_evidence",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Delegates to the normalized evidence workflow without altering evidence semantics.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/gpr/lookup.py",
+    "line": 330,
+    "name": "resolve_sgpr",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Runs one evidence record through deterministic merger and returns the EC with the resolution.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/gpr/lookup.py",
+    "line": 33,
+    "name": "__init__",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Initializes parser state only; scientific status N/A.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/gpr/lookup.py",
+    "line": 45,
+    "name": "_identifier",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Extracts the BioCyc object query parameter from an anchor URL.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/gpr/lookup.py",
+    "line": 49,
+    "name": "_finish",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Closes one parsed gene block, accepting only visible symbol and identifier pairs.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/gpr/lookup.py",
+    "line": 67,
+    "name": "handle_starttag",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Tracks visible bold labels, anchors, and block boundaries; HTML attributes do not become gene symbols.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/gpr/lookup.py",
+    "line": 81,
+    "name": "handle_endtag",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Closes anchor/bold/block parser state.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/gpr/lookup.py",
+    "line": 90,
+    "name": "handle_data",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Collects text only inside a recognized BioCyc gene block.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/gpr/lookup.py",
+    "line": 107,
+    "name": "pairs",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Flushes parser state and returns deterministic unique pairs.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/gpr/merge.py",
+    "line": 68,
+    "name": "_key",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Builds a structural key that ignores provenance metadata but keeps gene/operator/coefficient structure.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/gpr/merge.py",
+    "line": 72,
+    "name": "_flatten",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Canonicalizes nested serialization for comparison while retaining biological fields.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/gpr/merge.py",
+    "line": 84,
+    "name": "_conservative_score",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Uses required-gene count, alternatives, and known coefficients as a deterministic tie-break, not as scientific evidence.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/gpr/merge.py",
+    "line": 109,
+    "name": "merge_sgpr_evidence",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Compares equal-precedence evidence, retains conflicts, and avoids unioning unrelated genes; lower-ranked sources inform provenance only.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/gpr/merge.py",
+    "line": 49,
+    "name": "node",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Returns the same canonical node through a compatibility property.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/gpr/merge.py",
+    "line": 52,
+    "name": "to_dict",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Serializes selected rule, conflict state, source list, warnings, and all candidates.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/gpr/selection.py",
+    "line": 21,
+    "name": "usable_gpr",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Validates and canonicalizes a candidate rule, returning its genes; invalid strings become empty candidates.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/gpr/selection.py",
+    "line": 44,
+    "name": "_gpr_expression_genes",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Walks the canonical expression to collect genes.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/gpr/selection.py",
+    "line": 54,
+    "name": "_accepted_external_gpr",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Requires a strong/authoritative or reaction-matched confidence and excludes unresolved records except reaction-matched ones.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/gpr/selection.py",
+    "line": 102,
+    "name": "_candidate_key",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Creates deterministic ordering from canonical GPR and stable record fields.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/gpr/selection.py",
+    "line": 114,
+    "name": "select_reaction_gpr",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Keeps model rules preferred, gates external evidence, surfaces structural conflicts, and derives flat stoichiometry only for an unambiguous single branch.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/gpr/selection.py",
+    "line": 80,
+    "name": "to_record",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Serializes selection and optional sGPR metadata without mutating the selected data.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/gpr/sources/biocyc.py",
+    "line": 11,
+    "name": "_gene",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Maps an explicit BioCyc gene and integer count to a gene leaf; absent names are rejected.",
+    "scientific_rationale": "Structured enzyme components are represented as required members; alternatives are preserved as OR; unstructured list stays candidate."
+  },
+  {
+    "file": "src/thg_protocol/gpr/sources/biocyc.py",
+    "line": 33,
+    "name": "_enzyme",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Maps listed subunits as a required complex and nested enzyme members recursively.",
+    "scientific_rationale": "Structured enzyme components are represented as required members; alternatives are preserved as OR; unstructured list stays candidate."
+  },
+  {
+    "file": "src/thg_protocol/gpr/sources/biocyc.py",
+    "line": 55,
+    "name": "_record_node",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Maps enzyme alternatives as OR and a single complex through its component structure.",
+    "scientific_rationale": "Structured enzyme components are represented as required members; alternatives are preserved as OR; unstructured list stays candidate."
+  },
+  {
+    "file": "src/thg_protocol/gpr/sources/biocyc.py",
+    "line": 79,
+    "name": "biocyc_sgpr_evidence",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Uses structural records when available and labels gene-list fallback as candidate with an explicit warning.",
+    "scientific_rationale": "Structured enzyme components are represented as required members; alternatives are preserved as OR; unstructured list stays candidate."
+  },
+  {
+    "file": "src/thg_protocol/gpr/sources/kegg.py",
+    "line": 11,
+    "name": "kegg_sgpr_evidence",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Maps linked genes as low-confidence OR alternatives because the fallback contains no complex structure.",
+    "scientific_rationale": "KEGG gene links lack complex structure here, so genes remain low-confidence alternatives."
+  },
+  {
+    "file": "src/thg_protocol/gpr/sources/reactome.py",
+    "line": 12,
+    "name": "reactome_sgpr_evidence",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Delegates catalyst mapping to the Reactome structure adapter.",
+    "scientific_rationale": "Reactome complex members are required together; EntitySet members are alternatives per the Reactome data model."
+  },
+  {
+    "file": "src/thg_protocol/gpr/sources/rhea.py",
+    "line": 11,
+    "name": "rhea_sgpr_evidence",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Refuses ambiguous EC-to-reaction mappings and includes only human-associated proteins when organism metadata is present.",
+    "scientific_rationale": "EC-to-reaction ambiguity is not resolved by gene union; only one reaction hit may contribute evidence."
+  },
+  {
+    "file": "src/thg_protocol/gpr/sources/uniprot.py",
+    "line": 11,
+    "name": "uniprot_sgpr_evidence",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Treats protein-to-gene mappings as supporting OR evidence and does not infer stoichiometry from text.",
+    "scientific_rationale": "Protein-to-gene evidence is supporting-only and carries no inferred subunit counts."
+  },
+  {
+    "file": "src/thg_protocol/gpr/stoichiometry.py",
+    "line": 71,
+    "name": "validate_sgpr",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Rejects empty genes/logical nodes, unsupported nodes, invalid statuses, booleans, and nonpositive/noninteger coefficients.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/gpr/stoichiometry.py",
+    "line": 93,
+    "name": "_semantic_key",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Keys the expression by gene/operator/coefficient/status for deterministic deduplication.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/gpr/stoichiometry.py",
+    "line": 99,
+    "name": "_ordering_key",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Keeps gene ordering stable when coefficient values change.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/gpr/stoichiometry.py",
+    "line": 106,
+    "name": "normalize_sgpr",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Flattens same-operator nodes, retains repeated AND leaves as multiplicity, and removes exact duplicate OR alternatives.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/gpr/stoichiometry.py",
+    "line": 133,
+    "name": "_gene_text",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Applies explicit unknown/default coefficient policy and omits defaulted counts when requested.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/gpr/stoichiometry.py",
+    "line": 149,
+    "name": "_render",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Serializes nested AND/OR with parentheses where precedence requires them.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/gpr/stoichiometry.py",
+    "line": 188,
+    "name": "to_gpr",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Serializes normalized Boolean structure without stoichiometric counts.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/gpr/stoichiometry.py",
+    "line": 194,
+    "name": "to_sgpr",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Serializes supported counts under explicit default/unknown policy.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/gpr/stoichiometry.py",
+    "line": 209,
+    "name": "to_legacy_sgpr",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Preserves historical `*1` formatting for compatibility.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/gpr/stoichiometry.py",
+    "line": 230,
+    "name": "default_sgpr_coefficients",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Marks compatibility defaults as defaulted instead of observed.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/gpr/stoichiometry.py",
+    "line": 242,
+    "name": "strip_stoichiometry",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Removes counts while preserving Boolean structure and provenance.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/gpr/stoichiometry.py",
+    "line": 250,
+    "name": "genes_in_sgpr",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Returns sorted unique symbols without claiming multiplicity.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/gpr/stoichiometry.py",
+    "line": 259,
+    "name": "unambiguous_stoichiometry",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Returns a flat count map only for one AND branch with complete unique leaf counts.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/gpr/stoichiometry.py",
+    "line": 277,
+    "name": "sgpr_to_dict",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Serializes typed nodes and retains evidence/source/status fields.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/gpr/stoichiometry.py",
+    "line": 294,
+    "name": "sgpr_from_dict",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Deserializes recognized node types and delegates numeric/shape validity to validation at normalization boundaries.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/gpr/stoichiometry.py",
+    "line": 319,
+    "name": "parse_sgpr",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Parses the restricted AND/OR/gene-count grammar with parentheses and rejects unconsumed input.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/gpr/stoichiometry.py",
+    "line": 23,
+    "name": "kind",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Returns the node type label; N/A for biological interpretation.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/gpr/stoichiometry.py",
+    "line": 26,
+    "name": "to_dict",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Serializes one typed node through the common canonical serializer.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/gpr/stoichiometry.py",
+    "line": 29,
+    "name": "__post_init__",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Normalizes stored gene/child/evidence values; coefficient constraints are enforced by `validate_sgpr`.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/gpr/stoichiometry.py",
+    "line": 41,
+    "name": "kind",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Returns the node type label; N/A for biological interpretation.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/gpr/stoichiometry.py",
+    "line": 44,
+    "name": "to_dict",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Serializes one typed node through the common canonical serializer.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/gpr/stoichiometry.py",
+    "line": 47,
+    "name": "__post_init__",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Normalizes stored gene/child/evidence values; coefficient constraints are enforced by `validate_sgpr`.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/gpr/stoichiometry.py",
+    "line": 58,
+    "name": "kind",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Returns the node type label; N/A for biological interpretation.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/gpr/stoichiometry.py",
+    "line": 61,
+    "name": "to_dict",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Serializes one typed node through the common canonical serializer.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/gpr/stoichiometry.py",
+    "line": 64,
+    "name": "__post_init__",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Normalizes stored gene/child/evidence values; coefficient constraints are enforced by `validate_sgpr`.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/gpr/stoichiometry.py",
+    "line": 213,
+    "name": "render",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Renders one parsed primary term and optional coefficient.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/gpr/stoichiometry.py",
+    "line": 332,
+    "name": "peek",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Reads the next token without advancing the parser.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/gpr/stoichiometry.py",
+    "line": 335,
+    "name": "take",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Consumes one required token and raises on missing/unexpected input.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/gpr/stoichiometry.py",
+    "line": 343,
+    "name": "primary",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Parses one gene or parenthesized expression and a trailing coefficient.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/gpr/stoichiometry.py",
+    "line": 359,
+    "name": "conjunction",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Parses AND with higher precedence than OR.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/gpr/stoichiometry.py",
+    "line": 366,
+    "name": "disjunction",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Parses OR as the lowest-precedence operation.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/io/__init__.py",
+    "line": 10,
+    "name": "convert_json_to_sbml",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/io/models.py",
+    "line": 10,
+    "name": "load_model",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/io/models.py",
+    "line": 21,
+    "name": "save_model",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/io/models.py",
+    "line": 29,
+    "name": "save_json",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/io/models.py",
+    "line": 38,
+    "name": "save_sbml",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/memote.py",
+    "line": 13,
+    "name": "run_memote",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Earlier audit pass reviewed the implementation and callers; see consolidated audit findings and targeted checks.",
+    "scientific_rationale": "Reviewed biological rule/evidence representation; logical structure and observed versus defaulted coefficient status remain explicit."
+  },
+  {
+    "file": "src/thg_protocol/services/_http.py",
+    "line": 30,
+    "name": "request",
+    "functional": "reviewed",
+    "scientific": "N/A",
+    "functional_rationale": "Applies bounded timeout/retries/backoff to HTTP requests; transport plumbing only.",
+    "scientific_rationale": "Transport, serialization, or compatibility plumbing; no biological/chemical inference is made here."
+  },
+  {
+    "file": "src/thg_protocol/services/_http.py",
+    "line": 13,
+    "name": "_unavailable",
+    "functional": "reviewed",
+    "scientific": "N/A",
+    "functional_rationale": "Classifies not-found/transient/request errors for adapter fallback; transport plumbing only.",
+    "scientific_rationale": "Transport, serialization, or compatibility plumbing; no biological/chemical inference is made here."
+  },
+  {
+    "file": "src/thg_protocol/services/biocyc.py",
+    "line": 27,
+    "name": "get_ec_html",
+    "functional": "reviewed",
+    "scientific": "N/A",
+    "functional_rationale": "Builds the BioCyc EC endpoint request.",
+    "scientific_rationale": "Transport, serialization, or compatibility plumbing; no biological/chemical inference is made here."
+  },
+  {
+    "file": "src/thg_protocol/services/biocyc.py",
+    "line": 29,
+    "name": "get_page",
+    "functional": "reviewed",
+    "scientific": "N/A",
+    "functional_rationale": "Fetches/caches a page by its absolute URL.",
+    "scientific_rationale": "Transport, serialization, or compatibility plumbing; no biological/chemical inference is made here."
+  },
+  {
+    "file": "src/thg_protocol/services/biocyc.py",
+    "line": 31,
+    "name": "get_cco",
+    "functional": "reviewed",
+    "scientific": "N/A",
+    "functional_rationale": "Fetches JSON and returns only mapping-shaped CCO terms.",
+    "scientific_rationale": "Transport, serialization, or compatibility plumbing; no biological/chemical inference is made here."
+  },
+  {
+    "file": "src/thg_protocol/services/biocyc.py",
+    "line": 43,
+    "name": "get_ec_html",
+    "functional": "reviewed",
+    "scientific": "N/A",
+    "functional_rationale": "Builds the BioCyc EC endpoint request.",
+    "scientific_rationale": "Transport, serialization, or compatibility plumbing; no biological/chemical inference is made here."
+  },
+  {
+    "file": "src/thg_protocol/services/biocyc.py",
+    "line": 46,
+    "name": "get_page",
+    "functional": "reviewed",
+    "scientific": "N/A",
+    "functional_rationale": "Fetches/caches a page by its absolute URL.",
+    "scientific_rationale": "Transport, serialization, or compatibility plumbing; no biological/chemical inference is made here."
+  },
+  {
+    "file": "src/thg_protocol/services/biocyc.py",
+    "line": 49,
+    "name": "get_cco",
+    "functional": "reviewed",
+    "scientific": "N/A",
+    "functional_rationale": "Fetches JSON and returns only mapping-shaped CCO terms.",
+    "scientific_rationale": "Transport, serialization, or compatibility plumbing; no biological/chemical inference is made here."
+  },
+  {
+    "file": "src/thg_protocol/services/biocyc.py",
+    "line": 58,
+    "name": "__init__",
+    "functional": "reviewed",
+    "scientific": "N/A",
+    "functional_rationale": "Configures session/retry/cache and paired credentials.",
+    "scientific_rationale": "Transport, serialization, or compatibility plumbing; no biological/chemical inference is made here."
+  },
+  {
+    "file": "src/thg_protocol/services/biocyc.py",
+    "line": 87,
+    "name": "_login",
+    "functional": "reviewed",
+    "scientific": "N/A",
+    "functional_rationale": "Authenticates and rejects malformed or unsuccessful login responses.",
+    "scientific_rationale": "Transport, serialization, or compatibility plumbing; no biological/chemical inference is made here."
+  },
+  {
+    "file": "src/thg_protocol/services/biocyc.py",
+    "line": 104,
+    "name": "_get",
+    "functional": "reviewed",
+    "scientific": "N/A",
+    "functional_rationale": "Caches successful pages and stores release/hash provenance.",
+    "scientific_rationale": "Transport, serialization, or compatibility plumbing; no biological/chemical inference is made here."
+  },
+  {
+    "file": "src/thg_protocol/services/biocyc.py",
+    "line": 130,
+    "name": "get_ec_html",
+    "functional": "reviewed",
+    "scientific": "N/A",
+    "functional_rationale": "Builds the BioCyc EC endpoint request.",
+    "scientific_rationale": "Transport, serialization, or compatibility plumbing; no biological/chemical inference is made here."
+  },
+  {
+    "file": "src/thg_protocol/services/biocyc.py",
+    "line": 135,
+    "name": "get_page",
+    "functional": "reviewed",
+    "scientific": "N/A",
+    "functional_rationale": "Fetches/caches a page by its absolute URL.",
+    "scientific_rationale": "Transport, serialization, or compatibility plumbing; no biological/chemical inference is made here."
+  },
+  {
+    "file": "src/thg_protocol/services/biocyc.py",
+    "line": 138,
+    "name": "get_cco",
+    "functional": "reviewed",
+    "scientific": "N/A",
+    "functional_rationale": "Fetches JSON and returns only mapping-shaped CCO terms.",
+    "scientific_rationale": "Transport, serialization, or compatibility plumbing; no biological/chemical inference is made here."
+  },
+  {
+    "file": "src/thg_protocol/services/ensembl.py",
+    "line": 32,
+    "name": "as_dict",
+    "functional": "reviewed",
+    "scientific": "N/A",
+    "functional_rationale": "Converts the normalized dataclass to JSON-compatible lists.",
+    "scientific_rationale": "Transport, serialization, or compatibility plumbing; no biological/chemical inference is made here."
+  },
+  {
+    "file": "src/thg_protocol/services/ensembl.py",
+    "line": 43,
+    "name": "annotate",
+    "functional": "reviewed",
+    "scientific": "N/A",
+    "functional_rationale": "Deduplicates work via cache and omits unresolved identifiers.",
+    "scientific_rationale": "Transport, serialization, or compatibility plumbing; no biological/chemical inference is made here."
+  },
+  {
+    "file": "src/thg_protocol/services/ensembl.py",
+    "line": 54,
+    "name": "annotate",
+    "functional": "reviewed",
+    "scientific": "N/A",
+    "functional_rationale": "Deduplicates work via cache and omits unresolved identifiers.",
+    "scientific_rationale": "Transport, serialization, or compatibility plumbing; no biological/chemical inference is made here."
+  },
+  {
+    "file": "src/thg_protocol/services/ensembl.py",
+    "line": 80,
+    "name": "__init__",
+    "functional": "reviewed",
+    "scientific": "N/A",
+    "functional_rationale": "Configures HTTP session, bounded retries, and per-identifier cache.",
+    "scientific_rationale": "Transport, serialization, or compatibility plumbing; no biological/chemical inference is made here."
+  },
+  {
+    "file": "src/thg_protocol/services/ensembl.py",
+    "line": 96,
+    "name": "_request",
+    "functional": "reviewed",
+    "scientific": "N/A",
+    "functional_rationale": "Normalizes HTTP/JSON errors and treats 404 as unresolved.",
+    "scientific_rationale": "Transport, serialization, or compatibility plumbing; no biological/chemical inference is made here."
+  },
+  {
+    "file": "src/thg_protocol/services/ensembl.py",
+    "line": 117,
+    "name": "_annotation",
+    "functional": "reviewed",
+    "scientific": "N/A",
+    "functional_rationale": "Extracts the stable Ensembl ID and display fields from a payload.",
+    "scientific_rationale": "Transport, serialization, or compatibility plumbing; no biological/chemical inference is made here."
+  },
+  {
+    "file": "src/thg_protocol/services/ensembl.py",
+    "line": 128,
+    "name": "_xrefs",
+    "functional": "reviewed",
+    "scientific": "N/A",
+    "functional_rationale": "Separates Entrez and UniProt cross-references by database name.",
+    "scientific_rationale": "Transport, serialization, or compatibility plumbing; no biological/chemical inference is made here."
+  },
+  {
+    "file": "src/thg_protocol/services/ensembl.py",
+    "line": 145,
+    "name": "_lookup",
+    "functional": "reviewed",
+    "scientific": "N/A",
+    "functional_rationale": "Uses Ensembl ID endpoint for ENS IDs and symbol endpoint otherwise, then adds xrefs.",
+    "scientific_rationale": "Transport, serialization, or compatibility plumbing; no biological/chemical inference is made here."
+  },
+  {
+    "file": "src/thg_protocol/services/ensembl.py",
+    "line": 167,
+    "name": "annotate",
+    "functional": "reviewed",
+    "scientific": "N/A",
+    "functional_rationale": "Deduplicates work via cache and omits unresolved identifiers.",
+    "scientific_rationale": "Transport, serialization, or compatibility plumbing; no biological/chemical inference is made here."
+  },
+  {
+    "file": "src/thg_protocol/services/go.py",
+    "line": 20,
+    "name": "load",
+    "functional": "reviewed",
+    "scientific": "N/A",
+    "functional_rationale": "Downloads ontology text with bounded retry, records hash/release metadata, and delegates parsing to the reviewed GO parser.",
+    "scientific_rationale": "Transport, serialization, or compatibility plumbing; no biological/chemical inference is made here."
+  },
+  {
+    "file": "src/thg_protocol/services/go.py",
+    "line": 27,
+    "name": "load",
+    "functional": "reviewed",
+    "scientific": "N/A",
+    "functional_rationale": "Downloads ontology text with bounded retry, records hash/release metadata, and delegates parsing to the reviewed GO parser.",
+    "scientific_rationale": "Transport, serialization, or compatibility plumbing; no biological/chemical inference is made here."
+  },
+  {
+    "file": "src/thg_protocol/services/go.py",
+    "line": 34,
+    "name": "__init__",
+    "functional": "reviewed",
+    "scientific": "N/A",
+    "functional_rationale": "Configures loader session, source URL, timeout, and release metadata.",
+    "scientific_rationale": "Transport, serialization, or compatibility plumbing; no biological/chemical inference is made here."
+  },
+  {
+    "file": "src/thg_protocol/services/go.py",
+    "line": 48,
+    "name": "load",
+    "functional": "reviewed",
+    "scientific": "N/A",
+    "functional_rationale": "Downloads ontology text with bounded retry, records hash/release metadata, and delegates parsing to the reviewed GO parser.",
+    "scientific_rationale": "Transport, serialization, or compatibility plumbing; no biological/chemical inference is made here."
+  },
+  {
+    "file": "src/thg_protocol/services/goa.py",
+    "line": 36,
+    "name": "parse_gaf",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Selects cellular-component (C) annotations, excludes NOT qualifiers, and maps GAF fields by the official column schema.",
+    "scientific_rationale": "GAF aspect C denotes cellular component and NOT is a negating qualifier in the official GAF schema."
+  },
+  {
+    "file": "src/thg_protocol/services/goa.py",
+    "line": 33,
+    "name": "annotations_for",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Filters normalized annotation rows by object ID or symbol.",
+    "scientific_rationale": "GAF aspect C denotes cellular component and NOT is a negating qualifier in the official GAF schema."
+  },
+  {
+    "file": "src/thg_protocol/services/goa.py",
+    "line": 66,
+    "name": "annotations_for",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Filters normalized annotation rows by object ID or symbol.",
+    "scientific_rationale": "GAF aspect C denotes cellular component and NOT is a negating qualifier in the official GAF schema."
+  },
+  {
+    "file": "src/thg_protocol/services/goa.py",
+    "line": 95,
+    "name": "__init__",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Configures the GOA HTTP adapter and lazy cache.",
+    "scientific_rationale": "GAF aspect C denotes cellular component and NOT is a negating qualifier in the official GAF schema."
+  },
+  {
+    "file": "src/thg_protocol/services/goa.py",
+    "line": 108,
+    "name": "_load",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Downloads/decompresses the human GAF and parses it while preserving response hash/release.",
+    "scientific_rationale": "GAF aspect C denotes cellular component and NOT is a negating qualifier in the official GAF schema."
+  },
+  {
+    "file": "src/thg_protocol/services/goa.py",
+    "line": 133,
+    "name": "annotations_for",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Filters normalized annotation rows by object ID or symbol.",
+    "scientific_rationale": "GAF aspect C denotes cellular component and NOT is a negating qualifier in the official GAF schema."
+  },
+  {
+    "file": "src/thg_protocol/services/kegg.py",
+    "line": 26,
+    "name": "get_page",
+    "functional": "reviewed",
+    "scientific": "N/A",
+    "functional_rationale": "Fetches a caller-specified KEGG page through the request/cache boundary.",
+    "scientific_rationale": "Transport, serialization, or compatibility plumbing; no biological/chemical inference is made here."
+  },
+  {
+    "file": "src/thg_protocol/services/kegg.py",
+    "line": 28,
+    "name": "get_entries",
+    "functional": "reviewed",
+    "scientific": "N/A",
+    "functional_rationale": "Batches KEGG IDs, honors request pacing, parses entries, and caches missing as well as found IDs.",
+    "scientific_rationale": "Transport, serialization, or compatibility plumbing; no biological/chemical inference is made here."
+  },
+  {
+    "file": "src/thg_protocol/services/kegg.py",
+    "line": 37,
+    "name": "get_ec_html",
+    "functional": "reviewed",
+    "scientific": "N/A",
+    "functional_rationale": "Builds the KEGG EC page URL.",
+    "scientific_rationale": "Transport, serialization, or compatibility plumbing; no biological/chemical inference is made here."
+  },
+  {
+    "file": "src/thg_protocol/services/kegg.py",
+    "line": 39,
+    "name": "link_ec_to_ko",
+    "functional": "reviewed",
+    "scientific": "N/A",
+    "functional_rationale": "Builds the KEGG EC-to-KO relation URL.",
+    "scientific_rationale": "Transport, serialization, or compatibility plumbing; no biological/chemical inference is made here."
+  },
+  {
+    "file": "src/thg_protocol/services/kegg.py",
+    "line": 41,
+    "name": "link_ecs_to_genes",
+    "functional": "reviewed",
+    "scientific": "N/A",
+    "functional_rationale": "Batches EC-to-human-gene links and returns genes keyed to their EC.",
+    "scientific_rationale": "Transport, serialization, or compatibility plumbing; no biological/chemical inference is made here."
+  },
+  {
+    "file": "src/thg_protocol/services/kegg.py",
+    "line": 49,
+    "name": "link_ko_to_genes",
+    "functional": "reviewed",
+    "scientific": "N/A",
+    "functional_rationale": "Builds the KEGG KO-to-gene relation URL.",
+    "scientific_rationale": "Transport, serialization, or compatibility plumbing; no biological/chemical inference is made here."
+  },
+  {
+    "file": "src/thg_protocol/services/kegg.py",
+    "line": 51,
+    "name": "get_reaction_entries",
+    "functional": "reviewed",
+    "scientific": "N/A",
+    "functional_rationale": "Uses the shared entry batching path for reaction records.",
+    "scientific_rationale": "Transport, serialization, or compatibility plumbing; no biological/chemical inference is made here."
+  },
+  {
+    "file": "src/thg_protocol/services/kegg.py",
+    "line": 72,
+    "name": "get_page",
+    "functional": "reviewed",
+    "scientific": "N/A",
+    "functional_rationale": "Fetches a caller-specified KEGG page through the request/cache boundary.",
+    "scientific_rationale": "Transport, serialization, or compatibility plumbing; no biological/chemical inference is made here."
+  },
+  {
+    "file": "src/thg_protocol/services/kegg.py",
+    "line": 75,
+    "name": "get_entries",
+    "functional": "reviewed",
+    "scientific": "N/A",
+    "functional_rationale": "Batches KEGG IDs, honors request pacing, parses entries, and caches missing as well as found IDs.",
+    "scientific_rationale": "Transport, serialization, or compatibility plumbing; no biological/chemical inference is made here."
+  },
+  {
+    "file": "src/thg_protocol/services/kegg.py",
+    "line": 91,
+    "name": "get_ec_html",
+    "functional": "reviewed",
+    "scientific": "N/A",
+    "functional_rationale": "Builds the KEGG EC page URL.",
+    "scientific_rationale": "Transport, serialization, or compatibility plumbing; no biological/chemical inference is made here."
+  },
+  {
+    "file": "src/thg_protocol/services/kegg.py",
+    "line": 94,
+    "name": "link_ec_to_ko",
+    "functional": "reviewed",
+    "scientific": "N/A",
+    "functional_rationale": "Builds the KEGG EC-to-KO relation URL.",
+    "scientific_rationale": "Transport, serialization, or compatibility plumbing; no biological/chemical inference is made here."
+  },
+  {
+    "file": "src/thg_protocol/services/kegg.py",
+    "line": 97,
+    "name": "link_ecs_to_genes",
+    "functional": "reviewed",
+    "scientific": "N/A",
+    "functional_rationale": "Batches EC-to-human-gene links and returns genes keyed to their EC.",
+    "scientific_rationale": "Transport, serialization, or compatibility plumbing; no biological/chemical inference is made here."
+  },
+  {
+    "file": "src/thg_protocol/services/kegg.py",
+    "line": 111,
+    "name": "link_ko_to_genes",
+    "functional": "reviewed",
+    "scientific": "N/A",
+    "functional_rationale": "Builds the KEGG KO-to-gene relation URL.",
+    "scientific_rationale": "Transport, serialization, or compatibility plumbing; no biological/chemical inference is made here."
+  },
+  {
+    "file": "src/thg_protocol/services/kegg.py",
+    "line": 114,
+    "name": "get_reaction_entries",
+    "functional": "reviewed",
+    "scientific": "N/A",
+    "functional_rationale": "Uses the shared entry batching path for reaction records.",
+    "scientific_rationale": "Transport, serialization, or compatibility plumbing; no biological/chemical inference is made here."
+  },
+  {
+    "file": "src/thg_protocol/services/kegg.py",
+    "line": 132,
+    "name": "__init__",
+    "functional": "reviewed",
+    "scientific": "N/A",
+    "functional_rationale": "Configures session, retry, and caches.",
+    "scientific_rationale": "Transport, serialization, or compatibility plumbing; no biological/chemical inference is made here."
+  },
+  {
+    "file": "src/thg_protocol/services/kegg.py",
+    "line": 149,
+    "name": "_get",
+    "functional": "reviewed",
+    "scientific": "N/A",
+    "functional_rationale": "Fetches/caches successful response text and normalizes request failure.",
+    "scientific_rationale": "Transport, serialization, or compatibility plumbing; no biological/chemical inference is made here."
+  },
+  {
+    "file": "src/thg_protocol/services/kegg.py",
+    "line": 166,
+    "name": "get_ec_html",
+    "functional": "reviewed",
+    "scientific": "N/A",
+    "functional_rationale": "Builds the KEGG EC page URL.",
+    "scientific_rationale": "Transport, serialization, or compatibility plumbing; no biological/chemical inference is made here."
+  },
+  {
+    "file": "src/thg_protocol/services/kegg.py",
+    "line": 169,
+    "name": "get_page",
+    "functional": "reviewed",
+    "scientific": "N/A",
+    "functional_rationale": "Fetches a caller-specified KEGG page through the request/cache boundary.",
+    "scientific_rationale": "Transport, serialization, or compatibility plumbing; no biological/chemical inference is made here."
+  },
+  {
+    "file": "src/thg_protocol/services/kegg.py",
+    "line": 172,
+    "name": "link_ec_to_ko",
+    "functional": "reviewed",
+    "scientific": "N/A",
+    "functional_rationale": "Builds the KEGG EC-to-KO relation URL.",
+    "scientific_rationale": "Transport, serialization, or compatibility plumbing; no biological/chemical inference is made here."
+  },
+  {
+    "file": "src/thg_protocol/services/kegg.py",
+    "line": 175,
+    "name": "link_ecs_to_genes",
+    "functional": "reviewed",
+    "scientific": "N/A",
+    "functional_rationale": "Batches EC-to-human-gene links and returns genes keyed to their EC.",
+    "scientific_rationale": "Transport, serialization, or compatibility plumbing; no biological/chemical inference is made here."
+  },
+  {
+    "file": "src/thg_protocol/services/kegg.py",
+    "line": 218,
+    "name": "link_ko_to_genes",
+    "functional": "reviewed",
+    "scientific": "N/A",
+    "functional_rationale": "Builds the KEGG KO-to-gene relation URL.",
+    "scientific_rationale": "Transport, serialization, or compatibility plumbing; no biological/chemical inference is made here."
+  },
+  {
+    "file": "src/thg_protocol/services/kegg.py",
+    "line": 221,
+    "name": "get_reaction_entries",
+    "functional": "reviewed",
+    "scientific": "N/A",
+    "functional_rationale": "Uses the shared entry batching path for reaction records.",
+    "scientific_rationale": "Transport, serialization, or compatibility plumbing; no biological/chemical inference is made here."
+  },
+  {
+    "file": "src/thg_protocol/services/kegg.py",
+    "line": 241,
+    "name": "get_entries",
+    "functional": "reviewed",
+    "scientific": "N/A",
+    "functional_rationale": "Batches KEGG IDs, honors request pacing, parses entries, and caches missing as well as found IDs.",
+    "scientific_rationale": "Transport, serialization, or compatibility plumbing; no biological/chemical inference is made here."
+  },
+  {
+    "file": "src/thg_protocol/services/location.py",
+    "line": 24,
+    "name": "get_page",
+    "functional": "reviewed",
+    "scientific": "N/A",
+    "functional_rationale": "Returns cached page text from the HTTP boundary.",
+    "scientific_rationale": "Transport, serialization, or compatibility plumbing; no biological/chemical inference is made here."
+  },
+  {
+    "file": "src/thg_protocol/services/location.py",
+    "line": 26,
+    "name": "post_page",
+    "functional": "reviewed",
+    "scientific": "N/A",
+    "functional_rationale": "Uploads caller-provided files with bounded request handling.",
+    "scientific_rationale": "Transport, serialization, or compatibility plumbing; no biological/chemical inference is made here."
+  },
+  {
+    "file": "src/thg_protocol/services/location.py",
+    "line": 36,
+    "name": "get_page",
+    "functional": "reviewed",
+    "scientific": "N/A",
+    "functional_rationale": "Returns cached page text from the HTTP boundary.",
+    "scientific_rationale": "Transport, serialization, or compatibility plumbing; no biological/chemical inference is made here."
+  },
+  {
+    "file": "src/thg_protocol/services/location.py",
+    "line": 39,
+    "name": "post_page",
+    "functional": "reviewed",
+    "scientific": "N/A",
+    "functional_rationale": "Uploads caller-provided files with bounded request handling.",
+    "scientific_rationale": "Transport, serialization, or compatibility plumbing; no biological/chemical inference is made here."
+  },
+  {
+    "file": "src/thg_protocol/services/location.py",
+    "line": 47,
+    "name": "__init__",
+    "functional": "reviewed",
+    "scientific": "N/A",
+    "functional_rationale": "Configures session, timeout, retry, and cache.",
+    "scientific_rationale": "Transport, serialization, or compatibility plumbing; no biological/chemical inference is made here."
+  },
+  {
+    "file": "src/thg_protocol/services/location.py",
+    "line": 63,
+    "name": "get_page",
+    "functional": "reviewed",
+    "scientific": "N/A",
+    "functional_rationale": "Returns cached page text from the HTTP boundary.",
+    "scientific_rationale": "Transport, serialization, or compatibility plumbing; no biological/chemical inference is made here."
+  },
+  {
+    "file": "src/thg_protocol/services/location.py",
+    "line": 80,
+    "name": "post_page",
+    "functional": "reviewed",
+    "scientific": "N/A",
+    "functional_rationale": "Uploads caller-provided files with bounded request handling.",
+    "scientific_rationale": "Transport, serialization, or compatibility plumbing; no biological/chemical inference is made here."
+  },
+  {
+    "file": "src/thg_protocol/services/pubchem.py",
+    "line": 33,
+    "name": "get_compound",
+    "functional": "reviewed",
+    "scientific": "N/A",
+    "functional_rationale": "Maps a static or remote PubChem record into the normalized property object.",
+    "scientific_rationale": "Transport, serialization, or compatibility plumbing; no biological/chemical inference is made here."
+  },
+  {
+    "file": "src/thg_protocol/services/pubchem.py",
+    "line": 42,
+    "name": "get_compound",
+    "functional": "reviewed",
+    "scientific": "N/A",
+    "functional_rationale": "Maps a static or remote PubChem record into the normalized property object.",
+    "scientific_rationale": "Transport, serialization, or compatibility plumbing; no biological/chemical inference is made here."
+  },
+  {
+    "file": "src/thg_protocol/services/pubchem.py",
+    "line": 62,
+    "name": "__init__",
+    "functional": "reviewed",
+    "scientific": "N/A",
+    "functional_rationale": "Configures rate pacing, retry behavior, and lookup cache.",
+    "scientific_rationale": "Transport, serialization, or compatibility plumbing; no biological/chemical inference is made here."
+  },
+  {
+    "file": "src/thg_protocol/services/pubchem.py",
+    "line": 81,
+    "name": "get_compound",
+    "functional": "reviewed",
+    "scientific": "N/A",
+    "functional_rationale": "Maps a static or remote PubChem record into the normalized property object.",
+    "scientific_rationale": "Transport, serialization, or compatibility plumbing; no biological/chemical inference is made here."
+  },
+  {
+    "file": "src/thg_protocol/services/reactome.py",
+    "line": 45,
+    "name": "catalyst_candidate_gpr",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Renders the explicit catalyst AST without inventing conjunctions.",
+    "scientific_rationale": "Reactome complex members are required together; EntitySet members are alternatives per the Reactome data model."
+  },
+  {
+    "file": "src/thg_protocol/services/reactome.py",
+    "line": 60,
+    "name": "_member_node",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Maps a protein/gene leaf or a nested catalyst record; repeated identical complex members become inferred multiplicity.",
+    "scientific_rationale": "Reactome complex members are required together; EntitySet members are alternatives per the Reactome data model."
+  },
+  {
+    "file": "src/thg_protocol/services/reactome.py",
+    "line": 90,
+    "name": "_catalyst_node",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Maps Reactome complexes to AND and interchangeable entity sets to OR, matching the source data model.",
+    "scientific_rationale": "Reactome complex members are required together; EntitySet members are alternatives per the Reactome data model."
+  },
+  {
+    "file": "src/thg_protocol/services/reactome.py",
+    "line": 150,
+    "name": "catalyst_sgpr",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Retains Reactome structure/provenance and emits unresolved status for unknown catalyst forms.",
+    "scientific_rationale": "Reactome complex members are required together; EntitySet members are alternatives per the Reactome data model."
+  },
+  {
+    "file": "src/thg_protocol/services/reactome.py",
+    "line": 29,
+    "name": "reactions_for_rhea",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Queries a Rhea cross-reference and accepts only mapping-shaped search results.",
+    "scientific_rationale": "Reactome complex members are required together; EntitySet members are alternatives per the Reactome data model."
+  },
+  {
+    "file": "src/thg_protocol/services/reactome.py",
+    "line": 30,
+    "name": "reaction",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Returns a local snapshot result or mapping-shaped remote record.",
+    "scientific_rationale": "Reactome complex members are required together; EntitySet members are alternatives per the Reactome data model."
+  },
+  {
+    "file": "src/thg_protocol/services/reactome.py",
+    "line": 38,
+    "name": "reactions_for_rhea",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Queries a Rhea cross-reference and accepts only mapping-shaped search results.",
+    "scientific_rationale": "Reactome complex members are required together; EntitySet members are alternatives per the Reactome data model."
+  },
+  {
+    "file": "src/thg_protocol/services/reactome.py",
+    "line": 41,
+    "name": "reaction",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Returns a local snapshot result or mapping-shaped remote record.",
+    "scientific_rationale": "Reactome complex members are required together; EntitySet members are alternatives per the Reactome data model."
+  },
+  {
+    "file": "src/thg_protocol/services/reactome.py",
+    "line": 51,
+    "name": "render",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Renders canonical catalyst structure as a plain GPR.",
+    "scientific_rationale": "Reactome complex members are required together; EntitySet members are alternatives per the Reactome data model."
+  },
+  {
+    "file": "src/thg_protocol/services/reactome.py",
+    "line": 169,
+    "name": "__init__",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Configures snapshot, session, and source metadata.",
+    "scientific_rationale": "Reactome complex members are required together; EntitySet members are alternatives per the Reactome data model."
+  },
+  {
+    "file": "src/thg_protocol/services/reactome.py",
+    "line": 184,
+    "name": "_remote",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Fetches JSON and records raw response hash and URL.",
+    "scientific_rationale": "Reactome complex members are required together; EntitySet members are alternatives per the Reactome data model."
+  },
+  {
+    "file": "src/thg_protocol/services/reactome.py",
+    "line": 204,
+    "name": "reactions_for_rhea",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Queries a Rhea cross-reference and accepts only mapping-shaped search results.",
+    "scientific_rationale": "Reactome complex members are required together; EntitySet members are alternatives per the Reactome data model."
+  },
+  {
+    "file": "src/thg_protocol/services/reactome.py",
+    "line": 228,
+    "name": "reaction",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Returns a local snapshot result or mapping-shaped remote record.",
+    "scientific_rationale": "Reactome complex members are required together; EntitySet members are alternatives per the Reactome data model."
+  },
+  {
+    "file": "src/thg_protocol/services/rhea.py",
+    "line": 19,
+    "name": "reactions_for_ec",
+    "functional": "reviewed",
+    "scientific": "N/A",
+    "functional_rationale": "Returns locally configured or API reaction records for an EC query.",
+    "scientific_rationale": "Transport, serialization, or compatibility plumbing; no biological/chemical inference is made here."
+  },
+  {
+    "file": "src/thg_protocol/services/rhea.py",
+    "line": 20,
+    "name": "reaction",
+    "functional": "reviewed",
+    "scientific": "N/A",
+    "functional_rationale": "Returns a local reaction or mapping-shaped remote payload.",
+    "scientific_rationale": "Transport, serialization, or compatibility plumbing; no biological/chemical inference is made here."
+  },
+  {
+    "file": "src/thg_protocol/services/rhea.py",
+    "line": 21,
+    "name": "proteins_for_reaction",
+    "functional": "reviewed",
+    "scientific": "N/A",
+    "functional_rationale": "Uses local proteins first, then the proteins field in the reaction response.",
+    "scientific_rationale": "Transport, serialization, or compatibility plumbing; no biological/chemical inference is made here."
+  },
+  {
+    "file": "src/thg_protocol/services/rhea.py",
+    "line": 31,
+    "name": "reactions_for_ec",
+    "functional": "reviewed",
+    "scientific": "N/A",
+    "functional_rationale": "Returns locally configured or API reaction records for an EC query.",
+    "scientific_rationale": "Transport, serialization, or compatibility plumbing; no biological/chemical inference is made here."
+  },
+  {
+    "file": "src/thg_protocol/services/rhea.py",
+    "line": 34,
+    "name": "reaction",
+    "functional": "reviewed",
+    "scientific": "N/A",
+    "functional_rationale": "Returns a local reaction or mapping-shaped remote payload.",
+    "scientific_rationale": "Transport, serialization, or compatibility plumbing; no biological/chemical inference is made here."
+  },
+  {
+    "file": "src/thg_protocol/services/rhea.py",
+    "line": 37,
+    "name": "proteins_for_reaction",
+    "functional": "reviewed",
+    "scientific": "N/A",
+    "functional_rationale": "Uses local proteins first, then the proteins field in the reaction response.",
+    "scientific_rationale": "Transport, serialization, or compatibility plumbing; no biological/chemical inference is made here."
+  },
+  {
+    "file": "src/thg_protocol/services/rhea.py",
+    "line": 46,
+    "name": "__init__",
+    "functional": "reviewed",
+    "scientific": "N/A",
+    "functional_rationale": "Configures local snapshots, session, and metadata.",
+    "scientific_rationale": "Transport, serialization, or compatibility plumbing; no biological/chemical inference is made here."
+  },
+  {
+    "file": "src/thg_protocol/services/rhea.py",
+    "line": 61,
+    "name": "_remote",
+    "functional": "reviewed",
+    "scientific": "N/A",
+    "functional_rationale": "Fetches JSON and records request/release/hash metadata.",
+    "scientific_rationale": "Transport, serialization, or compatibility plumbing; no biological/chemical inference is made here."
+  },
+  {
+    "file": "src/thg_protocol/services/rhea.py",
+    "line": 81,
+    "name": "reactions_for_ec",
+    "functional": "reviewed",
+    "scientific": "N/A",
+    "functional_rationale": "Returns locally configured or API reaction records for an EC query.",
+    "scientific_rationale": "Transport, serialization, or compatibility plumbing; no biological/chemical inference is made here."
+  },
+  {
+    "file": "src/thg_protocol/services/rhea.py",
+    "line": 99,
+    "name": "reaction",
+    "functional": "reviewed",
+    "scientific": "N/A",
+    "functional_rationale": "Returns a local reaction or mapping-shaped remote payload.",
+    "scientific_rationale": "Transport, serialization, or compatibility plumbing; no biological/chemical inference is made here."
+  },
+  {
+    "file": "src/thg_protocol/services/rhea.py",
+    "line": 111,
+    "name": "proteins_for_reaction",
+    "functional": "reviewed",
+    "scientific": "N/A",
+    "functional_rationale": "Uses local proteins first, then the proteins field in the reaction response.",
+    "scientific_rationale": "Transport, serialization, or compatibility plumbing; no biological/chemical inference is made here."
+  },
+  {
+    "file": "src/thg_protocol/services/uniprot.py",
+    "line": 39,
+    "name": "annotations_for",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Matches requested human identifiers against UniProt accessions, symbols, and Ensembl xrefs, follows all pages, rejects incomplete batches, then emits location evidence.",
+    "scientific_rationale": "Location/GO rows are evidence mappings; no stoichiometry or exclusivity is inferred."
+  },
+  {
+    "file": "src/thg_protocol/services/uniprot.py",
+    "line": 50,
+    "name": "annotations_for",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Matches requested human identifiers against UniProt accessions, symbols, and Ensembl xrefs, follows all pages, rejects incomplete batches, then emits location evidence.",
+    "scientific_rationale": "Location/GO rows are evidence mappings; no stoichiometry or exclusivity is inferred."
+  },
+  {
+    "file": "src/thg_protocol/services/uniprot.py",
+    "line": 94,
+    "name": "__init__",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Configures UniProt session, organism, and location mapping.",
+    "scientific_rationale": "Location/GO rows are evidence mappings; no stoichiometry or exclusivity is inferred."
+  },
+  {
+    "file": "src/thg_protocol/services/uniprot.py",
+    "line": 110,
+    "name": "_location_go_terms",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Uses UniProt SL-to-GO cross-references from supplied data or its endpoint and hashes the mapping response.",
+    "scientific_rationale": "Location/GO rows are evidence mappings; no stoichiometry or exclusivity is inferred."
+  },
+  {
+    "file": "src/thg_protocol/services/uniprot.py",
+    "line": 141,
+    "name": "annotations_for",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Matches requested human identifiers against UniProt accessions, symbols, and Ensembl xrefs, follows all pages, rejects incomplete batches, then emits location evidence.",
+    "scientific_rationale": "Location/GO rows are evidence mappings; no stoichiometry or exclusivity is inferred."
+  },
+  {
+    "file": "src/thg_protocol/services/uniprot.py",
+    "line": 14,
+    "name": "tqdm",
+    "functional": "reviewed",
+    "scientific": "reviewed",
+    "functional_rationale": "Provides progress iteration when the optional dependency is installed; otherwise identity iteration.",
+    "scientific_rationale": "Location/GO rows are evidence mappings; no stoichiometry or exclusivity is inferred."
+  }
+]

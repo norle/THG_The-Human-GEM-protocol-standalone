@@ -91,11 +91,9 @@ def implement_pathway(
             abbreviation_map,
         )
 
-    reactions_added = 0
-    for abbreviation, _ in resolved:
-        reactions_added += create_compartment_reactions(
-            model, id_database, abbreviation, config, abbreviation_map
-        )
+    reactions_added = create_compartment_reactions(
+        model, id_database, "", config, abbreviation_map
+    )
 
     metabolite_ids = [item.get("id") for item in model.get("metabolites", [])]
     reaction_ids = [item.get("id") for item in model.get("reactions", [])]

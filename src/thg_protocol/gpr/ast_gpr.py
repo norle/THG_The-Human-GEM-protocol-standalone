@@ -32,11 +32,19 @@ def compare_ast(ast_left, ast_right) -> bool:
         if ast_left.id != ast_right.id:
             return False
     elif isinstance(ast_left, BoolOp) and isinstance(ast_right, BoolOp):
+        if type(ast_left.op) is not type(ast_right.op):
+            return False
+        if len(ast_left.values) != len(ast_right.values):
+            return False
+        unmatched = list(ast_right.values)
         for left_leaf in ast_left.values:
-            if not any(
-                compare_ast(left_leaf, leaf_right) for leaf_right in ast_right.values
-            ):
+            for index, right_leaf in enumerate(unmatched):
+                if compare_ast(left_leaf, right_leaf):
+                    unmatched.pop(index)
+                    break
+            else:
                 return False
+        return True
     else:
         # base case 2: types do not match
         return False
@@ -76,22 +84,16 @@ def naive_reduce_or(ast: Expression):
     It is not guaranteed to reduce the AST to canonical form, but it
     tackles the usual non-reduced GPRs and it is faster than Quine-McCluskey.
     """
-    to_remove = []
-    if isinstance(ast, Name) or isinstance(ast, str):
+    if not isinstance(ast, BoolOp):
         return
-    # merge ORs at the same level
-    for i, node in enumerate(ast.values):
-        if is_or(node):
-            if i != len(ast.values) - 1:
-                for j in range(i + 1, len(ast.values)):
-                    if is_or(ast.values[j]):
-                        to_remove.append(j)
-                        node.values += ast.values[j].values
-    ast.values = [node for i, node in enumerate(ast.values) if i not in to_remove]
-    # walk down the tree
+    flattened = []
     for node in ast.values:
-        if isinstance(node, BoolOp):
-            naive_reduce_or(node)
+        naive_reduce_or(node)
+        if isinstance(node, BoolOp) and type(node.op) is type(ast.op):
+            flattened.extend(node.values)
+        else:
+            flattened.append(node)
+    ast.values = flattened
 
 
 def remove_empty(ast: Expression):

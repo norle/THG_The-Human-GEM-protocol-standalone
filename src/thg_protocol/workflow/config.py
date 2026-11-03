@@ -385,7 +385,9 @@ def _parse_workflow(
                         MODEL_SUFFIXES,
                     )
                 )
-            if section in {"beta2", "validation"} and "input_model" in value:
+            if section == "validation" or (
+                section == "beta2" and "input_model" in value
+            ):
                 value = dict(value)
                 value["input_model"] = str(
                     _input_path(
@@ -515,10 +517,14 @@ def _parse_workflow(
                         f"unknown cell-specific validation profile: {profile}"
                     )
                 threshold = value.get("threshold", 0.0)
-                if isinstance(threshold, bool) or not isinstance(
-                    threshold, (int, float)
+                if (
+                    isinstance(threshold, bool)
+                    or not isinstance(threshold, (int, float))
+                    or not math.isfinite(threshold)
                 ):
-                    raise ConfigError("'cell_specific.threshold' must be numeric")
+                    raise ConfigError(
+                        "'cell_specific.threshold' must be finite and numeric"
+                    )
                 if not isinstance(value.get("preserved_reactions", []), list):
                     raise ConfigError(
                         "'cell_specific.preserved_reactions' must be a list"
@@ -852,6 +858,7 @@ def _parse_workflow(
                     if (
                         isinstance(value["minimum_flux"], bool)
                         or not isinstance(value["minimum_flux"], (int, float))
+                        or not math.isfinite(value["minimum_flux"])
                         or value["minimum_flux"] <= 0
                     ):
                         raise ConfigError("'gapfill.minimum_flux' must be positive")

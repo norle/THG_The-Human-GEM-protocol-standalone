@@ -81,22 +81,24 @@ def resolve_compartment(
             "reason": "location-not-in-registry",
         }
 
-    queue: list[tuple[str, list[dict[str, object]], int]] = [(start, [], 0)]
+    queue: list[tuple[str, list[dict[str, object]], int, int]] = [(start, [], 0, 0)]
     candidates: list[tuple[int, int, str, list[dict[str, object]]]] = []
     visited: set[tuple[str, tuple[str, ...]]] = set()
     while queue:
-        identifier, path, distance = queue.pop(0)
+        identifier, path, distance, path_rank = queue.pop(0)
         term = graph.get(identifier, {})
         name = normalize_location(str(term.get("name", identifier)))
         current_path = path + [{"cco_id": identifier, "name": name}]
         key = by_name.get(name)
         if key is not None:
-            candidates.append((distance, 0, key, current_path))
-        # Containment is more authoritative than a generic superclass.
+            candidates.append((distance, path_rank, key, current_path))
+        # At equal distance, prefer paths containing only containment edges.
         edges = [(str(item), 0) for item in term.get("component_of", []) or []]
         edges += [(str(item), 1) for item in term.get("superclasses", []) or []]
         for next_id, relation_rank in edges:
-            if next_id not in graph:
+            if next_id not in graph or any(
+                item.get("cco_id") == next_id for item in current_path
+            ):
                 continue
             marker = (next_id, tuple(item.get("cco_id", "") for item in current_path))
             if marker in visited:
@@ -114,6 +116,7 @@ def resolve_compartment(
                         }
                     ],
                     distance + 1,
+                    max(path_rank, relation_rank),
                 )
             )
     if not candidates:
@@ -138,7 +141,7 @@ def resolve_compartment(
         }
     key = targets[0]
     chosen = sorted(
-        (item for item in selected if item[2] == key), key=lambda item: item[3]
+        (item for item in selected if item[2] == key), key=lambda item: repr(item[3])
     )[0]
     return {
         "raw_location": raw_location,

@@ -1,0 +1,3310 @@
+[
+  {
+    "file": "files/metabolic_tasks/make_name_mapping.py",
+    "line": 16,
+    "name": "metabolites",
+    "functional": "no issue found",
+    "scientific": "N/A: no scientific logic",
+    "function_rationale": "Purpose: Yield (id, name, compartment) from the YAML ``metabolites`` section."
+  },
+  {
+    "file": "files/metabolic_tasks/make_name_mapping.py",
+    "line": 39,
+    "name": "main",
+    "functional": "no issue found",
+    "scientific": "N/A: no scientific logic",
+    "function_rationale": "Purpose: begins by path, commit = (sys.argv[1], sys.argv[2])"
+  },
+  {
+    "file": "src/thg_protocol/analysis/compaction.py",
+    "line": 9,
+    "name": "_scratch_copy",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Copy a model onto GLPK for structural edits that never solve. ``Model.copy`` rebuilds the whole solver problem; with Gurobi that goes through sympy and takes minutes on a genome-scale model."
+  },
+  {
+    "file": "src/thg_protocol/analysis/compaction.py",
+    "line": 36,
+    "name": "are_reactions_proportional",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Compare two reactions by stoichiometry, including reversal."
+  },
+  {
+    "file": "src/thg_protocol/analysis/compaction.py",
+    "line": 63,
+    "name": "combine_identical_reactions",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Return a copy with proportional non-boundary reactions combined."
+  },
+  {
+    "file": "src/thg_protocol/analysis/compaction.py",
+    "line": 72,
+    "name": "_members",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by return list(reaction.annotation.get('compaction_members', [reaction.id]))"
+  },
+  {
+    "file": "src/thg_protocol/analysis/compaction.py",
+    "line": 76,
+    "name": "_combine_parallel",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Merge parallel capacities in place, including reversed stoichiometry."
+  },
+  {
+    "file": "src/thg_protocol/analysis/compaction.py",
+    "line": 133,
+    "name": "_combine_linear",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by loops: list[Any] = []"
+  },
+  {
+    "file": "src/thg_protocol/analysis/compaction.py",
+    "line": 179,
+    "name": "full_compaction",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Collapse linear/parallel pathways and return empty loop reactions. Blocked-reaction filtering is solver-dependent and imported only when explicitly requested. The default operation is deterministic and offline."
+  },
+  {
+    "file": "src/thg_protocol/analysis/compaction.py",
+    "line": 215,
+    "name": "detect_infeasible_loops",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Identify obligatory loops on a copy; this is not exhaustive loop detection."
+  },
+  {
+    "file": "src/thg_protocol/analysis/compaction.py",
+    "line": 243,
+    "name": "remove_infeasible_loops",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Remove only detected original reactions, returning auditable ledger entries."
+  },
+  {
+    "file": "src/thg_protocol/analysis/compare.py",
+    "line": 34,
+    "name": "reactions_by_compartment",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Return reaction IDs grouped by every compartment they involve."
+  },
+  {
+    "file": "src/thg_protocol/analysis/compare.py",
+    "line": 47,
+    "name": "_stoichiometry",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by metabolites = reaction.metabolites"
+  },
+  {
+    "file": "src/thg_protocol/analysis/compare.py",
+    "line": 55,
+    "name": "compare_reactions",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Compare reaction IDs and stoichiometry per compartment."
+  },
+  {
+    "file": "src/thg_protocol/analysis/compare.py",
+    "line": 104,
+    "name": "_category_for_object",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Classify a semantic change using stable, inspectable model metadata."
+  },
+  {
+    "file": "src/thg_protocol/analysis/compare.py",
+    "line": 120,
+    "name": "_without_id",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by if isinstance(value, dict):"
+  },
+  {
+    "file": "src/thg_protocol/analysis/compare.py",
+    "line": 128,
+    "name": "_categorize_signature_diff",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by categories = {name: [] for name in _CHANGE_CATEGORIES}"
+  },
+  {
+    "file": "src/thg_protocol/analysis/compare.py",
+    "line": 229,
+    "name": "compare_semantic_models",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Compare model meaning and classify every added, removed, or changed object. The result is JSON-compatible and deterministic, making it suitable for a run artifact and for comparing uninterrupted and resumed releases."
+  },
+  {
+    "file": "src/thg_protocol/analysis/compare.py",
+    "line": 255,
+    "name": "_load_model",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by from thg_protocol.io.models import load_model"
+  },
+  {
+    "file": "src/thg_protocol/analysis/compare.py",
+    "line": 261,
+    "name": "compare_model_files_semantically",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Run a semantic comparison on two JSON or SBML model files."
+  },
+  {
+    "file": "src/thg_protocol/analysis/compare.py",
+    "line": 270,
+    "name": "_run_model_path",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by manifest = json.loads((run_dir / 'manifest.json').read_text(encoding='utf-8'))"
+  },
+  {
+    "file": "src/thg_protocol/analysis/compare.py",
+    "line": 282,
+    "name": "compare_workflow_runs",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Compare final model artifacts and non-model validation/task artifacts."
+  },
+  {
+    "file": "src/thg_protocol/analysis/compare.py",
+    "line": 314,
+    "name": "save_semantic_comparison",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Write a stable JSON semantic-comparison artifact."
+  },
+  {
+    "file": "src/thg_protocol/analysis/compare.py",
+    "line": 325,
+    "name": "remove_blocked_reactions",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Return a copy with COBRA universally blocked reactions removed."
+  },
+  {
+    "file": "src/thg_protocol/analysis/compare.py",
+    "line": 336,
+    "name": "compare_models_from_files",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Load two JSON/SBML models and optionally write comparison CSV reports."
+  },
+  {
+    "file": "src/thg_protocol/analysis/compare.py",
+    "line": 367,
+    "name": "save_comparison_csv",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Write a stable, machine-readable comparison report."
+  },
+  {
+    "file": "src/thg_protocol/analysis/compare.py",
+    "line": 345,
+    "name": "load",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by from thg_protocol.io.models import load_model"
+  },
+  {
+    "file": "src/thg_protocol/analysis/compare.py",
+    "line": 293,
+    "name": "payload",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by manifest = json.loads((root / 'manifest.json').read_text(encoding='utf-8'))"
+  },
+  {
+    "file": "src/thg_protocol/analysis/compare_cli.py",
+    "line": 9,
+    "name": "build_parser",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by parser = argparse.ArgumentParser(description='Compare reactions in two COBRA models.')"
+  },
+  {
+    "file": "src/thg_protocol/analysis/compare_cli.py",
+    "line": 30,
+    "name": "main",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by args = build_parser().parse_args(argv)"
+  },
+  {
+    "file": "src/thg_protocol/analysis/conservation.py",
+    "line": 66,
+    "name": "_sbo_terms",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by value = (getattr(reaction, 'annotation', None) or {}).get('sbo')"
+  },
+  {
+    "file": "src/thg_protocol/analysis/conservation.py",
+    "line": 75,
+    "name": "_subsystems",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by result: dict[str, set[str]] = defaultdict(set)"
+  },
+  {
+    "file": "src/thg_protocol/analysis/conservation.py",
+    "line": 90,
+    "name": "_own_exclusions",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by subsystems = _subsystems(model)"
+  },
+  {
+    "file": "src/thg_protocol/analysis/conservation.py",
+    "line": 105,
+    "name": "conservation_exclusions",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Return internal reactions excluded from conservation, with their rule. Rules, in order: biomass SBO term, Human-GEM's artificial/pool subsystems, an approved exclusion recorded in the reaction notes, excluded in the input model (by ID), and listed in the configuration. Boundary reactions are always excluded and are not listed."
+  },
+  {
+    "file": "src/thg_protocol/analysis/conservation.py",
+    "line": 130,
+    "name": "_memote_consistency",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by try:"
+  },
+  {
+    "file": "src/thg_protocol/analysis/conservation.py",
+    "line": 140,
+    "name": "_pruned",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Return a copy without the excluded reactions, for MEMOTE's internals."
+  },
+  {
+    "file": "src/thg_protocol/analysis/conservation.py",
+    "line": 154,
+    "name": "_describe",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by return {'id': metabolite.id, 'name': getattr(metabolite, 'name', '') or '', 'compartment': getattr(metabolite, 'compartment', None)}"
+  },
+  {
+    "file": "src/thg_protocol/analysis/conservation.py",
+    "line": 167,
+    "name": "find_unconserved_metabolites",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Name the metabolites no positive conservation vector can weight. Runs MEMOTE's ``check_stoichiometric_consistency`` (one LP) and, only when that fails and ``identify`` is true, ``find_unconserved_metabolites`` (one MILP), both on a copy of the model without the excluded reactions and with the model's solver unless ``solver`` is given. With ``identify=False`` an inconsistent model reports ``unconserved`` as ``None``. Reactions MEMOTE itself treats as biomass are added to the exclusions with the rule ``memote-biomass``."
+  },
+  {
+    "file": "src/thg_protocol/analysis/conservation.py",
+    "line": 226,
+    "name": "_round",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by rounded = round(float(value), 6)"
+  },
+  {
+    "file": "src/thg_protocol/analysis/conservation.py",
+    "line": 231,
+    "name": "chemically_suspect",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Internal reactions with an element or charge imbalance, a metabolite without formula or charge, or a non-integer coefficient."
+  },
+  {
+    "file": "src/thg_protocol/analysis/conservation.py",
+    "line": 248,
+    "name": "blame_reactions",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Find a small set of reactions that break mass conservation, in one LP. Solves ``min \u03a3|s_j|`` subject to ``\u03a3_i S_ij m_i = s_j`` and ``m_i \u2265 1`` over the non-excluded internal reactions: every metabolite gets a positive mass, and ``s_j`` is the mass that reaction ``j`` creates (positive) or destroys (negative). Reactions with ``s_j \u2260 0`` are blamed. Removing them always leaves a consistent model, since ``m`` then conserves every remaining reaction. The L1 objective keeps the set small but not provably minimal. Where a loop can be broken at several reactions at equal cost, reactions in ``prefer`` are blamed first: every other reaction costs ``1 + TIE_BREAK``, which decides ties but never changes the optimum by more than that fraction. The problem is built in the model's solver interface, as MEMOTE builds its consistency problems."
+  },
+  {
+    "file": "src/thg_protocol/analysis/conservation.py",
+    "line": 327,
+    "name": "_stoichiometry",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by return {metabolite.id: float(coefficient) for metabolite, coefficient in reaction.metabolites.items()}"
+  },
+  {
+    "file": "src/thg_protocol/analysis/conservation.py",
+    "line": 334,
+    "name": "_same",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by return set(left) == set(right) and all((abs(left[key] - right[key]) <= TOLERANCE for key in left))"
+  },
+  {
+    "file": "src/thg_protocol/analysis/conservation.py",
+    "line": 340,
+    "name": "reaction_origin",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Classify a reaction against the input model: added, changed or unchanged."
+  },
+  {
+    "file": "src/thg_protocol/analysis/conservation.py",
+    "line": 355,
+    "name": "fractional",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Return the non-integer coefficients of a stoichiometry."
+  },
+  {
+    "file": "src/thg_protocol/analysis/conservation.py",
+    "line": 364,
+    "name": "_blamed_row",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by stoichiometry = _stoichiometry(reaction)"
+  },
+  {
+    "file": "src/thg_protocol/analysis/conservation.py",
+    "line": 404,
+    "name": "localize",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Blame reactions with one LP and flag what is chemically wrong with each. Each blamed reaction carries its element and charge balance, non-integer coefficients, metabolites whose formula or charge disagrees across compartments or with the input model, and possibly mislabelled metabolites (a name shared with a conflicting metabolite, or renamed from the input model to another compound's name). Flagged reactions come first: a blamed reaction with no flag is often an innocent member of a loop that the LP had to break somewhere. Unconserved metabolites already unconserved in the input model are listed as inherited."
+  },
+  {
+    "file": "src/thg_protocol/analysis/conservation.py",
+    "line": 476,
+    "name": "_metabolite",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by for source in (model, input_model):"
+  },
+  {
+    "file": "src/thg_protocol/analysis/conservation.py",
+    "line": 487,
+    "name": "element_residual",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Return products-minus-reactants element counts, or the formula gaps."
+  },
+  {
+    "file": "src/thg_protocol/analysis/conservation.py",
+    "line": 520,
+    "name": "charge_residual",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Return the net charge of a stoichiometry, or the metabolites lacking one."
+  },
+  {
+    "file": "src/thg_protocol/analysis/conservation.py",
+    "line": 548,
+    "name": "_format_side",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by return ' + '.join(((f'{_round(abs(coefficient))} ' if abs(coefficient) != 1 else '') + label for label, coefficient in items))"
+  },
+  {
+    "file": "src/thg_protocol/analysis/conservation.py",
+    "line": 555,
+    "name": "equation",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Render ``reactants <=> products`` with IDs, or with ``labels`` if given."
+  },
+  {
+    "file": "src/thg_protocol/analysis/conservation.py",
+    "line": 571,
+    "name": "reaction_summary",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Equation (IDs and names), element balance and charge balance."
+  },
+  {
+    "file": "src/thg_protocol/analysis/conservation.py",
+    "line": 601,
+    "name": "_input_reaction",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by if input_model is None:"
+  },
+  {
+    "file": "src/thg_protocol/analysis/conservation.py",
+    "line": 610,
+    "name": "_input_context",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by original = _input_reaction(input_model, reaction_id)"
+  },
+  {
+    "file": "src/thg_protocol/analysis/conservation.py",
+    "line": 630,
+    "name": "hill_formula",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Format element counts in Hill order (C, H, then alphabetical)."
+  },
+  {
+    "file": "src/thg_protocol/analysis/conservation.py",
+    "line": 638,
+    "name": "infer_formula",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Return the single formula that balances every reaction of a metabolite. Every non-excluded internal reaction containing the metabolite must have formulas for all its other metabolites and must imply the same non-negative integer formula; otherwise ``None``."
+  },
+  {
+    "file": "src/thg_protocol/analysis/conservation.py",
+    "line": 675,
+    "name": "_by_name",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by result: dict[tuple[str, str], Any] = {}"
+  },
+  {
+    "file": "src/thg_protocol/analysis/conservation.py",
+    "line": 683,
+    "name": "_merge",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by merged = dict(stoichiometry)"
+  },
+  {
+    "file": "src/thg_protocol/analysis/conservation.py",
+    "line": 692,
+    "name": "_balanced_stoichiometries",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Find bounded, minimal edits conserving both elements and charge. Original species stay on their original sides. Existing fractional or large coefficients may be retained; replacements are positive integers up to COEFFICIENT_LIMIT. New species have signed integer coefficients up to ADDITION_LIMIT. Lexicographically minimize added species, changed original coefficients, then total absolute coefficient change."
+  },
+  {
+    "file": "src/thg_protocol/analysis/conservation.py",
+    "line": 838,
+    "name": "coefficient_candidates",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Balance existing compounds, keeping formulas, charges and sides fixed."
+  },
+  {
+    "file": "src/thg_protocol/analysis/conservation.py",
+    "line": 843,
+    "name": "cofactor_candidates",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Balance with bounded small-molecule additions in one compartment. Coefficients may also change. NAD(P) oxidised/reduced partners are added together, preferentially using a pair already present in the reaction. No metabolites are created and no formula or charge is changed."
+  },
+  {
+    "file": "src/thg_protocol/analysis/conservation.py",
+    "line": 937,
+    "name": "redox_candidates",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Return redox-pair additions that cancel a charge-only residual. When the elements balance but the charge does not, the reaction usually moves electrons without a carrier, as ``12-HETE + O2 + 2 H+ -> LTB4 + H2O`` for a P450 hydroxylation that needs NADPH. Turning ``NADPH`` into ``NADP+ + H+`` (or back) changes the charge by two and no element, so an even residual of up to ``2 * REDOX_LIMIT`` gets one candidate per redox pair and compartment, or only the pairs the reaction already uses."
+  },
+  {
+    "file": "src/thg_protocol/analysis/conservation.py",
+    "line": 1004,
+    "name": "_flags",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by flags = []"
+  },
+  {
+    "file": "src/thg_protocol/analysis/conservation.py",
+    "line": 1019,
+    "name": "integer_candidates",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Round fractional coefficients; keep element- and charge-balanced results. Fitted coefficients such as ``1.2 O2 -> 1.5 product`` usually stand for a small integer stoichiometry. Coefficients are never rounded to zero. Reactions with more than ``limit`` non-integer coefficients are skipped."
+  },
+  {
+    "file": "src/thg_protocol/analysis/conservation.py",
+    "line": 1050,
+    "name": "_proposal",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by from thg_protocol.workflow.proposals import Proposal, proposal_id"
+  },
+  {
+    "file": "src/thg_protocol/analysis/conservation.py",
+    "line": 1089,
+    "name": "_is_pseudo",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by return bool(_PSEUDO_PATTERN.search(reaction.id) or _PSEUDO_PATTERN.search(getattr(reaction, 'name', '') or ''))"
+  },
+  {
+    "file": "src/thg_protocol/analysis/conservation.py",
+    "line": 1096,
+    "name": "_alternatives",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by ids = [item.proposal_id for item in group]"
+  },
+  {
+    "file": "src/thg_protocol/analysis/conservation.py",
+    "line": 1103,
+    "name": "_reaction_metadata",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by reversible = bool(reaction.reversibility)"
+  },
+  {
+    "file": "src/thg_protocol/analysis/conservation.py",
+    "line": 1133,
+    "name": "reaction_fixes",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Per-reaction fix rules, tried in order until one yields proposals. Exclude biomass/pool/lumped reactions when ``exclude_pseudo`` is true. Otherwise balance existing coefficients first, then allow bounded cofactor additions. Both elements and charge must balance. Formulas and charges are fixed; the reference model supplies context only. Equally ranked candidates are mutually exclusive alternatives. ``context`` carries the blamed row (origin, imbalance, flags)."
+  },
+  {
+    "file": "src/thg_protocol/analysis/conservation.py",
+    "line": 1246,
+    "name": "_balanced_reactions",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Count the internal reactions of a metabolite that balance, optionally with a substituted formula or charge."
+  },
+  {
+    "file": "src/thg_protocol/analysis/conservation.py",
+    "line": 1277,
+    "name": "formula_fixes",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Turn formula disagreements into ``set-formula``/``set-charge`` proposals. For a metabolite whose formula or charge differs across compartments, the value held by most compartments (when one value has a strict majority of the members that have a value) is proposed for each member that differs. For a metabolite that differs from ``reference_model``, the reference value is proposed. Both can apply to one metabolite; they are then alternatives. Each proposal records how many of the metabolite's internal reactions are balanced before and after."
+  },
+  {
+    "file": "src/thg_protocol/analysis/conservation.py",
+    "line": 1388,
+    "name": "charge_fixes",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Propose ``set-charge`` for a metabolite whose charge is off by one. For each charge-unbalanced reaction, a metabolite qualifies when changing its charge by exactly one balances the reaction and keeps every reaction of it that balances now balanced. Larger changes are not proposed: they contradict the formula's protonation state more often than they fix it. Each proposal is low confidence and lists the reactions it balances."
+  },
+  {
+    "file": "src/thg_protocol/analysis/conservation.py",
+    "line": 1455,
+    "name": "propose_fixes",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Turn blamed reactions into fix proposals where a rule supports one. Rules, per blamed reaction: biomass/pool/lumped reactions are excluded; coefficients are solved first, then bounded small-molecule/cofactor additions, conserving both elements and charge with fixed formulas. Equally ranked candidates are alternatives. A formula-less added metabolite in a blamed reaction gets the one formula that balances all its reactions. A blamed reaction no rule covers yields an ``unresolved`` removal proposal for manual curation. Each proposal records the blamed reactions it targets, so the re-check can tell whether it worked."
+  },
+  {
+    "file": "src/thg_protocol/analysis/conservation.py",
+    "line": 1603,
+    "name": "fix_target",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: The part of the model a fix changes; one approved fix per target. A metabolite's formula and charge are separate targets; every fix to a reaction targets the whole reaction."
+  },
+  {
+    "file": "src/thg_protocol/analysis/conservation.py",
+    "line": 1619,
+    "name": "apply_conservation_fixes",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Apply approved or replaced proposals to a copy of ``model``. Returns the modified copy, the applied proposals and the ledger entries. The input model is never changed. Two applied fixes on the same target (see ``fix_target``) are rejected, since alternatives (e.g. NAD vs NADP) are mutually exclusive. Charge repairs must still balance their targets and preserve previously balanced reactions after the whole batch is applied."
+  },
+  {
+    "file": "src/thg_protocol/analysis/conservation.py",
+    "line": 1737,
+    "name": "compare_detections",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Report unconserved metabolites before and after, and ineffective fixes. A fix is ineffective when a reaction it targets is still blamed by ``blame_reactions`` on the fixed model."
+  },
+  {
+    "file": "src/thg_protocol/analysis/conservation.py",
+    "line": 786,
+    "name": "solve",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by remaining = deadline - monotonic()"
+  },
+  {
+    "file": "src/thg_protocol/analysis/conservation.py",
+    "line": 1157,
+    "name": "metadata",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by return _reaction_metadata(reaction, model, after, rule, input_model=input_model, context=context)"
+  },
+  {
+    "file": "src/thg_protocol/analysis/conservation.py",
+    "line": 1297,
+    "name": "offer",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by if value is None or value == '':"
+  },
+  {
+    "file": "src/thg_protocol/analysis/conservation.py",
+    "line": 1479,
+    "name": "evidence",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by return [f\"blamed:{key} (imbalance {rows[key]['imbalance']:g})\" for key in sorted(reaction_ids)]"
+  },
+  {
+    "file": "src/thg_protocol/analysis/conservation.py",
+    "line": 1639,
+    "name": "apply",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by key = fix_target(proposal.object_type, proposal.object_id, proposal.operation)"
+  },
+  {
+    "file": "src/thg_protocol/analysis/consistency.py",
+    "line": 11,
+    "name": "reaction_balance",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Return elemental totals for a COBRA reaction (products minus reactants)."
+  },
+  {
+    "file": "src/thg_protocol/analysis/consistency.py",
+    "line": 21,
+    "name": "_has_complete_formulas",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by return all((formula_atoms(getattr(metabolite, 'formula', '') or '') for metabolite in reaction.metabolites))"
+  },
+  {
+    "file": "src/thg_protocol/analysis/consistency.py",
+    "line": 28,
+    "name": "unassessable_reactions",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Return internal reactions with a metabolite lacking a parsable formula. Their elemental balance cannot be judged, so ``unbalanced_reactions`` neither reports nor clears them."
+  },
+  {
+    "file": "src/thg_protocol/analysis/consistency.py",
+    "line": 41,
+    "name": "unbalanced_reactions",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Return IDs of internal reactions whose formulas do not balance. Boundary reactions (exchange, demand, sink) add or remove mass by definition and are skipped, as are reactions with a metabolite whose formula is missing or unparsable (see ``unassessable_reactions``)."
+  },
+  {
+    "file": "src/thg_protocol/analysis/consistency.py",
+    "line": 57,
+    "name": "orphan_metabolites",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Return metabolite IDs that participate in no reactions."
+  },
+  {
+    "file": "src/thg_protocol/analysis/consistency.py",
+    "line": 64,
+    "name": "_directional_roles",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Metabolites some reaction can make, and metabolites some can use. A reaction makes its products when it can run forward (upper bound > 0) and its reactants when it can run backward (lower bound < 0); using is the converse. Reactions with both bounds at zero do neither."
+  },
+  {
+    "file": "src/thg_protocol/analysis/consistency.py",
+    "line": 84,
+    "name": "dead_end_metabolites",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Return metabolites that bounds allow to be only made or only used. Reversible reactions both make and use their metabolites, so a metabolite on a reversible path is not a dead end."
+  },
+  {
+    "file": "src/thg_protocol/analysis/consistency.py",
+    "line": 94,
+    "name": "charge_balance",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Return net charge for a reaction using defined metabolite charges."
+  },
+  {
+    "file": "src/thg_protocol/analysis/consistency.py",
+    "line": 110,
+    "name": "unbalanced_reactions_by_charge",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Return internal reactions with a non-zero or undefined net charge."
+  },
+  {
+    "file": "src/thg_protocol/analysis/consistency.py",
+    "line": 122,
+    "name": "blocked_reactions",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Find blocked reactions through COBRA's optional solver interface."
+  },
+  {
+    "file": "src/thg_protocol/analysis/consistency.py",
+    "line": 131,
+    "name": "_close_boundaries_keeping_direction",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Close boundary reactions and cap internal fluxes at one unit. Internal bounds keep their direction (forward, backward or both) but lose any forced flux, so a fixed-flux reaction such as ATP maintenance cannot make the closed model infeasible."
+  },
+  {
+    "file": "src/thg_protocol/analysis/consistency.py",
+    "line": 145,
+    "name": "stoichiometrically_balanced_cycles",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Return reactions that carry flux with every boundary closed. Run on a copy: boundaries are closed, internal reactions keep their direction but lose forced flux, and the objective is not enforced. Any remaining flux is a mass-conserving cycle."
+  },
+  {
+    "file": "src/thg_protocol/analysis/consistency.py",
+    "line": 168,
+    "name": "metabolites_not_produced",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Return metabolites some reaction can use but none can make."
+  },
+  {
+    "file": "src/thg_protocol/analysis/consistency.py",
+    "line": 174,
+    "name": "metabolites_not_consumed",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Return metabolites some reaction can make but none can use."
+  },
+  {
+    "file": "src/thg_protocol/analysis/consistency.py",
+    "line": 180,
+    "name": "unbounded_reactions",
+    "functional": "finding: F5",
+    "scientific": "finding: F5: FVA endpoints at or above 999 are treated as infinity, including explicit finite bounds",
+    "function_rationale": "finding: F5: FVA endpoints at or above 999 are treated as infinity, including explicit finite bounds"
+  },
+  {
+    "file": "src/thg_protocol/analysis/leakage.py",
+    "line": 35,
+    "name": "_leaking",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Metabolites a drain (``-1``) or source (``1``) can exchange. Each solve maximises the summed flux of the drains not yet found, so one LP proves the rest cannot leak or names at least one more that can. Capping each drain at ``LEAK_FLUX`` (as FASTCC does) makes the LP spread flux over as many leaks as it can; any leak scales below the cap, so the result is unchanged."
+  },
+  {
+    "file": "src/thg_protocol/analysis/leakage.py",
+    "line": 76,
+    "name": "metabolite_leaks",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Metabolites the network can make (``produced``) or destroy (``consumed``) with every boundary reaction closed."
+  },
+  {
+    "file": "src/thg_protocol/analysis/leakage.py",
+    "line": 82,
+    "name": "_values",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by flat: set[str] = set()"
+  },
+  {
+    "file": "src/thg_protocol/analysis/leakage.py",
+    "line": 92,
+    "name": "_find",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: MEMOTE's metabolite lookup; ties go to the most shared cross-references. MetaNetX merges protonation states, so Human-GEM's hydroxide is annotated as water (MNXM2) too; water still shares more IDs with MEMOTE's shortlist."
+  },
+  {
+    "file": "src/thg_protocol/analysis/leakage.py",
+    "line": 116,
+    "name": "_dissipation",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by from memote.support.consistency import ENERGY_COUPLES"
+  },
+  {
+    "file": "src/thg_protocol/analysis/leakage.py",
+    "line": 129,
+    "name": "energy_generating_cycles",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Energy metabolites the network charges without any uptake. Follows MEMOTE (Fritzemeier et al. 2017): for each energy couple found in the cytosol, add an irreversible dissipation reaction (e.g. ATP + H2O -> ADP + Pi + H+), close the boundaries and maximise it. Any flux means an energy-generating cycle; ``cycles`` maps the charged metabolite to the reactions of a least-flux (pFBA) cycle, not every reaction carrying flux. ``not_found`` names couples whose metabolites the model lacks."
+  },
+  {
+    "file": "src/thg_protocol/analysis/model_signature.py",
+    "line": 21,
+    "name": "_stable_key",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by return json.dumps(value, ensure_ascii=True, sort_keys=True, separators=(',', ':'))"
+  },
+  {
+    "file": "src/thg_protocol/analysis/model_signature.py",
+    "line": 25,
+    "name": "_normalize",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Return JSON-compatible, recursively sorted annotation data."
+  },
+  {
+    "file": "src/thg_protocol/analysis/model_signature.py",
+    "line": 48,
+    "name": "_object_name",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by name = getattr(value, 'name', None)"
+  },
+  {
+    "file": "src/thg_protocol/analysis/model_signature.py",
+    "line": 53,
+    "name": "_annotation",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by return _normalize(getattr(value, 'annotation', {}))"
+  },
+  {
+    "file": "src/thg_protocol/analysis/model_signature.py",
+    "line": 57,
+    "name": "_gpr_node",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by if isinstance(node, ast.Name):"
+  },
+  {
+    "file": "src/thg_protocol/analysis/model_signature.py",
+    "line": 71,
+    "name": "_normalized_gpr",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by gpr = getattr(reaction, 'gpr', None)"
+  },
+  {
+    "file": "src/thg_protocol/analysis/model_signature.py",
+    "line": 85,
+    "name": "_stoichiometry",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by metabolites = getattr(reaction, 'metabolites', {})"
+  },
+  {
+    "file": "src/thg_protocol/analysis/model_signature.py",
+    "line": 95,
+    "name": "_metabolite_signature",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by return {'id': str(metabolite.id), 'name': _object_name(metabolite), 'formula': getattr(metabolite, 'formula', None), 'charge': getattr(metabolite, 'ch"
+  },
+  {
+    "file": "src/thg_protocol/analysis/model_signature.py",
+    "line": 106,
+    "name": "_reaction_signature",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by return {'id': str(reaction.id), 'name': _object_name(reaction), 'lower_bound': float(reaction.lower_bound), 'upper_bound': float(reaction.upper_bound)"
+  },
+  {
+    "file": "src/thg_protocol/analysis/model_signature.py",
+    "line": 118,
+    "name": "_gene_signature",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by return {'id': str(gene.id), 'name': _object_name(gene), 'annotation': _annotation(gene)}"
+  },
+  {
+    "file": "src/thg_protocol/analysis/model_signature.py",
+    "line": 126,
+    "name": "_group_signature",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by members = getattr(group, 'members', ())"
+  },
+  {
+    "file": "src/thg_protocol/analysis/model_signature.py",
+    "line": 136,
+    "name": "_objective_signature",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by objective = getattr(model, 'objective', None)"
+  },
+  {
+    "file": "src/thg_protocol/analysis/model_signature.py",
+    "line": 156,
+    "name": "model_signature",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Return a deterministic JSON-compatible semantic model signature. Collections and annotation values are sorted. Boolean GPR operands are canonicalized as commutative ``and``/``or`` trees, so equivalent operand ordering does not create a false difference."
+  },
+  {
+    "file": "src/thg_protocol/analysis/model_signature.py",
+    "line": 195,
+    "name": "_keyed",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by return {str(value[key]): value for value in values}"
+  },
+  {
+    "file": "src/thg_protocol/analysis/model_signature.py",
+    "line": 201,
+    "name": "diff_model_signatures",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Return added, removed, and changed semantic objects between signatures."
+  },
+  {
+    "file": "src/thg_protocol/analysis/network.py",
+    "line": 15,
+    "name": "find_network_components",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Return weakly connected metabolite/reaction components. The model is traversed read-only. The returned graph is directed: consumed metabolites point to reactions and reactions point to products. Solver-backed blocked-reaction cleanup and HTML visualization remain separate legacy operations."
+  },
+  {
+    "file": "src/thg_protocol/analysis/network.py",
+    "line": 83,
+    "name": "write_component_report",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Write JSON-serializable component information to ``output_path``."
+  },
+  {
+    "file": "src/thg_protocol/cell_specific/__init__.py",
+    "line": 37,
+    "name": "evaluate_gpr_activity",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Evaluate a boolean GPR and report genes absent from the activity map."
+  },
+  {
+    "file": "src/thg_protocol/cell_specific/__init__.py",
+    "line": 51,
+    "name": "build_cell_specific_model",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Build a copied COBRA model from gene activity with uncertainty reporting."
+  },
+  {
+    "file": "src/thg_protocol/cell_specific/__init__.py",
+    "line": 84,
+    "name": "_activity_matrix",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by import numpy as np"
+  },
+  {
+    "file": "src/thg_protocol/cell_specific/__init__.py",
+    "line": 104,
+    "name": "_labeled_csv_activity",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Read a ``reaction_id`` activity CSV and align it to model order."
+  },
+  {
+    "file": "src/thg_protocol/cell_specific/__init__.py",
+    "line": 129,
+    "name": "load_activity_matrix",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Load an activity matrix, aligning labeled CSV rows by reaction ID. Unlabeled file inputs require an explicit legacy row-order acknowledgement and a model signature supplied by the calling workflow."
+  },
+  {
+    "file": "src/thg_protocol/cell_specific/__init__.py",
+    "line": 169,
+    "name": "_write_model",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by from thg_protocol.io.models import save_model"
+  },
+  {
+    "file": "src/thg_protocol/cell_specific/__init__.py",
+    "line": 175,
+    "name": "reduce_model_by_activity",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Tailor a model using the mean non-zero activity per reaction. Activity rows must follow ``model.reactions`` order. Reactions whose non-zero presence is at or below ``presence_threshold`` are removed, except for IDs in ``preserve_reactions``. The input model is copied and never mutated. CSV and MAT inputs are supported without importing Troppo."
+  },
+  {
+    "file": "src/thg_protocol/cell_specific/consensus.py",
+    "line": 20,
+    "name": "consensus_from_gimme",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Exclude failed samples from the denominator and expose their identities."
+  },
+  {
+    "file": "src/thg_protocol/cell_specific/exchange.py",
+    "line": 9,
+    "name": "_core_id",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by identifier = metabolite.id"
+  },
+  {
+    "file": "src/thg_protocol/cell_specific/exchange.py",
+    "line": 19,
+    "name": "match_exchange_reactions",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Copy matching boundary bounds from ``model_base`` into a model copy. Matching uses compartment-aware metabolite core IDs and never performs annotation lookups, solver optimization, or network access. The returned model is independent of both inputs. ``add_reactions`` optionally copies unmatched base boundary reactions when all referenced metabolites exist."
+  },
+  {
+    "file": "src/thg_protocol/cell_specific/gimme.py",
+    "line": 36,
+    "name": "expression_penalties",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Return GIMME penalties for scores the expression data fixes exactly. Unknown and no-GPR evidence is unpenalized, and so is a score that only bounds the truth from below (an OR with an unmeasured isozyme): that isozyme might support the reaction fully."
+  },
+  {
+    "file": "src/thg_protocol/cell_specific/gimme.py",
+    "line": 57,
+    "name": "_solver_name",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by return str(getattr(getattr(model.solver, 'interface', None), '__name__', 'unknown'))"
+  },
+  {
+    "file": "src/thg_protocol/cell_specific/gimme.py",
+    "line": 61,
+    "name": "_objective_expression",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by if not coefficients:"
+  },
+  {
+    "file": "src/thg_protocol/cell_specific/gimme.py",
+    "line": 70,
+    "name": "run_gimme",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Solve one non-mutating GIMME reconstruction problem. A failed reference or GIMME optimization is returned as explicit evidence, never converted into an all-zero activity vector."
+  },
+  {
+    "file": "src/thg_protocol/cell_specific/gimme.py",
+    "line": 87,
+    "name": "empty",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by return GimmeResult(sample_id, status, None, {}, {}, {}, {}, penalties, maxima or {}, required or {}, {}, solver, (warning,))"
+  },
+  {
+    "file": "src/thg_protocol/cell_specific/gpr.py",
+    "line": 33,
+    "name": "_tokens",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by tokens = [match.group(1) for match in _TOKEN.finditer(rule)]"
+  },
+  {
+    "file": "src/thg_protocol/cell_specific/gpr.py",
+    "line": 40,
+    "name": "_parse",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by tokens, position = (_tokens(rule), 0)"
+  },
+  {
+    "file": "src/thg_protocol/cell_specific/gpr.py",
+    "line": 81,
+    "name": "_evaluate",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Return ``(score, genes, missing, complete, exact)`` for a GPR node."
+  },
+  {
+    "file": "src/thg_protocol/cell_specific/gpr.py",
+    "line": 110,
+    "name": "reaction_expression_evidence",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Score one GPR using AND=min and OR=max without executing the rule."
+  },
+  {
+    "file": "src/thg_protocol/cell_specific/gpr.py",
+    "line": 127,
+    "name": "reaction_expression_for_model",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Return deterministic reaction evidence in model reaction order."
+  },
+  {
+    "file": "src/thg_protocol/cell_specific/gpr.py",
+    "line": 24,
+    "name": "is_exact",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by if self.exact is None:"
+  },
+  {
+    "file": "src/thg_protocol/cell_specific/gpr.py",
+    "line": 43,
+    "name": "primary",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by nonlocal position"
+  },
+  {
+    "file": "src/thg_protocol/cell_specific/gpr.py",
+    "line": 59,
+    "name": "conjunction",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by nonlocal position"
+  },
+  {
+    "file": "src/thg_protocol/cell_specific/gpr.py",
+    "line": 67,
+    "name": "disjunction",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by nonlocal position"
+  },
+  {
+    "file": "src/thg_protocol/cell_specific/transcriptomics.py",
+    "line": 19,
+    "name": "extract_sgpr_rules",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Extract the final component of each reaction's ``sGPR`` annotation."
+  },
+  {
+    "file": "src/thg_protocol/cell_specific/transcriptomics.py",
+    "line": 34,
+    "name": "extract_ensembl_ids",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Extract ``ENSG`` identifiers from model genes in model order."
+  },
+  {
+    "file": "src/thg_protocol/cell_specific/transcriptomics.py",
+    "line": 43,
+    "name": "replace_index_tokens",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Replace ``x(index)`` GPR tokens with corresponding Ensembl IDs. ``index_base`` is the number of the first gene: 0 (the default) for Python-style rules, 1 for rules exported from the MATLAB COBRA Toolbox. A token with no gene (index out of range, or a blank identifier) is left unchanged instead of becoming an empty group."
+  },
+  {
+    "file": "src/thg_protocol/cell_specific/transcriptomics.py",
+    "line": 66,
+    "name": "extract_gene_annotation_pairs",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Read HGNC-symbol/Ensembl pairs from RDF annotation resources. Duplicate symbols retain all distinct Ensembl IDs in encounter order. Both historical ``hgnc.symbol`` and misspelled ``hgcn.symbol`` resources are accepted for compatibility."
+  },
+  {
+    "file": "src/thg_protocol/cell_specific/transcriptomics.py",
+    "line": 100,
+    "name": "replace_gene_symbols",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Replace gene symbols in model GPR rules with Ensembl identifiers. Rules are split on whitespace and parentheses, so symbols may contain hyphens or other punctuation (``MT-ND1``). A symbol with several Ensembl identifiers becomes an OR group of all of them. A symbol with no mapping is left unchanged: the rule stays valid and the gene is later reported as missing expression evidence, instead of silently shrinking an AND complex."
+  },
+  {
+    "file": "src/thg_protocol/cell_specific/transcriptomics.py",
+    "line": 54,
+    "name": "replacement",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by position = int(match.group(1)) - index_base"
+  },
+  {
+    "file": "src/thg_protocol/cell_specific/transcriptomics.py",
+    "line": 117,
+    "name": "replacement",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by gene = match.group(0)"
+  },
+  {
+    "file": "src/thg_protocol/figures/comparison.py",
+    "line": 50,
+    "name": "annotation_group_percentages",
+    "functional": "no issue found",
+    "scientific": "N/A: no scientific logic",
+    "function_rationale": "Purpose: Calculate legacy annotation-group percentages from cell values."
+  },
+  {
+    "file": "src/thg_protocol/figures/comparison.py",
+    "line": 67,
+    "name": "summarize_annotation_rows",
+    "functional": "no issue found",
+    "scientific": "N/A: no scientific logic",
+    "function_rationale": "Purpose: Summarize named columns without requiring pandas."
+  },
+  {
+    "file": "src/thg_protocol/figures/comparison.py",
+    "line": 78,
+    "name": "read_annotation_group_summary",
+    "functional": "no issue found",
+    "scientific": "N/A: no scientific logic",
+    "function_rationale": "Purpose: Read one annotation sheet from an Excel report and summarize it. Pandas and its Excel engine are imported only when this file-oriented API is called. A ``ValueError`` identifies missing columns before rendering begins, which makes malformed report inputs straightforward to diagnose."
+  },
+  {
+    "file": "src/thg_protocol/figures/comparison.py",
+    "line": 103,
+    "name": "_render_annotation_chart",
+    "functional": "no issue found",
+    "scientific": "N/A: no scientific logic",
+    "function_rationale": "Purpose: Render one summary chart using optional plotting dependencies."
+  },
+  {
+    "file": "src/thg_protocol/figures/comparison.py",
+    "line": 145,
+    "name": "generate_annotation_comparison_figures",
+    "functional": "no issue found",
+    "scientific": "N/A: no scientific logic",
+    "function_rationale": "Purpose: Generate the three workbook-backed annotation comparison figures. The report uses the historical zero-based sheet positions 4, 5, and 6. The returned paths are deterministic and are created below ``output_dir``. Plotting dependencies are required only when this function is executed."
+  },
+  {
+    "file": "src/thg_protocol/figures/comparison.py",
+    "line": 57,
+    "name": "percentage",
+    "functional": "no issue found",
+    "scientific": "N/A: no scientific logic",
+    "function_rationale": "Purpose: begins by return sum((value in allowed for value in values)) / denominator * 100"
+  },
+  {
+    "file": "src/thg_protocol/figures/models.py",
+    "line": 55,
+    "name": "_named_models",
+    "functional": "no issue found",
+    "scientific": "N/A: no scientific logic",
+    "function_rationale": "Purpose: begins by if isinstance(models, Mapping):"
+  },
+  {
+    "file": "src/thg_protocol/figures/models.py",
+    "line": 63,
+    "name": "model_component_summary",
+    "functional": "no issue found",
+    "scientific": "N/A: no scientific logic",
+    "function_rationale": "Purpose: Summarize one model without importing COBRA."
+  },
+  {
+    "file": "src/thg_protocol/figures/models.py",
+    "line": 76,
+    "name": "summarize_model_components",
+    "functional": "no issue found",
+    "scientific": "N/A: no scientific logic",
+    "function_rationale": "Purpose: Return component counts keyed by the supplied model labels."
+  },
+  {
+    "file": "src/thg_protocol/figures/models.py",
+    "line": 85,
+    "name": "unannotated_metabolite_percentage",
+    "functional": "no issue found",
+    "scientific": "N/A: no scientific logic",
+    "function_rationale": "Purpose: Return the legacy percentage of metabolites with no external IDs."
+  },
+  {
+    "file": "src/thg_protocol/figures/models.py",
+    "line": 98,
+    "name": "new_reaction_annotation_group_sizes",
+    "functional": "no issue found",
+    "scientific": "N/A: no scientific logic",
+    "function_rationale": "Purpose: Count groups of new reactions by their annotation mapping. The legacy chart grouped reactions absent from ``reference_model`` by the string representation of their annotation mapping, then plotted the size of each group. This function preserves that statistic while returning a deterministic, serializable mapping from group size to group count."
+  },
+  {
+    "file": "src/thg_protocol/figures/models.py",
+    "line": 117,
+    "name": "_pyplot",
+    "functional": "no issue found",
+    "scientific": "N/A: no scientific logic",
+    "function_rationale": "Purpose: Import matplotlib only when rendering is requested."
+  },
+  {
+    "file": "src/thg_protocol/figures/models.py",
+    "line": 128,
+    "name": "_bar_chart",
+    "functional": "no issue found",
+    "scientific": "N/A: no scientific logic",
+    "function_rationale": "Purpose: begins by plt = _pyplot()"
+  },
+  {
+    "file": "src/thg_protocol/figures/models.py",
+    "line": 154,
+    "name": "_pie_chart",
+    "functional": "no issue found",
+    "scientific": "N/A: no scientific logic",
+    "function_rationale": "Purpose: begins by plt = _pyplot()"
+  },
+  {
+    "file": "src/thg_protocol/figures/models.py",
+    "line": 165,
+    "name": "generate_model_comparison_figures",
+    "functional": "no issue found",
+    "scientific": "N/A: no scientific logic",
+    "function_rationale": "Purpose: Render figures from explicit models and optional score datasets. ``models`` supplies the inputs for the non-annotated-metabolite and model component charts. ``reference_model`` and ``new_reaction_model`` enable the new-reaction annotation chart. Score charts are generated only when their data is passed explicitly; no historical hard-coded scores are embedded in the package."
+  },
+  {
+    "file": "src/thg_protocol/gapfill/cli.py",
+    "line": 12,
+    "name": "build_parser",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by parser = argparse.ArgumentParser(description='Run standalone THG JSON gapfill operations.')"
+  },
+  {
+    "file": "src/thg_protocol/gapfill/cli.py",
+    "line": 38,
+    "name": "_parameters",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by values: dict[str, Any] = {}"
+  },
+  {
+    "file": "src/thg_protocol/gapfill/cli.py",
+    "line": 59,
+    "name": "_load_model",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by from thg_protocol.io.models import load_model"
+  },
+  {
+    "file": "src/thg_protocol/gapfill/cli.py",
+    "line": 65,
+    "name": "_write_outputs",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by from thg_protocol.io.models import save_json, save_sbml"
+  },
+  {
+    "file": "src/thg_protocol/gapfill/cli.py",
+    "line": 82,
+    "name": "main",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by args = build_parser().parse_args(argv)"
+  },
+  {
+    "file": "src/thg_protocol/gapfill/core.py",
+    "line": 77,
+    "name": "_candidate_model_copy",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by return deepcopy(model) if isinstance(model, dict) else model.copy()"
+  },
+  {
+    "file": "src/thg_protocol/gapfill/core.py",
+    "line": 81,
+    "name": "_add_candidate",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by if isinstance(model, dict):"
+  },
+  {
+    "file": "src/thg_protocol/gapfill/core.py",
+    "line": 111,
+    "name": "run_gapfill",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Run deterministic gapfill without temporary sinks or sources."
+  },
+  {
+    "file": "src/thg_protocol/gapfill/core.py",
+    "line": 228,
+    "name": "_components",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by sets = _UnionFind((met['id'] for met in model.get('metabolites', [])))"
+  },
+  {
+    "file": "src/thg_protocol/gapfill/core.py",
+    "line": 243,
+    "name": "_suffix",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by return re.search('[a-z]+$', metabolite_id).group(0) if re.search('[a-z]+$', metabolite_id) else ''"
+  },
+  {
+    "file": "src/thg_protocol/gapfill/core.py",
+    "line": 251,
+    "name": "_produced_consumed",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by produced, consumed = (set(), set())"
+  },
+  {
+    "file": "src/thg_protocol/gapfill/core.py",
+    "line": 262,
+    "name": "_metabolite_kind",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Sign-only dead-end kind, as legacy candidate typing (bounds ignored)."
+  },
+  {
+    "file": "src/thg_protocol/gapfill/core.py",
+    "line": 271,
+    "name": "_pair_type",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: A: product with substrate; B: two of one dead-end kind; C: otherwise."
+  },
+  {
+    "file": "src/thg_protocol/gapfill/core.py",
+    "line": 309,
+    "name": "_as_mapping",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by if isinstance(model, dict):"
+  },
+  {
+    "file": "src/thg_protocol/gapfill/core.py",
+    "line": 317,
+    "name": "_transport_key",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Return pair and capacities relative to lexicographic metabolite order."
+  },
+  {
+    "file": "src/thg_protocol/gapfill/core.py",
+    "line": 342,
+    "name": "_covered_transport",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by wanted = _transport_key({'metabolites': candidate.metabolites, 'lower_bound': candidate.lower_bound, 'upper_bound': candidate.upper_bound})"
+  },
+  {
+    "file": "src/thg_protocol/gapfill/core.py",
+    "line": 359,
+    "name": "_metrics",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by mapped = _as_mapping(model)"
+  },
+  {
+    "file": "src/thg_protocol/gapfill/core.py",
+    "line": 371,
+    "name": "_deadend_ids",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by produced, consumed = _produced_consumed(_as_mapping(model))"
+  },
+  {
+    "file": "src/thg_protocol/gapfill/core.py",
+    "line": 376,
+    "name": "_transport_direction",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Direction of the transport that resolves a pair of dead ends. ``1`` means first -> second, ``-1`` second -> first, ``0`` that the dead-end kinds do not say. A product-only metabolite must be drained and a substrate-only one fed, so only a (product, substrate) pair has a direction."
+  },
+  {
+    "file": "src/thg_protocol/gapfill/core.py",
+    "line": 394,
+    "name": "directed_transport",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: The one definition of a gap-filled transport between two metabolites. A directed transport is irreversible and moves ``first`` -> ``second`` (``direction`` 1) or ``second`` -> ``first`` (``-1``); direction ``0`` is a reversible transport."
+  },
+  {
+    "file": "src/thg_protocol/gapfill/core.py",
+    "line": 420,
+    "name": "_transport_candidates",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by mapped = _as_mapping(model)"
+  },
+  {
+    "file": "src/thg_protocol/gapfill/core.py",
+    "line": 473,
+    "name": "_resolved_parameters",
+    "functional": "finding: F4",
+    "scientific": "finding: F4: negative minimum_flux passes validation and makes the objective feasibility threshold vacuous",
+    "function_rationale": "finding: F4: negative minimum_flux passes validation and makes the objective feasibility threshold vacuous"
+  },
+  {
+    "file": "src/thg_protocol/gapfill/core.py",
+    "line": 543,
+    "name": "_compartment_pair_key",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by return ':'.join(sorted((first, second)))"
+  },
+  {
+    "file": "src/thg_protocol/gapfill/core.py",
+    "line": 547,
+    "name": "_connection_costs",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Validate ``{\"c:e\": cost}`` and normalize keys to sorted compartment pairs."
+  },
+  {
+    "file": "src/thg_protocol/gapfill/core.py",
+    "line": 624,
+    "name": "_candidate_reaction",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by return {'metabolites': candidate.metabolites, 'lower_bound': candidate.lower_bound, 'upper_bound': candidate.upper_bound}"
+  },
+  {
+    "file": "src/thg_protocol/gapfill/core.py",
+    "line": 632,
+    "name": "_run_transport",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by result_model = _candidate_model_copy(model)"
+  },
+  {
+    "file": "src/thg_protocol/gapfill/core.py",
+    "line": 750,
+    "name": "_run_milp",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by import cobra"
+  },
+  {
+    "file": "src/thg_protocol/gapfill/core.py",
+    "line": 837,
+    "name": "gapfill_model",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Gap-fill a copied COBRApy or JSON model with one standalone method."
+  },
+  {
+    "file": "src/thg_protocol/gapfill/core.py",
+    "line": 856,
+    "name": "_error_result",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: A ``failed`` result for a validation or execution error."
+  },
+  {
+    "file": "src/thg_protocol/gapfill/core.py",
+    "line": 873,
+    "name": "_json_parameters",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Normalize tuples and other small configuration values for JSON output."
+  },
+  {
+    "file": "src/thg_protocol/gapfill/core.py",
+    "line": 882,
+    "name": "_reaction_payload",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by metabolites = getattr(reaction, 'metabolites', None)"
+  },
+  {
+    "file": "src/thg_protocol/gapfill/core.py",
+    "line": 909,
+    "name": "generate_gapfill_plan",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Generate an auditable proposal without mutating ``model``. ``result`` is a gapfill already run on ``model`` (e.g. from workflow stages); without it the method runs here."
+  },
+  {
+    "file": "src/thg_protocol/gapfill/core.py",
+    "line": 1019,
+    "name": "_plan_proposals",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by proposals = plan.get('proposals', [])"
+  },
+  {
+    "file": "src/thg_protocol/gapfill/core.py",
+    "line": 1028,
+    "name": "validate_gapfill_plan",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Validate proposal identity and the deliberately narrow mutation policy."
+  },
+  {
+    "file": "src/thg_protocol/gapfill/core.py",
+    "line": 1095,
+    "name": "apply_gapfill_plan",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Apply every validated proposal to a private copy and return a ledger."
+  },
+  {
+    "file": "src/thg_protocol/gapfill/core.py",
+    "line": 57,
+    "name": "selected_reactions",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Canonical name for selected reactions (``selected`` is retained)."
+  },
+  {
+    "file": "src/thg_protocol/gapfill/core.py",
+    "line": 61,
+    "name": "as_dict",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by return {'selected': list(self.selected), 'candidate_coverage': dict(self.candidate_coverage), 'status': self.status, 'failure': self.failure, 'solver'"
+  },
+  {
+    "file": "src/thg_protocol/gapfill/core.py",
+    "line": 200,
+    "name": "__init__",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by self.parent: dict[Any, Any] = {item: item for item in items}"
+  },
+  {
+    "file": "src/thg_protocol/gapfill/core.py",
+    "line": 203,
+    "name": "__contains__",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by return item in self.parent"
+  },
+  {
+    "file": "src/thg_protocol/gapfill/core.py",
+    "line": 206,
+    "name": "__iter__",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by return iter(self.parent)"
+  },
+  {
+    "file": "src/thg_protocol/gapfill/core.py",
+    "line": 209,
+    "name": "add",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by self.parent.setdefault(item, item)"
+  },
+  {
+    "file": "src/thg_protocol/gapfill/core.py",
+    "line": 212,
+    "name": "find",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by parent = self.parent"
+  },
+  {
+    "file": "src/thg_protocol/gapfill/core.py",
+    "line": 219,
+    "name": "union",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Merge two sets; ``False`` if they were already one."
+  },
+  {
+    "file": "src/thg_protocol/gapfill/core.py",
+    "line": 574,
+    "name": "__init__",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by self.produced, self.consumed = _produced_consumed(mapped)"
+  },
+  {
+    "file": "src/thg_protocol/gapfill/core.py",
+    "line": 584,
+    "name": "_record_transport",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by key = _transport_key(reaction)"
+  },
+  {
+    "file": "src/thg_protocol/gapfill/core.py",
+    "line": 589,
+    "name": "dead_end_ids",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by return self.produced ^ self.consumed"
+  },
+  {
+    "file": "src/thg_protocol/gapfill/core.py",
+    "line": 592,
+    "name": "improvement",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Dead ends and components removed by adding ``candidate``."
+  },
+  {
+    "file": "src/thg_protocol/gapfill/core.py",
+    "line": 609,
+    "name": "covers",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by wanted = _transport_key(_candidate_reaction(candidate))"
+  },
+  {
+    "file": "src/thg_protocol/gapfill/core.py",
+    "line": 615,
+    "name": "add",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by for metabolite_id, coefficient in candidate.metabolites.items():"
+  },
+  {
+    "file": "src/thg_protocol/gapfill/exclusions.py",
+    "line": 66,
+    "name": "_flatten",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by if isinstance(value, str):"
+  },
+  {
+    "file": "src/thg_protocol/gapfill/exclusions.py",
+    "line": 77,
+    "name": "is_excluded",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Whether a metabolite is on ``excluded``. It matches by exact metabolite ID, by compartment-free base ID, or by any cross-reference in ``annotation`` (also when given as a URL, by its last path component)."
+  },
+  {
+    "file": "src/thg_protocol/gapfill/gate.py",
+    "line": 24,
+    "name": "apply_energy_cycle_gate",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Remove ``added`` reactions found in energy-generating cycles. ``model`` is modified in place. Returns a JSON-serializable report with ``status`` (``checked`` or ``skipped``), ``reason`` when skipped, ``tested`` energy metabolites, ``rejected`` (reaction ID -> energy metabolites it helps charge) and the number of ``rounds`` that removed something."
+  },
+  {
+    "file": "src/thg_protocol/gapfill/ptr.py",
+    "line": 62,
+    "name": "network_components",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Number components by size; metabolites in no reaction get no entry. Reactions and metabolites share one ID space here, so a reaction ID that is also a metabolite ID raises instead of silently merging two nodes."
+  },
+  {
+    "file": "src/thg_protocol/gapfill/ptr.py",
+    "line": 150,
+    "name": "generate_ptr_candidates",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Pairs that join two components, or two main-component dead ends. A pair across components qualifies with any type. A pair inside the main component qualifies only as type A or B, i.e. when it links dead ends. Candidates sorted by ``reaction_id``. Metabolites matching ``excluded_metabolites`` (by ID, base ID or cross-reference, see :mod:`thg_protocol.gapfill.exclusions`) are never paired. Dead ends here are sign-only, as in legacy typing (agreed spec); the temporary sinks of :func:`compute_coverage` are bounds-aware instead."
+  },
+  {
+    "file": "src/thg_protocol/gapfill/ptr.py",
+    "line": 219,
+    "name": "select_connectors",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Join every component with one PTR per spanning-tree edge (Kruskal). Each component pair is represented by its best candidate (type A before B before C, then base and metabolite IDs); edges are taken in that order."
+  },
+  {
+    "file": "src/thg_protocol/gapfill/ptr.py",
+    "line": 241,
+    "name": "_connector_key",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by return (_RANK[candidate.type], candidate.base, candidate.met1, candidate.met2)"
+  },
+  {
+    "file": "src/thg_protocol/gapfill/ptr.py",
+    "line": 245,
+    "name": "_fluxes",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by primal = model.solver.primal_values"
+  },
+  {
+    "file": "src/thg_protocol/gapfill/ptr.py",
+    "line": 254,
+    "name": "_solve",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Optimum, ``None`` if infeasible; any other non-optimal status raises. Unbounded or numerically troubled LPs would otherwise read as \"blocked\"."
+  },
+  {
+    "file": "src/thg_protocol/gapfill/ptr.py",
+    "line": 268,
+    "name": "_lp7",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: FASTCC LP7: maximize sum z, 0 <= z_r <= epsilon, z_r <= sign_r * v_r. Only for reactions whose sign the bounds already fix, so the coupling removes no flux. Returns the optimum and the fluxes of ``watched``, or ``None`` if infeasible."
+  },
+  {
+    "file": "src/thg_protocol/gapfill/ptr.py",
+    "line": 309,
+    "name": "_optimize_direction",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Optimize ``sum weight_r * v_r``; ``watched`` fluxes, ``None`` if infeasible."
+  },
+  {
+    "file": "src/thg_protocol/gapfill/ptr.py",
+    "line": 329,
+    "name": "unblockable",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Reactions of ``reaction_ids`` that can carry at least ``epsilon`` flux. Every LP solution is a witness: a reaction it shows at ``epsilon`` or more is unblockable. Irreversible reactions go through FASTCC's LP7 loop, whose optimum below ``epsilon`` proves none of them can reach it. Reversible reactions are pushed both ways along one random direction ``c``; when ``c . v`` cannot vary, none of them can, and the witness settles them. When neither LP proves anything new, the varying reactions are maximized one at a time, so the result matches two LPs per reaction up to tolerance."
+  },
+  {
+    "file": "src/thg_protocol/gapfill/ptr.py",
+    "line": 408,
+    "name": "_max_flux",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by reaction = model.reactions.get_by_id(reaction_id)"
+  },
+  {
+    "file": "src/thg_protocol/gapfill/ptr.py",
+    "line": 446,
+    "name": "_add_temporary_exchanges",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Source every dead-end substrate and sink every dead-end product. Dead ends account for bounds (legacy ``get_deadend_info``); metabolites that can be neither produced nor consumed get nothing."
+  },
+  {
+    "file": "src/thg_protocol/gapfill/ptr.py",
+    "line": 469,
+    "name": "_add_ptr",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Add ``candidate`` exactly as the final model will get it."
+  },
+  {
+    "file": "src/thg_protocol/gapfill/ptr.py",
+    "line": 474,
+    "name": "candidate_costs",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: MILP cost per candidate: its compartment pair's cost, else 1. ``connection_costs`` maps ``\"c:e\"`` (order does not matter) to a positive cost, e.g. to make cytosol-mitochondrion transports dearer than cytosol-extracellular ones."
+  },
+  {
+    "file": "src/thg_protocol/gapfill/ptr.py",
+    "line": 495,
+    "name": "compute_coverage",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Per original component, the blocked reactions each candidate unblocks. ``model`` is the phase-2 model (connectors added); ``components`` are those of the model before phase 2. Components below ``min_component_size`` nodes are skipped. A component in ``done`` is reused, and ``on_component`` is called after each newly computed one. ``model`` is left unchanged."
+  },
+  {
+    "file": "src/thg_protocol/gapfill/ptr.py",
+    "line": 566,
+    "name": "select_unblockers",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Maximize covered targets minus ``tradeoff_lambda * cost`` per selected PTR. ``costs`` gives a candidate's relative price (default 1), so implausible transports must unblock more to be worth adding. One global problem on an optlang ``interface``: binary y per candidate, z_r <= sum of y over the candidates covering target r, sum y <= budget. Status is ``partial`` when the budget binds with coverable targets left."
+  },
+  {
+    "file": "src/thg_protocol/gapfill/ptr.py",
+    "line": 646,
+    "name": "verify_selection",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Check the final model without sinks; report, never act. ``verified_unblocked`` are the targets that now carry flux and ``inactive_connectors`` the phase-2 reactions that carry none. Connectors and selected PTRs missing from ``model`` are added for the check only."
+  },
+  {
+    "file": "src/thg_protocol/gapfill/ptr.py",
+    "line": 674,
+    "name": "ptr_collisions",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Reaction IDs of addable candidates that ``model`` already uses."
+  },
+  {
+    "file": "src/thg_protocol/gapfill/ptr.py",
+    "line": 683,
+    "name": "_failed",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by return GapfillResult(model, [], {}, 'failed', reason, {'strategy': 'sink-milp'}, 'sink-milp', parameters, before, before, reason)"
+  },
+  {
+    "file": "src/thg_protocol/gapfill/ptr.py",
+    "line": 701,
+    "name": "run_sink_milp",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Run candidates, connectors, coverage and MILP on a copy of ``model``. Phases already computed (by workflow stages) are passed in and reused. The result selects the connectors (phase 2) and then the MILP's PTRs (phase 3); ``solver`` carries MILP metadata and the verification report."
+  },
+  {
+    "file": "src/thg_protocol/gapfill/ptr.py",
+    "line": 116,
+    "name": "main_only",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by return self.components == (1, 1)"
+  },
+  {
+    "file": "src/thg_protocol/gapfill/ptr.py",
+    "line": 119,
+    "name": "to_dict",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by return {**asdict(self), 'compartments': list(self.compartments), 'components': list(self.components)}"
+  },
+  {
+    "file": "src/thg_protocol/gapfill/ptr.py",
+    "line": 127,
+    "name": "from_dict",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by return cls(**{**payload, 'compartments': tuple(payload['compartments']), 'components': tuple(payload['components'])})"
+  },
+  {
+    "file": "src/thg_protocol/gapfill/ptr.py",
+    "line": 136,
+    "name": "as_gapfill_candidate",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by annotation: dict[str, Any] = {'type': self.type, 'base': self.base}"
+  },
+  {
+    "file": "src/thg_protocol/gapfill/ptr.py",
+    "line": 348,
+    "name": "harvest",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by new = {rid for rid in pending if abs(fluxes[rid]) >= threshold}"
+  },
+  {
+    "file": "src/thg_protocol/gapfill/ptr.py",
+    "line": 433,
+    "name": "to_dict",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by return asdict(self)"
+  },
+  {
+    "file": "src/thg_protocol/gapfill/ptr.py",
+    "line": 437,
+    "name": "from_dict",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by return cls(int(payload['component']), list(payload['targets']), list(payload['sink_only']), {key: list(value) for key, value in payload['coverage'].it"
+  },
+  {
+    "file": "src/thg_protocol/glycan.py",
+    "line": 14,
+    "name": "parse_formula",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Convert a molecular formula to the legacy atom-group contract. The legacy reformulation code consumes each element as ``group[0][0]`` (symbol) and ``group[0][1]`` (count). Keeping that shape here allows both old mass-balance copies to use one tested parser."
+  },
+  {
+    "file": "src/thg_protocol/glycan.py",
+    "line": 32,
+    "name": "resolve_glycan_atoms",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Resolve a KEGG glycan ID to its primary compound and atom groups."
+  },
+  {
+    "file": "src/thg_protocol/glycan.py",
+    "line": 52,
+    "name": "normalize_identifiers",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Normalize one or more glycan IDs without treating a string as iterable."
+  },
+  {
+    "file": "src/thg_protocol/glycan.py",
+    "line": 59,
+    "name": "glycan_atoms",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Resolve glycan atoms and optionally append a historical cache row."
+  },
+  {
+    "file": "src/thg_protocol/merge/__init__.py",
+    "line": 130,
+    "name": "_annotation_values",
+    "functional": "no issue found",
+    "scientific": "N/A: no scientific logic",
+    "function_rationale": "Purpose: begins by value = item.annotation.get(key)"
+  },
+  {
+    "file": "src/thg_protocol/merge/__init__.py",
+    "line": 136,
+    "name": "_index",
+    "functional": "no issue found",
+    "scientific": "N/A: no scientific logic",
+    "function_rationale": "Purpose: begins by result: dict[str, list[str]] = {}"
+  },
+  {
+    "file": "src/thg_protocol/merge/__init__.py",
+    "line": 145,
+    "name": "_chemistry",
+    "functional": "no issue found",
+    "scientific": "N/A: no scientific logic",
+    "function_rationale": "Purpose: Element counts (with hydrogen) and charge; ``None`` where unknown."
+  },
+  {
+    "file": "src/thg_protocol/merge/__init__.py",
+    "line": 157,
+    "name": "_metabolite_conflict",
+    "functional": "no issue found",
+    "scientific": "N/A: no scientific logic",
+    "function_rationale": "Purpose: Why two linked metabolites are not the same species, or None. Returns the decision category and a description. Formula and charge must be identical, hydrogen included: a protonation difference changes the stoichiometry of every reaction written for either form."
+  },
+  {
+    "file": "src/thg_protocol/merge/__init__.py",
+    "line": 199,
+    "name": "species_ignored",
+    "functional": "no issue found",
+    "scientific": "N/A: no scientific logic",
+    "function_rationale": "Purpose: Whether ``identifier`` is one of the ``ignore`` species (or its compartments)."
+  },
+  {
+    "file": "src/thg_protocol/merge/__init__.py",
+    "line": 208,
+    "name": "reaction_stoichiometry",
+    "functional": "no issue found",
+    "scientific": "N/A: no scientific logic",
+    "function_rationale": "Purpose: Metabolite ID -> coefficient, the identity of a reaction's chemistry. ``metabolite_map`` renames metabolites first (coefficients of metabolites that map to one ID add up). Every species counts, H+ and H2O included: two reactions that differ only in protons or water are different reactions. ``ignore`` names species to leave out, matched by ID or ID prefix before the compartment (``\"atp\"`` skips ``atp_c``); only a caller that asks for it drops anything."
+  },
+  {
+    "file": "src/thg_protocol/merge/__init__.py",
+    "line": 233,
+    "name": "_reverse",
+    "functional": "no issue found",
+    "scientific": "N/A: no scientific logic",
+    "function_rationale": "Purpose: begins by return {key: -value for key, value in stoichiometry.items()}"
+  },
+  {
+    "file": "src/thg_protocol/merge/__init__.py",
+    "line": 237,
+    "name": "_link_metabolites",
+    "functional": "no issue found",
+    "scientific": "N/A: no scientific logic",
+    "function_rationale": "Purpose: Return linked (base, incoming) pairs and ambiguous groups, with tokens. A link is the same metabolite ID. Metabolites whose ID is not in the other model are linked by a shared annotation identifier in the same compartment (ATP in the cytosol and in mitochondria share a KEGG ID but are different species). A metabolite linked to more than one on the other side is ambiguous."
+  },
+  {
+    "file": "src/thg_protocol/merge/__init__.py",
+    "line": 306,
+    "name": "generate_merge_plan",
+    "functional": "no issue found",
+    "scientific": "N/A: no scientific logic",
+    "function_rationale": "Purpose: Plan a merge: which metabolites, reactions and genes are the same. Metabolites are linked by the same ID or, when their ID is not in the other model, by a shared annotation identifier (KEGG, ChEBI, HMDB, InChIKey) in the same compartment. A linked pair is merged only when it is the same species: identical formula (element counts, hydrogen included) and charge, and no disjoint KEGG compound IDs. Every other linked pair is kept separate with a decision naming why (``protonation-conflict``, ``formula-conflict``, ``charge-conflict``, ``missing-chemistry``, ``identifier-conflict``, ``compartment-conflict`` or ``ambiguous-metabolite``); an incoming metabolite kept separate from a base metabolite with its ID is renamed with the ``__incoming`` suffix, so each model's reactions stay balanced against their own chemistry. Reactions with the same ID are the same reaction; when their stoichiometry differs (after mapping and renaming), the base reaction is kept and the difference reported. Reactions with different IDs merge when they share an annotation identifier and have exactly the same stoichiometry, H+ and H2O included."
+  },
+  {
+    "file": "src/thg_protocol/merge/__init__.py",
+    "line": 507,
+    "name": "apply_merge_plan",
+    "functional": "no issue found",
+    "scientific": "N/A: no scientific logic",
+    "function_rationale": "Purpose: Apply a reviewed plan to copies of both models. Incoming metabolites are renamed and mapped as planned, so a mapped metabolite takes the base ID (its chemistry is identical by construction). Overlapping reactions keep the base stoichiometry; bounds and GPRs follow the plan's policy, and names follow its source precedence."
+  },
+  {
+    "file": "src/thg_protocol/merge/__init__.py",
+    "line": 566,
+    "name": "validate_merged_model",
+    "functional": "no issue found",
+    "scientific": "N/A: no scientific logic",
+    "function_rationale": "Purpose: Run the maintained validation profile and optional versioned task suite."
+  },
+  {
+    "file": "src/thg_protocol/merge/__init__.py",
+    "line": 591,
+    "name": "_merge_annotation",
+    "functional": "no issue found",
+    "scientific": "N/A: no scientific logic",
+    "function_rationale": "Purpose: Copy non-empty incoming annotations without sharing mutable values."
+  },
+  {
+    "file": "src/thg_protocol/merge/__init__.py",
+    "line": 598,
+    "name": "_write_model",
+    "functional": "no issue found",
+    "scientific": "N/A: no scientific logic",
+    "function_rationale": "Purpose: begins by from thg_protocol.io.models import save_model"
+  },
+  {
+    "file": "src/thg_protocol/merge/__init__.py",
+    "line": 604,
+    "name": "_combine",
+    "functional": "no issue found",
+    "scientific": "N/A: no scientific logic",
+    "function_rationale": "Purpose: Add the incoming objects to a copy of the base model, by ID. Called with an incoming model already renamed and mapped by a plan, so an overlapping metabolite has the same chemistry on both sides. Overlaps keep the base formula, charge, stoichiometry and bounds; names follow ``source_precedence``, non-empty annotations are added and missing GPRs filled."
+  },
+  {
+    "file": "src/thg_protocol/merge/__init__.py",
+    "line": 694,
+    "name": "merge_models",
+    "functional": "no issue found",
+    "scientific": "N/A: no scientific logic",
+    "function_rationale": "Purpose: Merge ``incoming_model`` into a copy of ``base_model``. Plans the merge with [`generate_merge_plan`][thg_protocol.merge.generate_merge_plan] and applies it, so metabolites merge only when they are the same species. Neither input model is mutated."
+  },
+  {
+    "file": "src/thg_protocol/merge/__init__.py",
+    "line": 730,
+    "name": "merge_models_from_paths",
+    "functional": "no issue found",
+    "scientific": "N/A: no scientific logic",
+    "function_rationale": "Purpose: Load two SBML/JSON models and merge them to an explicit output path."
+  },
+  {
+    "file": "src/thg_protocol/merge/__init__.py",
+    "line": 51,
+    "name": "__post_init__",
+    "functional": "no issue found",
+    "scientific": "N/A: no scientific logic",
+    "function_rationale": "Purpose: begins by choices = {'source_precedence': {'base', 'incoming'}, 'direction': {'strict', 'allow-reversal'}, 'bounds': {'report', 'base', 'incoming'}, 'gpr': {'re"
+  },
+  {
+    "file": "src/thg_protocol/merge/__init__.py",
+    "line": 78,
+    "name": "to_dict",
+    "functional": "no issue found",
+    "scientific": "N/A: no scientific logic",
+    "function_rationale": "Purpose: begins by return {'metabolite_map': dict(sorted(self.metabolite_map.items())), 'gene_map': dict(sorted(self.gene_map.items())), 'reaction_map': dict(sorted(self"
+  },
+  {
+    "file": "src/thg_protocol/merge/__init__.py",
+    "line": 91,
+    "name": "from_dict",
+    "functional": "no issue found",
+    "scientific": "N/A: no scientific logic",
+    "function_rationale": "Purpose: begins by policy = payload.get('policy', {})"
+  },
+  {
+    "file": "src/thg_protocol/merge/__init__.py",
+    "line": 249,
+    "name": "compartment",
+    "functional": "no issue found",
+    "scientific": "N/A: no scientific logic",
+    "function_rationale": "Purpose: begins by return model.metabolites.get_by_id(metabolite_id).compartment or ''"
+  },
+  {
+    "file": "src/thg_protocol/merge/__init__.py",
+    "line": 369,
+    "name": "note",
+    "functional": "no issue found",
+    "scientific": "N/A: no scientific logic",
+    "function_rationale": "Purpose: begins by names = [renamed[item] for item in source_ids.split(',') if item in renamed]"
+  },
+  {
+    "file": "src/thg_protocol/merge/__init__.py",
+    "line": 740,
+    "name": "load",
+    "functional": "no issue found",
+    "scientific": "N/A: no scientific logic",
+    "function_rationale": "Purpose: begins by return load_model(path)"
+  },
+  {
+    "file": "src/thg_protocol/merge/__init__.py",
+    "line": 102,
+    "name": "mapping",
+    "functional": "no issue found",
+    "scientific": "N/A: no scientific logic",
+    "function_rationale": "Purpose: begins by return {str(name): str(value) for name, value in dict(payload.get(key, {})).items()}"
+  },
+  {
+    "file": "src/thg_protocol/model_build/__init__.py",
+    "line": 28,
+    "name": "_identifiers",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by if value is None:"
+  },
+  {
+    "file": "src/thg_protocol/model_build/__init__.py",
+    "line": 45,
+    "name": "_load_json_cache",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by try:"
+  },
+  {
+    "file": "src/thg_protocol/model_build/__init__.py",
+    "line": 53,
+    "name": "_save_json_cache",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by path.parent.mkdir(parents=True, exist_ok=True)"
+  },
+  {
+    "file": "src/thg_protocol/model_build/__init__.py",
+    "line": 60,
+    "name": "build_model",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Annotate an existing COBRA model through injectable service clients. The workflow is deliberately explicit about all filesystem outputs. It preserves the model's reactions and stoichiometry, enriching reaction annotations from KEGG/BioCyc and gene annotations from Ensembl. Service clients are instantiated lazily only when a matching annotation exists, which keeps empty/toy models fully offline and testable."
+  },
+  {
+    "file": "src/thg_protocol/model_build/__init__.py",
+    "line": 220,
+    "name": "__getattr__",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by if name == 'build_model_batch':"
+  },
+  {
+    "file": "src/thg_protocol/model_build/batch.py",
+    "line": 14,
+    "name": "build_model_batch",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Annotate a model with batch-oriented service and cache boundaries. The model, output, cache, and error paths are explicit. Service clients are injectable for offline tests and production adapters are instantiated lazily by [`build_model`][thg_protocol.model_build.build_model]. Package-owned JSON caches are the source of annotation state."
+  },
+  {
+    "file": "src/thg_protocol/model_build/mass_balance.py",
+    "line": 20,
+    "name": "_numpy",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by if np is None:"
+  },
+  {
+    "file": "src/thg_protocol/model_build/mass_balance.py",
+    "line": 28,
+    "name": "gcd",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Return the greatest common divisor of two integers."
+  },
+  {
+    "file": "src/thg_protocol/model_build/mass_balance.py",
+    "line": 33,
+    "name": "formula_atoms",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Parse an elemental formula into an element/count mapping."
+  },
+  {
+    "file": "src/thg_protocol/model_build/mass_balance.py",
+    "line": 45,
+    "name": "formulas_conflict",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Return whether two formulas differ in anything but hydrogen. Formulas that differ only in H describe protonation states of the same compound and do not conflict. A missing or unparsable formula never conflicts."
+  },
+  {
+    "file": "src/thg_protocol/model_build/mass_balance.py",
+    "line": 61,
+    "name": "atom10",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Return legacy C/H/O/N/P/S/K/Ca/Na/Fe/X/R counts."
+  },
+  {
+    "file": "src/thg_protocol/model_build/mass_balance.py",
+    "line": 70,
+    "name": "missing_atoms",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Report net elemental differences in ``substrates -> products``."
+  },
+  {
+    "file": "src/thg_protocol/model_build/mass_balance.py",
+    "line": 83,
+    "name": "reaction_compare",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Return species newly present in ``first`` relative to ``second``."
+  },
+  {
+    "file": "src/thg_protocol/model_build/mass_balance.py",
+    "line": 96,
+    "name": "inarray",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Return the common integer multiplier between two vectors. This is the dependency-free portion of the historical mass-balance API. Zero entries in ``first`` must also be zero in ``second``; an empty or non-integral result returns the historical empty-string sentinel."
+  },
+  {
+    "file": "src/thg_protocol/model_build/mass_balance.py",
+    "line": 118,
+    "name": "equation_matrix",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Build an elemental composition matrix for an equation. Columns are compounds in left-to-right equation order and rows are the elements encountered in those compounds. Stoichiometric coefficients are included in the matrix and products have negative signs."
+  },
+  {
+    "file": "src/thg_protocol/model_build/mass_balance.py",
+    "line": 155,
+    "name": "balance_equation",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Return the smallest positive elemental-balance coefficients. Uses the same syntax as ``equation_matrix`` and replaces existing input coefficients. Minimizes the sum of positive integer coefficients; equations that cannot be balanced without adding compounds return two empty lists."
+  },
+  {
+    "file": "src/thg_protocol/model_build/mass_balance.py",
+    "line": 218,
+    "name": "count_atoms",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Compatibility implementation of the historical ``CountAtom`` helper."
+  },
+  {
+    "file": "src/thg_protocol/model_build/mass_balance.py",
+    "line": 227,
+    "name": "balance_reaction",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Return the historical eleven-field reaction-balance result. This dependency-free implementation reports an unbalanced equation when no positive elemental solution exists. It does not invent proton or water terms; callers that need that chemistry must add them explicitly."
+  },
+  {
+    "file": "src/thg_protocol/model_build/mass_balance.py",
+    "line": 262,
+    "name": "nullity",
+    "functional": "finding: F8",
+    "scientific": "finding: F8: trailing unit rows can duplicate independent rows and leave the returned completion matrix rank deficient",
+    "function_rationale": "finding: F8: trailing unit rows can duplicate independent rows and leave the returned completion matrix rank deficient"
+  },
+  {
+    "file": "src/thg_protocol/model_build/mass_balance.py",
+    "line": 289,
+    "name": "inv",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Return the inverse of a square numeric matrix."
+  },
+  {
+    "file": "src/thg_protocol/model_build/mass_balance.py",
+    "line": 298,
+    "name": "maximum_gcd",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Return the GCD of integer expressions after substituting ``variable``."
+  },
+  {
+    "file": "src/thg_protocol/model_build/mass_balance.py",
+    "line": 340,
+    "name": "reformulate_glycan_equation",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Replace glycan IDs in an equation with symbolic formula letters."
+  },
+  {
+    "file": "src/thg_protocol/model_build/mass_balance.py",
+    "line": 86,
+    "name": "sides",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by left, right = equation.replace(' ', '').split('->', 1)"
+  },
+  {
+    "file": "src/thg_protocol/model_build/mass_balance.py",
+    "line": 302,
+    "name": "calculate",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by operators = {ast.Add: lambda left, right: left + right, ast.Sub: lambda left, right: left - right, ast.Mult: lambda left, right: left * right, ast.Div"
+  },
+  {
+    "file": "src/thg_protocol/model_build/mass_balance.py",
+    "line": 364,
+    "name": "render",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by values = []"
+  },
+  {
+    "file": "src/thg_protocol/model_build/mass_balance.py",
+    "line": 310,
+    "name": "visit",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by if isinstance(node, ast.Expression):"
+  },
+  {
+    "file": "src/thg_protocol/pathway/cli.py",
+    "line": 11,
+    "name": "build_parser",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by parser = argparse.ArgumentParser(description='Implement configured pathway components in a JSON model.')"
+  },
+  {
+    "file": "src/thg_protocol/pathway/cli.py",
+    "line": 26,
+    "name": "main",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Run the pathway CLI and return an exit status."
+  },
+  {
+    "file": "src/thg_protocol/pathway/core.py",
+    "line": 26,
+    "name": "substitute_compartment_abbreviations",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Replace bracketed config compartments with model abbreviations."
+  },
+  {
+    "file": "src/thg_protocol/pathway/core.py",
+    "line": 38,
+    "name": "select_pathway_metabolites",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Select configured metabolite definitions for one model compartment."
+  },
+  {
+    "file": "src/thg_protocol/pathway/core.py",
+    "line": 66,
+    "name": "build_reaction_from_config",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Build a serializable reaction dictionary from parsed data and config."
+  },
+  {
+    "file": "src/thg_protocol/pathway/core.py",
+    "line": 96,
+    "name": "parse_reaction_equation",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Parse a universal reaction equation without resolving metabolites."
+  },
+  {
+    "file": "src/thg_protocol/pathway/core.py",
+    "line": 141,
+    "name": "parse_universal_reaction",
+    "functional": "finding: F1",
+    "scientific": "finding: F1: unresolved equation terms are skipped, so returned stoichiometry can omit required participants",
+    "function_rationale": "finding: F1: unresolved equation terms are skipped, so returned stoichiometry can omit required participants"
+  },
+  {
+    "file": "src/thg_protocol/pathway/core.py",
+    "line": 172,
+    "name": "create_compartment_metabolites",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Create configured metabolites in a model dictionary. The model is mutated in place. Existing metabolites are preserved and the return value is the number of newly appended metabolites. Missing base metabolites are skipped, matching the legacy workflow behavior."
+  },
+  {
+    "file": "src/thg_protocol/pathway/core.py",
+    "line": 266,
+    "name": "create_compartment_reactions",
+    "functional": "finding: F2",
+    "scientific": "finding: F2: auto IDs are allocated before later explicit IDs are reserved; a collision silently skips the later config row",
+    "function_rationale": "finding: F2: auto IDs are allocated before later explicit IDs are reserved; a collision silently skips the later config row"
+  },
+  {
+    "file": "src/thg_protocol/pathway/core.py",
+    "line": 311,
+    "name": "find_metabolite_by_formula_in_model",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Find the first metabolite with a matching formula and optional compartment."
+  },
+  {
+    "file": "src/thg_protocol/pathway/core.py",
+    "line": 327,
+    "name": "get_metabolite_id_base",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Return a metabolite identifier without its compartment suffix."
+  },
+  {
+    "file": "src/thg_protocol/pathway/core.py",
+    "line": 335,
+    "name": "get_next_metabolite_id",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Get the next available metabolite ID in the MAM##### format."
+  },
+  {
+    "file": "src/thg_protocol/pathway/core.py",
+    "line": 348,
+    "name": "get_next_reaction_id",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Get the next available reaction ID in the MAR##### format."
+  },
+  {
+    "file": "src/thg_protocol/pathway/core.py",
+    "line": 361,
+    "name": "find_metabolite_by_annotation",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Find a metabolite by matching its annotations against an ID database."
+  },
+  {
+    "file": "src/thg_protocol/pathway/core.py",
+    "line": 406,
+    "name": "create_metabolite_in_new_compartment",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Create a copy of a metabolite in a different compartment."
+  },
+  {
+    "file": "src/thg_protocol/pathway/core.py",
+    "line": 430,
+    "name": "find_metabolite_robust",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Find a metabolite by exact, annotation, substring, or formula matching."
+  },
+  {
+    "file": "src/thg_protocol/pathway/core.py",
+    "line": 511,
+    "name": "add_compartment",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Add a compartment to a model dictionary."
+  },
+  {
+    "file": "src/thg_protocol/pathway/core.py",
+    "line": 524,
+    "name": "check_pathway_exists",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Return counts and IDs for a compartment/pathway in a model dictionary."
+  },
+  {
+    "file": "src/thg_protocol/pathway/kegg_listing.py",
+    "line": 11,
+    "name": "_reaction_ids",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by values: list[str] = []"
+  },
+  {
+    "file": "src/thg_protocol/pathway/kegg_listing.py",
+    "line": 18,
+    "name": "list_pathway_reactions",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Write pathway IDs, names, and reaction IDs to a TSV file."
+  },
+  {
+    "file": "src/thg_protocol/pathway/workflow.py",
+    "line": 18,
+    "name": "implement_pathway",
+    "functional": "finding: F3",
+    "scientific": "finding: F3: global reaction config is reapplied for every configured compartment, duplicating ID-less reactions",
+    "function_rationale": "finding: F3: global reaction config is reapplied for every configured compartment, duplicating ID-less reactions"
+  },
+  {
+    "file": "src/thg_protocol/pathway/workflow.py",
+    "line": 136,
+    "name": "implement_pathway_files",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: Load a JSON or SBML model plus JSON inputs, run [`implement_pathway`][thg_protocol.pathway.workflow.implement_pathway], and write the result."
+  },
+  {
+    "file": "src/thg_protocol/pathway/workflow.py",
+    "line": 74,
+    "name": "choose_key",
+    "functional": "no issue found",
+    "scientific": "no issue found",
+    "function_rationale": "Purpose: begins by for key in candidate_keys:"
+  },
+  {
+    "file": "src/thg_protocol/raven_tasks.py",
+    "line": 138,
+    "name": "load_task_mapping",
+    "functional": "no issue found",
+    "scientific": "N/A: no scientific logic",
+    "function_rationale": "Purpose: Load a JSON mapping of ``metabolites``, ``compartments``, ``reactions``."
+  },
+  {
+    "file": "src/thg_protocol/raven_tasks.py",
+    "line": 173,
+    "name": "read_raven_rows",
+    "functional": "no issue found",
+    "scientific": "N/A: no scientific logic",
+    "function_rationale": "Purpose: Read the header and data rows of a tab-delimited RAVEN task table."
+  },
+  {
+    "file": "src/thg_protocol/raven_tasks.py",
+    "line": 331,
+    "name": "_number",
+    "functional": "no issue found",
+    "scientific": "N/A: no scientific logic",
+    "function_rationale": "Purpose: begins by text = row.get(column)"
+  },
+  {
+    "file": "src/thg_protocol/raven_tasks.py",
+    "line": 350,
+    "name": "_split",
+    "functional": "no issue found",
+    "scientific": "N/A: no scientific logic",
+    "function_rationale": "Purpose: begins by return [item.strip() for item in text.split(';') if item.strip()]"
+  },
+  {
+    "file": "src/thg_protocol/raven_tasks.py",
+    "line": 354,
+    "name": "_should_fail",
+    "functional": "no issue found",
+    "scientific": "N/A: no scientific logic",
+    "function_rationale": "Purpose: begins by text = row.get('SHOULD FAIL')"
+  },
+  {
+    "file": "src/thg_protocol/raven_tasks.py",
+    "line": 373,
+    "name": "_intersect",
+    "functional": "no issue found",
+    "scientific": "N/A: no scientific logic",
+    "function_rationale": "Purpose: begins by result = {}"
+  },
+  {
+    "file": "src/thg_protocol/raven_tasks.py",
+    "line": 406,
+    "name": "_side",
+    "functional": "no issue found",
+    "scientific": "N/A: no scientific logic",
+    "function_rationale": "Purpose: begins by explicit: dict[str, list[tuple[tuple[float, float], SourceRow, str]]] = {}"
+  },
+  {
+    "file": "src/thg_protocol/raven_tasks.py",
+    "line": 451,
+    "name": "_equation",
+    "functional": "no issue found",
+    "scientific": "N/A: no scientific logic",
+    "function_rationale": "Purpose: begins by if ' <=> ' in f' {text} ':"
+  },
+  {
+    "file": "src/thg_protocol/raven_tasks.py",
+    "line": 510,
+    "name": "_changed",
+    "functional": "no issue found",
+    "scientific": "N/A: no scientific logic",
+    "function_rationale": "Purpose: begins by declared: dict[str, list[tuple[tuple[float, float], SourceRow, str]]] = {}"
+  },
+  {
+    "file": "src/thg_protocol/raven_tasks.py",
+    "line": 549,
+    "name": "_build_task",
+    "functional": "no issue found",
+    "scientific": "N/A: no scientific logic",
+    "function_rationale": "Purpose: begins by first = draft.rows[0]"
+  },
+  {
+    "file": "src/thg_protocol/raven_tasks.py",
+    "line": 610,
+    "name": "_sha256",
+    "functional": "no issue found",
+    "scientific": "N/A: no scientific logic",
+    "function_rationale": "Purpose: begins by return hashlib.sha256(path.read_bytes()).hexdigest()"
+  },
+  {
+    "file": "src/thg_protocol/raven_tasks.py",
+    "line": 614,
+    "name": "import_raven_tasks",
+    "functional": "no issue found",
+    "scientific": "N/A: no scientific logic",
+    "function_rationale": "Purpose: Import a RAVEN task table against ``model``. Tasks with problems stay in the suite and run as ``invalid``; use :attr:`RavenImport.resolved` for the resolved tasks only. Rows that do not belong to any task raise ``ValueError``."
+  },
+  {
+    "file": "src/thg_protocol/raven_tasks.py",
+    "line": 679,
+    "name": "convert_raven_tasks",
+    "functional": "no issue found",
+    "scientific": "N/A: no scientific logic",
+    "function_rationale": "Purpose: Import a RAVEN table and write it as a JSON task suite. Refuses to write while problems remain, unless ``resolved_only`` writes the resolved tasks and lists the omitted ones in ``metadata.omitted_tasks``."
+  },
+  {
+    "file": "src/thg_protocol/raven_tasks.py",
+    "line": 703,
+    "name": "is_raven_table",
+    "functional": "no issue found",
+    "scientific": "N/A: no scientific logic",
+    "function_rationale": "Purpose: begins by return Path(path).suffix.lower() in TABLE_SUFFIXES"
+  },
+  {
+    "file": "src/thg_protocol/raven_tasks.py",
+    "line": 707,
+    "name": "task_input_version",
+    "functional": "no issue found",
+    "scientific": "N/A: no scientific logic",
+    "function_rationale": "Purpose: The suite version a task input has, without importing a RAVEN table."
+  },
+  {
+    "file": "src/thg_protocol/raven_tasks.py",
+    "line": 714,
+    "name": "load_task_input",
+    "functional": "no issue found",
+    "scientific": "N/A: no scientific logic",
+    "function_rationale": "Purpose: Load a JSON task suite, or import a RAVEN table against ``model``."
+  },
+  {
+    "file": "src/thg_protocol/raven_tasks.py",
+    "line": 107,
+    "name": "__post_init__",
+    "functional": "no issue found",
+    "scientific": "N/A: no scientific logic",
+    "function_rationale": "Purpose: begins by for name in ('metabolites', 'compartments', 'reactions'):"
+  },
+  {
+    "file": "src/thg_protocol/raven_tasks.py",
+    "line": 128,
+    "name": "metabolite",
+    "functional": "no issue found",
+    "scientific": "N/A: no scientific logic",
+    "function_rationale": "Purpose: begins by return self._metabolites.get(text.strip().upper())"
+  },
+  {
+    "file": "src/thg_protocol/raven_tasks.py",
+    "line": 131,
+    "name": "compartment",
+    "functional": "no issue found",
+    "scientific": "N/A: no scientific logic",
+    "function_rationale": "Purpose: begins by return self._compartments.get(label.strip().upper(), label.strip())"
+  },
+  {
+    "file": "src/thg_protocol/raven_tasks.py",
+    "line": 134,
+    "name": "reaction",
+    "functional": "no issue found",
+    "scientific": "N/A: no scientific logic",
+    "function_rationale": "Purpose: begins by return self._reactions.get(reaction_id.strip(), reaction_id.strip())"
+  },
+  {
+    "file": "src/thg_protocol/raven_tasks.py",
+    "line": 159,
+    "name": "get",
+    "functional": "no issue found",
+    "scientific": "N/A: no scientific logic",
+    "function_rationale": "Purpose: begins by for name, value in self.cells:"
+  },
+  {
+    "file": "src/thg_protocol/raven_tasks.py",
+    "line": 165,
+    "name": "to_dict",
+    "functional": "no issue found",
+    "scientific": "N/A: no scientific logic",
+    "function_rationale": "Purpose: begins by return {'file': file, 'row': self.row, 'columns': [[name, value] for name, value in self.cells]}"
+  },
+  {
+    "file": "src/thg_protocol/raven_tasks.py",
+    "line": 221,
+    "name": "resolved",
+    "functional": "no issue found",
+    "scientific": "N/A: no scientific logic",
+    "function_rationale": "Purpose: The suite without invalid tasks; omitted tasks are listed in metadata."
+  },
+  {
+    "file": "src/thg_protocol/raven_tasks.py",
+    "line": 236,
+    "name": "__init__",
+    "functional": "no issue found",
+    "scientific": "N/A: no scientific logic",
+    "function_rationale": "Purpose: begins by self.model = model"
+  },
+  {
+    "file": "src/thg_protocol/raven_tasks.py",
+    "line": 255,
+    "name": "problem",
+    "functional": "no issue found",
+    "scientific": "N/A: no scientific logic",
+    "function_rationale": "Purpose: begins by item: dict[str, object] = {'task': None if draft is None else draft.raven_id, 'file': self.file, 'row': row.row, 'column': column, 'text': text, 'mess"
+  },
+  {
+    "file": "src/thg_protocol/raven_tasks.py",
+    "line": 279,
+    "name": "compartment",
+    "functional": "no issue found",
+    "scientific": "N/A: no scientific logic",
+    "function_rationale": "Purpose: begins by return self.compartments.get(self.mapping.compartment(label).upper())"
+  },
+  {
+    "file": "src/thg_protocol/raven_tasks.py",
+    "line": 282,
+    "name": "wildcard",
+    "functional": "no issue found",
+    "scientific": "N/A: no scientific logic",
+    "function_rationale": "Purpose: Expand ALLMETS / ALLMETSIN[comp]; ``None`` if ``text`` is neither."
+  },
+  {
+    "file": "src/thg_protocol/raven_tasks.py",
+    "line": 297,
+    "name": "metabolite",
+    "functional": "no issue found",
+    "scientific": "N/A: no scientific logic",
+    "function_rationale": "Purpose: Resolve ``name[comp]`` to a metabolite ID, or explain why not."
+  },
+  {
+    "file": "src/thg_protocol/reaction_config.py",
+    "line": 20,
+    "name": "default_lower_bound",
+    "functional": "no issue found",
+    "scientific": "N/A: no scientific logic",
+    "function_rationale": "Purpose: Return the default lower bound implied by a config equation string."
+  },
+  {
+    "file": "src/thg_protocol/reaction_config.py",
+    "line": 27,
+    "name": "build_reaction_entry",
+    "functional": "no issue found",
+    "scientific": "N/A: no scientific logic",
+    "function_rationale": "Purpose: Build and validate a reaction entry compatible with pathway configs."
+  },
+  {
+    "file": "src/thg_protocol/reaction_config.py",
+    "line": 69,
+    "name": "upsert_reaction_entry",
+    "functional": "no issue found",
+    "scientific": "N/A: no scientific logic",
+    "function_rationale": "Purpose: Return a config copy with ``reaction_entry`` inserted or overwritten."
+  },
+  {
+    "file": "src/thg_protocol/tasks.py",
+    "line": 90,
+    "name": "_number",
+    "functional": "no issue found",
+    "scientific": "N/A: no scientific logic",
+    "function_rationale": "Purpose: begins by if isinstance(value, bool) or not isinstance(value, (int, float)):"
+  },
+  {
+    "file": "src/thg_protocol/tasks.py",
+    "line": 99,
+    "name": "_text",
+    "functional": "no issue found",
+    "scientific": "N/A: no scientific logic",
+    "function_rationale": "Purpose: begins by if value is None and optional:"
+  },
+  {
+    "file": "src/thg_protocol/tasks.py",
+    "line": 107,
+    "name": "_check_keys",
+    "functional": "no issue found",
+    "scientific": "N/A: no scientific logic",
+    "function_rationale": "Purpose: begins by unknown = sorted((str(key) for key in payload if key not in allowed))"
+  },
+  {
+    "file": "src/thg_protocol/tasks.py",
+    "line": 113,
+    "name": "_bound_pair",
+    "functional": "no issue found",
+    "scientific": "N/A: no scientific logic",
+    "function_rationale": "Purpose: begins by if not isinstance(value, (list, tuple)) or len(value) != 2:"
+  },
+  {
+    "file": "src/thg_protocol/tasks.py",
+    "line": 123,
+    "name": "_constraint_map",
+    "functional": "no issue found",
+    "scientific": "N/A: no scientific logic",
+    "function_rationale": "Purpose: begins by if value is None:"
+  },
+  {
+    "file": "src/thg_protocol/tasks.py",
+    "line": 136,
+    "name": "_temporary_reaction",
+    "functional": "no issue found",
+    "scientific": "N/A: no scientific logic",
+    "function_rationale": "Purpose: begins by if not isinstance(value, Mapping):"
+  },
+  {
+    "file": "src/thg_protocol/tasks.py",
+    "line": 182,
+    "name": "_metadata",
+    "functional": "no issue found",
+    "scientific": "N/A: no scientific logic",
+    "function_rationale": "Purpose: begins by if value is None:"
+  },
+  {
+    "file": "src/thg_protocol/tasks.py",
+    "line": 508,
+    "name": "_reject_duplicate_keys",
+    "functional": "no issue found",
+    "scientific": "N/A: no scientific logic",
+    "function_rationale": "Purpose: begins by result: dict[str, object] = {}"
+  },
+  {
+    "file": "src/thg_protocol/tasks.py",
+    "line": 517,
+    "name": "load_task_suite",
+    "functional": "no issue found",
+    "scientific": "N/A: no scientific logic",
+    "function_rationale": "Purpose: begins by payload = json.loads(Path(path).read_text(encoding='utf-8'), object_pairs_hook=_reject_duplicate_keys)"
+  },
+  {
+    "file": "src/thg_protocol/tasks.py",
+    "line": 527,
+    "name": "save_task_suite",
+    "functional": "no issue found",
+    "scientific": "N/A: no scientific logic",
+    "function_rationale": "Purpose: Write ``suite`` as JSON; tasks with unresolved import problems are refused."
+  },
+  {
+    "file": "src/thg_protocol/tasks.py",
+    "line": 543,
+    "name": "_definition_problems",
+    "functional": "no issue found",
+    "scientific": "N/A: no scientific logic",
+    "function_rationale": "Purpose: begins by problems = [str(item.get('message', item)) for item in task.problems]"
+  },
+  {
+    "file": "src/thg_protocol/tasks.py",
+    "line": 573,
+    "name": "_result",
+    "functional": "no issue found",
+    "scientific": "N/A: no scientific logic",
+    "function_rationale": "Purpose: begins by result: dict[str, object] = {'id': task.id, 'version': task.version, 'group': task.group, 'kind': task.kind, 'identity': task.identity, 'solver': task"
+  },
+  {
+    "file": "src/thg_protocol/tasks.py",
+    "line": 592,
+    "name": "_evaluate",
+    "functional": "no issue found",
+    "scientific": "N/A: no scientific logic",
+    "function_rationale": "Purpose: Evaluate one task inside a model context so every change is reverted."
+  },
+  {
+    "file": "src/thg_protocol/tasks.py",
+    "line": 683,
+    "name": "_run_on",
+    "functional": "no issue found",
+    "scientific": "N/A: no scientific logic",
+    "function_rationale": "Purpose: begins by try:"
+  },
+  {
+    "file": "src/thg_protocol/tasks.py",
+    "line": 694,
+    "name": "_solver_model",
+    "functional": "no issue found",
+    "scientific": "N/A: no scientific logic",
+    "function_rationale": "Purpose: begins by if task.solver not in cache:"
+  },
+  {
+    "file": "src/thg_protocol/tasks.py",
+    "line": 703,
+    "name": "run_task",
+    "functional": "no issue found",
+    "scientific": "N/A: no scientific logic",
+    "function_rationale": "Purpose: Execute one task on a copy of ``model``; the input is never modified."
+  },
+  {
+    "file": "src/thg_protocol/tasks.py",
+    "line": 708,
+    "name": "run_tasks",
+    "functional": "no issue found",
+    "scientific": "N/A: no scientific logic",
+    "function_rationale": "Purpose: Execute tasks serially, in order, on per-solver copies of ``model``."
+  },
+  {
+    "file": "src/thg_protocol/tasks.py",
+    "line": 746,
+    "name": "run_task_suite",
+    "functional": "no issue found",
+    "scientific": "N/A: no scientific logic",
+    "function_rationale": "Purpose: begins by report = run_tasks(model, suite.tasks)"
+  },
+  {
+    "file": "src/thg_protocol/tasks.py",
+    "line": 228,
+    "name": "__post_init__",
+    "functional": "no issue found",
+    "scientific": "N/A: no scientific logic",
+    "function_rationale": "Purpose: begins by _text(self.reaction, 'objective reaction')"
+  },
+  {
+    "file": "src/thg_protocol/tasks.py",
+    "line": 240,
+    "name": "from_mapping",
+    "functional": "no issue found",
+    "scientific": "N/A: no scientific logic",
+    "function_rationale": "Purpose: begins by if not isinstance(payload, Mapping):"
+  },
+  {
+    "file": "src/thg_protocol/tasks.py",
+    "line": 255,
+    "name": "to_dict",
+    "functional": "no issue found",
+    "scientific": "N/A: no scientific logic",
+    "function_rationale": "Purpose: begins by return {'reaction': self.reaction, 'direction': self.direction, 'threshold': self.threshold}"
+  },
+  {
+    "file": "src/thg_protocol/tasks.py",
+    "line": 262,
+    "name": "satisfied_by",
+    "functional": "no issue found",
+    "scientific": "N/A: no scientific logic",
+    "function_rationale": "Purpose: begins by if self.direction == 'max':"
+  },
+  {
+    "file": "src/thg_protocol/tasks.py",
+    "line": 288,
+    "name": "__post_init__",
+    "functional": "no issue found",
+    "scientific": "N/A: no scientific logic",
+    "function_rationale": "Purpose: begins by _text(self.id, 'task id')"
+  },
+  {
+    "file": "src/thg_protocol/tasks.py",
+    "line": 336,
+    "name": "kind",
+    "functional": "no issue found",
+    "scientific": "N/A: no scientific logic",
+    "function_rationale": "Purpose: begins by return 'feasibility' if self.objective is None else 'objective'"
+  },
+  {
+    "file": "src/thg_protocol/tasks.py",
+    "line": 339,
+    "name": "exchange_bounds",
+    "functional": "no issue found",
+    "scientific": "N/A: no scientific logic",
+    "function_rationale": "Purpose: Source and sink reactions for inputs and outputs. Returns ``{reaction ID: (metabolite ID, coefficient, bounds)}``. For a metabolite that is both input and output, a nonzero lower bound on one side closes the other side, as RAVEN's balance bounds do."
+  },
+  {
+    "file": "src/thg_protocol/tasks.py",
+    "line": 366,
+    "name": "reaction_bounds",
+    "functional": "no issue found",
+    "scientific": "N/A: no scientific logic",
+    "function_rationale": "Purpose: Intersect every explicit constraint per reaction, in first-seen order."
+  },
+  {
+    "file": "src/thg_protocol/tasks.py",
+    "line": 395,
+    "name": "from_mapping",
+    "functional": "no issue found",
+    "scientific": "N/A: no scientific logic",
+    "function_rationale": "Purpose: begins by if not isinstance(payload, Mapping):"
+  },
+  {
+    "file": "src/thg_protocol/tasks.py",
+    "line": 427,
+    "name": "to_dict",
+    "functional": "no issue found",
+    "scientific": "N/A: no scientific logic",
+    "function_rationale": "Purpose: begins by result: dict[str, object] = {'id': self.id, 'version': self.version}"
+  },
+  {
+    "file": "src/thg_protocol/tasks.py",
+    "line": 460,
+    "name": "__post_init__",
+    "functional": "no issue found",
+    "scientific": "N/A: no scientific logic",
+    "function_rationale": "Purpose: begins by _text(self.id, 'task suite id')"
+  },
+  {
+    "file": "src/thg_protocol/tasks.py",
+    "line": 472,
+    "name": "to_dict",
+    "functional": "no issue found",
+    "scientific": "N/A: no scientific logic",
+    "function_rationale": "Purpose: begins by result: dict[str, object] = {'schema_version': TASK_SCHEMA_VERSION, 'id': self.id, 'version': self.version, 'tasks': [task.to_dict() for task in self."
+  },
+  {
+    "file": "src/thg_protocol/tasks.py",
+    "line": 484,
+    "name": "from_mapping",
+    "functional": "no issue found",
+    "scientific": "N/A: no scientific logic",
+    "function_rationale": "Purpose: begins by _check_keys(payload, _SUITE_KEYS, 'task suite')"
+  },
+  {
+    "file": "supplementary_material/extra.ipynb",
+    "line": 39,
+    "name": "core_id_from_model",
+    "cell": 1,
+    "functional": "no issue found",
+    "scientific": "Normalizes metabolite IDs to a compartment-free key; identity mapping only.",
+    "function_rationale": "Purpose: Return a compartment-free 'core' metabolite string for ID formats: - met_core_c (underscore) - met_core[c] (brackets) - met_corec (flat suffix; last char(s) is the compartment)"
+  },
+  {
+    "file": "supplementary_material/extra.ipynb",
+    "line": 58,
+    "name": "is_single_met_boundary",
+    "cell": 1,
+    "functional": "no issue found",
+    "scientific": "Selects one-metabolite COBRA boundary reactions by structural membership; does not infer exchange feasibility.",
+    "function_rationale": "Purpose: begins by return len(r.metabolites) == 1 and r.id in {rx.id for rx in r.model.boundary}"
+  },
+  {
+    "file": "supplementary_material/extra.ipynb",
+    "line": 61,
+    "name": "extract_boundary_df",
+    "cell": 1,
+    "functional": "no issue found",
+    "scientific": "Reports boundary reaction stoichiometry and bounds as tabular data.",
+    "function_rationale": "Purpose: begins by if rxn_ids is None:"
+  },
+  {
+    "file": "supplementary_material/extra.ipynb",
+    "line": 85,
+    "name": "make_core_comp_index",
+    "cell": 1,
+    "functional": "no issue found",
+    "scientific": "Indexes boundary reactions by normalized metabolite and compartment; first matching reaction wins.",
+    "function_rationale": "Purpose: Build an index for single-metabolite boundary reactions: key = (core_met_id, compartment) \u2192 reaction object"
+  },
+  {
+    "file": "supplementary_material/extra.ipynb",
+    "line": 33,
+    "name": "is_single_met_boundary",
+    "cell": 2,
+    "functional": "no issue found",
+    "scientific": "Selects one-metabolite COBRA boundary reactions by structural membership; catches lookup errors as false.",
+    "function_rationale": "Purpose: True for single-metabolite boundary reactions in a COBRA model."
+  },
+  {
+    "file": "supplementary_material/extra.ipynb",
+    "line": 40,
+    "name": "core_id_from_model",
+    "cell": 2,
+    "functional": "no issue found",
+    "scientific": "Normalizes metabolite IDs to a compartment-free key; identity mapping only.",
+    "function_rationale": "Purpose: Compartment-agnostic metabolite 'core' (works for _c, [c], or ...c suffix)."
+  },
+  {
+    "file": "supplementary_material/extra.ipynb",
+    "line": 56,
+    "name": "extract_boundary_df",
+    "cell": 2,
+    "functional": "no issue found",
+    "scientific": "Reports boundary reaction stoichiometry and bounds as tabular data.",
+    "function_rationale": "Purpose: Return a DataFrame of boundary reactions (single-met), including equation & bounds. Optionally restrict to a set of reaction IDs."
+  },
+  {
+    "file": "supplementary_material/extra.ipynb",
+    "line": 85,
+    "name": "make_core_comp_index",
+    "cell": 2,
+    "functional": "no issue found",
+    "scientific": "Indexes boundary reactions by normalized metabolite and compartment; first matching reaction wins.",
+    "function_rationale": "Purpose: Index single-metabolite boundary reactions by (core_met_id, compartment) \u2192 reaction. If multiple reactions share the same key, the first is kept (we\u2019ll deduplicate output)."
+  },
+  {
+    "file": "supplementary_material/extra.ipynb",
+    "line": 34,
+    "name": "core_id",
+    "cell": 4,
+    "functional": "no issue found",
+    "scientific": "Normalizes metabolite IDs to a compartment-free key; identity mapping only.",
+    "function_rationale": "Purpose: Return compartment-free metabolite core ID for styles *_c*, *[c]*, or flat suffix *...c*."
+  },
+  {
+    "file": "supplementary_material/extra.ipynb",
+    "line": 48,
+    "name": "_normalize_ann",
+    "cell": 4,
+    "functional": "no issue found",
+    "scientific": "Converts external annotation values to strings for reporting.",
+    "function_rationale": "Purpose: Return annotation value as string; join lists/tuples/sets with ';'."
+  },
+  {
+    "file": "supplementary_material/extra.ipynb",
+    "line": 56,
+    "name": "get_first_ann",
+    "cell": 4,
+    "functional": "no issue found",
+    "scientific": "Selects the first populated annotation from a priority-ordered key list.",
+    "function_rationale": "Purpose: Return first non-empty annotation among the provided keys. Example: get_first_ann(r.annotation, 'vmhreaction', 'vmh.reaction')"
+  },
+  {
+    "file": "supplementary_material/extra.ipynb",
+    "line": 66,
+    "name": "met_row",
+    "cell": 4,
+    "functional": "no issue found",
+    "scientific": "Collects metabolite formula, compartment, and external identifiers into a report row.",
+    "function_rationale": "Purpose: Build a dict with metabolite fields + external IDs, skipping if met not in model."
+  },
+  {
+    "file": "supplementary_material/extra.ipynb",
+    "line": 92,
+    "name": "classify_deadend_in_final_model",
+    "cell": 4,
+    "functional": "finding: F7",
+    "scientific": "finding: F7: substrate/product labels use stoichiometric signs while ignoring feasible flux directions in reaction bounds",
+    "function_rationale": "finding: F7: substrate/product labels use stoichiometric signs while ignoring feasible flux directions in reaction bounds"
+  },
+  {
+    "file": "supplementary_material/extra.ipynb",
+    "line": 119,
+    "name": "reaction_ann_cols",
+    "cell": 4,
+    "functional": "no issue found",
+    "scientific": "Collects reaction external identifiers into report columns.",
+    "function_rationale": "Purpose: Return reaction external IDs as dict columns."
+  },
+  {
+    "file": "supplementary_material/extra.ipynb",
+    "line": 129,
+    "name": "met_ann_cols",
+    "cell": 4,
+    "functional": "no issue found",
+    "scientific": "Collects metabolite external identifiers into report columns.",
+    "function_rationale": "Purpose: Return metabolite external IDs as dict columns (for TR sheet)."
+  },
+  {
+    "file": "supplementary_material/extra.ipynb",
+    "line": 144,
+    "name": "tr_row",
+    "cell": 4,
+    "functional": "no issue found",
+    "scientific": "Reports stoichiometric equation-forward transport orientation as a hint and includes reaction bounds; it does not claim feasible net direction.",
+    "function_rationale": "Purpose: Build a row for a transport reaction: reaction info and the two metabolites it connects."
+  },
+  {
+    "file": "supplementary_material/extra.ipynb",
+    "line": 198,
+    "name": "df_from_met_list",
+    "cell": 4,
+    "functional": "no issue found",
+    "scientific": "Builds a metabolite report table and counts unresolved IDs.",
+    "function_rationale": "Purpose: begins by rows, skips = ([], 0)"
+  },
+  {
+    "file": "supplementary_material/extra.ipynb",
+    "line": 226,
+    "name": "load_list",
+    "cell": 4,
+    "functional": "no issue found",
+    "scientific": "Loads a local pickle list for the notebook report; malformed or missing files produce an empty list.",
+    "function_rationale": "Purpose: begins by if not os.path.exists(p):"
+  },
+  {
+    "file": "supplementary_material/extra.ipynb",
+    "line": 31,
+    "name": "_norm_anno",
+    "cell": 6,
+    "functional": "no issue found",
+    "scientific": "Normalizes annotation values for display.",
+    "function_rationale": "Purpose: Normalize annotation field: join lists/tuples, pass strings, else ''."
+  },
+  {
+    "file": "supplementary_material/extra.ipynb",
+    "line": 42,
+    "name": "load_protected_ids",
+    "cell": 6,
+    "functional": "no issue found",
+    "scientific": "Parses and deduplicates reaction identifiers from a local text list.",
+    "function_rationale": "Purpose: begins by ids = []"
+  },
+  {
+    "file": "supplementary_material/crucial_exchange_rs.ipynb",
+    "line": 6,
+    "name": "read_list",
+    "cell": 1,
+    "functional": "no issue found",
+    "scientific": "Parses tab-separated metabolite/reaction identifiers for cross-model presence checks.",
+    "function_rationale": "Purpose: Reads a text file where fields are separated by tabs. Skips the first line (header). Returns a list of lists, where each inner list represents a row's fields (ec_reaction, ec_met, thg_met)."
+  },
+  {
+    "file": "supplementary_material/crucial_exchange_rs.ipynb",
+    "line": 22,
+    "name": "main",
+    "cell": 1,
+    "functional": "no issue found",
+    "scientific": "Compares listed metabolite and boundary-reaction presence across model versions; presence is not a feasibility test.",
+    "function_rationale": "Purpose: begins by crucial_exch_rxns = 'model_full_THG_missing_exchange_edited.txt'"
+  },
+  {
+    "file": "supplementary_material/crucial_exchange_rs.ipynb",
+    "line": 34,
+    "name": "norm_list",
+    "cell": 4,
+    "functional": "no issue found",
+    "scientific": "Normalizes annotation values for display.",
+    "function_rationale": "Purpose: begins by val = ann.get(key, [])"
+  },
+  {
+    "file": "supplementary_material/crucial_exchange_rs.ipynb",
+    "line": 5,
+    "name": "get_mar_id_generator",
+    "cell": 8,
+    "functional": "no issue found",
+    "scientific": "Generates unused sequential MAR identifiers from the model reaction inventory.",
+    "function_rationale": "Purpose: Yields unique MAR##### IDs, starting one above the current max in `model`."
+  },
+  {
+    "file": "supplementary_material/crucial_exchange_rs.ipynb",
+    "line": 20,
+    "name": "classify_reaction",
+    "cell": 8,
+    "functional": "no issue found",
+    "scientific": "Classifies reaction role using COBRA exchange, demand, and sink collections.",
+    "function_rationale": "Purpose: Return 'exchange', 'demands', 'sink', or 'internal'."
+  },
+  {
+    "file": "supplementary_material/crucial_exchange_rs.ipynb",
+    "line": 30,
+    "name": "add_missing_exchanges",
+    "cell": 8,
+    "functional": "no issue found",
+    "scientific": "Copies a configured single-metabolite boundary reaction\u2019s bounds and stoichiometry to a mapped model metabolite, then checks model feasibility.",
+    "function_rationale": "Purpose: begins by created = []"
+  },
+  {
+    "file": "supplementary_material/crucial_exchange_rs.ipynb",
+    "line": 73,
+    "name": "main",
+    "cell": 8,
+    "functional": "no issue found",
+    "scientific": "Loads configured models and mappings, adds feasible mapped boundary reactions, and saves the resulting model.",
+    "function_rationale": "main is a tracked callable; body review retained in function inventory."
+  },
+  {
+    "file": "supplementary_material/crucial_exchange_rs.ipynb",
+    "line": 21,
+    "name": "test_and_remove_rxns",
+    "cell": 29,
+    "functional": "finding: F6",
+    "scientific": "finding: F6: FVA intervals are deemed blocked from maximum <= 0, so reverse-only feasible flux is missed",
+    "function_rationale": "finding: F6: FVA intervals are deemed blocked from maximum <= 0, so reverse-only feasible flux is missed"
+  }
+]

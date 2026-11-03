@@ -1,0 +1,3013 @@
+[
+  {
+    "file": "src/thg_protocol/runtime/artifacts.py",
+    "line": 83,
+    "name": "_read_manifest",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "Infrastructure or serialization helper; no scientific behavior applies."
+  },
+  {
+    "file": "src/thg_protocol/runtime/artifacts.py",
+    "line": 97,
+    "name": "resolve_artifact",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "Infrastructure or serialization helper; no scientific behavior applies."
+  },
+  {
+    "file": "src/thg_protocol/runtime/artifacts.py",
+    "line": 143,
+    "name": "upstream_fingerprint",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "Infrastructure or serialization helper; no scientific behavior applies."
+  },
+  {
+    "file": "src/thg_protocol/runtime/artifacts.py",
+    "line": 27,
+    "name": "from_mapping",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "Infrastructure or serialization helper; no scientific behavior applies."
+  },
+  {
+    "file": "src/thg_protocol/runtime/artifacts.py",
+    "line": 54,
+    "name": "to_dict",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "Infrastructure or serialization helper; no scientific behavior applies."
+  },
+  {
+    "file": "src/thg_protocol/runtime/artifacts.py",
+    "line": 73,
+    "name": "fingerprint",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "Infrastructure or serialization helper; no scientific behavior applies."
+  },
+  {
+    "file": "src/thg_protocol/runtime/concurrency.py",
+    "line": 13,
+    "name": "parallel_map",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "Infrastructure or serialization helper; no scientific behavior applies."
+  },
+  {
+    "file": "src/thg_protocol/runtime/engine.py",
+    "line": 24,
+    "name": "_descendants",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "Infrastructure or serialization helper; no scientific behavior applies."
+  },
+  {
+    "file": "src/thg_protocol/runtime/engine.py",
+    "line": 43,
+    "name": "_entry",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "Infrastructure or serialization helper; no scientific behavior applies."
+  },
+  {
+    "file": "src/thg_protocol/runtime/engine.py",
+    "line": 50,
+    "name": "_write",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "Infrastructure or serialization helper; no scientific behavior applies."
+  },
+  {
+    "file": "src/thg_protocol/runtime/engine.py",
+    "line": 55,
+    "name": "_invalidate",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "Infrastructure or serialization helper; no scientific behavior applies."
+  },
+  {
+    "file": "src/thg_protocol/runtime/engine.py",
+    "line": 70,
+    "name": "_artifacts_valid",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "Infrastructure or serialization helper; no scientific behavior applies."
+  },
+  {
+    "file": "src/thg_protocol/runtime/engine.py",
+    "line": 82,
+    "name": "_next_attempt",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "Infrastructure or serialization helper; no scientific behavior applies."
+  },
+  {
+    "file": "src/thg_protocol/runtime/engine.py",
+    "line": 96,
+    "name": "_attach_run_log",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "Infrastructure or serialization helper; no scientific behavior applies."
+  },
+  {
+    "file": "src/thg_protocol/runtime/engine.py",
+    "line": 107,
+    "name": "_error",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "Infrastructure or serialization helper; no scientific behavior applies."
+  },
+  {
+    "file": "src/thg_protocol/runtime/engine.py",
+    "line": 111,
+    "name": "execute",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "Infrastructure or serialization helper; no scientific behavior applies."
+  },
+  {
+    "file": "src/thg_protocol/runtime/hashing.py",
+    "line": 11,
+    "name": "sha256_file",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "Infrastructure or serialization helper; no scientific behavior applies."
+  },
+  {
+    "file": "src/thg_protocol/runtime/hashing.py",
+    "line": 19,
+    "name": "sha256_json",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "Infrastructure or serialization helper; no scientific behavior applies."
+  },
+  {
+    "file": "src/thg_protocol/runtime/hashing.py",
+    "line": 26,
+    "name": "_safe_path",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "Infrastructure or serialization helper; no scientific behavior applies."
+  },
+  {
+    "file": "src/thg_protocol/runtime/hashing.py",
+    "line": 38,
+    "name": "artifact_record",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "Infrastructure or serialization helper; no scientific behavior applies."
+  },
+  {
+    "file": "src/thg_protocol/runtime/hashing.py",
+    "line": 50,
+    "name": "verify_artifact",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "Infrastructure or serialization helper; no scientific behavior applies."
+  },
+  {
+    "file": "src/thg_protocol/runtime/locking.py",
+    "line": 18,
+    "name": "_metadata",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "Infrastructure or serialization helper; no scientific behavior applies."
+  },
+  {
+    "file": "src/thg_protocol/runtime/locking.py",
+    "line": 27,
+    "name": "acquire_run_lock",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "Infrastructure or serialization helper; no scientific behavior applies."
+  },
+  {
+    "file": "src/thg_protocol/runtime/locking.py",
+    "line": 56,
+    "name": "unlock_run",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "Infrastructure or serialization helper; no scientific behavior applies."
+  },
+  {
+    "file": "src/thg_protocol/runtime/manifest.py",
+    "line": 20,
+    "name": "utc_now",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "Infrastructure or serialization helper; no scientific behavior applies."
+  },
+  {
+    "file": "src/thg_protocol/runtime/manifest.py",
+    "line": 24,
+    "name": "_package_version",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "Infrastructure or serialization helper; no scientific behavior applies."
+  },
+  {
+    "file": "src/thg_protocol/runtime/manifest.py",
+    "line": 33,
+    "name": "new_manifest",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "Infrastructure or serialization helper; no scientific behavior applies."
+  },
+  {
+    "file": "src/thg_protocol/runtime/manifest.py",
+    "line": 68,
+    "name": "validate_manifest",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "Infrastructure or serialization helper; no scientific behavior applies."
+  },
+  {
+    "file": "src/thg_protocol/runtime/manifest.py",
+    "line": 138,
+    "name": "write_manifest_atomic",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "Infrastructure or serialization helper; no scientific behavior applies."
+  },
+  {
+    "file": "src/thg_protocol/runtime/manifest.py",
+    "line": 150,
+    "name": "load_manifest",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "Infrastructure or serialization helper; no scientific behavior applies."
+  },
+  {
+    "file": "src/thg_protocol/runtime/stage.py",
+    "line": 40,
+    "name": "dump_json",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "Infrastructure or serialization helper; no scientific behavior applies."
+  },
+  {
+    "file": "src/thg_protocol/runtime/stage.py",
+    "line": 48,
+    "name": "dependency_records",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "Infrastructure or serialization helper; no scientific behavior applies."
+  },
+  {
+    "file": "src/thg_protocol/runtime/stage.py",
+    "line": 63,
+    "name": "dependency_hashes",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "Infrastructure or serialization helper; no scientific behavior applies."
+  },
+  {
+    "file": "src/thg_protocol/runtime/stage.py",
+    "line": 79,
+    "name": "dependency_path",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "Infrastructure or serialization helper; no scientific behavior applies."
+  },
+  {
+    "file": "src/thg_protocol/runtime/stage.py",
+    "line": 31,
+    "name": "enabled",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "Infrastructure or serialization helper; no scientific behavior applies."
+  },
+  {
+    "file": "src/thg_protocol/runtime/stage.py",
+    "line": 33,
+    "name": "fingerprint_data",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "Infrastructure or serialization helper; no scientific behavior applies."
+  },
+  {
+    "file": "src/thg_protocol/runtime/stage.py",
+    "line": 35,
+    "name": "run",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "Infrastructure or serialization helper; no scientific behavior applies."
+  },
+  {
+    "file": "src/thg_protocol/runtime/stage.py",
+    "line": 37,
+    "name": "validate",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "Infrastructure or serialization helper; no scientific behavior applies."
+  },
+  {
+    "file": "src/thg_protocol/validation.py",
+    "line": 78,
+    "name": "_check",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/validation.py",
+    "line": 113,
+    "name": "_ids",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/validation.py",
+    "line": 130,
+    "name": "_references",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/validation.py",
+    "line": 143,
+    "name": "_gprs",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/validation.py",
+    "line": 168,
+    "name": "_balance_result",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/validation.py",
+    "line": 199,
+    "name": "_mass_balance",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/validation.py",
+    "line": 236,
+    "name": "_charge_balance",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/validation.py",
+    "line": 256,
+    "name": "reaction_compartment",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/validation.py",
+    "line": 263,
+    "name": "by_compartment",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/validation.py",
+    "line": 282,
+    "name": "compartment_summary",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/validation.py",
+    "line": 301,
+    "name": "fractional_coefficients",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/validation.py",
+    "line": 341,
+    "name": "_base_id",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/validation.py",
+    "line": 352,
+    "name": "_formula_key",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/validation.py",
+    "line": 359,
+    "name": "formula_disagreement",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/validation.py",
+    "line": 426,
+    "name": "_identifiers",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/validation.py",
+    "line": 437,
+    "name": "_identity_conflict",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/validation.py",
+    "line": 453,
+    "name": "_describe_identity",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/validation.py",
+    "line": 460,
+    "name": "annotation_conflict",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/validation.py",
+    "line": 540,
+    "name": "unusual_protons",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/validation.py",
+    "line": 597,
+    "name": "_objective",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/validation.py",
+    "line": 607,
+    "name": "_optional_invariant",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/validation.py",
+    "line": 621,
+    "name": "stoichiometric_consistency",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/validation.py",
+    "line": 660,
+    "name": "metabolite_leakage",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/validation.py",
+    "line": 686,
+    "name": "energy_cycles",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/validation.py",
+    "line": 712,
+    "name": "minimal_inconsistent_sets",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/validation.py",
+    "line": 728,
+    "name": "load_model",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/validation.py",
+    "line": 738,
+    "name": "validate_model",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/validation.py",
+    "line": 67,
+    "name": "to_dict",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/validation.py",
+    "line": 376,
+    "name": "differs",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/validation.py",
+    "line": 384,
+    "name": "describe",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/validation.py",
+    "line": 477,
+    "name": "by_name",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/validation.py",
+    "line": 768,
+    "name": "_cached",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/validation.py",
+    "line": 773,
+    "name": "_dead_ends",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/validation.py",
+    "line": 781,
+    "name": "_blocked",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/validation.py",
+    "line": 786,
+    "name": "_pseudo",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/validation.py",
+    "line": 792,
+    "name": "find",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/validation_apply.py",
+    "line": 27,
+    "name": "_validation",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "Infrastructure or serialization helper; no scientific behavior applies."
+  },
+  {
+    "file": "src/thg_protocol/validation_apply.py",
+    "line": 32,
+    "name": "report_payload",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "Infrastructure or serialization helper; no scientific behavior applies."
+  },
+  {
+    "file": "src/thg_protocol/validation_apply.py",
+    "line": 71,
+    "name": "apply_decisions",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "Infrastructure or serialization helper; no scientific behavior applies."
+  },
+  {
+    "file": "src/thg_protocol/validation_fixes.py",
+    "line": 27,
+    "name": "_failed",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "Infrastructure or serialization helper; no scientific behavior applies."
+  },
+  {
+    "file": "src/thg_protocol/validation_fixes.py",
+    "line": 31,
+    "name": "_blamed_rows",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "Infrastructure or serialization helper; no scientific behavior applies."
+  },
+  {
+    "file": "src/thg_protocol/validation_fixes.py",
+    "line": 46,
+    "name": "collect_fixes",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "Infrastructure or serialization helper; no scientific behavior applies."
+  },
+  {
+    "file": "src/thg_protocol/validation_fixes.py",
+    "line": 148,
+    "name": "_strings",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "Infrastructure or serialization helper; no scientific behavior applies."
+  },
+  {
+    "file": "src/thg_protocol/validation_fixes.py",
+    "line": 162,
+    "name": "_subsystem",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "Infrastructure or serialization helper; no scientific behavior applies."
+  },
+  {
+    "file": "src/thg_protocol/validation_fixes.py",
+    "line": 169,
+    "name": "build_index",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "Infrastructure or serialization helper; no scientific behavior applies."
+  },
+  {
+    "file": "src/thg_protocol/validation_fixes.py",
+    "line": 63,
+    "name": "add",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "Infrastructure or serialization helper; no scientific behavior applies."
+  },
+  {
+    "file": "src/thg_protocol/validation_report.py",
+    "line": 147,
+    "name": "_validation",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/validation_report.py",
+    "line": 156,
+    "name": "_display",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/validation_report.py",
+    "line": 170,
+    "name": "_passed",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/validation_report.py",
+    "line": 179,
+    "name": "_status",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/validation_report.py",
+    "line": 186,
+    "name": "_label",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/validation_report.py",
+    "line": 191,
+    "name": "_count",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/validation_report.py",
+    "line": 195,
+    "name": "_anchor",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/validation_report.py",
+    "line": 209,
+    "name": "_filter",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/validation_report.py",
+    "line": 218,
+    "name": "_inline",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/validation_report.py",
+    "line": 251,
+    "name": "_id_list",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/validation_report.py",
+    "line": 257,
+    "name": "_table",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/validation_report.py",
+    "line": 272,
+    "name": "_value",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/validation_report.py",
+    "line": 337,
+    "name": "_fields",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/validation_report.py",
+    "line": 379,
+    "name": "_lookup",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/validation_report.py",
+    "line": 386,
+    "name": "_block",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/validation_report.py",
+    "line": 392,
+    "name": "_equation",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/validation_report.py",
+    "line": 401,
+    "name": "_imbalance",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/validation_report.py",
+    "line": 409,
+    "name": "_balance_evidence",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/validation_report.py",
+    "line": 481,
+    "name": "_atoms",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/validation_report.py",
+    "line": 488,
+    "name": "_difference",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/validation_report.py",
+    "line": 505,
+    "name": "_metabolite_ref",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/validation_report.py",
+    "line": 515,
+    "name": "_formula_evidence",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/validation_report.py",
+    "line": 647,
+    "name": "_compartment_label",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/validation_report.py",
+    "line": 651,
+    "name": "_compartment_split",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/validation_report.py",
+    "line": 700,
+    "name": "_compartment_evidence",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/validation_report.py",
+    "line": 751,
+    "name": "_retired",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/validation_report.py",
+    "line": 760,
+    "name": "_headline",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/validation_report.py",
+    "line": 836,
+    "name": "_pill",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/validation_report.py",
+    "line": 854,
+    "name": "_fix_target",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/validation_report.py",
+    "line": 869,
+    "name": "_proposals",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/validation_report.py",
+    "line": 880,
+    "name": "_residual",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/validation_report.py",
+    "line": 908,
+    "name": "_rule",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/validation_report.py",
+    "line": 926,
+    "name": "_alternative",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/validation_report.py",
+    "line": 989,
+    "name": "_fix_legend",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/validation_report.py",
+    "line": 1014,
+    "name": "_fixes",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/validation_report.py",
+    "line": 1059,
+    "name": "_check_card",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/validation_report.py",
+    "line": 1092,
+    "name": "_verdict",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/validation_report.py",
+    "line": 1143,
+    "name": "_metric_cards",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/validation_report.py",
+    "line": 1168,
+    "name": "_reduction",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/validation_report.py",
+    "line": 1210,
+    "name": "_changes",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/validation_report.py",
+    "line": 1256,
+    "name": "_tasks",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/validation_report.py",
+    "line": 1313,
+    "name": "_gimme",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/validation_report.py",
+    "line": 1334,
+    "name": "_memote",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/validation_report.py",
+    "line": 1382,
+    "name": "_solver",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/validation_report.py",
+    "line": 1402,
+    "name": "_provenance",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/validation_report.py",
+    "line": 1435,
+    "name": "_json_script",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/validation_report.py",
+    "line": 1440,
+    "name": "_review_data",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/validation_report.py",
+    "line": 1689,
+    "name": "render_validation_html",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/validation_report.py",
+    "line": 1930,
+    "name": "render_validation_summary",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/validation_report.py",
+    "line": 202,
+    "name": "__init__",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/validation_report.py",
+    "line": 205,
+    "name": "__call__",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/validation_report.py",
+    "line": 421,
+    "name": "subsystem",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/validation_report.py",
+    "line": 523,
+    "name": "name",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/validation_report.py",
+    "line": 527,
+    "name": "compartment",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/validation_report.py",
+    "line": 1100,
+    "name": "names",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/validation_report.py",
+    "line": 1219,
+    "name": "amount",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/_scientific.py",
+    "line": 30,
+    "name": "_jsonl",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/_scientific.py",
+    "line": 37,
+    "name": "_read_jsonl",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/_scientific.py",
+    "line": 41,
+    "name": "_software",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/_scientific.py",
+    "line": 50,
+    "name": "_task_results",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/_scientific.py",
+    "line": 61,
+    "name": "_gimme_objective_results",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/_scientific.py",
+    "line": 108,
+    "name": "_model_metrics",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/_scientific.py",
+    "line": 1062,
+    "name": "cell_specific_stages",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/_scientific.py",
+    "line": 1254,
+    "name": "pathway_stages",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/_scientific.py",
+    "line": 1322,
+    "name": "_copy",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/_scientific.py",
+    "line": 1327,
+    "name": "compare_stages",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/_scientific.py",
+    "line": 149,
+    "name": "__init__",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/_scientific.py",
+    "line": 159,
+    "name": "enabled",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/_scientific.py",
+    "line": 163,
+    "name": "fingerprint_data",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/_scientific.py",
+    "line": 187,
+    "name": "run",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/_scientific.py",
+    "line": 1035,
+    "name": "_unknown_genes",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/_scientific.py",
+    "line": 1047,
+    "name": "_uncertain_reactions",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/_scientific.py",
+    "line": 1057,
+    "name": "validate",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/_scientific.py",
+    "line": 1122,
+    "name": "__init__",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/_scientific.py",
+    "line": 1127,
+    "name": "enabled",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/_scientific.py",
+    "line": 1131,
+    "name": "fingerprint_data",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/_scientific.py",
+    "line": 1146,
+    "name": "run",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/_scientific.py",
+    "line": 1249,
+    "name": "validate",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/_scientific.py",
+    "line": 1271,
+    "name": "__init__",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/_scientific.py",
+    "line": 1274,
+    "name": "enabled",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/_scientific.py",
+    "line": 1278,
+    "name": "fingerprint_data",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/_scientific.py",
+    "line": 1292,
+    "name": "run",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/_scientific.py",
+    "line": 1317,
+    "name": "validate",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/beta1/_stages.py",
+    "line": 53,
+    "name": "_evidence_record",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/beta1/_stages.py",
+    "line": 102,
+    "name": "_status_counts",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/beta1/_stages.py",
+    "line": 110,
+    "name": "_section",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/beta1/_stages.py",
+    "line": 115,
+    "name": "_model",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/beta1/_stages.py",
+    "line": 119,
+    "name": "_save",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/beta1/_stages.py",
+    "line": 125,
+    "name": "_mapping",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/beta1/_stages.py",
+    "line": 135,
+    "name": "_string_mapping",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/beta1/_stages.py",
+    "line": 143,
+    "name": "_int_mapping",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/beta1/_stages.py",
+    "line": 149,
+    "name": "_resolution_mapping",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/beta1/_stages.py",
+    "line": 157,
+    "name": "_decision_items",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/beta1/_stages.py",
+    "line": 166,
+    "name": "_structural_identifiers",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/beta1/_stages.py",
+    "line": 175,
+    "name": "_resolve_metabolite_payload",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/beta1/_stages.py",
+    "line": 207,
+    "name": "_curate_gpr_payload",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/beta1/_stages.py",
+    "line": 247,
+    "name": "_software_versions",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/beta1/_stages.py",
+    "line": 259,
+    "name": "_run_provenance",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/beta1/_stages.py",
+    "line": 1330,
+    "name": "_annotation_pairs",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/beta1/_stages.py",
+    "line": 1341,
+    "name": "_gpr_gene_ids",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/beta1/_stages.py",
+    "line": 1351,
+    "name": "_semantic_ledger_entries",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/beta1/_stages.py",
+    "line": 1381,
+    "name": "beta1_stages",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/beta1/_stages.py",
+    "line": 302,
+    "name": "__init__",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/beta1/_stages.py",
+    "line": 307,
+    "name": "enabled",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/beta1/_stages.py",
+    "line": 311,
+    "name": "fingerprint_data",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/beta1/_stages.py",
+    "line": 350,
+    "name": "run",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/beta1/_stages.py",
+    "line": 1325,
+    "name": "validate",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/beta2/_stages.py",
+    "line": 58,
+    "name": "_gpr_checkpoint",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/beta2/_stages.py",
+    "line": 75,
+    "name": "_section",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/beta2/_stages.py",
+    "line": 80,
+    "name": "_jsonl",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/beta2/_stages.py",
+    "line": 90,
+    "name": "_snapshot_records",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/beta2/_stages.py",
+    "line": 97,
+    "name": "_record_kind",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/beta2/_stages.py",
+    "line": 103,
+    "name": "_target_names",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/beta2/_stages.py",
+    "line": 117,
+    "name": "_source_release",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/beta2/_stages.py",
+    "line": 123,
+    "name": "_ec_numbers",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/beta2/_stages.py",
+    "line": 133,
+    "name": "_resolve_location_payload",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/beta2/_stages.py",
+    "line": 173,
+    "name": "_model",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/beta2/_stages.py",
+    "line": 177,
+    "name": "_reference_beta1_upstream",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/beta2/_stages.py",
+    "line": 2478,
+    "name": "beta2_stages",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/beta2/_stages.py",
+    "line": 203,
+    "name": "__init__",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/beta2/_stages.py",
+    "line": 206,
+    "name": "enabled",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/beta2/_stages.py",
+    "line": 210,
+    "name": "fingerprint_data",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/beta2/_stages.py",
+    "line": 259,
+    "name": "run",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/beta2/_stages.py",
+    "line": 2473,
+    "name": "validate",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/beta2/_stages.py",
+    "line": 18,
+    "name": "tqdm",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/beta2/_stages.py",
+    "line": 1061,
+    "name": "add_external",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/beta2/_stages.py",
+    "line": 1605,
+    "name": "resolve_location",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/beta2/_stages.py",
+    "line": 2238,
+    "name": "merge_source_metadata",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/cli.py",
+    "line": 26,
+    "name": "_add_verbosity_argument",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/cli.py",
+    "line": 48,
+    "name": "_configure_logging",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/cli.py",
+    "line": 70,
+    "name": "_is_validation_config",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/cli.py",
+    "line": 80,
+    "name": "_direct_validation",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/cli.py",
+    "line": 108,
+    "name": "_apply_decisions",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/cli.py",
+    "line": 131,
+    "name": "build_parser",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/cli.py",
+    "line": 237,
+    "name": "_print_human_status",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/cli.py",
+    "line": 246,
+    "name": "_print_final_report",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/cli.py",
+    "line": 286,
+    "name": "main",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/cli.py",
+    "line": 20,
+    "name": "filter",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/config.py",
+    "line": 216,
+    "name": "_object",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/config.py",
+    "line": 222,
+    "name": "_keys",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/config.py",
+    "line": 228,
+    "name": "_required_string",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/config.py",
+    "line": 235,
+    "name": "_check_transport_settings",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/config.py",
+    "line": 261,
+    "name": "_positive_integer",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/config.py",
+    "line": 267,
+    "name": "_input_path",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/config.py",
+    "line": 282,
+    "name": "_directory_path",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/config.py",
+    "line": 289,
+    "name": "_has_beta2_evidence_source",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/config.py",
+    "line": 303,
+    "name": "load_workflow_config",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/config.py",
+    "line": 319,
+    "name": "_parse_workflow",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/config.py",
+    "line": 1070,
+    "name": "_resolve_workflow_paths",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/config.py",
+    "line": 1102,
+    "name": "workflow_config_to_dict",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/config.py",
+    "line": 1111,
+    "name": "write_workflow_snapshot",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/config.py",
+    "line": 1120,
+    "name": "load_snapshot",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/conservation.py",
+    "line": 25,
+    "name": "_section",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/conservation.py",
+    "line": 30,
+    "name": "_read",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/conservation.py",
+    "line": 247,
+    "name": "conservation_stages",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/conservation.py",
+    "line": 39,
+    "name": "__init__",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/conservation.py",
+    "line": 42,
+    "name": "enabled",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/conservation.py",
+    "line": 46,
+    "name": "fingerprint_data",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/conservation.py",
+    "line": 66,
+    "name": "_models",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/conservation.py",
+    "line": 77,
+    "name": "run",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/conservation.py",
+    "line": 242,
+    "name": "validate",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/evidence.py",
+    "line": 40,
+    "name": "_utc_now",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "Infrastructure or serialization helper; no scientific behavior applies."
+  },
+  {
+    "file": "src/thg_protocol/workflow/evidence.py",
+    "line": 164,
+    "name": "evidence_id",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "Infrastructure or serialization helper; no scientific behavior applies."
+  },
+  {
+    "file": "src/thg_protocol/workflow/evidence.py",
+    "line": 65,
+    "name": "__post_init__",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "Infrastructure or serialization helper; no scientific behavior applies."
+  },
+  {
+    "file": "src/thg_protocol/workflow/evidence.py",
+    "line": 88,
+    "name": "from_mapping",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "Infrastructure or serialization helper; no scientific behavior applies."
+  },
+  {
+    "file": "src/thg_protocol/workflow/evidence.py",
+    "line": 141,
+    "name": "to_dict",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "Infrastructure or serialization helper; no scientific behavior applies."
+  },
+  {
+    "file": "src/thg_protocol/workflow/evidence.py",
+    "line": 174,
+    "name": "__init__",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "Infrastructure or serialization helper; no scientific behavior applies."
+  },
+  {
+    "file": "src/thg_protocol/workflow/evidence.py",
+    "line": 179,
+    "name": "cache_raw",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "Infrastructure or serialization helper; no scientific behavior applies."
+  },
+  {
+    "file": "src/thg_protocol/workflow/evidence.py",
+    "line": 189,
+    "name": "append",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "Infrastructure or serialization helper; no scientific behavior applies."
+  },
+  {
+    "file": "src/thg_protocol/workflow/evidence.py",
+    "line": 209,
+    "name": "read",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "Infrastructure or serialization helper; no scientific behavior applies."
+  },
+  {
+    "file": "src/thg_protocol/workflow/evidence.py",
+    "line": 226,
+    "name": "verify_offline",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "Infrastructure or serialization helper; no scientific behavior applies."
+  },
+  {
+    "file": "src/thg_protocol/workflow/evidence.py",
+    "line": 96,
+    "name": "text",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "Infrastructure or serialization helper; no scientific behavior applies."
+  },
+  {
+    "file": "src/thg_protocol/workflow/evidence.py",
+    "line": 104,
+    "name": "texts",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "Infrastructure or serialization helper; no scientific behavior applies."
+  },
+  {
+    "file": "src/thg_protocol/workflow/final_thg.py",
+    "line": 334,
+    "name": "final_thg_stages",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/final_thg.py",
+    "line": 31,
+    "name": "__init__",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/final_thg.py",
+    "line": 50,
+    "name": "enabled",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/final_thg.py",
+    "line": 54,
+    "name": "fingerprint_data",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/final_thg.py",
+    "line": 123,
+    "name": "_inputs",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/final_thg.py",
+    "line": 163,
+    "name": "run",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/final_thg.py",
+    "line": 321,
+    "name": "validate",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/gapfill.py",
+    "line": 32,
+    "name": "_section",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/gapfill.py",
+    "line": 37,
+    "name": "_software",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/gapfill.py",
+    "line": 57,
+    "name": "_hash",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/gapfill.py",
+    "line": 65,
+    "name": "_model_counts",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/gapfill.py",
+    "line": 74,
+    "name": "_metrics",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/gapfill.py",
+    "line": 95,
+    "name": "_safe_metrics",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/gapfill.py",
+    "line": 102,
+    "name": "_task_report",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/gapfill.py",
+    "line": 113,
+    "name": "_as_error_status",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/gapfill.py",
+    "line": 124,
+    "name": "_plan_file",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/gapfill.py",
+    "line": 140,
+    "name": "_write_plan",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/gapfill.py",
+    "line": 152,
+    "name": "_model_diff_is_clean",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/gapfill.py",
+    "line": 254,
+    "name": "_read_jsonl",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/gapfill.py",
+    "line": 262,
+    "name": "_write_jsonl",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/gapfill.py",
+    "line": 270,
+    "name": "_ptr_candidates",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/gapfill.py",
+    "line": 277,
+    "name": "_ptr_connectors",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/gapfill.py",
+    "line": 284,
+    "name": "_coverage_lines",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/gapfill.py",
+    "line": 300,
+    "name": "_parameters",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/gapfill.py",
+    "line": 1131,
+    "name": "gapfill_stages",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/gapfill.py",
+    "line": 181,
+    "name": "enabled",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/gapfill.py",
+    "line": 185,
+    "name": "fingerprint_data",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/gapfill.py",
+    "line": 193,
+    "name": "run",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/gapfill.py",
+    "line": 239,
+    "name": "validate",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/gapfill.py",
+    "line": 323,
+    "name": "__init__",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/gapfill.py",
+    "line": 337,
+    "name": "enabled",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/gapfill.py",
+    "line": 343,
+    "name": "fingerprint_data",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/gapfill.py",
+    "line": 391,
+    "name": "run",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/gapfill.py",
+    "line": 1116,
+    "name": "validate",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/gapfill.py",
+    "line": 607,
+    "name": "checkpoint",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/human_database.py",
+    "line": 199,
+    "name": "human_database_stages",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/human_database.py",
+    "line": 30,
+    "name": "__init__",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/human_database.py",
+    "line": 37,
+    "name": "enabled",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/human_database.py",
+    "line": 40,
+    "name": "fingerprint_data",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/human_database.py",
+    "line": 66,
+    "name": "run",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/human_database.py",
+    "line": 194,
+    "name": "validate",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/human_database_integration.py",
+    "line": 28,
+    "name": "__init__",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/human_database_integration.py",
+    "line": 35,
+    "name": "enabled",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/human_database_integration.py",
+    "line": 38,
+    "name": "fingerprint_data",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/human_database_integration.py",
+    "line": 46,
+    "name": "run",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/human_database_integration.py",
+    "line": 108,
+    "name": "validate",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/ids.py",
+    "line": 20,
+    "name": "_strip_compartment",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "Infrastructure or serialization helper; no scientific behavior applies."
+  },
+  {
+    "file": "src/thg_protocol/workflow/ids.py",
+    "line": 37,
+    "name": "metabolite_base_ids",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "Infrastructure or serialization helper; no scientific behavior applies."
+  },
+  {
+    "file": "src/thg_protocol/workflow/ids.py",
+    "line": 63,
+    "name": "_slug",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "Infrastructure or serialization helper; no scientific behavior applies."
+  },
+  {
+    "file": "src/thg_protocol/workflow/ids.py",
+    "line": 71,
+    "name": "__init__",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "Infrastructure or serialization helper; no scientific behavior applies."
+  },
+  {
+    "file": "src/thg_protocol/workflow/ids.py",
+    "line": 80,
+    "name": "source_key",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "Infrastructure or serialization helper; no scientific behavior applies."
+  },
+  {
+    "file": "src/thg_protocol/workflow/ids.py",
+    "line": 95,
+    "name": "generate",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "Infrastructure or serialization helper; no scientific behavior applies."
+  },
+  {
+    "file": "src/thg_protocol/workflow/ids.py",
+    "line": 123,
+    "name": "register_imported",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "Infrastructure or serialization helper; no scientific behavior applies."
+  },
+  {
+    "file": "src/thg_protocol/workflow/ids.py",
+    "line": 131,
+    "name": "register_alias",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "Infrastructure or serialization helper; no scientific behavior applies."
+  },
+  {
+    "file": "src/thg_protocol/workflow/ids.py",
+    "line": 137,
+    "name": "to_dict",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "Infrastructure or serialization helper; no scientific behavior applies."
+  },
+  {
+    "file": "src/thg_protocol/workflow/ids.py",
+    "line": 146,
+    "name": "save",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "Infrastructure or serialization helper; no scientific behavior applies."
+  },
+  {
+    "file": "src/thg_protocol/workflow/ids.py",
+    "line": 158,
+    "name": "load",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "Infrastructure or serialization helper; no scientific behavior applies."
+  },
+  {
+    "file": "src/thg_protocol/workflow/proposals.py",
+    "line": 159,
+    "name": "proposal_id",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/proposals.py",
+    "line": 173,
+    "name": "write_jsonl",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/proposals.py",
+    "line": 182,
+    "name": "read_proposals",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/proposals.py",
+    "line": 204,
+    "name": "write_proposals",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/proposals.py",
+    "line": 210,
+    "name": "read_decisions",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/proposals.py",
+    "line": 232,
+    "name": "decisions_fingerprint",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/proposals.py",
+    "line": 237,
+    "name": "apply_proposals",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/proposals.py",
+    "line": 308,
+    "name": "apply_proposals_file",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/proposals.py",
+    "line": 38,
+    "name": "__post_init__",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/proposals.py",
+    "line": 51,
+    "name": "from_mapping",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/proposals.py",
+    "line": 106,
+    "name": "to_dict",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/proposals.py",
+    "line": 132,
+    "name": "from_mapping",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/proposals.py",
+    "line": 148,
+    "name": "to_dict",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/proposals.py",
+    "line": 324,
+    "name": "__init__",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/proposals.py",
+    "line": 327,
+    "name": "entries",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/proposals.py",
+    "line": 349,
+    "name": "append",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/proposals.py",
+    "line": 363,
+    "name": "fingerprint",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/reference_reporting.py",
+    "line": 21,
+    "name": "_counts",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/reference_reporting.py",
+    "line": 29,
+    "name": "_changes",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/reference_reporting.py",
+    "line": 44,
+    "name": "_markdown",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/reference_reporting.py",
+    "line": 79,
+    "name": "__init__",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/reference_reporting.py",
+    "line": 83,
+    "name": "enabled",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/reference_reporting.py",
+    "line": 86,
+    "name": "fingerprint_data",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/reference_reporting.py",
+    "line": 93,
+    "name": "run",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/reference_reporting.py",
+    "line": 274,
+    "name": "validate",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/registry.py",
+    "line": 78,
+    "name": "register_workflow",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "Infrastructure or serialization helper; no scientific behavior applies."
+  },
+  {
+    "file": "src/thg_protocol/workflow/registry.py",
+    "line": 95,
+    "name": "get_workflow",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "Infrastructure or serialization helper; no scientific behavior applies."
+  },
+  {
+    "file": "src/thg_protocol/workflow/registry.py",
+    "line": 99,
+    "name": "list_workflows",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "Infrastructure or serialization helper; no scientific behavior applies."
+  },
+  {
+    "file": "src/thg_protocol/workflow/registry.py",
+    "line": 103,
+    "name": "validate_workflow_dependencies",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "Infrastructure or serialization helper; no scientific behavior applies."
+  },
+  {
+    "file": "src/thg_protocol/workflow/registry.py",
+    "line": 107,
+    "name": "register_builtin_workflows",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "Infrastructure or serialization helper; no scientific behavior applies."
+  },
+  {
+    "file": "src/thg_protocol/workflow/registry.py",
+    "line": 23,
+    "name": "stage_ids",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "Infrastructure or serialization helper; no scientific behavior applies."
+  },
+  {
+    "file": "src/thg_protocol/workflow/registry.py",
+    "line": 26,
+    "name": "validate",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "Infrastructure or serialization helper; no scientific behavior applies."
+  },
+  {
+    "file": "src/thg_protocol/workflow/registry.py",
+    "line": 48,
+    "name": "__init__",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "Infrastructure or serialization helper; no scientific behavior applies."
+  },
+  {
+    "file": "src/thg_protocol/workflow/registry.py",
+    "line": 51,
+    "name": "register",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "Infrastructure or serialization helper; no scientific behavior applies."
+  },
+  {
+    "file": "src/thg_protocol/workflow/registry.py",
+    "line": 61,
+    "name": "get",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "Infrastructure or serialization helper; no scientific behavior applies."
+  },
+  {
+    "file": "src/thg_protocol/workflow/registry.py",
+    "line": 67,
+    "name": "ids",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "Infrastructure or serialization helper; no scientific behavior applies."
+  },
+  {
+    "file": "src/thg_protocol/workflow/registry.py",
+    "line": 70,
+    "name": "validate_all",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "Infrastructure or serialization helper; no scientific behavior applies."
+  },
+  {
+    "file": "src/thg_protocol/workflow/runner.py",
+    "line": 34,
+    "name": "_write",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "Infrastructure or serialization helper; no scientific behavior applies."
+  },
+  {
+    "file": "src/thg_protocol/workflow/runner.py",
+    "line": 39,
+    "name": "_resume_config_key",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "Infrastructure or serialization helper; no scientific behavior applies."
+  },
+  {
+    "file": "src/thg_protocol/workflow/runner.py",
+    "line": 51,
+    "name": "_definition",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "Infrastructure or serialization helper; no scientific behavior applies."
+  },
+  {
+    "file": "src/thg_protocol/workflow/runner.py",
+    "line": 58,
+    "name": "_resolved_stages",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "Infrastructure or serialization helper; no scientific behavior applies."
+  },
+  {
+    "file": "src/thg_protocol/workflow/runner.py",
+    "line": 63,
+    "name": "_execute",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "Infrastructure or serialization helper; no scientific behavior applies."
+  },
+  {
+    "file": "src/thg_protocol/workflow/runner.py",
+    "line": 84,
+    "name": "start",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "Infrastructure or serialization helper; no scientific behavior applies."
+  },
+  {
+    "file": "src/thg_protocol/workflow/runner.py",
+    "line": 119,
+    "name": "resume",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "Infrastructure or serialization helper; no scientific behavior applies."
+  },
+  {
+    "file": "src/thg_protocol/workflow/runner.py",
+    "line": 165,
+    "name": "get_status",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "Infrastructure or serialization helper; no scientific behavior applies."
+  },
+  {
+    "file": "src/thg_protocol/workflow/validation.py",
+    "line": 155,
+    "name": "validation_stages",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/validation.py",
+    "line": 22,
+    "name": "__init__",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/validation.py",
+    "line": 27,
+    "name": "enabled",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/validation.py",
+    "line": 31,
+    "name": "fingerprint_data",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/validation.py",
+    "line": 47,
+    "name": "run",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  },
+  {
+    "file": "src/thg_protocol/workflow/validation.py",
+    "line": 150,
+    "name": "validate",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false
+  }
+]

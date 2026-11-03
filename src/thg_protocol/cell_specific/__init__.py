@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import math
 from collections.abc import Sequence
 from dataclasses import dataclass
 from pathlib import Path
@@ -40,6 +41,12 @@ def evaluate_gpr_activity(
     """Evaluate a boolean GPR and report genes absent from the activity map."""
     from .gpr import reaction_expression_evidence
 
+    if (
+        isinstance(threshold, bool)
+        or not isinstance(threshold, (int, float))
+        or not math.isfinite(threshold)
+    ):
+        raise ValueError("threshold must be finite and numeric")
     evidence = reaction_expression_evidence("activity", rule, activity)
     return (
         not rule.strip()

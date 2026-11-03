@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import math
 import re
 from collections.abc import Mapping
 from copy import deepcopy
@@ -499,6 +500,15 @@ def _resolved_parameters(
         )
     if not isinstance(values.get("max_additions"), int) or values["max_additions"] <= 0:
         raise ValueError("max_additions must be positive")
+    if method == "milp":
+        minimum_flux = values["minimum_flux"]
+        if (
+            isinstance(minimum_flux, bool)
+            or not isinstance(minimum_flux, (int, float))
+            or not math.isfinite(minimum_flux)
+            or minimum_flux <= 0
+        ):
+            raise ValueError("minimum_flux must be a finite positive number")
     if method == "sink-milp":
         if "allowed_connections" not in values:
             raise ValueError("allowed_connections is required for sink-milp")

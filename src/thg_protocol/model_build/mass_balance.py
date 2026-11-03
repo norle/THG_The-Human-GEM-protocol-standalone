@@ -260,12 +260,11 @@ eq2mat = equation_matrix
 
 
 def nullity(matrix: Any) -> tuple[np.ndarray, np.ndarray]:
-    """Return a row-independent matrix and its nullity-completion matrix."""
+    """Return a full-rank square row completion and the independent input rows."""
     numpy = _numpy()
     values = numpy.asarray(matrix, dtype=float)
     if values.ndim != 2:
         raise ValueError("matrix must be two-dimensional")
-    rank = numpy.linalg.matrix_rank(values)
     independent: list[np.ndarray] = []
     current_rank = 0
     for row in values:
@@ -277,13 +276,16 @@ def nullity(matrix: Any) -> tuple[np.ndarray, np.ndarray]:
     independent_matrix = numpy.asarray(independent, dtype=float)
     if independent_matrix.size == 0:
         independent_matrix = numpy.empty((0, values.shape[1]))
-    completion = numpy.zeros((max(values.shape[1] - rank, 0), values.shape[1]))
-    for index in range(completion.shape[0]):
-        completion[index, -(index + 1)] = 1
-    return (
-        np.vstack([independent_matrix, completion]),
-        independent_matrix,
-    )
+    completed = independent_matrix.copy()
+    for row in numpy.eye(values.shape[1])[::-1]:
+        if current_rank == values.shape[1]:
+            break
+        candidate = numpy.vstack([completed, row])
+        new_rank = numpy.linalg.matrix_rank(candidate)
+        if new_rank > current_rank:
+            completed = candidate
+            current_rank = new_rank
+    return completed, independent_matrix
 
 
 def inv(matrix: Any) -> np.ndarray:

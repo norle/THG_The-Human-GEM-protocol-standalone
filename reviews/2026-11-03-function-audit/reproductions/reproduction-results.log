@@ -1,0 +1,22 @@
+[core] exit_code=0
+All six audit reproductions passed.
+
+[gapfill] exit_code=0
+No objective coefficients in model. Unclear what should be optimized
+{'status': 'solved', 'selected': [], 'objective': 0.0, 'failure': None}
+
+[annotations] exit_code=0
+Processing annotation file: /tmp/tmpkekfp3kq/empty.tsv
+All full-pipeline assertions reproduced.
+
+[workflows] exit_code=0
+confirmed: missing validation model crashes at fingerprint; infinite threshold deactivates finite activity
+
+[notebooks] exit_code=0
+Testing removal of SINK_A ...
+Removal of SINK_A blocks 1 internal reactions. Restoring.
+F7 reproduced: reverse-only interval marked blocked, so sink is restored.
+F8 reproduced: reversible A_c is classified as final substrate: ['A_c'].
+
+[additional] exit_code=0
+Confirmed: fractional subunit count truncation and unchanged reverse fixture.

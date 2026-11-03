@@ -72,9 +72,13 @@ def test_small_sbml_reaction_models_use_package_jaccard_workflow(tmp_path):
       </reaction>
     </model>
     """
-    reverse_template = reaction_template.replace(
-        'species="MAM00001c"', 'species="MAM00002c"', 1
-    ).replace('species="MAM00002c"', 'species="MAM00001c"', 1)
+    reverse_template = (
+        reaction_template.replace('species="MAM00001c"', 'species="TEMP"', 1)
+        .replace('species="MAM00002c"', 'species="MAM00001c"', 1)
+        .replace('species="TEMP"', 'species="MAM00002c"', 1)
+    )
+    assert reverse_template != reaction_template
+    assert 'species="MAM00002c"' in reverse_template.split("</listOfReactants>")[0]
     left_path = tmp_path / "left.xml"
     right_path = tmp_path / "right.xml"
     left_path.write_text(reaction_template)
@@ -82,6 +86,8 @@ def test_small_sbml_reaction_models_use_package_jaccard_workflow(tmp_path):
 
     left = process_reac(str(left_path), r"[A-Z]+[0-9]+[a-z][0-9]*", "", "")
     right = process_reac(str(right_path), r"[A-Z]+[0-9]+[a-z][0-9]*", "", "")
+    assert left.iloc[0, 5] == right.iloc[0, 6]
+    assert left.iloc[0, 6] == right.iloc[0, 5]
     matches = execute_jaccard(left, right)
 
     assert matches.shape == (1, 7)

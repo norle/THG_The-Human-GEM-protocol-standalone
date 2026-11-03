@@ -887,9 +887,10 @@ def generate_curation_proposals(
             }
             if any(count <= 0 for count in normalized_subunits.values()):
                 raise ValueError("S-GPR subunit stoichiometry must be positive")
+            curated_rule = after
             before = _json(getattr(reaction, "annotation", {}) or {})
             after = dict(before) if isinstance(before, Mapping) else {}
-            record = serialize_s_gpr(after if after else rule, normalized_subunits)
+            record = serialize_s_gpr(curated_rule, normalized_subunits)
             after["thg_s_gpr"] = record
             if after != before:
                 proposals.append(

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import re
+from decimal import Decimal
 from io import StringIO
 
 import pandas as pd
@@ -36,7 +37,11 @@ def process_reac(
             result += identify_reaction(reaction, n, MetID, MetIDH, MetIDH2O)
 
     reaction_jaccard_input = StringIO(result)
-    out = pd.read_csv(reaction_jaccard_input, sep=" ", header=None)
+    if not result:
+        return pd.DataFrame(columns=range(12))
+    out = pd.read_csv(
+        reaction_jaccard_input, sep=" ", header=None, dtype={7: str, 8: str}
+    )
     out.dropna(subset=[5, 6], inplace=True)
     return out
 
@@ -63,6 +68,29 @@ def replace_met_id_by_met_kegg(infile: pd.DataFrame, dictionary: dict) -> pd.Dat
     return infile
 
 
+def _coefficient_sides(left: str, right: str, coefficients: str) -> tuple[dict, dict]:
+    """Pair retained species with exact coefficients; require the same scale."""
+    left_species = str(left).split(",")
+    right_species = str(right).split(",")
+    values = str(coefficients).split(",")
+    if len(values) != len(left_species) + len(right_species):
+        raise ValueError("reaction species and coefficients have different lengths")
+    sides = ({}, {})
+    for index, species in enumerate(left_species + right_species):
+        value = Decimal(values[index])
+        if not value.is_finite() or value <= 0:
+            raise ValueError("reaction coefficients must be finite and positive")
+        side = sides[0 if index < len(left_species) else 1]
+        side[species] = side.get(species, Decimal(0)) + value
+    return sides
+
+
+def _same_coefficients(left, right) -> bool:
+    first = _coefficient_sides(left[5], left[6], left[7])
+    second = _coefficient_sides(right[5], right[6], right[7])
+    return first == second or first == second[::-1]
+
+
 def execute_jaccard(b: pd.DataFrame, c2: pd.DataFrame) -> pd.DataFrame:
     """Match reactions with identical left/right metabolite sets in either direction."""
     b_left_sets = [set(left.split(",")) for left in b[5]]
@@ -83,6 +111,12 @@ def execute_jaccard(b: pd.DataFrame, c2: pd.DataFrame) -> pd.DataFrame:
             if (b_left == c2_left and b_right == c2_right) or (
                 b_left == c2_right and b_right == c2_left
             ):
+                if (
+                    7 in b.columns
+                    and 7 in c2.columns
+                    and not _same_coefficients(b.iloc[i], c2.iloc[j])
+                ):
+                    continue
                 results.append(
                     [
                         b_id,
@@ -104,7 +138,9 @@ def execute_jaccard(b: pd.DataFrame, c2: pd.DataFrame) -> pd.DataFrame:
 def process_jaccard(
     left_model: pd.DataFrame, right_model: pd.DataFrame, jaccard_result: pd.DataFrame
 ) -> dict:
-    """Postprocess dataframe from reaction Jaccard matching."""
+    """Postprocess candidate matches using exact, paired stoichiometry."""
+    if jaccard_result.empty:
+        return {}
     right_model.columns = [13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24]
     jaccard_result.columns = [0, 5, 6, 14, 18, 19, 12]
 
@@ -120,6 +156,17 @@ def process_jaccard(
     jaccard_result = pd.merge(
         pd.merge(jaccard_result, right_model, on=[18, 19, 14]), left_model, on=[0, 5, 6]
     ).drop(columns=[11])
+    if jaccard_result.empty:
+        return {}
+    jaccard_result = jaccard_result[
+        jaccard_result.apply(
+            lambda row: _same_coefficients(
+                {5: row[5], 6: row[6], 7: row[7]},
+                {5: row[18], 6: row[19], 7: row[20]},
+            ),
+            axis=1,
+        )
+    ]
     jaccard_result = jaccard_result.sort_index(axis=1)
     jaccard_result = jaccard_result.sort_values(by=[0, 1])
     jaccard_result[100] = jaccard_result[1] + jaccard_result[2]
@@ -130,11 +177,9 @@ def process_jaccard(
             )
         )
     ]
-    mm = mm[(mm[8] == mm[21])]
     mm = mm[(mm[100].isin(mm[100][mm[100].duplicated()]))]
     mm = mm.drop_duplicates(100).reset_index(drop=True)
     jaccard_result = jaccard_result.loc[~jaccard_result[100].isin(mm[100])]
-    jaccard_result = jaccard_result[(jaccard_result[8] == jaccard_result[21])]
     jaccard_result = jaccard_result[jaccard_result[1] != jaccard_result[14]]
     jaccard_result = jaccard_result.rename(columns={1: "kegg.reaction"})
     jaccard_result = jaccard_result[["kegg.reaction", 14, 24]]
@@ -164,8 +209,9 @@ def identify_reaction(
     if re.findall(mar_id, reaction):
         mar = re.findall(mar_id, reaction)[0]
 
-    reactants = re.findall(reactants_pattern, reaction, re.DOTALL)[0]
-    reactants = re.findall(MetID, reactants)
+    reactant_sides = re.findall(reactants_pattern, reaction, re.DOTALL)
+    reactants_text = reactant_sides[0] if reactant_sides else ""
+    reactants = re.findall(MetID, reactants_text)
     reactant_compartments = list(
         {re.findall("[a-z]+[0-9]*", reactant)[0] for reactant in reactants}
     )
@@ -176,9 +222,10 @@ def identify_reaction(
         and re.findall(met_id_pattern, reactant)[0] not in MetIDH2O
     ]
 
+    products_text = ""
     if re.findall(products_pattern, reaction, re.DOTALL):
-        products = re.findall(products_pattern, reaction, re.DOTALL)[0]
-        products = re.findall(MetID, products)
+        products_text = re.findall(products_pattern, reaction, re.DOTALL)[0]
+        products = re.findall(MetID, products_text)
         product_compartments = list(
             {re.findall("[a-z]+[0-9]*", product)[0] for product in products}
         )
@@ -189,19 +236,25 @@ def identify_reaction(
             and re.findall(met_id_pattern, product)[0] not in MetIDH2O
         ]
 
+    # Boundary reactions are valid SBML but cannot match two-sided chemistry.
+    if not reactants or not products:
+        return ""
+
     species_pairs = (
         ",".join(map(str, reactants)) + " " + ",".join(map(str, products))
     ).replace("_", "")
     compartments = ",".join(set(re.findall("[a-z]+[0-9]*", species_pairs)))
     all_compartments = ",".join(set(reactant_compartments + product_compartments))
-    stoichiometry = [
-        str(round(float(re.findall(species + '" stoichiometry="(.+?)"', reaction)[0])))
-        for species in reactants + products
-    ]
+    stoichiometry = []
+    for species_list, side in ((reactants, reactants_text), (products, products_text)):
+        for reference in re.findall(r"<speciesReference\b[^>]*>", side):
+            attributes = dict(re.findall(r'(\w+)="([^"]*)"', reference))
+            species = re.findall(MetID, attributes.get("species", ""))
+            if species and species[0] in species_list:
+                stoichiometry.append(str(Decimal(attributes.get("stoichiometry", "1"))))
     stoichiometry = ",".join(stoichiometry)
     all_stoichiometry = [
-        str(round(float(value)))
-        for value in re.findall('stoichiometry="(.+?)"', reaction)
+        str(Decimal(value)) for value in re.findall('stoichiometry="(.+?)"', reaction)
     ]
     all_stoichiometry = ",".join(all_stoichiometry)
     reversible = re.findall('reversible="(.+?)"', reaction)[0]

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import math
 from collections import defaultdict
 from typing import Any
 
@@ -178,16 +179,39 @@ def metabolites_not_consumed(model: Any) -> list[str]:
 
 
 def unbounded_reactions(model: Any) -> tuple[list[str], float, Any]:
-    """Return reactions at an FVA infinity bound and their fraction."""
+    """Return reactions with solver-proven unbounded feasible flux and their FVA.
+
+    Each direction is optimized over the model's feasible region, without
+    constraining its original objective. Finite flux caps are never infinity.
+    """
     try:
-        from cobra.flux_analysis import flux_variability_analysis
+        import pandas as pd
+        from cobra.util.solver import check_solver_status
     except ImportError as error:  # pragma: no cover - optional dependency path
         raise RuntimeError("FVA checks require COBRA") from error
-    result = flux_variability_analysis(model)
+    result = pd.DataFrame(
+        index=[reaction.id for reaction in model.reactions],
+        columns=["minimum", "maximum"],
+        dtype=float,
+    )
+    with model:
+        for reaction in model.reactions:
+            model.objective = reaction
+            for direction, column, infinity in (
+                ("min", "minimum", -math.inf),
+                ("max", "maximum", math.inf),
+            ):
+                model.objective_direction = direction
+                value = model.slim_optimize()
+                if model.solver.status == "unbounded":
+                    value = infinity
+                else:
+                    check_solver_status(model.solver.status, raise_error=True)
+                result.loc[reaction.id, column] = value
     ids = [
         reaction_id
         for reaction_id, row in result.iterrows()
-        if abs(float(row["minimum"])) >= 999.0 or abs(float(row["maximum"])) >= 999.0
+        if math.isinf(float(row["minimum"])) or math.isinf(float(row["maximum"]))
     ]
     denominator = max(len(result), 1)
     return ids, len(ids) / denominator, result

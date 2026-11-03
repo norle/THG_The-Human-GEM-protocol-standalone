@@ -1,0 +1,929 @@
+[
+  {
+    "file": "src/thg_protocol/validation_report.py",
+    "line": 1522,
+    "name": "IIFE",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "UI/event-handler plumbing; scientific behavior does not apply. Reviewed source behavior and caller/data flow."
+  },
+  {
+    "file": "src/thg_protocol/validation_report.py",
+    "line": 1523,
+    "name": "data",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "UI/event-handler plumbing; scientific behavior does not apply. Reviewed source behavior and caller/data flow."
+  },
+  {
+    "file": "src/thg_protocol/validation_report.py",
+    "line": 1524,
+    "name": "esc",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "UI/event-handler plumbing; scientific behavior does not apply. Reviewed source behavior and caller/data flow."
+  },
+  {
+    "file": "src/thg_protocol/validation_report.py",
+    "line": 1524,
+    "name": "anonymous replace callback",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "UI/event-handler plumbing; scientific behavior does not apply. Reviewed source behavior and caller/data flow."
+  },
+  {
+    "file": "src/thg_protocol/validation_report.py",
+    "line": 1529,
+    "name": "kind",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "UI/event-handler plumbing; scientific behavior does not apply. Reviewed source behavior and caller/data flow."
+  },
+  {
+    "file": "src/thg_protocol/validation_report.py",
+    "line": 1531,
+    "name": "link",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "UI/event-handler plumbing; scientific behavior does not apply. Reviewed source behavior and caller/data flow."
+  },
+  {
+    "file": "src/thg_protocol/validation_report.py",
+    "line": 1532,
+    "name": "linkTokens",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "UI/event-handler plumbing; scientific behavior does not apply. Reviewed source behavior and caller/data flow."
+  },
+  {
+    "file": "src/thg_protocol/validation_report.py",
+    "line": 1532,
+    "name": "anonymous map callback",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "UI/event-handler plumbing; scientific behavior does not apply. Reviewed source behavior and caller/data flow."
+  },
+  {
+    "file": "src/thg_protocol/validation_report.py",
+    "line": 1533,
+    "name": "show",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "UI/event-handler plumbing; scientific behavior does not apply. Reviewed source behavior and caller/data flow."
+  },
+  {
+    "file": "src/thg_protocol/validation_report.py",
+    "line": 1551,
+    "name": "anonymous map callback",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "UI/event-handler plumbing; scientific behavior does not apply. Reviewed source behavior and caller/data flow."
+  },
+  {
+    "file": "src/thg_protocol/validation_report.py",
+    "line": 1557,
+    "name": "close",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "UI/event-handler plumbing; scientific behavior does not apply. Reviewed source behavior and caller/data flow."
+  },
+  {
+    "file": "src/thg_protocol/validation_report.py",
+    "line": 1559,
+    "name": "anonymous addEventListener callback",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "UI/event-handler plumbing; scientific behavior does not apply. Reviewed source behavior and caller/data flow."
+  },
+  {
+    "file": "src/thg_protocol/validation_report.py",
+    "line": 1560,
+    "name": "anonymous forEach callback",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "UI/event-handler plumbing; scientific behavior does not apply. Reviewed source behavior and caller/data flow."
+  },
+  {
+    "file": "src/thg_protocol/validation_report.py",
+    "line": 1568,
+    "name": "anonymous addEventListener callback",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "UI/event-handler plumbing; scientific behavior does not apply. Reviewed source behavior and caller/data flow."
+  },
+  {
+    "file": "src/thg_protocol/validation_report.py",
+    "line": 1572,
+    "name": "anonymous addEventListener callback",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "UI/event-handler plumbing; scientific behavior does not apply. Reviewed source behavior and caller/data flow."
+  },
+  {
+    "file": "src/thg_protocol/validation_report.py",
+    "line": 1581,
+    "name": "fmt",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "UI/event-handler plumbing; scientific behavior does not apply. Reviewed source behavior and caller/data flow."
+  },
+  {
+    "file": "src/thg_protocol/validation_report.py",
+    "line": 1582,
+    "name": "parse",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "UI/event-handler plumbing; scientific behavior does not apply. Reviewed source behavior and caller/data flow."
+  },
+  {
+    "file": "src/thg_protocol/validation_report.py",
+    "line": 1583,
+    "name": "load",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "UI/event-handler plumbing; scientific behavior does not apply. Reviewed source behavior and caller/data flow."
+  },
+  {
+    "file": "src/thg_protocol/validation_report.py",
+    "line": 1584,
+    "name": "anonymous forEach callback",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "UI/event-handler plumbing; scientific behavior does not apply. Reviewed source behavior and caller/data flow."
+  },
+  {
+    "file": "src/thg_protocol/validation_report.py",
+    "line": 1585,
+    "name": "save",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "UI/event-handler plumbing; scientific behavior does not apply. Reviewed source behavior and caller/data flow."
+  },
+  {
+    "file": "src/thg_protocol/validation_report.py",
+    "line": 1586,
+    "name": "item",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "UI/event-handler plumbing; scientific behavior does not apply. Reviewed source behavior and caller/data flow."
+  },
+  {
+    "file": "src/thg_protocol/validation_report.py",
+    "line": 1586,
+    "name": "anonymous filter callback",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "UI/event-handler plumbing; scientific behavior does not apply. Reviewed source behavior and caller/data flow."
+  },
+  {
+    "file": "src/thg_protocol/validation_report.py",
+    "line": 1589,
+    "name": "say",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "UI/event-handler plumbing; scientific behavior does not apply. Reviewed source behavior and caller/data flow."
+  },
+  {
+    "file": "src/thg_protocol/validation_report.py",
+    "line": 1591,
+    "name": "edited",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "UI/event-handler plumbing; scientific behavior does not apply. Reviewed source behavior and caller/data flow."
+  },
+  {
+    "file": "src/thg_protocol/validation_report.py",
+    "line": 1595,
+    "name": "render",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "UI/event-handler plumbing; scientific behavior does not apply. Reviewed source behavior and caller/data flow."
+  },
+  {
+    "file": "src/thg_protocol/validation_report.py",
+    "line": 1596,
+    "name": "anonymous forEach callback",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "UI/event-handler plumbing; scientific behavior does not apply. Reviewed source behavior and caller/data flow."
+  },
+  {
+    "file": "src/thg_protocol/validation_report.py",
+    "line": 1598,
+    "name": "anonymous forEach callback",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "UI/event-handler plumbing; scientific behavior does not apply. Reviewed source behavior and caller/data flow."
+  },
+  {
+    "file": "src/thg_protocol/validation_report.py",
+    "line": 1608,
+    "name": "anonymous forEach callback",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "UI/event-handler plumbing; scientific behavior does not apply. Reviewed source behavior and caller/data flow."
+  },
+  {
+    "file": "src/thg_protocol/validation_report.py",
+    "line": 1616,
+    "name": "anonymous forEach callback",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "UI/event-handler plumbing; scientific behavior does not apply. Reviewed source behavior and caller/data flow."
+  },
+  {
+    "file": "src/thg_protocol/validation_report.py",
+    "line": 1618,
+    "name": "anonymous addEventListener callback",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "UI/event-handler plumbing; scientific behavior does not apply. Reviewed source behavior and caller/data flow."
+  },
+  {
+    "file": "src/thg_protocol/validation_report.py",
+    "line": 1623,
+    "name": "anonymous addEventListener callback",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "UI/event-handler plumbing; scientific behavior does not apply. Reviewed source behavior and caller/data flow."
+  },
+  {
+    "file": "src/thg_protocol/validation_report.py",
+    "line": 1624,
+    "name": "anonymous addEventListener callback",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "UI/event-handler plumbing; scientific behavior does not apply. Reviewed source behavior and caller/data flow."
+  },
+  {
+    "file": "src/thg_protocol/validation_report.py",
+    "line": 1626,
+    "name": "anonymous forEach callback",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "UI/event-handler plumbing; scientific behavior does not apply. Reviewed source behavior and caller/data flow."
+  },
+  {
+    "file": "src/thg_protocol/validation_report.py",
+    "line": 1632,
+    "name": "decisions",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "UI/event-handler plumbing; scientific behavior does not apply. Reviewed source behavior and caller/data flow."
+  },
+  {
+    "file": "src/thg_protocol/validation_report.py",
+    "line": 1634,
+    "name": "anonymous forEach callback",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "UI/event-handler plumbing; scientific behavior does not apply. Reviewed source behavior and caller/data flow."
+  },
+  {
+    "file": "src/thg_protocol/validation_report.py",
+    "line": 1637,
+    "name": "anonymous forEach callback",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "UI/event-handler plumbing; scientific behavior does not apply. Reviewed source behavior and caller/data flow."
+  },
+  {
+    "file": "src/thg_protocol/validation_report.py",
+    "line": 1640,
+    "name": "anonymous forEach callback",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "UI/event-handler plumbing; scientific behavior does not apply. Reviewed source behavior and caller/data flow."
+  },
+  {
+    "file": "src/thg_protocol/validation_report.py",
+    "line": 1648,
+    "name": "anonymous addEventListener callback",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "UI/event-handler plumbing; scientific behavior does not apply. Reviewed source behavior and caller/data flow."
+  },
+  {
+    "file": "src/thg_protocol/validation_report.py",
+    "line": 1650,
+    "name": "anonymous map callback",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "UI/event-handler plumbing; scientific behavior does not apply. Reviewed source behavior and caller/data flow."
+  },
+  {
+    "file": "src/thg_protocol/validation_report.py",
+    "line": 1653,
+    "name": "anonymous setTimeout callback",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "UI/event-handler plumbing; scientific behavior does not apply. Reviewed source behavior and caller/data flow."
+  },
+  {
+    "file": "src/thg_protocol/validation_report.py",
+    "line": 1656,
+    "name": "anonymous addEventListener callback",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "UI/event-handler plumbing; scientific behavior does not apply. Reviewed source behavior and caller/data flow."
+  },
+  {
+    "file": "src/thg_protocol/validation_report.py",
+    "line": 1658,
+    "name": "anonymous then callback",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "UI/event-handler plumbing; scientific behavior does not apply. Reviewed source behavior and caller/data flow."
+  },
+  {
+    "file": "src/thg_protocol/validation_report.py",
+    "line": 1660,
+    "name": "anonymous forEach callback",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "UI/event-handler plumbing; scientific behavior does not apply. Reviewed source behavior and caller/data flow."
+  },
+  {
+    "file": "src/thg_protocol/validation_report.py",
+    "line": 1660,
+    "name": "anonymous forEach callback",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "UI/event-handler plumbing; scientific behavior does not apply. Reviewed source behavior and caller/data flow."
+  },
+  {
+    "file": "src/thg_protocol/validation_report.py",
+    "line": 1662,
+    "name": "anonymous forEach callback",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "UI/event-handler plumbing; scientific behavior does not apply. Reviewed source behavior and caller/data flow."
+  },
+  {
+    "file": "src/thg_protocol/validation_report.py",
+    "line": 1668,
+    "name": "anonymous forEach callback",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "UI/event-handler plumbing; scientific behavior does not apply. Reviewed source behavior and caller/data flow."
+  },
+  {
+    "file": "src/thg_protocol/validation_report.py",
+    "line": 1670,
+    "name": "anonymous filter callback",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "UI/event-handler plumbing; scientific behavior does not apply. Reviewed source behavior and caller/data flow."
+  },
+  {
+    "file": "src/thg_protocol/validation_report.py",
+    "line": 1672,
+    "name": "anonymous some callback",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "UI/event-handler plumbing; scientific behavior does not apply. Reviewed source behavior and caller/data flow."
+  },
+  {
+    "file": "src/thg_protocol/validation_report.py",
+    "line": 1680,
+    "name": "anonymous addEventListener callback",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "UI/event-handler plumbing; scientific behavior does not apply. Reviewed source behavior and caller/data flow."
+  },
+  {
+    "file": "src/thg_protocol/validation_report.py",
+    "line": 1901,
+    "name": "searchText",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "UI/event-handler plumbing; scientific behavior does not apply. Reviewed source behavior and caller/data flow."
+  },
+  {
+    "file": "src/thg_protocol/validation_report.py",
+    "line": 1903,
+    "name": "anonymous forEach callback",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "UI/event-handler plumbing; scientific behavior does not apply. Reviewed source behavior and caller/data flow."
+  },
+  {
+    "file": "src/thg_protocol/validation_report.py",
+    "line": 1906,
+    "name": "anonymous forEach callback",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "UI/event-handler plumbing; scientific behavior does not apply. Reviewed source behavior and caller/data flow."
+  },
+  {
+    "file": "src/thg_protocol/validation_report.py",
+    "line": 1909,
+    "name": "anonymous addEventListener callback",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "UI/event-handler plumbing; scientific behavior does not apply. Reviewed source behavior and caller/data flow."
+  },
+  {
+    "file": "src/thg_protocol/validation_report.py",
+    "line": 1914,
+    "name": "anonymous forEach callback",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "UI/event-handler plumbing; scientific behavior does not apply. Reviewed source behavior and caller/data flow."
+  },
+  {
+    "file": "src/thg_protocol/validation_report.py",
+    "line": 1915,
+    "name": "anonymous addEventListener callback",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "UI/event-handler plumbing; scientific behavior does not apply. Reviewed source behavior and caller/data flow."
+  },
+  {
+    "file": "src/thg_protocol/validation_report.py",
+    "line": 1917,
+    "name": "anonymous forEach callback",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "UI/event-handler plumbing; scientific behavior does not apply. Reviewed source behavior and caller/data flow."
+  },
+  {
+    "file": "src/thg_protocol/validation_report.py",
+    "line": 1920,
+    "name": "anonymous forEach callback",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "UI/event-handler plumbing; scientific behavior does not apply. Reviewed source behavior and caller/data flow."
+  },
+  {
+    "file": "src/thg_protocol/validation_report.py",
+    "line": 1921,
+    "name": "anonymous addEventListener callback",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "UI/event-handler plumbing; scientific behavior does not apply. Reviewed source behavior and caller/data flow."
+  },
+  {
+    "file": "docs/assets/component_visualization_template.html",
+    "line": 44,
+    "name": "getNodeLabel",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "UI/event-handler plumbing; scientific behavior does not apply. Reviewed source behavior and caller/data flow."
+  },
+  {
+    "file": "docs/assets/component_visualization_template.html",
+    "line": 49,
+    "name": "getNodeTitle",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "UI/event-handler plumbing; scientific behavior does not apply. Reviewed source behavior and caller/data flow."
+  },
+  {
+    "file": "docs/assets/component_visualization_template.html",
+    "line": 54,
+    "name": "updateNetworkLabels",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "UI/event-handler plumbing; scientific behavior does not apply. Reviewed source behavior and caller/data flow."
+  },
+  {
+    "file": "docs/assets/component_visualization_template.html",
+    "line": 56,
+    "name": "anonymous forEach callback",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "UI/event-handler plumbing; scientific behavior does not apply. Reviewed source behavior and caller/data flow."
+  },
+  {
+    "file": "docs/assets/component_visualization_template.html",
+    "line": 62,
+    "name": "initializeNetworkByName",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "UI/event-handler plumbing; scientific behavior does not apply. Reviewed source behavior and caller/data flow."
+  },
+  {
+    "file": "docs/assets/component_visualization_template.html",
+    "line": 71,
+    "name": "anonymous map callback",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "UI/event-handler plumbing; scientific behavior does not apply. Reviewed source behavior and caller/data flow."
+  },
+  {
+    "file": "docs/assets/component_visualization_template.html",
+    "line": 97,
+    "name": "DOMContentLoaded listener",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "UI/event-handler plumbing; scientific behavior does not apply. Reviewed source behavior and caller/data flow."
+  },
+  {
+    "file": "docs/assets/component_visualization_template.html",
+    "line": 100,
+    "name": "per-button IIFE",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "UI/event-handler plumbing; scientific behavior does not apply. Reviewed source behavior and caller/data flow."
+  },
+  {
+    "file": "docs/assets/component_visualization_template.html",
+    "line": 101,
+    "name": "anonymous addEventListener callback",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "UI/event-handler plumbing; scientific behavior does not apply. Reviewed source behavior and caller/data flow."
+  },
+  {
+    "file": "docs/assets/component_visualization_template.html",
+    "line": 112,
+    "name": "anonymous forEach callback",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "UI/event-handler plumbing; scientific behavior does not apply. Reviewed source behavior and caller/data flow."
+  },
+  {
+    "file": "docs/assets/component_visualization_template.html",
+    "line": 135,
+    "name": "anonymous addEventListener callback",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "UI/event-handler plumbing; scientific behavior does not apply. Reviewed source behavior and caller/data flow."
+  },
+  {
+    "file": "docs/assets/component_visualization_template.html",
+    "line": 137,
+    "name": "anonymous forEach callback",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "UI/event-handler plumbing; scientific behavior does not apply. Reviewed source behavior and caller/data flow."
+  },
+  {
+    "file": "docs/assets/mermaid-init.js",
+    "line": 2,
+    "name": "DOMContentLoaded listener",
+    "functional": true,
+    "scientific": false,
+    "scientific_na": true,
+    "review_note": "UI/event-handler plumbing; scientific behavior does not apply. Reviewed source behavior and caller/data flow."
+  },
+  {
+    "file": "supplementary_material/pathway/figures/Glycocalyx_Cytoskeleton_network_d3.html",
+    "line": 16740,
+    "name": "anonymous filter callback",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false,
+    "review_note": "Graph-display behavior reviewed: model counts, stoichiometric edge orientation/weight, reversibility visibility, compartment styling/layout, and tooltip field flow."
+  },
+  {
+    "file": "supplementary_material/pathway/figures/Glycocalyx_Cytoskeleton_network_d3.html",
+    "line": 16741,
+    "name": "anonymous filter callback",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false,
+    "review_note": "Graph-display behavior reviewed: model counts, stoichiometric edge orientation/weight, reversibility visibility, compartment styling/layout, and tooltip field flow."
+  },
+  {
+    "file": "supplementary_material/pathway/figures/Glycocalyx_Cytoskeleton_network_d3.html",
+    "line": 16773,
+    "name": "anonymous event callback",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false,
+    "review_note": "Graph-display behavior reviewed: model counts, stoichiometric edge orientation/weight, reversibility visibility, compartment styling/layout, and tooltip field flow."
+  },
+  {
+    "file": "supplementary_material/pathway/figures/Glycocalyx_Cytoskeleton_network_d3.html",
+    "line": 16792,
+    "name": "forceCompartment",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false,
+    "review_note": "Graph-display behavior reviewed: model counts, stoichiometric edge orientation/weight, reversibility visibility, compartment styling/layout, and tooltip field flow."
+  },
+  {
+    "file": "supplementary_material/pathway/figures/Glycocalyx_Cytoskeleton_network_d3.html",
+    "line": 16805,
+    "name": "anonymous arrow callback",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false,
+    "review_note": "Graph-display behavior reviewed: model counts, stoichiometric edge orientation/weight, reversibility visibility, compartment styling/layout, and tooltip field flow."
+  },
+  {
+    "file": "supplementary_material/pathway/figures/Glycocalyx_Cytoskeleton_network_d3.html",
+    "line": 16806,
+    "name": "anonymous arrow callback",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false,
+    "review_note": "Graph-display behavior reviewed: model counts, stoichiometric edge orientation/weight, reversibility visibility, compartment styling/layout, and tooltip field flow."
+  },
+  {
+    "file": "supplementary_material/pathway/figures/Glycocalyx_Cytoskeleton_network_d3.html",
+    "line": 16808,
+    "name": "anonymous arrow callback",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false,
+    "review_note": "Graph-display behavior reviewed: model counts, stoichiometric edge orientation/weight, reversibility visibility, compartment styling/layout, and tooltip field flow."
+  },
+  {
+    "file": "supplementary_material/pathway/figures/Glycocalyx_Cytoskeleton_network_d3.html",
+    "line": 16817,
+    "name": "anonymous arrow callback",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false,
+    "review_note": "Graph-display behavior reviewed: model counts, stoichiometric edge orientation/weight, reversibility visibility, compartment styling/layout, and tooltip field flow."
+  },
+  {
+    "file": "supplementary_material/pathway/figures/Glycocalyx_Cytoskeleton_network_d3.html",
+    "line": 16822,
+    "name": "anonymous join callback",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false,
+    "review_note": "Graph-display behavior reviewed: model counts, stoichiometric edge orientation/weight, reversibility visibility, compartment styling/layout, and tooltip field flow."
+  },
+  {
+    "file": "supplementary_material/pathway/figures/Glycocalyx_Cytoskeleton_network_d3.html",
+    "line": 16823,
+    "name": "anonymous arrow callback",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false,
+    "review_note": "Graph-display behavior reviewed: model counts, stoichiometric edge orientation/weight, reversibility visibility, compartment styling/layout, and tooltip field flow."
+  },
+  {
+    "file": "supplementary_material/pathway/figures/Glycocalyx_Cytoskeleton_network_d3.html",
+    "line": 16831,
+    "name": "anonymous arrow callback",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false,
+    "review_note": "Graph-display behavior reviewed: model counts, stoichiometric edge orientation/weight, reversibility visibility, compartment styling/layout, and tooltip field flow."
+  },
+  {
+    "file": "supplementary_material/pathway/figures/Glycocalyx_Cytoskeleton_network_d3.html",
+    "line": 16832,
+    "name": "anonymous each callback",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false,
+    "review_note": "Graph-display behavior reviewed: model counts, stoichiometric edge orientation/weight, reversibility visibility, compartment styling/layout, and tooltip field flow."
+  },
+  {
+    "file": "supplementary_material/pathway/figures/Glycocalyx_Cytoskeleton_network_d3.html",
+    "line": 16846,
+    "name": "anonymous filter callback",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false,
+    "review_note": "Graph-display behavior reviewed: model counts, stoichiometric edge orientation/weight, reversibility visibility, compartment styling/layout, and tooltip field flow."
+  },
+  {
+    "file": "supplementary_material/pathway/figures/Glycocalyx_Cytoskeleton_network_d3.html",
+    "line": 16849,
+    "name": "anonymous arrow callback",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false,
+    "review_note": "Graph-display behavior reviewed: model counts, stoichiometric edge orientation/weight, reversibility visibility, compartment styling/layout, and tooltip field flow."
+  },
+  {
+    "file": "supplementary_material/pathway/figures/Glycocalyx_Cytoskeleton_network_d3.html",
+    "line": 16851,
+    "name": "anonymous event callback",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false,
+    "review_note": "Graph-display behavior reviewed: model counts, stoichiometric edge orientation/weight, reversibility visibility, compartment styling/layout, and tooltip field flow."
+  },
+  {
+    "file": "supplementary_material/pathway/figures/Glycocalyx_Cytoskeleton_network_d3.html",
+    "line": 16853,
+    "name": "anonymous arrow callback",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false,
+    "review_note": "Graph-display behavior reviewed: model counts, stoichiometric edge orientation/weight, reversibility visibility, compartment styling/layout, and tooltip field flow."
+  },
+  {
+    "file": "supplementary_material/pathway/figures/Glycocalyx_Cytoskeleton_network_d3.html",
+    "line": 16854,
+    "name": "anonymous arrow callback",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false,
+    "review_note": "Graph-display behavior reviewed: model counts, stoichiometric edge orientation/weight, reversibility visibility, compartment styling/layout, and tooltip field flow."
+  },
+  {
+    "file": "supplementary_material/pathway/figures/Glycocalyx_Cytoskeleton_network_d3.html",
+    "line": 16855,
+    "name": "anonymous arrow callback",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false,
+    "review_note": "Graph-display behavior reviewed: model counts, stoichiometric edge orientation/weight, reversibility visibility, compartment styling/layout, and tooltip field flow."
+  },
+  {
+    "file": "supplementary_material/pathway/figures/Glycocalyx_Cytoskeleton_network_d3.html",
+    "line": 16856,
+    "name": "anonymous arrow callback",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false,
+    "review_note": "Graph-display behavior reviewed: model counts, stoichiometric edge orientation/weight, reversibility visibility, compartment styling/layout, and tooltip field flow."
+  },
+  {
+    "file": "supplementary_material/pathway/figures/Glycocalyx_Cytoskeleton_network_d3.html",
+    "line": 16858,
+    "name": "anonymous each callback",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false,
+    "review_note": "Graph-display behavior reviewed: model counts, stoichiometric edge orientation/weight, reversibility visibility, compartment styling/layout, and tooltip field flow."
+  },
+  {
+    "file": "supplementary_material/pathway/figures/Glycocalyx_Cytoskeleton_network_d3.html",
+    "line": 16866,
+    "name": "anonymous arrow callback",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false,
+    "review_note": "Graph-display behavior reviewed: model counts, stoichiometric edge orientation/weight, reversibility visibility, compartment styling/layout, and tooltip field flow."
+  },
+  {
+    "file": "supplementary_material/pathway/figures/Glycocalyx_Cytoskeleton_network_d3.html",
+    "line": 16866,
+    "name": "anonymous arrow callback",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false,
+    "review_note": "Graph-display behavior reviewed: model counts, stoichiometric edge orientation/weight, reversibility visibility, compartment styling/layout, and tooltip field flow."
+  },
+  {
+    "file": "supplementary_material/pathway/figures/Glycocalyx_Cytoskeleton_network_d3.html",
+    "line": 16869,
+    "name": "drag",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false,
+    "review_note": "Graph-display behavior reviewed: model counts, stoichiometric edge orientation/weight, reversibility visibility, compartment styling/layout, and tooltip field flow."
+  },
+  {
+    "file": "supplementary_material/pathway/figures/Glycocalyx_Cytoskeleton_network_d3.html",
+    "line": 16870,
+    "name": "dragstarted",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false,
+    "review_note": "Graph-display behavior reviewed: model counts, stoichiometric edge orientation/weight, reversibility visibility, compartment styling/layout, and tooltip field flow."
+  },
+  {
+    "file": "supplementary_material/pathway/figures/Glycocalyx_Cytoskeleton_network_d3.html",
+    "line": 16874,
+    "name": "dragged",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false,
+    "review_note": "Graph-display behavior reviewed: model counts, stoichiometric edge orientation/weight, reversibility visibility, compartment styling/layout, and tooltip field flow."
+  },
+  {
+    "file": "supplementary_material/pathway/figures/Glycocalyx_Cytoskeleton_network_d3.html",
+    "line": 16875,
+    "name": "dragended",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false,
+    "review_note": "Graph-display behavior reviewed: model counts, stoichiometric edge orientation/weight, reversibility visibility, compartment styling/layout, and tooltip field flow."
+  },
+  {
+    "file": "supplementary_material/pathway/figures/Glycocalyx_Cytoskeleton_network_d3.html",
+    "line": 16885,
+    "name": "showTooltip",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false,
+    "review_note": "Graph-display behavior reviewed: model counts, stoichiometric edge orientation/weight, reversibility visibility, compartment styling/layout, and tooltip field flow."
+  },
+  {
+    "file": "supplementary_material/pathway/figures/Glycocalyx_Cytoskeleton_network_d3.html",
+    "line": 16901,
+    "name": "hideTooltip",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false,
+    "review_note": "Graph-display behavior reviewed: model counts, stoichiometric edge orientation/weight, reversibility visibility, compartment styling/layout, and tooltip field flow."
+  },
+  {
+    "file": "supplementary_material/pathway/figures/Glycocalyx_Cytoskeleton_network_d3.html",
+    "line": 16902,
+    "name": "resetZoom",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false,
+    "review_note": "Graph-display behavior reviewed: model counts, stoichiometric edge orientation/weight, reversibility visibility, compartment styling/layout, and tooltip field flow."
+  },
+  {
+    "file": "supplementary_material/pathway/figures/Glycocalyx_Cytoskeleton_network_d3.html",
+    "line": 16903,
+    "name": "toggleLabels",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false,
+    "review_note": "Graph-display behavior reviewed: model counts, stoichiometric edge orientation/weight, reversibility visibility, compartment styling/layout, and tooltip field flow."
+  },
+  {
+    "file": "supplementary_material/pathway/figures/Glycocalyx_Cytoskeleton_network_d3.html",
+    "line": 16904,
+    "name": "colorByCompartment",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false,
+    "review_note": "Graph-display behavior reviewed: model counts, stoichiometric edge orientation/weight, reversibility visibility, compartment styling/layout, and tooltip field flow."
+  },
+  {
+    "file": "supplementary_material/pathway/figures/Glycocalyx_Cytoskeleton_network_d3.html",
+    "line": 16905,
+    "name": "anonymous arrow callback",
+    "functional": true,
+    "scientific": true,
+    "scientific_na": false,
+    "review_note": "Graph-display behavior reviewed: model counts, stoichiometric edge orientation/weight, reversibility visibility, compartment styling/layout, and tooltip field flow."
+  }
+]

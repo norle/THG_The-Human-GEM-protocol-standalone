@@ -14,6 +14,11 @@ venv/
 logs/
 backups/
 *.log
+# Preserve the evidence linked by the function audit.
+!/reviews/2026-11-03-function-audit/pytest.log
+!/reviews/2026-11-03-function-audit/pytest-fixed.log
+!/reviews/2026-11-03-function-audit/javascript-syntax-check.log
+!/reviews/2026-11-03-function-audit/reproductions/reproduction-results.log
 run_full.log
 run_full_db.log
 run_subset.log

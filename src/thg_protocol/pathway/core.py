@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import copy
+import math
 import re
 from typing import Any
 
@@ -118,13 +119,15 @@ def parse_reaction_equation(equation: str) -> dict[str, Any] | None:
                 continue
             match = term_pattern.match(term)
             if not match:
-                continue
+                raise ValueError(f"Malformed reaction participant: {term!r}")
             stoich_text, name, compartment = match.groups()
             name = name.strip()
             compartment = compartment.strip()
-            if not name or not compartment:
-                continue
+            if not name or not compartment or "[" in name or "]" in name:
+                raise ValueError(f"Malformed reaction participant: {term!r}")
             stoich = float(stoich_text) if stoich_text else 1.0
+            if not math.isfinite(stoich) or stoich <= 0:
+                raise ValueError(f"Invalid reaction coefficient: {term!r}")
             terms.append(
                 {
                     "name": name,
@@ -148,17 +151,21 @@ def parse_universal_reaction(
     if parsed is None:
         return None
 
+    working_model = {**model, "metabolites": list(model.get("metabolites", []))}
     metabolites: dict[str, float] = {}
     for term in parsed["terms"]:
         metabolite = find_metabolite_robust(
-            model,
+            working_model,
             term["name"],
             id_database,
             term["compartment"],
             auto_create=True,
         )
         if metabolite is None:
-            continue
+            raise ValueError(
+                f"Unresolved reaction participant: {term['name']}"
+                f"[{term['compartment']}]"
+            )
         metabolite_id = metabolite["id"]
         metabolites[metabolite_id] = (
             metabolites.get(metabolite_id, 0.0) + term["stoich"]
@@ -166,6 +173,9 @@ def parse_universal_reaction(
 
     if not metabolites:
         return None
+    model.setdefault("metabolites", []).extend(
+        working_model["metabolites"][len(model.get("metabolites", [])) :]
+    )
     return {"metabolites": metabolites, "reversible": parsed["reversible"]}
 
 
@@ -274,6 +284,19 @@ def create_compartment_reactions(
     del compartment_abbrev  # retained for compatibility with the workflow API
     new_reactions: list[dict[str, Any]] = []
     existing_ids = {reaction["id"] for reaction in model.get("reactions", [])}
+    reserved_ids = {
+        reaction["id"] for reaction in config.get("reactions", []) if reaction.get("id")
+    }
+    explicit_definitions = {}
+    for reaction in config.get("reactions", []):
+        reaction_id = reaction.get("id")
+        if reaction_id:
+            if (
+                reaction_id in explicit_definitions
+                and explicit_definitions[reaction_id] != reaction
+            ):
+                raise ValueError(f"Conflicting explicit reaction ID: {reaction_id}")
+            explicit_definitions[reaction_id] = reaction
     next_number = 1
     for reaction_id in existing_ids:
         if reaction_id.startswith("MAR") and len(reaction_id) >= 8:
@@ -284,7 +307,7 @@ def create_compartment_reactions(
     for reaction_config in config.get("reactions", []):
         reaction_id = reaction_config.get("id")
         if not reaction_id:
-            while f"MAR{next_number:05d}" in existing_ids:
+            while f"MAR{next_number:05d}" in existing_ids | reserved_ids:
                 next_number += 1
             reaction_id = f"MAR{next_number:05d}"
             next_number += 1
@@ -293,16 +316,26 @@ def create_compartment_reactions(
                 next_number = max(next_number, int(str(reaction_id)[3:8]) + 1)
             except ValueError:
                 pass
-        if reaction_id in existing_ids:
-            continue
         equation = substitute_compartment_abbreviations(
             reaction_config.get("equation", ""), abbrev_map
         )
         reaction_data = parse_universal_reaction(equation, model, id_database)
         if not reaction_data:
-            continue
+            raise ValueError(
+                f"Invalid equation for reaction {reaction_id}: {equation!r}"
+            )
         config_entry = {**reaction_config, "id": reaction_id}
-        new_reactions.append(build_reaction_from_config(config_entry, reaction_data))
+        reaction = build_reaction_from_config(config_entry, reaction_data)
+        if reaction_id in existing_ids:
+            existing = next(
+                item
+                for item in model.get("reactions", []) + new_reactions
+                if item["id"] == reaction_id
+            )
+            if existing.get("metabolites") != reaction["metabolites"]:
+                raise ValueError(f"Conflicting explicit reaction ID: {reaction_id}")
+            continue
+        new_reactions.append(reaction)
         existing_ids.add(reaction_id)
     model.setdefault("reactions", []).extend(new_reactions)
     return len(new_reactions)
