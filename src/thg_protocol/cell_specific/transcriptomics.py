@@ -40,19 +40,27 @@ def extract_ensembl_ids(model: Any) -> list[str]:
     ]
 
 
-def replace_index_tokens(model: Any, ensembl_ids: Sequence[str]) -> list[str]:
-    """Replace ``x(index)`` GPR tokens with corresponding Ensembl IDs."""
-    rules: list[str] = []
-    for reaction in model.reactions:
-        rule = reaction.gene_reaction_rule
+def replace_index_tokens(
+    model: Any, ensembl_ids: Sequence[str], *, index_base: int = 0
+) -> list[str]:
+    """Replace ``x(index)`` GPR tokens with corresponding Ensembl IDs.
 
-        def replacement(match: re.Match[str]) -> str:
-            index = int(match.group(1))
-            identifier = ensembl_ids[index] if index < len(ensembl_ids) else ""
-            return f"({identifier})"
+    ``index_base`` is the number of the first gene: 0 (the default) for
+    Python-style rules, 1 for rules exported from the MATLAB COBRA Toolbox.
+    A token with no gene (index out of range, or a blank identifier) is left
+    unchanged instead of becoming an empty group.
+    """
 
-        rules.append(re.sub(r"x\((\d+)\)", replacement, rule).strip())
-    return rules
+    def replacement(match: re.Match[str]) -> str:
+        position = int(match.group(1)) - index_base
+        if 0 <= position < len(ensembl_ids) and ensembl_ids[position]:
+            return f"({ensembl_ids[position]})"
+        return match.group(0)
+
+    return [
+        re.sub(r"x\((\d+)\)", replacement, reaction.gene_reaction_rule).strip()
+        for reaction in model.reactions
+    ]
 
 
 def extract_gene_annotation_pairs(model_path: str | Path) -> dict[str, str | list[str]]:

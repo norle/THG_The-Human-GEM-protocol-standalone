@@ -170,3 +170,26 @@ def test_replace_gene_symbols_ors_together_every_mapped_identifier():
 def test_replace_gene_symbols_does_not_rewrite_inside_other_symbols():
     model = _rules_model("GENE1 or GENE10")
     assert replace_gene_symbols(model, {"GENE1": "ENSG1"}) == ["ENSG1 or GENE10"]
+
+
+def test_replace_index_tokens_supports_matlab_one_based_indices():
+    model = _rules_model("x(1) and x(2)", "x(3) or x(1)")
+    ids = ["ENSG1", "ENSG2", "ENSG3"]
+    assert replace_index_tokens(model, ids, index_base=1) == [
+        "(ENSG1) and (ENSG2)",
+        "(ENSG3) or (ENSG1)",
+    ]
+
+
+def test_replace_index_tokens_default_stays_zero_based():
+    assert replace_index_tokens(_rules_model("x(0) and x(1)"), ["A", "B"]) == [
+        "(A) and (B)"
+    ]
+
+
+def test_replace_index_tokens_keeps_unresolvable_tokens_instead_of_empty_groups():
+    model = _rules_model("x(0) and x(5)", "x(1)")
+    # x(5) is out of range and ids[1] is blank: neither may become "()".
+    assert replace_index_tokens(model, ["A", ""]) == ["(A) and x(5)", "x(1)"]
+    # With a one-based file, x(0) cannot refer to any gene.
+    assert replace_index_tokens(_rules_model("x(0)"), ["A"], index_base=1) == ["x(0)"]
