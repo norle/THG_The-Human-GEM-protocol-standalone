@@ -138,3 +138,35 @@ def test_gpr_context_specific_builder_reports_unknown_genes():
     tailored, report = build_cell_specific_model(model, {"G1": 1, "G2": 0})
     assert not tailored.reactions.has_id("R1")
     assert report.unknown_genes == ("G3",)
+
+
+def _rules_model(*rules):
+    return SimpleNamespace(
+        reactions=[SimpleNamespace(gene_reaction_rule=rule) for rule in rules]
+    )
+
+
+def test_replace_gene_symbols_handles_hyphenated_symbols():
+    model = _rules_model("MT-ND1 and HLA-A")
+    mapping = {"MT-ND1": "ENSG1", "HLA-A": "ENSG2"}
+    assert replace_gene_symbols(model, mapping) == ["ENSG1 and ENSG2"]
+
+
+def test_replace_gene_symbols_keeps_unmapped_genes_so_rules_stay_valid():
+    model = _rules_model("GENE1 and GENE3", "(GENE3 or GENE1) and GENE2")
+    result = replace_gene_symbols(model, {"GENE1": "ENSG1", "GENE2": "ENSG2"})
+    assert result == ["ENSG1 and GENE3", "(GENE3 or ENSG1) and ENSG2"]
+
+
+def test_replace_gene_symbols_ors_together_every_mapped_identifier():
+    model = _rules_model("DUP and GENE2", "DUP")
+    mapping = {"DUP": ["ENSG5", "ENSG6"], "GENE2": "ENSG2"}
+    assert replace_gene_symbols(model, mapping) == [
+        "(ENSG5 or ENSG6) and ENSG2",
+        "(ENSG5 or ENSG6)",
+    ]
+
+
+def test_replace_gene_symbols_does_not_rewrite_inside_other_symbols():
+    model = _rules_model("GENE1 or GENE10")
+    assert replace_gene_symbols(model, {"GENE1": "ENSG1"}) == ["ENSG1 or GENE10"]

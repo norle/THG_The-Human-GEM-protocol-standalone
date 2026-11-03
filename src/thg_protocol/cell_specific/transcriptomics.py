@@ -92,23 +92,40 @@ def extract_gene_annotation_pairs(model_path: str | Path) -> dict[str, str | lis
 def replace_gene_symbols(
     model: Any, gene_mapping: Mapping[str, str | Sequence[str]]
 ) -> list[str]:
-    """Replace gene symbols in model GPR rules with Ensembl identifiers."""
+    """Replace gene symbols in model GPR rules with Ensembl identifiers.
+
+    Rules are split on whitespace and parentheses, so symbols may contain
+    hyphens or other punctuation (``MT-ND1``). A symbol with several Ensembl
+    identifiers becomes an OR group of all of them. A symbol with no mapping
+    is left unchanged: the rule stays valid and the gene is later reported as
+    missing expression evidence, instead of silently shrinking an AND complex.
+    """
     values = {
         value
         for mapped in gene_mapping.values()
         for value in (mapped if isinstance(mapped, (list, tuple)) else [mapped])
     }
-    output: list[str] = []
-    for reaction in model.reactions:
-        rule = reaction.gene_reaction_rule
-        for gene in re.findall(r"\w+", rule):
-            if gene in {"and", "or"} or gene.startswith("ENSG") or gene in values:
-                continue
-            mapped = gene_mapping.get(gene)
-            replacement = mapped[0] if isinstance(mapped, (list, tuple)) else mapped
-            rule = re.sub(rf"\b{re.escape(gene)}\b", replacement or "", rule)
-        output.append(rule.strip())
-    return output
+
+    def replacement(match: re.Match[str]) -> str:
+        gene = match.group(0)
+        if gene.lower() in {"and", "or"} or gene.startswith("ENSG") or gene in values:
+            return gene
+        mapped = gene_mapping.get(gene)
+        if not mapped:
+            return gene
+        if isinstance(mapped, str):
+            return mapped
+        identifiers = list(dict.fromkeys(mapped))
+        return (
+            identifiers[0]
+            if len(identifiers) == 1
+            else ("(" + " or ".join(identifiers) + ")")
+        )
+
+    return [
+        re.sub(r"[^\s()]+", replacement, reaction.gene_reaction_rule).strip()
+        for reaction in model.reactions
+    ]
 
 
 __all__ = [
