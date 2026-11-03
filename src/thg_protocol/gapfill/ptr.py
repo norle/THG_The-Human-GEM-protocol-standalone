@@ -14,7 +14,7 @@ from __future__ import annotations
 import math
 import random
 import re
-from collections.abc import Callable, Mapping
+from collections.abc import Callable, Collection, Mapping
 from dataclasses import asdict, dataclass, field, replace
 from typing import Any
 
@@ -25,15 +25,20 @@ from .core import (
     GapfillResult,
     _add_candidate,
     _as_mapping,
+    _compartment_pair_key,
     _metabolite_kind,
     _metrics,
     _pair_type,
     _produced_consumed,
     _resolved_parameters,
     _suffix,
+    _transport_direction,
     _TransportSearch,
     _UnionFind,
+    directed_transport,
 )
+from .exclusions import is_excluded
+from .gate import apply_energy_cycle_gate
 
 _RANK = {"A": 0, "B": 1, "C": 2}
 # Flux a reaction must reach to count as unblocked (FASTCC's default). Legacy
@@ -86,9 +91,13 @@ def network_components(model: Any) -> Components:
 
 @dataclass(frozen=True)
 class PtrCandidate:
-    """A reversible same-base transport between two compartments.
+    """A same-base transport between two compartments.
 
     ``met1 < met2``; ``compartments`` and ``components`` follow that order.
+    ``direction`` is 1 for an irreversible ``met1`` -> ``met2`` transport, -1
+    for ``met2`` -> ``met1`` and 0 for a reversible one: a pair of a
+    product-only and a substrate-only dead end (type A) can only be resolved
+    by moving flux from the first to the second.
     ``present`` marks a pair an existing transport already covers: such a
     candidate is reported but never added.
     """
@@ -101,6 +110,7 @@ class PtrCandidate:
     type: str
     reaction_id: str
     present: bool = False
+    direction: int = 0
 
     @property
     def main_only(self) -> bool:
@@ -127,11 +137,11 @@ class PtrCandidate:
         annotation: dict[str, Any] = {"type": self.type, "base": self.base}
         if phase is not None:
             annotation["phase"] = phase
-        return GapfillCandidate(
+        return directed_transport(
+            self.met1,
+            self.met2,
+            self.direction,
             self.reaction_id,
-            {self.met1: -1.0, self.met2: 1.0},
-            -1000.0,
-            1000.0,
             source="putative-transport",
             annotation=annotation,
         )
@@ -142,12 +152,16 @@ def generate_ptr_candidates(
     allowed_connections: list[tuple[str, str]],
     candidate_types: list[str],
     components: Components,
+    *,
+    excluded_metabolites: Collection[str] = (),
 ) -> list[PtrCandidate]:
     """Pairs that join two components, or two main-component dead ends.
 
     A pair across components qualifies with any type. A pair inside the main
     component qualifies only as type A or B, i.e. when it links dead ends.
-    Candidates sorted by ``reaction_id``.
+    Candidates sorted by ``reaction_id``. Metabolites matching
+    ``excluded_metabolites`` (by ID, base ID or cross-reference, see
+    :mod:`thg_protocol.gapfill.exclusions`) are never paired.
 
     Dead ends here are sign-only, as in legacy typing (agreed spec); the
     temporary sinks of :func:`compute_coverage` are bounds-aware instead.
@@ -158,7 +172,12 @@ def generate_ptr_candidates(
     buckets: dict[str, list[tuple[str, str]]] = {}
     bases = metabolite_base_ids({met["id"]: met for met in mapped["metabolites"]})
     for metabolite in model.metabolites:
-        if metabolite.id in components.of:
+        if metabolite.id in components.of and not is_excluded(
+            metabolite.id,
+            bases[metabolite.id],
+            metabolite.annotation,
+            excluded_metabolites,
+        ):
             compartment = metabolite.compartment or _suffix(metabolite.id)
             buckets.setdefault(bases[metabolite.id], []).append(
                 (metabolite.id, compartment)
@@ -171,10 +190,11 @@ def generate_ptr_candidates(
             for met2, compartment2 in members[index + 1 :]:
                 if tuple(sorted((compartment1, compartment2))) not in allowed:
                     continue
-                kind = _pair_type(
+                kinds = (
                     _metabolite_kind(met1, produced, consumed),
                     _metabolite_kind(met2, produced, consumed),
                 )
+                kind = _pair_type(*kinds)
                 pair = (components.of[met1], components.of[met2])
                 if kind not in candidate_types or (
                     pair[0] == pair[1] and (pair[0] != 1 or kind == "C")
@@ -188,6 +208,7 @@ def generate_ptr_candidates(
                     pair,
                     kind,
                     re.sub(r"[^A-Za-z0-9_]", "_", f"GAPFILL_PTR_{met1}_{met2}"),
+                    direction=_transport_direction(*kinds),
                 )
                 if search.covers(candidate.as_gapfill_candidate()):
                     candidate = replace(candidate, present=True)
@@ -446,16 +467,29 @@ def _add_temporary_exchanges(model: Any) -> None:
 
 
 def _add_ptr(model: Any, candidate: PtrCandidate) -> None:
-    from cobra import Reaction
+    """Add ``candidate`` exactly as the final model will get it."""
+    _add_candidate(model, candidate.as_gapfill_candidate())
 
-    reaction = Reaction(candidate.reaction_id, lower_bound=-1000.0, upper_bound=1000.0)
-    reaction.add_metabolites(
-        {
-            model.metabolites.get_by_id(candidate.met1): -1.0,
-            model.metabolites.get_by_id(candidate.met2): 1.0,
-        }
-    )
-    model.add_reactions([reaction])
+
+def candidate_costs(
+    candidates: Collection[PtrCandidate], connection_costs: Mapping[str, float]
+) -> dict[str, float]:
+    """MILP cost per candidate: its compartment pair's cost, else 1.
+
+    ``connection_costs`` maps ``"c:e"`` (order does not matter) to a positive
+    cost, e.g. to make cytosol-mitochondrion transports dearer than
+    cytosol-extracellular ones.
+    """
+    costs = {
+        _compartment_pair_key(*key.split(":")): value
+        for key, value in connection_costs.items()
+    }
+    return {
+        candidate.reaction_id: costs.get(
+            _compartment_pair_key(*candidate.compartments), 1.0
+        )
+        for candidate in candidates
+    }
 
 
 def compute_coverage(
@@ -535,8 +569,12 @@ def select_unblockers(
     tradeoff_lambda: float,
     budget: int,
     interface: Any,
+    costs: Mapping[str, float] | None = None,
 ) -> Selection:
-    """Maximize covered targets minus ``tradeoff_lambda`` per selected PTR.
+    """Maximize covered targets minus ``tradeoff_lambda * cost`` per selected PTR.
+
+    ``costs`` gives a candidate's relative price (default 1), so implausible
+    transports must unblock more to be worth adding.
 
     One global problem on an optlang ``interface``: binary y per candidate,
     z_r <= sum of y over the candidates covering target r, sum y <= budget.
@@ -583,7 +621,9 @@ def select_unblockers(
         + [interface.Constraint(add(list(y.values())), ub=budget, name="budget")]
     )
     problem.objective = interface.Objective(
-        add(list(z.values())) - tradeoff_lambda * add(list(y.values())), direction="max"
+        add(list(z.values()))
+        - tradeoff_lambda * add([(costs or {}).get(name, 1.0) * y[name] for name in y]),
+        direction="max",
     )
     status = problem.optimize()
     solver["milp_status"] = status
@@ -686,6 +726,7 @@ def run_sink_milp(
             parameters["allowed_connections"],
             parameters["candidate_types"],
             components,
+            excluded_metabolites=parameters["excluded_metabolites"],
         )
     if connectors is None:
         connectors = select_connectors(candidates)
@@ -719,6 +760,7 @@ def run_sink_milp(
         tradeoff_lambda=parameters["tradeoff_lambda"],
         budget=budget,
         interface=result_model.solver.interface,
+        costs=candidate_costs(candidates, parameters["connection_costs"]),
     )
     if selection.status == "failed":
         failed = _failed(model.copy(), parameters, before, "milp-failed")
@@ -729,12 +771,23 @@ def run_sink_milp(
     chosen = [by_id[reaction_id] for reaction_id in selection.selected]
     for candidate in chosen:
         _add_candidate(result_model, candidate.as_gapfill_candidate(phase=3))
+    gate: dict[str, Any] = {"status": "disabled"}
+    if parameters["energy_cycle_gate"]:
+        gate = apply_energy_cycle_gate(
+            result_model,
+            [candidate.reaction_id for candidate in [*connectors, *chosen]],
+        )
+    rejected = set(gate.get("rejected", {}))
+    connectors = [item for item in connectors if item.reaction_id not in rejected]
+    chosen = [item for item in chosen if item.reaction_id not in rejected]
     targets = {target for item in coverage for target in item.targets}
     verification = verify_selection(result_model, connectors, chosen, targets)
     connector_ids = {candidate.reaction_id for candidate in connectors}
-    chosen_ids = set(selection.selected)
+    chosen_ids = {candidate.reaction_id for candidate in chosen}
     candidate_coverage = {
-        candidate.reaction_id: "already-present"
+        candidate.reaction_id: "rejected-energy-cycle"
+        if candidate.reaction_id in rejected
+        else "already-present"
         if candidate.present
         else "connector"
         if candidate.reaction_id in connector_ids
@@ -747,9 +800,10 @@ def run_sink_milp(
         result_model,
         [candidate.reaction_id for candidate in [*connectors, *chosen]],
         candidate_coverage,
-        selection.status,
+        "partial" if rejected else selection.status,
         solver={
             **selection.solver,
+            "energy_cycle_gate": gate,
             "connectors": len(connectors),
             "targets": len(targets),
             "sink_only": sum(len(item.sink_only) for item in coverage),
@@ -759,7 +813,9 @@ def run_sink_milp(
         parameters=parameters,
         before_metrics=before,
         after_metrics=_metrics(result_model),
-        stop_reason="max-additions"
+        stop_reason="energy-cycle-gate"
+        if rejected
+        else "max-additions"
         if selection.status == "partial"
         else "milp-optimal",
     )

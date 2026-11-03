@@ -330,9 +330,9 @@ class GapfillStage:
         elif stage_id == "gate-gapfill":
             self.implementation_version = 3
         elif stage_id == "generate-gapfill-plan":
-            self.implementation_version = 5
+            self.implementation_version = 6
         elif stage_id in _PTR_STAGES:
-            self.implementation_version = 2
+            self.implementation_version = 3
 
     def enabled(self, config: Any) -> bool:
         if self.id not in _PTR_STAGES:
@@ -496,6 +496,7 @@ class GapfillStage:
                 parameters["allowed_connections"],
                 parameters["candidate_types"],
                 components,
+                excluded_metabolites=parameters["excluded_metabolites"],
             )
             return StageResult(
                 (

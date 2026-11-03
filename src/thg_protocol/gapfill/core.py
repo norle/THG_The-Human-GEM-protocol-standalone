@@ -11,6 +11,8 @@ from typing import Any
 
 from thg_protocol.workflow.ids import metabolite_base_ids
 
+from .exclusions import DEFAULT_EXCLUDED_METABOLITES, is_excluded
+
 __all__ = [
     "GapfillCandidate",
     "GapfillResult",
@@ -281,11 +283,15 @@ _DEFAULTS = {
         "max_additions": 500,
         "allowed_connections": [("c", "e"), ("c", "m")],
         "candidate_types": ["A", "B", "C"],
+        "excluded_metabolites": list(DEFAULT_EXCLUDED_METABOLITES),
+        "energy_cycle_gate": True,
     },
     "deadends": {
         "max_additions": 1000,
         "allowed_connections": [("c", "e")],
         "candidate_types": ["A", "B"],
+        "excluded_metabolites": list(DEFAULT_EXCLUDED_METABOLITES),
+        "energy_cycle_gate": True,
     },
     "milp": {"minimum_flux": 0.05, "penalties": {}, "max_additions": 100},
     "sink-milp": {
@@ -293,6 +299,9 @@ _DEFAULTS = {
         "candidate_types": ["A", "B", "C"],
         "tradeoff_lambda": 0.01,
         "min_component_size": 4,
+        "excluded_metabolites": list(DEFAULT_EXCLUDED_METABOLITES),
+        "energy_cycle_gate": True,
+        "connection_costs": {},
     },
 }
 
@@ -364,8 +373,55 @@ def _deadend_ids(model: Any) -> set[str]:
     return produced ^ consumed
 
 
+def _transport_direction(first_kind: str, second_kind: str) -> int:
+    """Direction of the transport that resolves a pair of dead ends.
+
+    ``1`` means first -> second, ``-1`` second -> first, ``0`` that the dead-end
+    kinds do not say. A product-only metabolite must be drained and a
+    substrate-only one fed, so only a (product, substrate) pair has a direction.
+    """
+    if (first_kind, second_kind) == ("product", "substrate"):
+        return 1
+    if (first_kind, second_kind) == ("substrate", "product"):
+        return -1
+    return 0
+
+
+#: Flux limit of a gap-filled transport, in the model's default bound units.
+TRANSPORT_BOUND = 1000.0
+
+
+def directed_transport(
+    first: str,
+    second: str,
+    direction: int,
+    reaction_id: str,
+    *,
+    source: str = "candidate-universe",
+    annotation: dict[str, Any] | None = None,
+) -> GapfillCandidate:
+    """The one definition of a gap-filled transport between two metabolites.
+
+    A directed transport is irreversible and moves ``first`` -> ``second``
+    (``direction`` 1) or ``second`` -> ``first`` (``-1``); direction ``0`` is
+    a reversible transport.
+    """
+    consumed, produced = (second, first) if direction < 0 else (first, second)
+    return GapfillCandidate(
+        reaction_id,
+        {consumed: -1.0, produced: 1.0},
+        -TRANSPORT_BOUND if direction == 0 else 0.0,
+        TRANSPORT_BOUND,
+        source=source,
+        annotation=annotation or {},
+    )
+
+
 def _transport_candidates(
-    model: Any, allowed_connections: list[tuple[str, str]], candidate_types: list[str]
+    model: Any,
+    allowed_connections: list[tuple[str, str]],
+    candidate_types: list[str],
+    excluded_metabolites: Any = (),
 ) -> list[GapfillCandidate]:
     mapped = _as_mapping(model)
     allowed = {tuple(sorted(pair)) for pair in allowed_connections}
@@ -373,6 +429,10 @@ def _transport_candidates(
     buckets: dict[str, list[dict[str, Any]]] = {}
     bases = metabolite_base_ids({met["id"]: met for met in mapped["metabolites"]})
     for met in mapped["metabolites"]:
+        if is_excluded(
+            met["id"], bases[met["id"]], met.get("annotation"), excluded_metabolites
+        ):
+            continue
         buckets.setdefault(bases[met["id"]], []).append(met)
     result = []
     for base, metabolites in sorted(buckets.items()):
@@ -389,20 +449,21 @@ def _transport_candidates(
                 )
                 if compartments not in allowed:
                     continue
-                kind = _pair_type(
-                    _metabolite_kind(left["id"], produced, consumed),
-                    _metabolite_kind(right["id"], produced, consumed),
+                first, second = sorted((left["id"], right["id"]))
+                kinds = (
+                    _metabolite_kind(first, produced, consumed),
+                    _metabolite_kind(second, produced, consumed),
                 )
+                kind = _pair_type(*kinds)
                 if kind not in candidate_types:
                     continue
-                first, second = sorted((left["id"], right["id"]))
                 reaction_id = re.sub(r"[^A-Za-z0-9_]", "_", f"GAPFILL_{first}_{second}")
                 result.append(
-                    GapfillCandidate(
+                    directed_transport(
+                        first,
+                        second,
+                        _transport_direction(*kinds),
                         reaction_id,
-                        {first: -1.0, second: 1.0},
-                        -1000.0,
-                        1000.0,
                         annotation={"type": kind, "base": base},
                     )
                 )
@@ -422,13 +483,14 @@ def _resolved_parameters(
         )
     foreign = (
         {"allowed_connections", "candidate_types", "tradeoff_lambda"}
-        | {"min_component_size"}
+        | {"min_component_size", "excluded_metabolites", "energy_cycle_gate"}
+        | {"connection_costs"}
         if method == "milp"
         else {"universal_model", "objective", "minimum_flux", "penalties"}
         | (
             set()
             if method == "sink-milp"
-            else {"tradeoff_lambda", "min_component_size"}
+            else {"tradeoff_lambda", "min_component_size", "connection_costs"}
         )
     ) & set(values)
     if foreign:
@@ -465,7 +527,40 @@ def _resolved_parameters(
             )
         if set(values["candidate_types"]) - {"A", "B", "C"}:
             raise ValueError("candidate_types may only contain A, B, and C")
+        excluded = values["excluded_metabolites"]
+        if not isinstance(excluded, (list, tuple)) or any(
+            not isinstance(item, str) or not item for item in excluded
+        ):
+            raise ValueError("excluded_metabolites must be a list of identifiers")
+        values["excluded_metabolites"] = list(excluded)
+        if not isinstance(values["energy_cycle_gate"], bool):
+            raise ValueError("energy_cycle_gate must be true or false")
+        if method == "sink-milp":
+            values["connection_costs"] = _connection_costs(values["connection_costs"])
     return values
+
+
+def _compartment_pair_key(first: str, second: str) -> str:
+    return ":".join(sorted((first, second)))
+
+
+def _connection_costs(costs: Any) -> dict[str, float]:
+    """Validate ``{"c:e": cost}`` and normalize keys to sorted compartment pairs."""
+    if not isinstance(costs, Mapping):
+        raise ValueError("connection_costs must map compartment pairs to costs")
+    normalized: dict[str, float] = {}
+    for key, cost in costs.items():
+        pair = str(key).split(":")
+        if len(pair) != 2 or not all(pair):
+            raise ValueError(f"connection_costs key must look like 'c:e': {key!r}")
+        if (
+            isinstance(cost, bool)
+            or not isinstance(cost, (int, float))
+            or not 0 < cost < float("inf")
+        ):
+            raise ValueError(f"connection_costs[{key!r}] must be a positive number")
+        normalized[_compartment_pair_key(*pair)] = float(cost)
+    return normalized
 
 
 class _TransportSearch:
@@ -541,7 +636,10 @@ def _run_transport(
     mapped = _as_mapping(result_model)
     before = _metrics(mapped)
     candidates = _transport_candidates(
-        mapped, parameters["allowed_connections"], parameters["candidate_types"]
+        mapped,
+        parameters["allowed_connections"],
+        parameters["candidate_types"],
+        parameters["excluded_metabolites"],
     )
     known_compartments = {met.get("compartment") for met in mapped["metabolites"]}
     for pair in parameters["allowed_connections"]:
@@ -604,6 +702,20 @@ def _run_transport(
         candidates.remove(best)
     for candidate in selected:
         _add_candidate(result_model, candidate)
+    gate: dict[str, Any] = {"status": "disabled"}
+    if parameters["energy_cycle_gate"]:
+        if isinstance(result_model, dict):
+            gate = {"status": "skipped", "reason": "gate needs a COBRApy model"}
+        else:
+            from .gate import apply_energy_cycle_gate
+
+            gate = apply_energy_cycle_gate(
+                result_model, [candidate.id for candidate in selected]
+            )
+    rejected = set(gate.get("rejected", {}))
+    for identifier in rejected:
+        coverage[identifier] = "rejected-energy-cycle"
+    selected = [candidate for candidate in selected if candidate.id not in rejected]
     after = _metrics(result_model)
     remaining_improvement = False
     targetable = False
@@ -617,7 +729,8 @@ def _run_transport(
         stop_reason = "max-additions"
     status = (
         "partial"
-        if at_limit and (remaining_improvement if method == "greedy" else targetable)
+        if rejected
+        or (at_limit and (remaining_improvement if method == "greedy" else targetable))
         else "solved"
     )
     return GapfillResult(
@@ -625,12 +738,12 @@ def _run_transport(
         [candidate.id for candidate in selected],
         coverage,
         status,
-        solver={"strategy": method},
+        solver={"strategy": method, "energy_cycle_gate": gate},
         method=method,
         parameters=parameters,
         before_metrics=before,
         after_metrics=after,
-        stop_reason=stop_reason,
+        stop_reason="energy-cycle-gate" if rejected else stop_reason,
     )
 
 

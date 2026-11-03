@@ -181,6 +181,9 @@ WORKFLOW_SECTION_KEYS = {
         "penalties",
         "tradeoff_lambda",
         "min_component_size",
+        "excluded_metabolites",
+        "energy_cycle_gate",
+        "connection_costs",
         "validation_profile",
         "task_suite",
         "task_mapping",
@@ -227,6 +230,32 @@ def _required_string(value: dict[str, Any], key: str, name: str) -> str:
     if not isinstance(result, str) or not result.strip():
         raise ConfigError(f"'{name}.{key}' must be a non-empty string")
     return result
+
+
+def _check_transport_settings(value: dict[str, Any]) -> None:
+    """Validate the cofactor blocklist, cycle gate and cost settings of gapfill."""
+    excluded = value.get("excluded_metabolites", [])
+    if not isinstance(excluded, list) or any(
+        not isinstance(item, str) or not item.strip() for item in excluded
+    ):
+        raise ConfigError(
+            "'gapfill.excluded_metabolites' must be a list of non-empty identifiers"
+        )
+    if not isinstance(value.get("energy_cycle_gate", True), bool):
+        raise ConfigError("'gapfill.energy_cycle_gate' must be true or false")
+    costs = value.get("connection_costs", {})
+    if not isinstance(costs, dict):
+        raise ConfigError("'gapfill.connection_costs' must be an object")
+    for key, cost in costs.items():
+        pair = str(key).split(":")
+        if len(pair) != 2 or not all(item.strip() for item in pair):
+            raise ConfigError(
+                f"'gapfill.connection_costs' key must look like 'c:e': {key!r}"
+            )
+        if isinstance(cost, bool) or not isinstance(cost, (int, float)) or cost <= 0:
+            raise ConfigError(
+                f"'gapfill.connection_costs' value for {key!r} must be positive"
+            )
 
 
 def _positive_integer(value: object, label: str) -> int:
@@ -723,7 +752,11 @@ def _parse_workflow(
                         )
                     )
                 transport = {"greedy", "deadends", "sink-milp"}
-                sink_keys = {"tradeoff_lambda", "min_component_size"}
+                sink_keys = {
+                    "tradeoff_lambda",
+                    "min_component_size",
+                    "connection_costs",
+                }
                 if method != "sink-milp" and sink_keys & set(value):
                     raise ConfigError(
                         f"gapfill {method} does not accept: "
@@ -780,6 +813,7 @@ def _parse_workflow(
                         raise ConfigError(
                             "'gapfill.min_component_size' must be a positive integer"
                         )
+                    _check_transport_settings(value)
                     incompatible = {
                         "universal_model",
                         "objective",
@@ -823,7 +857,12 @@ def _parse_workflow(
                         raise ConfigError("'gapfill.minimum_flux' must be positive")
                     if not isinstance(value["penalties"], dict):
                         raise ConfigError("'gapfill.penalties' must be an object")
-                    incompatible = {"allowed_connections", "candidate_types"}
+                    incompatible = {
+                        "allowed_connections",
+                        "candidate_types",
+                        "excluded_metabolites",
+                        "energy_cycle_gate",
+                    }
                     if incompatible & set(value):
                         raise ConfigError(
                             "gapfill milp does not accept: "

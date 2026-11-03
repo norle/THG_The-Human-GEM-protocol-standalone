@@ -313,3 +313,71 @@ def test_greedy_rejects_sink_milp_parameters(tmp_path, key):
                 tmp_path, method="greedy", candidate_types=["A"], **{key: 0.5}
             )
         )
+
+
+def test_transport_gapfill_accepts_cofactor_and_gate_settings(tmp_path):
+    config = load_workflow_config(
+        _sink_milp_config(
+            tmp_path,
+            excluded_metabolites=["MNXM3", "custom_id"],
+            energy_cycle_gate=False,
+            connection_costs={"c:e": 1, "c:m": 2.5},
+        )
+    )
+    section = config.sections["gapfill"]
+    assert section["excluded_metabolites"] == ["MNXM3", "custom_id"]
+    assert section["energy_cycle_gate"] is False
+
+
+@pytest.mark.parametrize(
+    ("changes", "message"),
+    [
+        ({"excluded_metabolites": "MNXM3"}, "excluded_metabolites"),
+        ({"excluded_metabolites": [""]}, "excluded_metabolites"),
+        ({"energy_cycle_gate": "yes"}, "energy_cycle_gate"),
+        ({"connection_costs": {"c:e": 0}}, "connection_costs"),
+        ({"connection_costs": {"ce": 1}}, "connection_costs"),
+        ({"connection_costs": [1]}, "connection_costs"),
+    ],
+)
+def test_transport_gapfill_rejects_invalid_cofactor_and_gate_settings(
+    tmp_path, changes, message
+):
+    with pytest.raises(ConfigError, match=message):
+        load_workflow_config(_sink_milp_config(tmp_path, **changes))
+
+
+@pytest.mark.parametrize(
+    "key", ["excluded_metabolites", "energy_cycle_gate", "connection_costs"]
+)
+def test_milp_gapfill_rejects_transport_only_settings(tmp_path, key):
+    value = {"connection_costs": {"c:e": 1}}.get(key, [] if key[0] == "e" else True)
+    section = {
+        "method": "milp",
+        "max_additions": 5,
+        "universal_model": str(_SANCTIONED_FIXTURE),
+        "objective": "R1",
+        "minimum_flux": 0.1,
+        "penalties": {},
+        "validation_profile": "structural-fast",
+        key: value,
+    }
+    path = _reference_config(
+        tmp_path,
+        beta2={"gene_locations": {"ENSG000001": ["cytosol"]}},
+        gapfill=section,
+    )
+    with pytest.raises(ConfigError, match=key):
+        load_workflow_config(path)
+
+
+def test_greedy_rejects_connection_costs(tmp_path):
+    with pytest.raises(ConfigError, match="connection_costs"):
+        load_workflow_config(
+            _sink_milp_config(
+                tmp_path,
+                method="greedy",
+                candidate_types=["A"],
+                connection_costs={"c:e": 2},
+            )
+        )

@@ -36,7 +36,11 @@ are deliberately unsupported. The putative-transport method `sink-milp`, the
 reference workflow default described in [gapfill workflows](../workflows/gapfill.md),
 is available through `gapfill_model(method="sink-milp")` and the `gapfill`
 workflow; it requires `allowed_connections` and accepts `candidate_types`,
-`tradeoff_lambda` (0.01), `min_component_size` (4) and `max_additions` (1000). For canonical construction, select parameters
+`tradeoff_lambda` (0.01), `min_component_size` (4), `connection_costs` and
+`max_additions` (1000). All three transport methods also accept
+`excluded_metabolites` (default: energy cofactors and H⁺) and
+`energy_cycle_gate` (default `true`); see
+[sink-MILP gap-filling](../workflows/gapfill-sink-milp.md). For canonical construction, select parameters
 that satisfy the configured post-gapfill checks and preserve them as release
 evidence.
 

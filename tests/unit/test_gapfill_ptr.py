@@ -7,10 +7,17 @@ import re
 import cobra
 import pytest
 
-from thg_protocol.gapfill import apply_gapfill_plan, generate_gapfill_plan
+from thg_protocol.gapfill import (
+    apply_gapfill_plan,
+    gapfill_model,
+    generate_gapfill_plan,
+)
+from thg_protocol.gapfill.core import _resolved_parameters
 from thg_protocol.gapfill.ptr import (
     ComponentCoverage,
     PtrCandidate,
+    _add_ptr,
+    candidate_costs,
     compute_coverage,
     generate_ptr_candidates,
     network_components,
@@ -485,3 +492,153 @@ def test_components_reject_ids_shared_by_reaction_and_metabolite():
     model = build({"Xc": {"Xc": -1, "Yc": 1}})
     with pytest.raises(ValueError, match="Xc"):
         network_components(model)
+
+
+# --- constrained transports ---------------------------------------------------
+
+
+def cofactor_islands():
+    """Two islands joined only by a would-be ATP transport (annotated MNXM3)."""
+    model = build(
+        {
+            "R1": {"Pc": -1, "Yc": 1},
+            "R2": {"Yc": -1, "Pc": 1},
+            "R3": {"Pe": -1, "We": 1},
+            "R4": {"We": -1, "Pe": 1},
+        }
+    )
+    for identifier in ("Pc", "Pe"):
+        model.metabolites.get_by_id(identifier).annotation = {
+            "metanetx.chemical": "MNXM3"
+        }
+    return model
+
+
+def test_type_a_transport_runs_only_from_product_to_substrate():
+    (candidate,) = candidates_of(main_with_dead_ends())
+    # Ae is only produced and Ac only consumed: Ae must be drained into Ac.
+    assert (candidate.type, candidate.direction) == ("A", -1)
+    transport = candidate.as_gapfill_candidate()
+    assert transport.metabolites == {"Ae": -1.0, "Ac": 1.0}
+    assert (transport.lower_bound, transport.upper_bound) == (0.0, 1000.0)
+
+
+def test_ambiguous_transport_stays_reversible():
+    (candidate,) = candidates_of(two_islands())
+    assert candidate.direction == 0
+    transport = candidate.as_gapfill_candidate()
+    assert transport.metabolites == {"Xc": -1.0, "Xe": 1.0}
+    assert (transport.lower_bound, transport.upper_bound) == (-1000.0, 1000.0)
+
+
+@pytest.mark.parametrize("make", [main_with_dead_ends, two_islands])
+def test_coverage_test_adds_exactly_what_the_final_model_gets(make):
+    model = make()
+    (candidate,) = candidates_of(model)
+    expected = candidate.as_gapfill_candidate()
+    _add_ptr(model, candidate)
+    reaction = model.reactions.get_by_id(candidate.reaction_id)
+    assert reaction.bounds == (expected.lower_bound, expected.upper_bound)
+    assert {m.id: c for m, c in reaction.metabolites.items()} == expected.metabolites
+
+
+def test_candidates_saved_before_direction_existed_load_as_reversible():
+    (candidate,) = candidates_of(main_with_dead_ends())
+    payload = candidate.to_dict()
+    del payload["direction"]
+    assert PtrCandidate.from_dict(payload).direction == 0
+
+
+def test_greedy_type_a_transport_is_irreversible():
+    result = gapfill_model(
+        main_with_dead_ends(),
+        method="greedy",
+        parameters={"allowed_connections": [("c", "e")], "candidate_types": ["A"]},
+    )
+    assert result.selected == ["GAPFILL_Ac_Ae"]
+    reaction = result.model.reactions.get_by_id("GAPFILL_Ac_Ae")
+    assert reaction.bounds == (0.0, 1000.0)
+    assert {m.id: c for m, c in reaction.metabolites.items()} == {"Ae": -1, "Ac": 1}
+
+
+def test_cofactors_are_not_proposed_as_transports():
+    parameters = {**SINK_MILP, "allowed_connections": [("c", "e")]}
+    assert run_sink_milp(cofactor_islands(), parameters).selected == []
+    allowed = run_sink_milp(
+        cofactor_islands(), {**parameters, "excluded_metabolites": []}
+    )
+    assert allowed.selected == ["GAPFILL_PTR_Pc_Pe"]
+
+
+def test_cofactor_blocklist_also_applies_to_greedy_gapfill():
+    parameters = {"allowed_connections": [("c", "e")], "candidate_types": ["C"]}
+    blocked = gapfill_model(cofactor_islands(), method="greedy", parameters=parameters)
+    free = gapfill_model(
+        cofactor_islands(),
+        method="greedy",
+        parameters={**parameters, "excluded_metabolites": []},
+    )
+    assert blocked.selected == [] and free.selected == ["GAPFILL_Pc_Pe"]
+
+
+def test_connection_costs_steer_the_milp_choice():
+    coverage = [ComponentCoverage(2, ["a"], [], {"P1": ["a"], "P2": ["a"]})]
+    kwargs = {"tradeoff_lambda": 0.01, "budget": 10, "interface": INTERFACE}
+    cheap_second = select_unblockers(coverage, costs={"P1": 5.0, "P2": 1.0}, **kwargs)
+    cheap_first = select_unblockers(coverage, costs={"P1": 1.0, "P2": 5.0}, **kwargs)
+    assert (cheap_second.selected, cheap_first.selected) == (["P2"], ["P1"])
+
+
+def test_candidate_too_costly_for_its_coverage_is_dropped():
+    coverage = [ComponentCoverage(2, ["a"], [], {"P1": ["a"]})]
+    selection = select_unblockers(
+        coverage,
+        tradeoff_lambda=0.5,
+        budget=10,
+        interface=INTERFACE,
+        costs={"P1": 4.0},
+    )
+    assert selection.selected == []
+
+
+def test_connection_costs_are_keyed_by_unordered_compartment_pair():
+    (candidate,) = candidates_of(two_islands())  # compartments (c, e)
+    expected = {candidate.reaction_id: 3.0}
+    assert candidate_costs([candidate], {"c:e": 3.0}) == expected
+    assert candidate_costs([candidate], {"e:c": 3.0}) == expected
+    assert candidate_costs([candidate], {"c:m": 3.0}) == {candidate.reaction_id: 1.0}
+
+
+@pytest.mark.parametrize(
+    ("method", "extra"),
+    [
+        ("sink-milp", {"connection_costs": {"c:e": -1}}),
+        ("sink-milp", {"connection_costs": {"ce": 1}}),
+        ("sink-milp", {"connection_costs": {"c:e": float("nan")}}),
+        ("greedy", {"connection_costs": {"c:e": 1}}),
+        ("milp", {"energy_cycle_gate": True}),
+        ("milp", {"excluded_metabolites": []}),
+        ("sink-milp", {"excluded_metabolites": "MNXM3"}),
+        ("sink-milp", {"excluded_metabolites": [""]}),
+        ("sink-milp", {"energy_cycle_gate": "yes"}),
+    ],
+)
+def test_new_gapfill_parameters_are_validated(method, extra):
+    base = {"allowed_connections": [("c", "e")]} if method != "milp" else {}
+    with pytest.raises(ValueError):
+        _resolved_parameters(method, {**base, **extra})
+
+
+def test_transport_methods_default_to_the_cofactor_blocklist_and_gate():
+    from thg_protocol.gapfill.exclusions import DEFAULT_EXCLUDED_METABOLITES
+
+    for method in ("greedy", "deadends", "sink-milp"):
+        values = _resolved_parameters(method, {"allowed_connections": [("c", "e")]})
+        assert values["excluded_metabolites"] == list(DEFAULT_EXCLUDED_METABOLITES)
+        assert values["energy_cycle_gate"] is True
+    assert (
+        _resolved_parameters("sink-milp", {"allowed_connections": [("c", "e")]})[
+            "connection_costs"
+        ]
+        == {}
+    )

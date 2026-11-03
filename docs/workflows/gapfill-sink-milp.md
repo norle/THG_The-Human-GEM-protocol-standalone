@@ -12,8 +12,10 @@ another, with no transport between them. Some parts of the network are not
 connected to the main network at all.
 
 `sink-milp` fixes this by adding **putative transport reactions (PTRs)**. A
-PTR is a reversible reaction `X[c1] <=> X[c2]` (bounds ±1000) that moves the
-same metabolite between two compartments. It tries to unblock as many
+PTR is a reaction `X[c1] -> X[c2]` that moves the same metabolite between two
+compartments. It is irreversible (bounds 0 to 1000) when the dead ends say
+which way flux must go (type A: drain the product-only metabolite into the
+substrate-only one), and reversible (bounds ±1000) when they do not. It tries to unblock as many
 reactions as possible while adding as few PTRs as possible. It is the default
 gap-filling method of the reference workflow (`configs/reference.json`).
 
@@ -109,7 +111,7 @@ One MILP over all components:
 variables   y_p ∈ {0,1}    1 if candidate PTR p is selected
             z_r ∈ [0,1]    1 if target reaction r is covered
 
-maximise    Σ_r z_r  −  λ · Σ_p y_p
+maximise    Σ_r z_r  −  λ · Σ_p cost_p · y_p
 
 subject to  z_r ≤ Σ_{p covers r} y_p     for every coverable target r
             Σ_p y_p ≤ max_additions − (number of connectors)
@@ -121,6 +123,35 @@ whenever it covers at least one target that is not covered yet. Among
 solutions that cover the same number of targets, the one with the fewest PTRs
 wins. The `z_r` do not need to be integer: at the optimum each one is pushed
 to 0 or 1.
+
+`tradeoff_lambda` is multiplied by a per-candidate cost, 1 by default. The
+optional `connection_costs` setting (for example `{"c:m": 3}`; compartment
+order does not matter) makes transports between some compartment pairs
+dearer, so they are chosen only when they unblock proportionally more.
+
+### Keeping transports plausible
+
+A free transport can do harm: moving ATP, NADH or a proton between
+compartments at no cost lets a model charge them from nothing. Three settings
+limit that, for `sink-milp`, `greedy` and `deadends` alike:
+
+- `excluded_metabolites` lists identifiers that are never paired into a
+  transport. An entry matches a metabolite ID, its compartment-free base ID or
+  a cross-reference such as a MetaNetX ID. The default is the MEMOTE energy
+  couples (ATP/ADP, NAD(P)H/NAD(P)⁺, FADH₂/FAD and relatives) and H⁺
+  (`thg_protocol.gapfill.exclusions`). Pass `[]` to turn it off.
+- Type A transports are irreversible and run from the product-only to the
+  substrate-only dead end. The coverage test and the final model use the same
+  definition of every transport.
+- `energy_cycle_gate` (default `true`) runs MEMOTE's energy-generating-cycle
+  test on the filled model and removes any added transport that takes part in
+  a cycle, repeating until none does. A removed transport is reported as
+  `rejected-energy-cycle`, the status becomes `partial` and the stop reason
+  `energy-cycle-gate`. The gate needs `memote` and MetaNetX cross-references
+  on the energy metabolites; otherwise it reports `skipped` and changes
+  nothing (`solver.energy_cycle_gate` holds the details). It sees only the
+  least-flux cycle per energy metabolite, so a model that already has such a
+  cycle should be repaired first.
 
 The result is a **plan**, not a changed model: connectors (`phase: 2`) and the
 selected PTRs (`phase: 3`), with IDs `GAPFILL_PTR_<met1>_<met2>`. Status is:
