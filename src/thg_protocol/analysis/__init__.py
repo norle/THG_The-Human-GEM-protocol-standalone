@@ -20,6 +20,7 @@ from .consistency import (
     dead_end_metabolites,
     orphan_metabolites,
     reaction_balance,
+    unassessable_reactions,
     unbalanced_reactions,
 )
 from .model_signature import diff_model_signatures, model_signature
@@ -44,6 +45,7 @@ __all__ = [
     "orphan_metabolites",
     "reaction_balance",
     "unbalanced_reactions",
+    "unassessable_reactions",
     "model_signature",
     "diff_model_signatures",
 ]

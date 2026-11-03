@@ -18,10 +18,39 @@ def reaction_balance(reaction: Any) -> dict[str, float]:
     return {element: value for element, value in totals.items() if abs(value) > 1e-9}
 
 
-def unbalanced_reactions(model: Any) -> list[str]:
-    """Return IDs of reactions whose available formulas do not balance."""
+def _has_complete_formulas(reaction: Any) -> bool:
+    return all(
+        formula_atoms(getattr(metabolite, "formula", "") or "")
+        for metabolite in reaction.metabolites
+    )
+
+
+def unassessable_reactions(model: Any) -> list[str]:
+    """Return internal reactions with a metabolite lacking a parsable formula.
+
+    Their elemental balance cannot be judged, so ``unbalanced_reactions``
+    neither reports nor clears them.
+    """
     return sorted(
-        reaction.id for reaction in model.reactions if reaction_balance(reaction)
+        reaction.id
+        for reaction in model.reactions
+        if not reaction.boundary and not _has_complete_formulas(reaction)
+    )
+
+
+def unbalanced_reactions(model: Any) -> list[str]:
+    """Return IDs of internal reactions whose formulas do not balance.
+
+    Boundary reactions (exchange, demand, sink) add or remove mass by
+    definition and are skipped, as are reactions with a metabolite whose
+    formula is missing or unparsable (see ``unassessable_reactions``).
+    """
+    return sorted(
+        reaction.id
+        for reaction in model.reactions
+        if not reaction.boundary
+        and _has_complete_formulas(reaction)
+        and reaction_balance(reaction)
     )
 
 
@@ -32,13 +61,34 @@ def orphan_metabolites(model: Any) -> list[str]:
     ]
 
 
-def dead_end_metabolites(model: Any) -> list[str]:
-    """Return metabolites used only as reactants or only as products."""
-    consumed, produced = set(), set()
+def _directional_roles(model: Any) -> tuple[set[str], set[str]]:
+    """Metabolites some reaction can make, and metabolites some can use.
+
+    A reaction makes its products when it can run forward (upper bound > 0)
+    and its reactants when it can run backward (lower bound < 0); using is
+    the converse. Reactions with both bounds at zero do neither.
+    """
+    produced: set[str] = set()
+    consumed: set[str] = set()
     for reaction in model.reactions:
+        forward = reaction.upper_bound > 0
+        backward = reaction.lower_bound < 0
         for metabolite, coefficient in reaction.metabolites.items():
-            (consumed if coefficient < 0 else produced).add(metabolite.id)
-    return sorted((consumed ^ produced) - set(orphan_metabolites(model)))
+            if (coefficient > 0 and forward) or (coefficient < 0 and backward):
+                produced.add(metabolite.id)
+            if (coefficient < 0 and forward) or (coefficient > 0 and backward):
+                consumed.add(metabolite.id)
+    return produced, consumed
+
+
+def dead_end_metabolites(model: Any) -> list[str]:
+    """Return metabolites that bounds allow to be only made or only used.
+
+    Reversible reactions both make and use their metabolites, so a
+    metabolite on a reversible path is not a dead end.
+    """
+    produced, consumed = _directional_roles(model)
+    return sorted(produced ^ consumed)
 
 
 def charge_balance(reaction: Any) -> dict[str, float]:
@@ -78,38 +128,52 @@ def blocked_reactions(model: Any) -> list[str]:
     return list(find_blocked_reactions(model))
 
 
+def _close_boundaries_keeping_direction(model: Any) -> None:
+    """Close boundary reactions and cap internal fluxes at one unit.
+
+    Internal bounds keep their direction (forward, backward or both) but lose
+    any forced flux, so a fixed-flux reaction such as ATP maintenance cannot
+    make the closed model infeasible.
+    """
+    for reaction in model.reactions:
+        lower, upper = reaction.lower_bound, reaction.upper_bound
+        reaction.bounds = (-1.0 if lower < 0 else 0.0, 1.0 if upper > 0 else 0.0)
+    for reaction in model.boundary:
+        reaction.bounds = (0.0, 0.0)
+
+
 def stoichiometrically_balanced_cycles(model: Any) -> list[str]:
-    """Return reactions carrying flux after all boundary reactions are closed."""
+    """Return reactions that carry flux with every boundary closed.
+
+    Run on a copy: boundaries are closed, internal reactions keep their
+    direction but lose forced flux, and the objective is not enforced. Any
+    remaining flux is a mass-conserving cycle.
+    """
     try:
         from cobra.flux_analysis import flux_variability_analysis
     except ImportError as error:  # pragma: no cover - optional dependency path
         raise RuntimeError("cycle checks require COBRA") from error
     closed = model.copy()
-    for reaction in closed.boundary:
-        reaction.bounds = (0.0, 0.0)
-    fva = flux_variability_analysis(closed)
+    _close_boundaries_keeping_direction(closed)
+    fva = flux_variability_analysis(closed, fraction_of_optimum=0.0)
+    tolerance = max(1e-9, float(closed.tolerance))
     return [
         reaction_id
         for reaction_id, row in fva.iterrows()
-        if abs(float(row["minimum"])) > 1e-9 or abs(float(row["maximum"])) > 1e-9
+        if abs(float(row["minimum"])) > tolerance
+        or abs(float(row["maximum"])) > tolerance
     ]
 
 
 def metabolites_not_produced(model: Any) -> list[str]:
-    """Return metabolites consumed by a reaction but never produced."""
-    consumed, produced = set(), set()
-    for reaction in model.reactions:
-        for metabolite, coefficient in reaction.metabolites.items():
-            (consumed if coefficient < 0 else produced).add(metabolite.id)
+    """Return metabolites some reaction can use but none can make."""
+    produced, consumed = _directional_roles(model)
     return sorted(consumed - produced)
 
 
 def metabolites_not_consumed(model: Any) -> list[str]:
-    """Return metabolites produced by a reaction but never consumed."""
-    consumed, produced = set(), set()
-    for reaction in model.reactions:
-        for metabolite, coefficient in reaction.metabolites.items():
-            (consumed if coefficient < 0 else produced).add(metabolite.id)
+    """Return metabolites some reaction can make but none can use."""
+    produced, consumed = _directional_roles(model)
     return sorted(produced - consumed)
 
 
@@ -141,4 +205,5 @@ __all__ = [
     "metabolites_not_consumed",
     "unbounded_reactions",
     "unbalanced_reactions",
+    "unassessable_reactions",
 ]
