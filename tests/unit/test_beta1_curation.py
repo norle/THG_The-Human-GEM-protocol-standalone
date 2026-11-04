@@ -279,8 +279,8 @@ def test_duplicate_cleanup_is_deterministic_and_merges_annotations():
     model = Model("duplicates")
     first = Metabolite("z_c", name="Z", formula="C", charge=0, compartment="c")
     second = Metabolite("a_c", name="A", formula="C", charge=0, compartment="c")
-    first.annotation = {"chebi": "1"}
-    second.annotation = {"chebi": "1", "kegg": "C00001"}
+    first.annotation = {"chebi": "1", "inchikey": "K1"}
+    second.annotation = {"chebi": "1", "kegg": "C00001", "inchikey": "K1"}
     model.add_metabolites([first, second])
     r1 = Reaction("R_Z")
     r2 = Reaction("R_A")
@@ -293,6 +293,7 @@ def test_duplicate_cleanup_is_deterministic_and_merges_annotations():
     assert cleaned.metabolites.a_c.annotation == {
         "chebi": ["1"],
         "kegg": "C00001",
+        "inchikey": ["K1"],
     }
     assert report["retained_metabolites"] == {"z_c": "a_c"}
 
@@ -332,8 +333,8 @@ def test_report_only_and_user_approved_modes_do_not_run_implicit_cleanup(tmp_pat
     model = Model("mode-fixture")
     first = Metabolite("z_c", formula="C", charge=0, compartment="c")
     second = Metabolite("a_c", formula="C", charge=0, compartment="c")
-    first.annotation = {"chebi": "1"}
-    second.annotation = {"chebi": "1"}
+    first.annotation = {"inchikey": "K1"}
+    second.annotation = {"inchikey": "K1"}
     reaction = Reaction("R_MODE")
     reaction.add_metabolites({first: -1, second: 1})
     model.add_reactions([reaction])
@@ -361,8 +362,8 @@ def test_cleanup_is_a_decisionable_proposal_and_rejection_preserves_duplicates()
     model = Model("cleanup-proposal")
     first = Metabolite("z_c", formula="C", charge=0, compartment="c")
     second = Metabolite("a_c", formula="C", charge=0, compartment="c")
-    first.annotation = {"chebi": "1"}
-    second.annotation = {"chebi": "1"}
+    first.annotation = {"inchikey": "K1"}
+    second.annotation = {"inchikey": "K1"}
     reaction = Reaction("R_CLEANUP")
     reaction.add_metabolites({first: -1, second: 1})
     model.add_reactions([reaction])
@@ -399,8 +400,8 @@ def test_metabolite_cleanup_remaps_group_members():
     model = Model("group-fixture")
     first = Metabolite("z_c", formula="C", charge=0, compartment="c")
     second = Metabolite("a_c", formula="C", charge=0, compartment="c")
-    first.annotation = {"chebi": "1"}
-    second.annotation = {"chebi": "1"}
+    first.annotation = {"inchikey": "K1"}
+    second.annotation = {"inchikey": "K1"}
     reaction = Reaction("R_GROUP")
     reaction.add_metabolites({first: -1, second: 1})
     model.add_reactions([reaction])
@@ -583,3 +584,66 @@ def test_consolidation_preserves_independent_objective_fluxes(tmp_path):
     path = tmp_path / "objective.json"
     save_json_model(consolidated, str(path))
     assert load_json_model(str(path)).slim_optimize() == 30
+
+
+def _pair_model(left: dict, right: dict, *, formula: str = "C20H40O2") -> Model:
+    model = Model("identity-pair")
+    first = Metabolite("m1_c", name="one", formula=formula, charge=0, compartment="c")
+    second = Metabolite("m2_c", name="two", formula=formula, charge=0, compartment="c")
+    first.annotation = left
+    second.annotation = right
+    reaction = Reaction("R_PAIR")
+    reaction.add_metabolites({first: -1, second: 1})
+    model.add_reactions([reaction])
+    return model
+
+
+def test_generic_pool_metabolites_are_never_consolidated():
+    # Human-GEM tissue pools share a generic ChEBI class (CHEBI:35366, fatty
+    # acid) and an R-group formula. Merging them lets flux enter a pool through
+    # one composition reaction and leave through another with different
+    # coefficients, creating mass and energy from nothing (VerifyModel 10, 11,
+    # 17 and 21 became feasible on Human2).
+    shared = {"chebi": "CHEBI:35366", "metanetx.chemical": "MNXM72"}
+    model = _pair_model(shared, dict(shared), formula="CO2R")
+    cleaned, report = consolidate_model(model)
+    assert report["removed_metabolites"] == []
+    assert len(cleaned.metabolites) == 2
+
+
+def test_shared_chebi_kegg_pubchem_alone_do_not_establish_identity():
+    # (2S)- and (2R)-pristanic acid in Human2 share ChEBI and PubChem.
+    shared = {"chebi": "CHEBI:51340", "kegg.compound": "C1", "pubchem.compound": "1"}
+    cleaned, report = consolidate_model(_pair_model(shared, dict(shared)))
+    assert report["removed_metabolites"] == []
+
+
+def test_differing_metanetx_vetoes_a_structural_match():
+    left = {"inchikey": "AAAA-BBBB-C", "metanetx.chemical": "MNXM162569"}
+    right = {"inchikey": "AAAA-BBBB-C", "metanetx.chemical": "MNXM163006"}
+    _, report = consolidate_model(_pair_model(left, right))
+    assert report["removed_metabolites"] == []
+
+
+def test_partially_overlapping_metanetx_sets_do_not_merge():
+    # (3S)- and (3R)-phytanic acid in Human2 overlap on one MetaNetX ID only.
+    left = {"metanetx.chemical": "MNXM91275"}
+    right = {"metanetx.chemical": ["MNXM165293", "MNXM1774", "MNXM91275"]}
+    _, report = consolidate_model(_pair_model(left, right))
+    assert report["removed_metabolites"] == []
+
+
+def test_identical_metanetx_without_structure_does_not_merge():
+    # Human2 6(S)/6(R)-hydroxy acids share one MetaNetX ID and nothing else.
+    mnx_only = {"metanetx.chemical": ["MNXM2", "MNXM3"], "chebi": "CHEBI:1"}
+    _, report = consolidate_model(_pair_model(mnx_only, dict(mnx_only)))
+    assert report["removed_metabolites"] == []
+
+
+def test_identical_structure_still_merges():
+    structural = {"inchikey": "AAAA-BBBB-C", "metanetx.chemical": "MNXM1"}
+    _, report = consolidate_model(_pair_model(structural, dict(structural)))
+    assert report["retained_metabolites"] == {"m2_c": "m1_c"}
+    no_mnx = {"inchi": "InChI=1S/CH4/h1H4"}
+    _, report = consolidate_model(_pair_model(no_mnx, dict(no_mnx)))
+    assert report["retained_metabolites"] == {"m2_c": "m1_c"}

@@ -1810,6 +1810,51 @@ def _apply_model_proposal(model: Any, proposal: Proposal, replacement: object) -
     )
 
 
+_STRUCTURAL_NAMESPACES = ("inchikey", "inchi", "smiles")
+_GENERIC_FORMULA_SYMBOLS = frozenset({"R", "X"})
+
+
+def _is_generic_formula(formula: object) -> bool:
+    """True for formulas with R/X groups, i.e. lumped pools or classes."""
+    if not formula:
+        return False
+    return bool(
+        _GENERIC_FORMULA_SYMBOLS & set(re.findall(r"[A-Z][a-z]?", str(formula)))
+    )
+
+
+def _consolidation_identity(metabolite: Any) -> tuple[object, ...] | None:
+    """Identity key under which two metabolites may be merged, or ``None``.
+
+    Only exact structure (InChIKey, InChI, SMILES) establishes identity.
+    ChEBI, KEGG, PubChem and MetaNetX are not enough on their own: Human-GEM
+    gives stereoisomers, positional isomers, tautomers and tissue-specific
+    lipid pools the same class-level records (on Human2, merging on identical
+    MetaNetX sets still joined 6(S)/6(R) hydroxy acids and 5,6-/5,8-epoxy
+    retinoate). Generic (R/X-group) metabolites are never merged, because
+    merging pools with different composition reactions creates mass from
+    nothing (VerifyModel 10, 11, 17 and 21 became feasible). The full
+    MetaNetX set is part of the key, so a MetaNetX disagreement vetoes a
+    structural match.
+    """
+    if _is_generic_formula(getattr(metabolite, "formula", None)):
+        return None
+    values: dict[str, set[str]] = defaultdict(set)
+    for namespace, value in _annotation_values(metabolite):
+        name = namespace.lower()
+        if name.startswith("metanetx"):
+            name = "metanetx"
+        values[name].add(str(value))
+    metanetx = tuple(sorted(values.get("metanetx", ())))
+    for namespace in _STRUCTURAL_NAMESPACES:
+        if values.get(namespace):
+            return (
+                (namespace, tuple(sorted(values[namespace]))),
+                ("metanetx", metanetx),
+            )
+    return None
+
+
 def consolidate_model(
     model: Any,
     *,
@@ -1820,37 +1865,14 @@ def consolidate_model(
     copied = model.copy()
     metabolite_groups: dict[tuple[object, ...], list[Any]] = defaultdict(list)
     for metabolite in copied.metabolites:
-        identity_by_namespace: dict[str, tuple[str, ...]] = defaultdict(tuple)
-        for namespace, value in _annotation_values(metabolite):
-            if namespace.lower() in {
-                "chebi",
-                "kegg",
-                "pubchem",
-                "inchi",
-                "inchikey",
-                "smiles",
-            }:
-                identity_by_namespace[namespace.lower()] = tuple(
-                    sorted(
-                        set(identity_by_namespace.get(namespace.lower(), ()))
-                        | {str(value)}
-                    )
-                )
-        identity_values = ()
-        for namespace in ("inchi", "inchikey", "smiles", "chebi", "kegg", "pubchem"):
-            if namespace in identity_by_namespace:
-                identity_values = ((namespace, identity_by_namespace[namespace]),)
-                break
-        # Formula/charge/compartment agreement alone does not establish
-        # chemical identity.  Generic or unannotated records remain separate
-        # until an explicit identity mapping is supplied.
-        if not identity_values:
+        identity = _consolidation_identity(metabolite)
+        if identity is None:
             continue
         key = (
             str(getattr(metabolite, "compartment", "")),
             getattr(metabolite, "formula", None),
             getattr(metabolite, "charge", None),
-            identity_values,
+            identity,
         )
         metabolite_groups[key].append(metabolite)
     retained: dict[str, str] = {}
