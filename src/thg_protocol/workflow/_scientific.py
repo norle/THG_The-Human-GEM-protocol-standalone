@@ -150,6 +150,8 @@ class CellSpecificStage:
         self.id, self.dependencies = stage_id, dependencies
         if stage_id in {"validate-cell-specific", "export-cell-specific"}:
             self.implementation_version = 6
+        elif stage_id == "compute-reaction-expression":
+            self.implementation_version = 5
         self.kind = (
             "mutation"
             if self.id in {"apply-reduction", "configure-context-exchanges"}

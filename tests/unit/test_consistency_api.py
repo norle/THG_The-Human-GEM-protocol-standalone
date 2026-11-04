@@ -1,4 +1,5 @@
 import cobra
+import pytest
 
 from thg_protocol.analysis.consistency import (
     charge_balance,
@@ -108,6 +109,25 @@ def test_closed_boundary_cycle_is_still_reported():
     back.add_metabolites({model.metabolites.b_c: -1, model.metabolites.a_c: 1})
     model.add_reactions([back])
     assert stoichiometrically_balanced_cycles(model) == ["R1", "R2"]
+
+
+@pytest.mark.parametrize(
+    "bounds,direction", [((-10, 0), "max"), ((0, 10), "min")]
+)
+def test_cycle_check_does_not_constrain_the_original_objective(bounds, direction):
+    model = _chain([bounds, (-10, 10), (-10, 10)])
+    back = cobra.Reaction("R2", lower_bound=bounds[0], upper_bound=bounds[1])
+    back.add_metabolites({model.metabolites.b_c: -1, model.metabolites.a_c: 1})
+    model.add_reactions([back])
+    model.objective = "R1"
+    model.objective_direction = direction
+    objective = model.objective.expression
+
+    assert stoichiometrically_balanced_cycles(model) == ["R1", "R2"]
+    assert model.objective.expression == objective
+    assert model.objective.direction == direction
+    assert model.reactions.R1.bounds == bounds
+    assert model.reactions.EX_a.bounds == (-10, 10)
 
 
 def test_cycle_check_respects_reaction_direction_and_leaves_model_unchanged():

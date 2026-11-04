@@ -202,6 +202,8 @@ class Beta2Stage:
 
     def __init__(self, stage_id: str, dependencies: tuple[str, ...] = ()):
         self.id, self.dependencies = stage_id, dependencies
+        if stage_id == "resolve-compartment-evidence":
+            self.implementation_version = 4
 
     def enabled(self, config: Any) -> bool:
         del config

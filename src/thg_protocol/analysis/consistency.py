@@ -156,6 +156,7 @@ def stoichiometrically_balanced_cycles(model: Any) -> list[str]:
         raise RuntimeError("cycle checks require COBRA") from error
     closed = model.copy()
     _close_boundaries_keeping_direction(closed)
+    closed.objective = closed.problem.Objective(0, direction="max")
     fva = flux_variability_analysis(closed, fraction_of_optimum=0.0)
     tolerance = max(1e-9, float(closed.tolerance))
     return [

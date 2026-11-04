@@ -181,6 +181,19 @@ def test_unmeasured_isozyme_is_not_penalized_as_if_absent():
     }
 
 
+@pytest.mark.parametrize("rule", ["(A or B) and C", "C and (A or B)"])
+def test_nested_unmeasured_isozyme_does_not_prove_an_inactive_complex(rule):
+    partial = reaction_expression_evidence("R", rule, {"A": 0, "C": 10})
+    assert not partial.is_exact
+    assert partial.missing_genes == ("B",)
+    assert expression_penalties([partial], 1.0) == {"R": 0.0}
+    measured = reaction_expression_evidence("R", rule, {"A": 0, "B": 10, "C": 10})
+    assert measured.is_exact and measured.score == 10
+    zero_subunit = reaction_expression_evidence("R", rule, {"A": 0, "C": 0})
+    assert zero_subunit.is_exact and zero_subunit.score == 0
+    assert expression_penalties([zero_subunit], 1.0) == {"R": 1.0}
+
+
 def test_serialized_evidence_without_exact_flag_penalizes_only_measured():
     old_rows = [
         ReactionExpressionEvidence("m", 0.0, "measured", ("A",), ()),

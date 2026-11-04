@@ -102,7 +102,7 @@ def _evaluate(node, expression: Mapping[str, float | None]):
     # partially observed complexes remain unknown rather than inventing a score.
     if complete:
         return min(scores), genes, missing, True, True
-    if any(value == 0 for value in scores):
+    if any(child[0] == 0 and child[4] for child in (left, right)):
         return 0.0, genes, missing, False, True
     return None, genes, missing, False, False
 

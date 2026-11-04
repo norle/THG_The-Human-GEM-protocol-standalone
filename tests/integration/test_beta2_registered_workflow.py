@@ -8,6 +8,7 @@ from cobra.io import save_json_model
 
 from thg_protocol.curation.beta1 import beta1_release_gate
 from thg_protocol.curation.beta2 import beta2_release_gate, release_beta2
+from thg_protocol.workflow.beta2._stages import Beta2Stage
 from thg_protocol.workflow.runner import get_status, resume, start
 
 ROOT = __import__("pathlib").Path(__file__).resolve().parents[2]
@@ -94,6 +95,32 @@ def test_beta2_rejects_unlabelled_direct_input(tmp_path):
     with pytest.raises(RuntimeError, match="stage 'load-beta1' failed"):
         start(config)
     assert get_status(run_dir)["steps"]["load-beta1"]["status"] == "failed"
+
+
+def test_beta2_resume_reruns_compartment_resolution_from_before_the_fix(
+    tmp_path, monkeypatch
+):
+    config, run_dir = _config(tmp_path)
+    fingerprint_data = Beta2Stage.fingerprint_data
+
+    def old_fingerprint(self, context):
+        data = dict(fingerprint_data(self, context))
+        if self.id == "resolve-compartment-evidence":
+            data["implementation_version"] = 3
+        return data
+
+    with monkeypatch.context() as patch:
+        patch.setattr(Beta2Stage, "fingerprint_data", old_fingerprint)
+        start(config)
+    before = get_status(run_dir)["steps"]
+    resume(run_dir)
+    after = get_status(run_dir)["steps"]
+    for stage in ("resolve-compartment-evidence", "export-beta2"):
+        assert after[stage]["attempt"] == before[stage]["attempt"] + 1
+    assert (
+        after["collect-location-evidence"]["attempt"]
+        == before["collect-location-evidence"]["attempt"]
+    )
 
 
 def test_beta2_consumes_only_verified_beta1_export(tmp_path):
