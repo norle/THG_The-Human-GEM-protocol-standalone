@@ -1823,36 +1823,61 @@ def _is_generic_formula(formula: object) -> bool:
     )
 
 
-def _consolidation_identity(metabolite: Any) -> tuple[object, ...] | None:
-    """Identity key under which two metabolites may be merged, or ``None``.
+_NAMESPACE_ALIASES = {
+    "kegg.compound": "kegg",
+    "pubchem.compound": "pubchem",
+    "metanetx": "metanetx.chemical",
+    "vmh": "vmhmetabolite",
+    "hmdb.metabolite": "hmdb",
+}
 
-    Only exact structure (InChIKey, InChI, SMILES) establishes identity.
-    ChEBI, KEGG, PubChem and MetaNetX are not enough on their own: Human-GEM
-    gives stereoisomers, positional isomers, tautomers and tissue-specific
-    lipid pools the same class-level records (on Human2, merging on identical
-    MetaNetX sets still joined 6(S)/6(R) hydroxy acids and 5,6-/5,8-epoxy
-    retinoate). Generic (R/X-group) metabolites are never merged, because
-    merging pools with different composition reactions creates mass from
-    nothing (VerifyModel 10, 11, 17 and 21 became feasible). The full
-    MetaNetX set is part of the key, so a MetaNetX disagreement vetoes a
-    structural match.
-    """
-    if _is_generic_formula(getattr(metabolite, "formula", None)):
-        return None
+
+def _chemical_identifiers(metabolite: Any) -> dict[str, frozenset[str]]:
+    """Normalized chemical database IDs of ``metabolite`` (SBO etc. dropped)."""
     values: dict[str, set[str]] = defaultdict(set)
     for namespace, value in _annotation_values(metabolite):
         name = namespace.lower()
         if name.startswith("metanetx"):
-            name = "metanetx"
+            name = "metanetx.chemical"
+        name = _NAMESPACE_ALIASES.get(name, name)
+        if name in NON_CHEMICAL_IDENTITY_NAMESPACES:
+            continue
         values[name].add(str(value))
-    metanetx = tuple(sorted(values.get("metanetx", ())))
+    return {name: frozenset(items) for name, items in values.items() if items}
+
+
+def _consolidation_identity(metabolite: Any) -> tuple[object, ...] | None:
+    """Structural key under which two metabolites may be merged, or ``None``.
+
+    Only exact structure (InChIKey, InChI, SMILES) proposes a merge; ChEBI,
+    KEGG and PubChem are class-level in Human-GEM and never establish identity
+    alone. Generic (R/X-group) metabolites are never merged, because merging
+    pools with different composition reactions creates mass from nothing
+    (VerifyModel 10, 11, 17 and 21). Metabolites sharing this key are merged
+    only if no database ID conflicts (see :func:`_identifiers_conflict`).
+    """
+    if _is_generic_formula(getattr(metabolite, "formula", None)):
+        return None
+    values = _chemical_identifiers(metabolite)
     for namespace in _STRUCTURAL_NAMESPACES:
         if values.get(namespace):
-            return (
-                (namespace, tuple(sorted(values[namespace]))),
-                ("metanetx", metanetx),
-            )
+            return ((namespace, tuple(sorted(values[namespace]))),)
     return None
+
+
+def _identifiers_conflict(
+    left: Mapping[str, frozenset[str]], right: Mapping[str, frozenset[str]]
+) -> bool:
+    """True if any namespace annotated on both sides has different IDs.
+
+    Human-GEM copies one isomer's structure and cross-references onto another:
+    MAM04041 (trans-5,8-tetradecadienoyl-CoA) carries the InChI, MetaNetX and
+    PubChem of MAM01576 ((5Z,8Z)); only BiGG and VMH differ. Merging that pair
+    made VerifyModel task 21 feasible, so every shared namespace (BiGG, VMH,
+    LIPID MAPS, HMDB, ChEBI, MetaNetX, ...) must agree exactly. A namespace
+    present on one side only is not a conflict.
+    """
+    return any(left[name] != right[name] for name in left.keys() & right.keys())
 
 
 def consolidate_model(
@@ -1877,10 +1902,25 @@ def consolidate_model(
         metabolite_groups[key].append(metabolite)
     retained: dict[str, str] = {}
     removed_metabolites: list[str] = []
+    clusters: list[tuple[Any, list[Any]]] = []
     for group in metabolite_groups.values():
+        # Greedy, deterministic clustering: a metabolite joins the first
+        # cluster whose accumulated IDs it does not contradict.
         group.sort(key=lambda item: str(item.id))
-        keep = group[0]
-        for duplicate in group[1:]:
+        accumulated: list[tuple[dict[str, frozenset[str]], list[Any]]] = []
+        for metabolite in group:
+            identifiers = _chemical_identifiers(metabolite)
+            for seen, members in accumulated:
+                if not _identifiers_conflict(seen, identifiers):
+                    members.append(metabolite)
+                    for name, items in identifiers.items():
+                        seen.setdefault(name, items)
+                    break
+            else:
+                accumulated.append((dict(identifiers), [metabolite]))
+        clusters.extend((members[0], members[1:]) for _, members in accumulated)
+    for keep, duplicates in clusters:
+        for duplicate in duplicates:
             retained[str(duplicate.id)] = str(keep.id)
             removed_metabolites.append(str(duplicate.id))
             # Merge annotations and retain the lexically stable non-empty name

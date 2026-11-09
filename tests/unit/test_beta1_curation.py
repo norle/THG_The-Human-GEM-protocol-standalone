@@ -647,3 +647,28 @@ def test_identical_structure_still_merges():
     no_mnx = {"inchi": "InChI=1S/CH4/h1H4"}
     _, report = consolidate_model(_pair_model(no_mnx, dict(no_mnx)))
     assert report["retained_metabolites"] == {"m2_c": "m1_c"}
+
+
+def test_any_differing_database_id_vetoes_a_structural_match():
+    # Human-GEM gives MAM04041 (trans-5,8-tetradecadienoyl-CoA) the InChI,
+    # MetaNetX and PubChem IDs of MAM01576 ((5Z,8Z)); only BiGG and VMH tell
+    # them apart. Merging them made VerifyModel task 21 feasible.
+    shared = {
+        "inchi": "InChI=1S/X",
+        "metanetx.chemical": "MNXM1364053",
+        "pubchem.compound": "21252281",
+    }
+    left = {**shared, "bigg.metabolite": "ttetddcoa"}
+    right = {**shared, "bigg.metabolite": "tetdecdicoa"}
+    _, report = consolidate_model(_pair_model(left, right))
+    assert report["removed_metabolites"] == []
+    lipid = {**shared, "lipidmaps": "LMFA1"}
+    _, report = consolidate_model(_pair_model(lipid, {**shared, "lipidmaps": "LMFA2"}))
+    assert report["removed_metabolites"] == []
+
+
+def test_sbo_terms_do_not_block_a_match():
+    structural = {"inchikey": "AAAA-BBBB-C", "sbo": "SBO:0000247"}
+    other = {"inchikey": "AAAA-BBBB-C", "sbo": "SBO:0000299"}
+    _, report = consolidate_model(_pair_model(structural, other))
+    assert report["retained_metabolites"] == {"m2_c": "m1_c"}
