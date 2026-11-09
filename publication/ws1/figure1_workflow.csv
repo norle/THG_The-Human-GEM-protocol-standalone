@@ -1,0 +1,53 @@
+stage,group,dependencies,implicit_reference_upstream
+beta1-input,Curate reference (beta1),,
+beta1-inventory,Curate reference (beta1),beta1-input,
+collect-metabolite-evidence,Curate reference (beta1),beta1-inventory,
+resolve-metabolite-identities,Curate reference (beta1),collect-metabolite-evidence,
+collect-reaction-evidence,Curate reference (beta1),resolve-metabolite-identities,
+resolve-reaction-identities,Curate reference (beta1),collect-reaction-evidence,
+normalize-genes,Curate reference (beta1),resolve-reaction-identities,
+curate-gprs,Curate reference (beta1),normalize-genes,
+generate-curation-proposals,Curate reference (beta1),curate-gprs,
+apply-curation,Curate reference (beta1),generate-curation-proposals,
+balance-audit,Curate reference (beta1),apply-curation,
+generate-balance-proposals,Curate reference (beta1),balance-audit,
+apply-balance-proposals,Curate reference (beta1),generate-balance-proposals,
+deduplicate-and-clean,Curate reference (beta1),apply-balance-proposals,
+validate-beta1,Curate reference (beta1),deduplicate-and-clean,
+export-beta1,Curate reference (beta1),validate-beta1,
+load-beta1,Expand compartments (beta2),,export-beta1
+collect-catalysis-evidence,Expand compartments (beta2),load-beta1,export-beta1
+collect-gpr-evidence,Expand compartments (beta2),collect-catalysis-evidence,export-beta1
+resolve-gprs,Expand compartments (beta2),collect-catalysis-evidence;collect-gpr-evidence,export-beta1
+normalize-compartments,Expand compartments (beta2),resolve-gprs,export-beta1
+collect-location-evidence,Expand compartments (beta2),normalize-compartments,export-beta1
+collect-reaction-location-evidence,Expand compartments (beta2),collect-location-evidence,export-beta1
+resolve-compartment-evidence,Expand compartments (beta2),normalize-compartments;collect-location-evidence;collect-reaction-location-evidence,export-beta1
+infer-complex-and-isoenzyme-locations,Expand compartments (beta2),resolve-compartment-evidence;resolve-gprs,export-beta1
+generate-expansion-plan,Expand compartments (beta2),infer-complex-and-isoenzyme-locations,export-beta1
+apply-expansion-decisions,Expand compartments (beta2),generate-expansion-plan,export-beta1
+apply-expansion,Expand compartments (beta2),apply-expansion-decisions,export-beta1
+consolidate-expanded-model,Expand compartments (beta2),apply-expansion,export-beta1
+validate-beta2,Expand compartments (beta2),consolidate-expanded-model,export-beta1
+export-beta2,Expand compartments (beta2),validate-beta2,export-beta1
+gate-beta2,Expand compartments (beta2),export-beta2,
+collect-records,Integrate database (optional),,
+snapshot-records,Integrate database (optional),collect-records,
+normalize-records,Integrate database (optional),snapshot-records,
+human-database-reconstruct,Integrate database (optional),normalize-records,
+human-database-validate,Integrate database (optional),human-database-reconstruct,
+human-database-export,Integrate database (optional),human-database-reconstruct;human-database-validate,
+plan-human-database-integration,Integrate database (optional),export-beta2;human-database-reconstruct,
+integrate-human-database,Integrate database (optional),plan-human-database-integration;export-beta2;human-database-reconstruct,
+load-gapfill-source,Gapfill,gate-beta2;integrate-human-database,
+characterize-gapfill-baseline,Gapfill,load-gapfill-source,
+generate-gapfill-candidates,Gapfill,load-gapfill-source,
+select-gapfill-connectors,Gapfill,generate-gapfill-candidates,
+compute-gapfill-coverage,Gapfill,load-gapfill-source;generate-gapfill-candidates;select-gapfill-connectors,
+generate-gapfill-plan,Gapfill,load-gapfill-source;characterize-gapfill-baseline;generate-gapfill-candidates;select-gapfill-connectors;compute-gapfill-coverage,
+apply-gapfill,Gapfill,load-gapfill-source;generate-gapfill-plan,
+validate-gapfill,Gapfill,load-gapfill-source;apply-gapfill;characterize-gapfill-baseline,
+gate-gapfill,Gapfill,generate-gapfill-plan;apply-gapfill;validate-gapfill,
+export-gapfilled-reference,Gapfill,load-gapfill-source;generate-gapfill-plan;apply-gapfill;validate-gapfill;gate-gapfill,
+summarize-reference,Export,export-gapfilled-reference,
+export-reference,Export,summarize-reference;export-gapfilled-reference,

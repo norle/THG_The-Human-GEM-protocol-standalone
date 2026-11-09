@@ -1,7 +1,7 @@
 # WS1: Frozen build of the current THG model
 
-Status (2026-11-09): **corrected build running; not done.** Deduplication
-attempt 2 completed without merges; beta1 validation is running. The manifest
+Status (2026-11-09): **corrected build running; not done.** Beta1 curation, validation
+and export completed; beta2 evidence collection is active. The manifest
 and live log remain authoritative; independent replay is pending.
 
 ## Files
@@ -37,7 +37,7 @@ After `thg-run unlock runs/thg-ws1-a` verified and cleared the stale lock:
 thg-run resume runs/thg-ws1-a --force-step deduplicate-and-clean -v > publication/ws1/corrected-build.log 2>&1
 ```
 
-The run is active at deduplication attempt 2; upstream artifacts were reused.
+The run started at deduplication attempt 2; upstream artifacts were reused.
 The live manifest/log is authoritative. A fresh independent replay remains
 pending; reusing valid artifacts in this run is not independent replay evidence.
 This build uses source commit `ac56d01`; subsequent publication scripts and prose
@@ -45,7 +45,8 @@ do not alter its workflow implementation.
 
 Deduplication attempt 2 completed in 484.60 s with zero metabolite/reaction
 merges; its model SHA-256 equals the `apply-balance-proposals` input
-(`50f9e3ae…b02cb6`). Beta1 validation is now running.
+(`50f9e3ae…b02cb6`). Beta1 validation subsequently completed in 464.35 s, and export completed
+in 213.53 s. Beta2 evidence collection is active.
 
 Checkpoint export (solver-free, seconds):
 ```sh
@@ -56,3 +57,38 @@ python publication/scripts/stage_table.py runs/thg-ws1-a publication/ws1/current
 runtime and cleanup merges. Completed states with incomplete upstream stages
 are labelled stale; their old outputs are omitted. The checkpoint is not a
 final run manifest or an independent-replay result.
+
+## Offline replay preparation
+
+After the corrected beta2 export is current, freeze its collected evidence and
+ontology into an empty destination:
+```sh
+python publication/scripts/freeze_evidence.py runs/thg-ws1-a publication/ws1/reference-b.json publication/ws1/frozen
+```
+
+This creates `reference-b-frozen.json`, source-file copies and their hashes,
+a combined snapshot, source releases and the exact source-run manifest. The
+freezer recomputes runtime fingerprints as well as checking completed states
+and source hashes, including implicit beta1 references. It refuses incomplete
+or stale evidence. It does not replay HTTP acquisition. A premature local
+snapshot made before that fingerprint guard was added was removed and is not
+publication evidence.
+
+Once the candidate is stable, replay from scratch with:
+```sh
+thg-run reference publication/ws1/reference-b-frozen.json -v
+```
+
+The independent replay has not run. Compare both byte checksums and semantic
+differences; snapshot provenance may differ even when chemistry is unchanged.
+The new freezer and stage-freshness checks have targeted regression coverage;
+the licensed native-thread check separately verifies effective Gurobi settings.
+
+## Figure 1
+
+`python publication/scripts/plot_workflow.py` generates
+`publication/figures/figure1_workflow.{svg,pdf,png}` and
+`figure1_workflow.csv`. The table is derived from registered stages and records
+explicit dependencies plus beta2's implicit reference to the beta1 export.
+This is a protocol diagram; stage counts include optional/disabled stages and
+do not claim that a build completed. The PNG was visually checked.

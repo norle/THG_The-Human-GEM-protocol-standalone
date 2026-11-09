@@ -13,6 +13,9 @@ from functools import cache
 from pathlib import Path
 from xml.etree.ElementTree import iterparse
 
+from thg_protocol.runtime.hashing import sha256_json
+from thg_protocol.runtime.stage import StageContext
+from thg_protocol.workflow.config import load_snapshot
 from thg_protocol.workflow.reference import REFERENCE_STAGES
 
 
@@ -35,10 +38,20 @@ def export(run, out):
     manifest = json.loads(manifest_bytes)
     definitions = {stage.id: stage for stage in REFERENCE_STAGES}
     steps = manifest["steps"]
+    context = StageContext(load_snapshot(run), run.resolve(), manifest)
 
     @cache
     def current(stage_id):
-        return steps[stage_id]["status"] == "completed" and all(
+        state = steps[stage_id]
+        if state["status"] == "skipped":
+            return not definitions[stage_id].enabled(context.config)
+        if state["status"] != "completed":
+            return False
+        try:
+            fingerprint = sha256_json(definitions[stage_id].fingerprint_data(context))
+        except Exception:
+            return False
+        return state["fingerprint"] == fingerprint and all(
             current(dependency) for dependency in definitions[stage_id].dependencies
         )
 
@@ -64,7 +77,7 @@ def export(run, out):
     def inputs(stage_id):
         result = {}
         for dependency in definitions[stage_id].dependencies:
-            if not current(dependency):
+            if not current(dependency) or steps[dependency]["status"] == "skipped":
                 continue
             for model in models(dependency) or inputs(dependency):
                 result[model["path"]] = model
@@ -121,7 +134,7 @@ def export(run, out):
                 "manifest_sha256": hashlib.sha256(manifest_bytes).hexdigest(),
                 "command": f"python publication/scripts/stage_table.py {run} {out}",
                 "scope": "Current manifest attempts; completed-stage models checked "
-                "against ledger; task gates not inferred",
+                "against ledger and runtime fingerprints; task gates not inferred",
             },
             indent=2,
         )

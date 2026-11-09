@@ -155,6 +155,10 @@ def test_stage_table_excludes_stale_downstream_artifacts(tmp_path, monkeypatch):
             SimpleNamespace(id="export", dependencies=("clean",)),
         ),
     )
+    monkeypatch.setattr(runner, "load_snapshot", lambda _: SimpleNamespace())
+    for stage in runner.REFERENCE_STAGES:
+        stage.fingerprint_data = lambda _: {"revision": 1}
+        stage.enabled = lambda _: True
     model = tmp_path / "model.json"
     model.write_text('{"reactions": [1, 2], "metabolites": [1], "genes": []}')
     artifact = {
@@ -163,6 +167,7 @@ def test_stage_table_excludes_stale_downstream_artifacts(tmp_path, monkeypatch):
         "sha256": hashlib.sha256(model.read_bytes()).hexdigest(),
     }
     completed = {
+        "fingerprint": runner.sha256_json({"revision": 1}),
         "status": "completed",
         "attempt": 1,
         "outputs": [artifact],
@@ -183,6 +188,11 @@ def test_stage_table_excludes_stale_downstream_artifacts(tmp_path, monkeypatch):
     assert json.loads(rows[0]["output_models"])[0]["reactions"] == 2
     assert rows[1]["output_models"] == rows[2]["output_models"] == "[]"
     assert rows[2]["status"] == "stale"
+    runner.REFERENCE_STAGES[0].fingerprint_data = lambda _: {"revision": 2}
+    stale = runner.export(tmp_path, tmp_path / "out")
+    assert stale[0]["status"] == "stale"
+    assert stale[0]["output_models"] == "[]"
+    runner.REFERENCE_STAGES[0].fingerprint_data = lambda _: {"revision": 1}
     model.write_text("changed")
     with pytest.raises(ValueError, match="differs from ledger"):
         runner.export(tmp_path, tmp_path / "out")
@@ -200,3 +210,214 @@ def test_stage_table_counts_sbml_without_solver(tmp_path):
         "<fbc:geneProduct/></model></sbml>"
     )
     assert runner.model_size(model) == {"reactions": 1, "metabolites": 1, "genes": 1}
+
+
+def test_freeze_evidence_preserves_sources_and_requires_completed_run(
+    tmp_path, monkeypatch
+):
+    import hashlib
+
+    script = (
+        Path(__file__).resolve().parents[2] / "publication/scripts/freeze_evidence.py"
+    )
+    spec = importlib.util.spec_from_file_location("publication_freeze", script)
+    runner = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(runner)
+    definitions = [
+        SimpleNamespace(id=stage, dependencies=()) for stage in runner.SOURCES
+    ]
+    definitions.append(
+        SimpleNamespace(id="export-beta2", dependencies=tuple(runner.SOURCES))
+    )
+    monkeypatch.setattr(runner, "REFERENCE_STAGES", definitions)
+    monkeypatch.setattr(runner, "load_snapshot", lambda _: SimpleNamespace())
+    for stage in definitions:
+        stage.fingerprint_data = lambda _: {"revision": 1}
+    data = {
+        "collect-gpr-evidence": '{"reaction_id":"r","candidate_gpr":"g"}\n',
+        "collect-location-evidence": json.dumps(
+            {
+                "gene_locations": {
+                    "g": {"raw_locations": [{"go_id": "GO:1"}], "confidence": "strong"}
+                }
+            }
+        ),
+        "collect-reaction-location-evidence": '{"reaction_id":"r","locations":[]}\n',
+        "normalize-compartments": json.dumps(
+            {"go_graph": {"GO:1": []}, "source_releases": {"go": "frozen"}}
+        ),
+    }
+    fingerprint = runner.sha256_json({"revision": 1})
+    steps = {"export-beta2": {"status": "running", "fingerprint": fingerprint}}
+    for stage, content in data.items():
+        suffix = (
+            ".jsonl"
+            if stage in ("collect-gpr-evidence", "collect-reaction-location-evidence")
+            else ".json"
+        )
+        path = tmp_path / (stage + suffix)
+        path.write_text(content)
+        steps[stage] = {
+            "fingerprint": fingerprint,
+            "status": "completed",
+            "outputs": [
+                {
+                    "role": runner.SOURCES[stage],
+                    "path": path.name,
+                    "sha256": hashlib.sha256(content.encode()).hexdigest(),
+                }
+            ],
+        }
+    manifest = tmp_path / "manifest.json"
+    manifest.write_text(json.dumps({"steps": steps}))
+    template = tmp_path / "replay.json"
+    template.write_text(
+        json.dumps(
+            {
+                "run": {"output_dir": "run-b"},
+                "beta2": {"evidence_mode": "live", "go_ontology_file": "unfrozen.obo"},
+            }
+        )
+    )
+    out = tmp_path / "frozen"
+    with pytest.raises(ValueError, match="incomplete stage"):
+        runner.freeze(tmp_path, template, out)
+    assert not out.exists()
+    steps["export-beta2"]["status"] = "completed"
+    steps["collect-gpr-evidence"]["status"] = "running"
+    manifest.write_text(json.dumps({"steps": steps}))
+    with pytest.raises(ValueError, match="incomplete stage"):
+        runner.freeze(tmp_path, template, out)
+    steps["collect-gpr-evidence"]["status"] = "completed"
+    manifest.write_text(json.dumps({"steps": steps}))
+    definitions[0].fingerprint_data = lambda _: {"revision": 2}
+    with pytest.raises(ValueError, match="stale stage fingerprint"):
+        runner.freeze(tmp_path, template, out)
+    definitions[0].fingerprint_data = lambda _: {"revision": 1}
+    generated = runner.freeze(tmp_path, template, out)
+    config = json.loads(generated.read_text())
+    assert config["beta2"]["evidence_mode"] == "snapshot"
+    assert "go_ontology_file" not in config["beta2"]
+    records = [
+        json.loads(line)
+        for line in (out / "beta2-evidence.jsonl").read_text().splitlines()
+    ]
+    assert [row["record_type"] for row in records] == [
+        "metadata",
+        "gpr",
+        "location",
+        "reaction-location",
+    ]
+    assert records[2]["raw_locations"] == [{"go_id": "GO:1"}]
+    assert (out / "sources/collect-gpr-evidence.jsonl").read_text() == data[
+        "collect-gpr-evidence"
+    ]
+    with pytest.raises(FileExistsError, match="must be empty"):
+        runner.freeze(tmp_path, template, out)
+
+    (tmp_path / "collect-gpr-evidence.jsonl").write_text("changed")
+    with pytest.raises(ValueError, match="differs from ledger"):
+        runner.freeze(tmp_path, template, tmp_path / "other")
+
+
+def test_workflow_figure_source_covers_registered_stages_and_gate_groups(monkeypatch):
+    script = (
+        Path(__file__).resolve().parents[2] / "publication/scripts/plot_workflow.py"
+    )
+    spec = importlib.util.spec_from_file_location("publication_workflow_plot", script)
+    runner = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(runner)
+    rows = runner.workflow_rows()
+    assert [row["stage"] for row in rows] == [
+        stage.id for stage in runner.REFERENCE_STAGES
+    ]
+    by_id = {row["stage"]: row for row in rows}
+    assert by_id["load-beta1"]["implicit_reference_upstream"] == "export-beta1"
+    assert by_id["gate-beta2"]["group"] == "Expand compartments (beta2)"
+    assert by_id["integrate-human-database"]["group"] == "Integrate database (optional)"
+    assert by_id["gate-gapfill"]["group"] == "Gapfill"
+    monkeypatch.setattr(
+        runner,
+        "REFERENCE_STAGES",
+        [stage for stage in runner.REFERENCE_STAGES if stage.id != "gate-beta2"],
+    )
+    with pytest.raises(ValueError, match="review figure grouping"):
+        runner.workflow_rows()
+
+
+def test_stage_table_accepts_disabled_optional_dependencies(tmp_path, monkeypatch):
+    script = Path(__file__).resolve().parents[2] / "publication/scripts/stage_table.py"
+    spec = importlib.util.spec_from_file_location("publication_stages", script)
+    runner = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(runner)
+
+    def fingerprint_data(_):
+        return {"version": 1}
+
+    optional = SimpleNamespace(id="optional", dependencies=(), enabled=lambda _: False)
+    exported = SimpleNamespace(
+        id="export", dependencies=("optional",), fingerprint_data=fingerprint_data
+    )
+    monkeypatch.setattr(runner, "REFERENCE_STAGES", [optional, exported])
+    monkeypatch.setattr(runner, "load_snapshot", lambda _: SimpleNamespace())
+    (tmp_path / "manifest.json").write_text(
+        json.dumps(
+            {
+                "overall_status": "completed",
+                "steps": {
+                    "optional": {"status": "skipped", "attempt": 0},
+                    "export": {
+                        "status": "completed",
+                        "attempt": 1,
+                        "outputs": [],
+                        "fingerprint": runner.sha256_json(fingerprint_data(None)),
+                    },
+                },
+            }
+        )
+    )
+    rows = runner.export(tmp_path, tmp_path / "out")
+    assert rows[1]["status"] == "completed"
+    optional.enabled = lambda _: True
+    rows = runner.export(tmp_path, tmp_path / "out")
+    assert rows[1]["status"] == "stale"
+
+
+@pytest.mark.gurobi
+def test_publication_gurobi_threads_apply_to_actual_task_copies(tmp_path, monkeypatch):
+    gurobipy = pytest.importorskip("gurobipy")
+    from thg_protocol.tasks import MetabolicTask, TaskSuite
+
+    script = Path(__file__).resolve().parents[2] / "publication/scripts/run_tasks.py"
+    spec = importlib.util.spec_from_file_location("publication_tasks", script)
+    runner = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(runner)
+    model_path = tmp_path / "model.json"
+    model_path.write_text("{}")
+    monkeypatch.setattr(cobra.io, "load_json_model", lambda _: cobra.Model("threads"))
+    monkeypatch.setenv("THG_SOLVER", "gurobi")
+    monkeypatch.delenv("THG_BLOCK", raising=False)
+    monkeypatch.setattr(
+        "sys.argv", [str(script), str(model_path), "test", str(tmp_path)]
+    )
+    suite = TaskSuite("native-thread-check", "1", (MetabolicTask("feasible"),))
+    monkeypatch.setattr(
+        runner,
+        "import_raven_tasks",
+        lambda *_args, **_kwargs: SimpleNamespace(suite=suite),
+    )
+    previous_threads = gurobipy.getParamInfo("Threads")[2]
+    previous_solver = cobra.Configuration().solver
+    try:
+        runner.main()
+        report = json.loads((tmp_path / "task_results_test.json").read_text())
+        for table in report["reports"].values():
+            solved = table["tasks"][0]
+            assert solved["status"] == "passed"
+            assert solved["diagnostics"]["solver_threads"] == 2
+            assert (
+                solved["diagnostics"]["solver_interface"] == "optlang.gurobi_interface"
+            )
+    finally:
+        gurobipy.setParam("Threads", previous_threads)
+        cobra.Configuration().solver = previous_solver

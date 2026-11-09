@@ -56,11 +56,11 @@
     "sha256": "7077098ca6189ff0d5f9081f679c0055a3bf8bc060d65692a2dc802d76e529e2"
   },
   {
-    "label": "thg-ws1-a:export-beta2",
-    "path": "runs/thg-ws1-a/artifacts/export-beta2/attempt-0002/thg-beta2-candidate.json",
+    "label": "thg-ws1-a:export-beta1",
+    "path": "runs/thg-ws1-a/artifacts/export-beta1/attempt-0002/thg-beta1-candidate.json",
     "provenance": "runs/thg-ws1-a/manifest.json; attempt 2; stage status completed; candidate, not yet final-gated",
     "status": "present",
-    "sha256": "8aef371abb499276e0215ad4bf3aa946a8454cabc5378b2a6ef091220ad98314",
+    "sha256": "50f9e3aeb332b8187ee0707c06d4651acfe29f51180e083a8a8ccac968b02cb6",
     "matches_ledger": true
   },
   {
