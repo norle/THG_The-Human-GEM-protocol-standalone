@@ -13,7 +13,7 @@ JSON and workflow manifests; new-job estimates below are not measured results.
 | Work | Regeneration command | Runtime / status |
 |---|---|---|
 | Model provenance | `python publication/scripts/pin_models.py` | seconds; file hashes only, no validation |
-| WS0 patched tasks | `python publication/scripts/run_tasks.py runs/human211-patched/Human_211_patched.xml human211-patched publication/ws0/pinned-refresh` | refresh pending after native-thread correction; earlier counts retained with limitations |
+| WS0 patched tasks | `python publication/scripts/run_tasks.py runs/human211-patched/Human_211_patched.xml human211-patched publication/ws0/pinned-refresh` | 278.85 s; VerifyModel 21/21, Essential 57/57, Full 255 pass + 2 invalid; native threads verified |
 | WS0 control | `python publication/scripts/run_tasks.py models/Human-GEM_2022-06-21.xml Human1 publication/ws0/numerical-refresh VerifyModel` | refresh pending |
 | WS0 validation | `thg-run validate publication/ws0/validation-config-211-patched.json` | pending; potentially hours |
 | WS1 corrected build | `thg-run resume runs/thg-ws1-a --force-step deduplicate-and-clean -v` | running from source `ac56d01`; earlier attempts preserved |
@@ -47,3 +47,9 @@ The first task refresh has an unverified native Gurobi thread count
 (`ws0/numerical-refresh/limitations.json`). Its numerical task counts are
 historical evidence; a thread-verified refresh is required before matched
 comparison. The corrected runner records the effective native count per solve.
+
+The native-thread-verified baseline is now saved in `ws0/pinned-refresh/`
+(source `628c6f0`, 278.85 s). Every solved task reports two native threads and
+feasibility tolerance 1e-7. MEMOTE and matched final-model evaluation remain
+pending. The earlier thread limitation applies to `numerical-refresh/`, not
+this corrected result.

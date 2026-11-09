@@ -152,6 +152,14 @@ measurements, sampled narratives, fixture-only checks and pending work.
 
 ### Model evaluation
 
+The corrected baseline task run, with every solve reporting two native Gurobi
+threads, gives VerifyModel 21/21 (all infeasible), Essential 57/57, and Full
+255 passed / 257 total with two invalid mappings. No numerical errors were
+reported. Runtime was 278.85 s. Evidence:
+`publication/ws0/pinned-refresh/task_results_human211-patched.json`; regenerate
+with `python publication/scripts/run_tasks.py runs/human211-patched/Human_211_patched.xml human211-patched publication/ws0/pinned-refresh`.
+This supersedes the earlier refresh with an unverified native thread count.
+
 Final candidate, matched quality results and supported coverage analysis are
 pending. Earlier baseline results are retained as historical evidence in
 `publication/ws0/`; numerical refresh outputs are separate. Intermediate model
