@@ -1,0 +1,380 @@
+{
+  "archived_corrected_exclusions_matching_old_copies": 26,
+  "origin_identity_defect": "introduced by redesign",
+  "origin_parent_chemistry": "inherited from baseline",
+  "identity_pairs": [
+    {
+      "removed": "MAM00324c",
+      "retained": "MAM00307c",
+      "conflicting_namespaces": [
+        "bigg.metabolite",
+        "lipidmaps",
+        "vmhmetabolite"
+      ],
+      "rejected_by_current_identifier_rule": true
+    },
+    {
+      "removed": "MAM00324r",
+      "retained": "MAM00307r",
+      "conflicting_namespaces": [
+        "bigg.metabolite",
+        "lipidmaps",
+        "vmhmetabolite"
+      ],
+      "rejected_by_current_identifier_rule": true
+    },
+    {
+      "removed": "MAM01206m",
+      "retained": "MAM01201m",
+      "conflicting_namespaces": [
+        "vmhmetabolite"
+      ],
+      "rejected_by_current_identifier_rule": true
+    },
+    {
+      "removed": "MAM01233c",
+      "retained": "MAM00353c",
+      "conflicting_namespaces": [
+        "vmhmetabolite"
+      ],
+      "rejected_by_current_identifier_rule": true
+    },
+    {
+      "removed": "MAM01233r",
+      "retained": "MAM00353r",
+      "conflicting_namespaces": [
+        "vmhmetabolite"
+      ],
+      "rejected_by_current_identifier_rule": true
+    },
+    {
+      "removed": "MAM02836c",
+      "retained": "MAM00353c",
+      "conflicting_namespaces": [
+        "bigg.metabolite",
+        "chebi",
+        "vmhmetabolite"
+      ],
+      "rejected_by_current_identifier_rule": true
+    },
+    {
+      "removed": "MAM02836e",
+      "retained": "MAM00353e",
+      "conflicting_namespaces": [
+        "bigg.metabolite",
+        "chebi",
+        "vmhmetabolite"
+      ],
+      "rejected_by_current_identifier_rule": true
+    },
+    {
+      "removed": "MAM02836r",
+      "retained": "MAM00353r",
+      "conflicting_namespaces": [
+        "bigg.metabolite",
+        "chebi",
+        "vmhmetabolite"
+      ],
+      "rejected_by_current_identifier_rule": true
+    },
+    {
+      "removed": "MAM03346c",
+      "retained": "MAM01057c",
+      "conflicting_namespaces": [
+        "vmhmetabolite"
+      ],
+      "rejected_by_current_identifier_rule": true
+    },
+    {
+      "removed": "MAM03543m",
+      "retained": "MAM03522m",
+      "conflicting_namespaces": [
+        "bigg.metabolite",
+        "hmdb",
+        "vmhmetabolite"
+      ],
+      "rejected_by_current_identifier_rule": true
+    },
+    {
+      "removed": "MAM04041m",
+      "retained": "MAM01576m",
+      "conflicting_namespaces": [
+        "bigg.metabolite",
+        "vmhmetabolite"
+      ],
+      "rejected_by_current_identifier_rule": true
+    }
+  ],
+  "old_merge_pairs": 11,
+  "pairs_vetoed_by_identifier_rule": 11,
+  "old_unbalanced_copies": [
+    {
+      "parent": "MAR00031",
+      "location": "Endoplasmic reticulum",
+      "imbalance": {
+        "charge": 0.0068000000000000005,
+        "C": -13.436400000000003,
+        "H": -19.207400000000003,
+        "O": -4.4474,
+        "R": -2.0826000000000002,
+        "N": -0.018799999999999997,
+        "P": -0.02,
+        "X": 1.0
+      }
+    },
+    {
+      "parent": "MAR00031",
+      "location": "cell membrane",
+      "imbalance": {
+        "charge": 0.0068000000000000005,
+        "C": -13.436400000000003,
+        "H": -19.207400000000003,
+        "O": -4.4474,
+        "R": -2.0826000000000002,
+        "N": -0.018799999999999997,
+        "P": -0.02,
+        "X": 1.0
+      }
+    },
+    {
+      "parent": "MAR00031",
+      "location": "vesicle",
+      "imbalance": {
+        "charge": 0.0068000000000000005,
+        "C": -13.436400000000003,
+        "H": -19.207400000000003,
+        "O": -4.4474,
+        "R": -2.0826000000000002,
+        "N": -0.018799999999999997,
+        "P": -0.02,
+        "X": 1.0
+      }
+    },
+    {
+      "parent": "MAR02032",
+      "location": "Endoplasmic reticulum",
+      "imbalance": {
+        "charge": -2.0
+      }
+    },
+    {
+      "parent": "MAR03992",
+      "location": "Endoplasmic reticulum",
+      "imbalance": {
+        "charge": 2.0
+      }
+    },
+    {
+      "parent": "MAR03992",
+      "location": "Mitochondria",
+      "imbalance": {
+        "charge": 2.0
+      }
+    },
+    {
+      "parent": "MAR04549",
+      "location": "Golgi apparatus",
+      "imbalance": {
+        "charge": -2.0
+      }
+    },
+    {
+      "parent": "MAR04549",
+      "location": "Mitochondria",
+      "imbalance": {
+        "charge": -2.0
+      }
+    },
+    {
+      "parent": "MAR04549",
+      "location": "lysosome",
+      "imbalance": {
+        "charge": -2.0
+      }
+    },
+    {
+      "parent": "MAR06634",
+      "location": "Endoplasmic reticulum",
+      "imbalance": {
+        "charge": 2.0
+      }
+    },
+    {
+      "parent": "MAR06729",
+      "location": "vesicle",
+      "imbalance": {
+        "charge": -2.0
+      }
+    },
+    {
+      "parent": "MAR07025",
+      "location": "Golgi apparatus",
+      "imbalance": {
+        "charge": -2.0
+      }
+    },
+    {
+      "parent": "MAR07025",
+      "location": "Mitochondria",
+      "imbalance": {
+        "charge": -2.0
+      }
+    },
+    {
+      "parent": "MAR07026",
+      "location": "Golgi apparatus",
+      "imbalance": {
+        "charge": -2.0
+      }
+    },
+    {
+      "parent": "MAR07026",
+      "location": "Mitochondria",
+      "imbalance": {
+        "charge": -2.0
+      }
+    },
+    {
+      "parent": "MAR07027",
+      "location": "Golgi apparatus",
+      "imbalance": {
+        "charge": -2.0
+      }
+    },
+    {
+      "parent": "MAR07027",
+      "location": "Mitochondria",
+      "imbalance": {
+        "charge": -2.0
+      }
+    },
+    {
+      "parent": "MAR07028",
+      "location": "Golgi apparatus",
+      "imbalance": {
+        "charge": -2.0
+      }
+    },
+    {
+      "parent": "MAR07028",
+      "location": "Mitochondria",
+      "imbalance": {
+        "charge": -2.0
+      }
+    },
+    {
+      "parent": "MAR07160",
+      "location": "Cytosol",
+      "imbalance": {
+        "charge": 1.0,
+        "C": 0.20000000000000018,
+        "H": 5.699999999999999,
+        "N": -3.7,
+        "O": 2.000000000000001,
+        "R": 2.0
+      }
+    },
+    {
+      "parent": "MAR07160",
+      "location": "Mitochondria",
+      "imbalance": {
+        "charge": 1.0,
+        "C": 0.20000000000000018,
+        "H": 5.699999999999999,
+        "N": -3.7,
+        "O": 2.000000000000001,
+        "R": 2.0
+      }
+    },
+    {
+      "parent": "MAR07625",
+      "location": "Endoplasmic reticulum",
+      "imbalance": {
+        "X": 1.0,
+        "C": -1.0,
+        "H": -1.0,
+        "N": -1.0,
+        "O": -1.0,
+        "R": -2.0
+      }
+    },
+    {
+      "parent": "MAR07625",
+      "location": "Nucleus",
+      "imbalance": {
+        "X": 1.0,
+        "C": -1.0,
+        "H": -1.0,
+        "N": -1.0,
+        "O": -1.0,
+        "R": -2.0
+      }
+    },
+    {
+      "parent": "MAR07625",
+      "location": "cell membrane",
+      "imbalance": {
+        "X": 1.0,
+        "C": -1.0,
+        "H": -1.0,
+        "N": -1.0,
+        "O": -1.0,
+        "R": -2.0
+      }
+    },
+    {
+      "parent": "MAR07741",
+      "location": "inner mitochondria",
+      "imbalance": {
+        "charge": -2.0
+      }
+    },
+    {
+      "parent": "MAR08615",
+      "location": "Cytosol",
+      "imbalance": {
+        "charge": 1.0
+      }
+    }
+  ],
+  "unbalanced_copy_count": 26,
+  "unbalanced_parent_count": 14,
+  "charge_only_parents": [
+    "MAR02032",
+    "MAR03992",
+    "MAR04549",
+    "MAR06634",
+    "MAR06729",
+    "MAR07025",
+    "MAR07026",
+    "MAR07027",
+    "MAR07028",
+    "MAR07741",
+    "MAR08615"
+  ],
+  "scope": "Archived real-model proposals; not corrected-run or task evidence",
+  "sources": [
+    {
+      "path": "runs/thg-ws1-a/artifacts/apply-balance-proposals/attempt-0001/balanced-model.json",
+      "sha256": "50f9e3aeb332b8187ee0707c06d4651acfe29f51180e083a8a8ccac968b02cb6"
+    },
+    {
+      "path": "runs/thg-ws1-a/artifacts/deduplicate-and-clean/attempt-0001/cleanup.json",
+      "sha256": "cb85db6047b4df7aaad7d8671591bb2ed7e7f0525f330c7161f945af8ea96c14"
+    },
+    {
+      "path": "runs/thg-ws1-a/artifacts/generate-expansion-plan/attempt-0001/beta2-expansion-plan.jsonl",
+      "sha256": "0ece9fbba3757335792fbdba1c6206660edb0ac7baff52b3692e1d4b76d2823b"
+    },
+    {
+      "path": "runs/thg-ws1-a/artifacts/export-beta1/attempt-0001/thg-beta1-candidate.json",
+      "sha256": "fb081fa8acf6f9ca898e9603105ac3eab5543e56448837140138c05ea407f5b1"
+    },
+    {
+      "path": "runs/thg-ws1-a/artifacts/generate-expansion-plan/attempt-0002/beta2-expansion-plan.jsonl",
+      "sha256": "3659f91e42e9fb941549194596a0d484d16ced66d4f340896f9754305e89bcb1"
+    }
+  ],
+  "code_commit": "ac56d018758de258e5008afb3aedb5869201d0a2",
+  "command": "python publication/scripts/measure_correctness.py"
+}

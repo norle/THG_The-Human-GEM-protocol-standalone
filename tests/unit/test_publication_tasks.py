@@ -91,3 +91,49 @@ def test_publication_task_mapping_checksum_is_enforced(tmp_path, monkeypatch):
     monkeypatch.setattr("sys.argv", [str(script), "unused.xml", "test", str(tmp_path)])
     with pytest.raises(ValueError, match="mapping checksum differs"):
         runner.main()
+
+
+def test_correctness_measurement_distinguishes_inherited_chemistry_and_identity():
+    script = (
+        Path(__file__).resolve().parents[2]
+        / "publication/scripts/measure_correctness.py"
+    )
+    spec = importlib.util.spec_from_file_location("publication_correctness", script)
+    runner = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(runner)
+    model = {
+        "metabolites": [
+            {
+                "id": "a",
+                "formula": "CH2",
+                "charge": 0,
+                "annotation": {"inchikey": "shared", "bigg.metabolite": "a"},
+            },
+            {
+                "id": "b",
+                "formula": "CH2",
+                "charge": 1,
+                "annotation": {"inchikey": "shared", "bigg.metabolite": "b"},
+            },
+        ],
+        "reactions": [{"id": "r", "metabolites": {"a": -1, "b": 1}}],
+    }
+    plan = [
+        {"action": "create", "reaction_id": "r", "location": "x"},
+        {"action": "retain", "reaction_id": "r", "location": "c"},
+    ]
+    corrected = [
+        {
+            "action": "retain",
+            "reaction_id": "r",
+            "location": "x",
+            "reason": "unbalanced-parent",
+        }
+    ]
+    result = runner.measure(
+        model, {"retained_metabolites": {"a": "b"}}, plan, model, corrected
+    )
+    assert result["pairs_vetoed_by_identifier_rule"] == 1
+    assert result["unbalanced_copy_count"] == result["unbalanced_parent_count"] == 1
+    assert result["old_unbalanced_copies"][0]["imbalance"] == {"charge": 1}
+    assert result["archived_corrected_exclusions_matching_old_copies"] == 1

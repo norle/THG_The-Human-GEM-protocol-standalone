@@ -26,3 +26,16 @@ MkDocs lives in the base environment. This is test evidence, not full-model
 benchmark evidence. Additional focused runner/importer/publication tests after
 checksum validation: 69 passed. Three measured correctness examples remain
 pending; the historical inventory above is not upgraded by these tests.
+
+## Archived real-model measurements
+
+`python publication/scripts/measure_correctness.py` writes `correctness.json`
+with source-artifact SHA-256 values and individual metabolite/reaction rows.
+All 11 previous consolidation pairs conflict in shared database identifiers.
+The archived expansion plan contains 26 copies of 14 unbalanced parents; all
+26 match explicit `unbalanced-parent` exclusions in the revised archived plan.
+Eleven parents have charge-only imbalance. These are real-model proposal
+measurements, not final-model or functional outcomes. The identity defect was
+introduced by the redesign; the parent imbalances are inherited. The original
+B1 narrative row remains historical and is not treated as refreshed task evidence.
+The numerical case and corrected end-to-end effects remain pending.
