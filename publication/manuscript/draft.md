@@ -33,10 +33,12 @@ write separate attempts and manifests with configuration snapshots, input
 references, artifact checksums and service/cache provenance. A forced stage
 rerun invalidates downstream results while preserving earlier attempts.
 
-Build configurations are `publication/ws1/reference-a.json` and
-`publication/ws1/reference-b.json`. The second run is intended as an independent
-replay with frozen service evidence. Replay and output identity have not yet
-been established; cached evidence alone does not establish an offline replay.
+Acquisition used `publication/ws1/reference-a.json` and was interrupted cleanly
+before gapfill finished. Its collected biological-service evidence is archived
+with source hashes. Fresh configurations `reference-b-frozen.json` and
+`reference-c-frozen.json` under `publication/ws1/` are prepared for the corrected
+cache runtime. Neither build has started; replay and output identity remain
+unestablished. Archived inputs alone do not establish independent replay.
 
 ![Protocol stages, gates and provenance](../figures/figure1_workflow.svg)
 
@@ -145,8 +147,22 @@ it does not establish a biochemical repair. Individual reactions and imbalance
 vectors are saved in `publication/ws2/correctness.json` using the same
 regeneration command above. Corrected end-to-end impact remains pending.
 
-The third selected example, numerical task reliability on an unstable real-model
-solve, remains pending. Supplementary fix inventory:
+For the numerical example, archived beta1 task 21 reports an optimal solution
+with maximum variable-bound violation 3.0275567736916796e-7, above the 1e-7
+reliability threshold. The updated harness returns unresolved, with no
+biological outcome (`publication/ws2/historical-failure/`; regenerate with the
+command in `publication/ws2/README.md`). The other 20 tasks are infeasible.
+This is an unreliable optimum, not confirmation of a biochemical leak.
+GLPK corroboration of this exact artifact remains pending.
+
+A separate policy ablation covers all 2,870 baseline-derived genes on the same
+current location evidence: the historical standalone multi-location rejection
+rule retains assigned targets for 1,613 genes versus 2,461 with the current
+rule; 848 multi-location genes account for the difference, and 409 have no
+mapped target. Evidence: `publication/ws2/gene_locations.{json,csv}`; regenerate
+with `python publication/scripts/measure_locations.py`. This isolates the
+acceptance policy and does not execute the 2023 legacy lookup pipeline or
+establish reaction-level/flux effects. Supplementary fix inventory:
 `publication/ws2/fixes.csv`; evidence labels distinguish real-model proposal
 measurements, sampled narratives, fixture-only checks and pending work.
 
@@ -188,3 +204,11 @@ dropped by user decision.
 Local regeneration commands and artifact status are maintained in
 `publication/README.md`. Public release, tagging and archiving are pending and
 require approval. The current draft does not claim to reproduce the 2023 model.
+
+## Shutdown checkpoint
+
+Work paused on 2026-11-09. Acquisition run A was interrupted cleanly during
+gapfill coverage (stage 45/52); no final candidate exists. Biological-service
+evidence is archived for fresh B/C builds under the corrected cache runtime.
+Independent replay, matched quality/coverage, remaining figures and the complete
+claim/evidence audit remain unfinished. See `publication/HANDOFF-2026-11-09.md`.

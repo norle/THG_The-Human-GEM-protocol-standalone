@@ -1,5 +1,9 @@
 # Publication evidence and internal draft
 
+**Paused for shutdown, 2026-11-09.** Build stopped cleanly; no task process is
+left running. Start with [the handoff](HANDOFF-2026-11-09.md). It supersedes
+earlier running/pending notes and gives the restart sequence.
+
 The controlling scope is `docs/plans/publication-plan.md` (November 9–12
 methods-led draft). Work is in progress. No gated final candidate, independent
 replay or complete model-results draft is available yet. WS3 is deferred;
@@ -16,14 +20,14 @@ JSON and workflow manifests; new-job estimates below are not measured results.
 | WS0 patched tasks | `python publication/scripts/run_tasks.py runs/human211-patched/Human_211_patched.xml human211-patched publication/ws0/pinned-refresh` | 278.85 s; VerifyModel 21/21, Essential 57/57, Full 255 pass + 2 invalid; native threads verified |
 | WS0 control | `python publication/scripts/run_tasks.py models/Human-GEM_2022-06-21.xml Human1 publication/ws0/numerical-refresh VerifyModel` | refresh pending |
 | WS0 validation | `thg-run validate publication/ws0/validation-config-211-patched.json` | pending; potentially hours |
-| WS1 corrected build | `thg-run resume runs/thg-ws1-a --force-step deduplicate-and-clean -v` | running from source `ac56d01`; earlier attempts preserved |
+| WS1 corrected build | `thg-run resume runs/thg-ws1-a --force-step deduplicate-and-clean -v` | interrupted cleanly at stage 45/52; source `ac56d01`; see handoff before resuming |
 | WS1 fresh checkout | `thg-run reference publication/ws1/reference-a.json -v` | existing run resumes; full build not yet measured |
-| WS1 freeze evidence | `python publication/scripts/freeze_evidence.py runs/thg-ws1-a publication/ws1/reference-b.json publication/ws1/frozen` | pending fresh beta2 export; destination must be empty |
+| WS1 freeze evidence | `python publication/scripts/freeze_evidence.py runs/thg-ws1-a publication/ws1/reference-b.json publication/ws1/frozen --archived` | archived input dataset captured with `--archived`; runtime fingerprints explicitly uncertified |
 | WS1 independent replay | `thg-run reference publication/ws1/reference-b-frozen.json -v` | pending freezer output and stable candidate |
 | WS1 stage sizes/runtime | `python publication/scripts/stage_table.py runs/thg-ws1-a publication/ws1/current` | live checkpoint; pending/stale outputs omitted |
 | WS1 stage task gate | `python publication/scripts/run_tasks.py MODEL STAGE publication/ws1/numerical-refresh VerifyModel` | pending corrected artifacts |
 | WS1 corroboration | `THG_SOLVER=glpk python publication/scripts/run_tasks.py MODEL STAGE-glpk publication/ws1/numerical-refresh VerifyModel` | pending; separate solver retained in provenance |
-| WS2 fix inventory | `publication/ws2/fixes.csv` | two archived model measurements: `python publication/scripts/measure_correctness.py`; third example pending |
+| WS2 fix inventory | `publication/ws2/fixes.csv` | identity/parent checks, location-policy ablation and historical numerical artifact saved; see handoff |
 | WS2 tests | `python -m pytest -m "not online" --ignore=tests/docs -q` | 350.38 s; 2,513 passed; `ws2/pytest-offline.log`; six docs checks passed separately |
 | WS4 quality/coverage | matched baseline/candidate validation | pending candidate and VerifyModel gate; command not yet available |
 | WS5 functional tasks | same `run_tasks.py` command on candidate, with all three tables | blocked on candidate; VerifyModel failure/unresolved result skips later tables |
@@ -53,3 +57,9 @@ The native-thread-verified baseline is now saved in `ws0/pinned-refresh/`
 feasibility tolerance 1e-7. MEMOTE and matched final-model evaluation remain
 pending. The earlier thread limitation applies to `numerical-refresh/`, not
 this corrected result.
+
+Archived biological-service evidence is preserved in `ws1/frozen/` (74 MB),
+with source hashes and an explicit archival status. Fresh B/C configs exist;
+neither has started. Do not blindly resume acquisition run A after the runtime
+fingerprint fix: beta2 service collection would repeat. The handoff explains
+the required solver bootstrap and all unverified deliverables.

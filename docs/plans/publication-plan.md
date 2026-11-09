@@ -12,12 +12,17 @@ Read first: `docs/about/legacy-comparison.md`,
 
 ## Progress (updated 2026-11-09)
 
+**Shutdown checkpoint:** goal paused; build stopped cleanly at stage 45/52.
+Read [`publication/HANDOFF-2026-11-09.md`](../../publication/HANDOFF-2026-11-09.md)
+for current results, preserved inputs and exact restart instructions. No final
+gapfilled candidate or independent replay exists yet.
+
 | WS | State |
 |---|---|
-| WS0 | **Not done.** Harness validated (Human1 21/21). Human 2.1.1 leaks (task 21); patched model (`MAR20193` blocked) 21/21, Essential 57/57, Full 255/255 (2 invalid). Missing: MEMOTE/`final-standard` validation of the patched model, README final summary (Human1/legacy rows not needed for now, user 2026-11-09). Gene-essentiality dry run **skipped by user decision**. |
-| WS1 | **Started; fixes in, re-run pending.** Configs point at the patched model. Run `runs/thg-ws1-a` (2026-11-05, after `0e5584b`) failed `gate-beta2` ("added reactions include mass- or charge-unbalanced chemistry"). Both causes fixed 2026-11-09 (below); WS1 build must be re-run from `deduplicate-and-clean`. `thg-ws1-b` (determinism twin) not run. |
-| WS2 | Started: inventory only (`publication/ws2/fixes.csv`, `engineering.csv`); no real-data impact measured. |
-| WS3, WS4, WS5, WS7 | Not started; all wait on the WS1 model. WS3 legacy comparison deprioritised by user (2026-11-09). |
+| WS0 | **Partial.** Native-thread-verified patched baseline: VerifyModel 21/21, Essential 57/57, Full 255 passed / 257 total (2 invalid), 278.85 s. Basic statistics saved. MEMOTE/final-standard validation remains missing. Essentiality dropped; Human1/legacy benchmark rows deferred. |
+| WS1 | **Paused for shutdown.** Acquisition run A interrupted cleanly at stage 45/52 (`compute-gapfill-coverage`, attempt 2); completed artifacts retained through stage 44. Beta1 and beta2 exported (attempts 2/3). Beta1 VerifyModel 21/21 with Gurobi and GLPK. Same-run fingerprint bug fixed (`9174aea`); A used the old implementation. Archived evidence and fresh B/C frozen configs saved. Independent replay not started. |
+| WS2 | **Measured results saved.** 11 shared-ID conflicts; exclusions of 26 copies from 14 failed-balance parents; whole-baseline location-policy ablation (848 genes); archived failing beta1 optimum has bound violation 3.0276e-7 and is correctly unresolved. Other inventory entries retain evidence-strength labels. |
+| WS3, WS4, WS5, WS7 | WS3 deferred; WS4/WS5 await a gated candidate. WS7 Methods draft, status refresh and Figure 1 saved; remaining figures/results and evidence audit incomplete. |
 | WS6 | **Dropped** (essentiality benchmark skipped by user; DepMap not used). Fig 5 loses its essentiality panel. |
 
 **WS1 findings from `thg-ws1-a` (resolved 2026-11-09):**
@@ -42,9 +47,10 @@ Read first: `docs/about/legacy-comparison.md`,
    coefficients of 0.0001, itself unbalanced: C +16.2, charge −1). GLPK calls
    the same β1 LP infeasible, and Gurobi's verdict flips with how the LP is
    built. So the task-21 result on β1, dedup and β2 depended on solver
-   numerics. Follow-up (open): make the task harness report the max bound and
-   constraint violation of every "optimal" task solve and flag > 1e-7 as
-   numerically unreliable, so VerifyModel cannot pass or fail on slack.
+   numerics. Follow-up implemented: optimal task solves now report bound and constraint
+   violations and flag > 1e-7 as numerically unreliable. Archived beta1 task 21
+   reproduces a 3.0276e-7 bound violation and returns unresolved; see
+   `publication/ws2/historical-failure/`.
 3. **β2 copied unbalanced parents.** **Fix:** `generate_expansion_plan` no
    longer copies a reaction whose parent is mass- or charge-unbalanced
    (`reason: "unbalanced-parent"`); this removed 26 copies of 14 parents in
@@ -56,10 +62,62 @@ Read first: `docs/about/legacy-comparison.md`,
    (`MAR00031`, `MAR07160`, `MAR07625`) are R/X pool reactions and stay
    unbalanced and uncopied.
 
-**Next actions:** re-run WS1 (`thg-ws1-a` from `deduplicate-and-clean`, or a
-fresh run) → stage-wise VerifyModel with Gurobi and GLPK → `thg-ws1-b` for
-determinism. Then: charge curation of the 11 parents (β1), harness violation
-check, WS0 MEMOTE on the patched model.
+**Next actions after explicit resume:** follow the shutdown handoff. Diagnostics
+and pinned baseline tasks are done. Gate new beta2 attempt 3; corroborate the
+historical numerical example with GLPK; build fresh frozen B/C cohorts under
+the corrected runtime and verified solver defaults; then final gates, matched
+quality/coverage, replay, figures and manuscript audit. Charge curation of the
+11 inherited parents remains desirable, but is not a draft prerequisite while
+unbalanced parents are excluded. Respect the WS5 stop condition.
+
+
+## Draft target: November 9–12, 2026
+
+Scope agreed after review on November 9: a methods-led internal draft and
+traceable results within four days. Dates are targets, not runtime guarantees.
+This scope overrides the deferred workstream descriptions below.
+
+| Day | Priority | Deliverable |
+|---|---|---|
+| Nov 9 | Numerical diagnostics; freeze settings; restart corrected WS1; begin Methods | Reliable task verdicts, pinned inputs/config/code/solver settings, build status, Methods text |
+| Nov 10 | Finish build and stage/final gates; validate patched baseline and THG | Candidate model, stage table, comparable quality results, or documented blocker |
+| Nov 11 | Independent replay; three correctness examples; coverage analysis | Reproducibility comparison, source tables and three figures |
+| Nov 12 | Assemble manuscript and audit claims against evidence | Complete internal draft with evidence links and explicit unresolved results |
+
+**Numerical prerequisite:** record maximum bound and constraint violations for
+every optimal task solve, with solver status and tolerances. Flag violations
+above 1e-7 as numerically unreliable, not as a pass or a confirmed leak.
+Record infeasible and unresolved statuses separately; do not substitute zero
+residuals for an unavailable solution. Cross-solver agreement corroborates the
+result but does not replace these checks. Refresh affected baseline results
+under the same harness/settings used for THG.
+
+**Day-2 decision point:** if the final candidate is still blocked or fails its
+gates, continue a methods/validation draft using verified baseline and
+correctness results. Label final-model evaluation incomplete. Preserve the
+WS5 leak investigation stop condition; do not call an intermediate model final.
+Writing Methods and independent WS2 results can continue during that stop.
+
+Required for the model-results draft: one gated candidate, patched baseline,
+matched quality/task measurements, supported coverage analysis, independent
+replay, and three measured correctness examples. Candidate examples are
+consolidation safeguards, numerical task reliability, and exclusion of
+unbalanced parents. Distinguish inherited defects from redesign-introduced
+bugs, and numerical artifacts from biochemical leaks. Every count needs a
+saved result and regeneration command; existing narrative counts are leads.
+
+The baseline already passes all valid Essential/Full tasks. Use those tasks
+to test preservation of function, not improved pass rates. Assess added
+coverage through evidence source, balance, connectivity and flux capability
+under stated conditions; reaction counts alone do not establish biological
+improvement. Report Full as 255 pass / 257 total, with 2 invalid, until rerun.
+
+Defer WS3 legacy attribution, additional reference-model benchmarks, broad
+ablations, exhaustive full-model audit-fix measurements and public release.
+WS6 remains dropped. Keep all other fixes in a supplement labelled by evidence
+strength. Run memory-heavy validation jobs sequentially. Record missing or
+unfinished metrics honestly; do not silently relax scientific gates to meet
+the date. Venue selection and release publication do not block an internal draft.
 
 Results so far: `publication/ws0/` (task results, `verifymodel_leaks.md`), `publication/ws1/` (stage VerifyModel, dedup bisect, run configs), `publication/benchmark_settings.json`.
 Machine memory was exhausted on 2026-11-04; check `free -m` before MEMOTE runs (2026-11-09: ~11 GB available).
@@ -71,15 +129,15 @@ optlang/Gurobi for model-scale LPs. mkdocs and ruff live only in the base env.
 
 ## 1. Framing of the paper
 
-**Main claim (software/methods):** THG has been re-implemented as a
-reproducible, tested and resumable protocol. Porting it exposed and fixed
-scientific errors in the legacy pipeline, and the redesigned protocol produces
-a model that is at least as consistent as Human-GEM while extending its
-coverage.
+**Main framing (software/methods):** a redesigned, reproducible and resumable
+THG protocol, with measured examples of how scientific safeguards affect
+model construction and validation. Claim testing and reproducibility only to
+the extent supported by recorded checks and the independent replay.
 
-**Supporting claim (resource):** the resulting THG model is compared with
-Human1 and Human2 on structural, quality and functional benchmarks, with every
-model run through the same pipeline.
+**Resource evaluation:** compare current THG with Human-GEM 2.1.1 with
+`MAR20193` blocked under matched conditions. Whether THG preserves consistency
+and extends useful coverage is a question to test, not a promised conclusion.
+Keep unpatched 2.1.1 as context for the baseline intervention.
 
 Wording rule: the paper describes a **redesigned and re-implemented
 protocol**. It does not claim to reproduce the 2023 artifact
@@ -95,33 +153,34 @@ strong.
 
 | Section | Content | Evidence from |
 |---|---|---|
-| Abstract | Claim, key numbers (bugs fixed, model size, task pass rates, essentiality AUC) | all WS |
-| 1. Introduction | Human GEMs (Recon3D, Human1, Human2), 2023 THG protocol, reproducibility problem in GEM curation | literature |
-| 2. Methods / Implementation | Package architecture, stage DAG, resumable runs and provenance, gates, service clients, merge, `sink-milp` gapfill, validation profiles, task evaluation, benchmark protocol | WS1, WS7 |
-| 3.1 Results: re-implementation | Correctness fixes with quantified impact; engineering metrics | WS2 |
-| 3.2 Results: legacy vs. current THG | Model-level diff, attribution of differences to reference-model change vs. code changes | WS3 |
-| 3.3 Results: THG vs. Human1/Human2, structure and quality | Size, overlap, compartments, dead-ends, blocked reactions, balance, consistency, EGCs, MEMOTE | WS4 |
-| 3.4 Results: function | Metabolic tasks (VerifyModel, Essential, Full), gene essentiality in cell-specific models | WS5, WS6 |
-| 4. Discussion | What the redesign changes scientifically, limitations, future work | all WS |
-| Data and code availability | Tagged release, Zenodo DOI, pinned configs, run manifests | WS7 |
-| Supplementary | Full tables, per-fix before/after, per-task results, run manifests | all WS |
+| Abstract | Methods contribution and verified quantitative findings | WS1, WS2, WS4, WS5 |
+| 1. Introduction | Human GEM curation and reproducibility problem | literature; citations still pending |
+| 2. Methods / Implementation | Workflow, provenance, scientific gates, numerical diagnostics, benchmark settings | WS0, WS1, WS7 |
+| 3.1 Results: correctness | Three measured examples, with origin of defects stated | WS2 |
+| 3.2 Results: model evaluation | Patched baseline vs. THG quality, supported coverage and preservation of task performance | WS4, WS5 |
+| 3.3 Results: reproducibility | Independent replay and stage sizes/runtime | WS1 |
+| 4. Discussion | Supported conclusions, numerical limits, missing validation and future work | all active WS |
+| Data and code availability | Local artifacts and regeneration commands; public release pending | WS7 |
+| Supplementary | Full fix inventory with evidence strength, per-task results, manifests and validation detail | active WS |
 
-### Planned figures and tables
+### Planned figures and tables for the first draft
 
 | ID | Content | Produced by |
 |---|---|---|
-| Fig 1 | Protocol overview: stage DAG β1 → β2 → Human Database → merge → gapfill → validation → export, with gates and provenance | WS1 |
-| Fig 2 | Impact of the correctness fixes (before vs. after per fix) | WS2 |
-| Fig 3 | Legacy THG vs. current THG: reaction/metabolite/gene overlap (UpSet or Venn) and attribution waterfall | WS3 |
-| Fig 4 | THG vs. Human1 vs. Human2: structure and quality panel (size, compartments, dead-ends, blocked, balance, EGCs, MEMOTE) | WS4 |
-| Fig 5 | Function: task pass rates and gene-essentiality ROC/PR curves | WS5, WS6 |
-| Table 1 | Legacy vs. standalone engineering comparison (short) | WS2 |
-| Table 2 | Model statistics for all compared models | WS3, WS4 |
-| Table S* | Per-fix evidence, per-task results, per-cell-line essentiality, MEMOTE detail | all WS |
+| Fig 1 | Protocol stages, gates and provenance | WS1 |
+| Fig 2 | Three correctness examples with measured effects | WS2 |
+| Fig 3 | Patched baseline vs. THG quality and supported coverage; task preservation | WS4, WS5 |
+| Table 1 | Model statistics and benchmark outcomes, including invalid/unresolved counts | WS0, WS4, WS5 |
+| Table S* | Fix inventory, per-task results, stage/replay evidence and validation details | active WS |
+
+Legacy-overlap figures and essentiality panels are not draft deliverables.
 
 ## 3. Models in scope
 
-Pin every model by path and SHA-256 in `publication/models.json` (WS1).
+Pin every model actually used by path and SHA-256 in `publication/models.json`
+(WS1). The table below is the broader inventory, not a requirement to benchmark
+every row for this draft. Required comparison: patched 2.1.1 and current THG;
+retain unpatched 2.1.1 and Human1 control provenance where used.
 
 | Label | File | Role |
 |---|---|---|
@@ -202,7 +261,7 @@ Figures are generated by scripts in `publication/scripts/`, never by hand.
 Goal: run the full benchmark harness on Human2 before any THG model is
 involved. Human2 is the input to the current pipeline and the main comparison
 model. Its results show the harness works, and they become the reference values
-for WS4, WS5 and WS6.
+for WS4 and WS5.
 
 1. **Identify Human2.** *Done: Human-GEM 2.1.1 (user), patched; see section 3. `Human2.xml` is believed to be 2.0, unverified.* Record the exact version, source (repository, tag or
    commit, download date) and SHA-256 of `inputs/models/Human2.xml`, and how it
@@ -238,23 +297,19 @@ for WS4, WS5 and WS6.
 5. **Essential and Full tasks.** Run them on Human2 with the same settings. Record
    each task's result. Note any task whose metabolites or reactions are not
    mapped to Human2 IDs ("invalid"), and why.
-6. **Gene-essentiality dry run.** *SKIPPED by user decision (2026-11-05); WS6 dropped.* Do the WS6 pipeline end to end on Human2 for
-   one cell line: data download (pin the DepMap release), cell-specific model
-   extraction with the package's GIMME, knockouts, scoring. This checks the method and the runtime before
-   the THG models exist. Compare with Human1's published essentiality numbers
-   where they are comparable, and explain any large gap.
+6. **Gene-essentiality dry run: dropped.** No DepMap work is required.
 7. **Fix the settings.** Write `publication/benchmark_settings.json` with the
    solver, tolerances, medium, bounds, task tables (and commit), mapping file,
-   DepMap release and thresholds. Every later workstream uses exactly these
+   explicit numerical tolerances and residual reliability threshold. Every later workstream uses exactly these
    settings for every model.
 
 Output: `publication/ws0/` with `model_stats.csv` (one row, same columns as
 WS4), the validation report and MEMOTE output, `task_results.csv` (same format
-as WS5), the essentiality dry-run results, and a `README.md` with commands,
+as WS5), and a `README.md` with commands,
 commit and runtime. Plus `publication/benchmark_settings.json`.
 Done when: Human2 has 21 of 21 VerifyModel tasks infeasible, all metrics above
-are recorded, and the essentiality dry run completes for one cell line. Report
-the summary to the user before starting WS1.
+are recorded or explicitly marked missing. Report the summary. Pending MEMOTE
+does not prevent the corrected WS1 build; reliable task evaluation is required.
 
 ### WS1: Frozen, reproducible build of the current THG model
 
@@ -308,10 +363,11 @@ Goal: quantify each scientific bug fixed during the port.
 
 Output: `publication/ws2/fixes.csv` (fix id, description, metric, legacy value,
 standalone value, affected entities, evidence path), `publication/ws2/engineering.csv`.
-Done when: each fix has a numeric impact measured on a full model or is
-explicitly marked "fixture only" with a reason.
+Draft done when: three selected examples have measured real-model impact and
+regeneration commands. All remaining fixes are labelled measured, sampled,
+fixture-only or pending, with reasons; exhaustive measurement is deferred.
 
-### WS3: Legacy THG vs. current THG
+### WS3: Legacy THG vs. current THG (deferred beyond first draft)
 
 Goal: explain how and why the current model differs from the published one.
 
@@ -362,7 +418,8 @@ Goal: a fair, same-pipeline comparison. Reuse the Human2 row from WS0 if the
 code commit and `benchmark_settings.json` are unchanged; otherwise rerun it.
 
 Run `thg-run validate` with the same profile (`final-standard`) and
-`run_memote: true` on every model in section 3. `runs/human2-validation` is a
+`run_memote: true` on the patched baseline and current THG. Other section-3
+models are deferred. `runs/human2-validation` is a
 starting point but ran without MEMOTE.
 
 Collect per model:
@@ -429,7 +486,7 @@ Goal: show what the models can do, not only how they look.
 
    > **STOP CONDITION.** If the newly generated THG model has **any**
    > VerifyModel task feasible, stop all of WS5 and every workstream that
-   > depends on the final model (WS3, WS4, WS6, figures, WS7). Do not attempt
+   > depends on the final model (WS4, model-dependent figures and WS7 exports). Do not attempt
    > to fix the leak, do not edit the model or pipeline to remove it, and do
    > not report Essential/Full results. Instead:
    >
@@ -448,8 +505,8 @@ Goal: show what the models can do, not only how they look.
    >
    > WS2 can continue during the stop, since it does not depend on the model.
 
-3. Only after 21 of 21 VerifyModel tasks are infeasible: run Essential and Full
-   (CellfieConsensus optional) on Human1, Human2, THG-2023 and current THG,
+3. Only after 21 of 21 VerifyModel tasks are reliably infeasible: run Essential
+   and Full on the patched Human-GEM 2.1.1 baseline and current THG,
    with the same medium, bounds and solver. Also run VerifyModel on the other
    models and report it. A comparison model that fails it (THG-2023 may) is
    reported as is, with its Essential/Full passes marked as upper bounds; this
@@ -463,26 +520,10 @@ Done when: current THG has 21 of 21 VerifyModel tasks infeasible and every
 discordant task has a stated cause. If the stop condition fired, WS5 is not done
 until the user has investigated and given the go-ahead.
 
-### WS6: Gene essentiality in cell-specific models
+### WS6: Gene essentiality (dropped)
 
-Goal: an external, biological benchmark.
-
-1. Pick 3–5 cell lines that have both expression data (CCLE/DepMap RNA-seq) and
-   CRISPR essentiality (DepMap Chronos). Prefer lines used in Human1's
-   benchmark so results can be compared.
-2. Build cell-specific models from Human2 and from current THG with the
-   package's own GIMME implementation (`src/thg_protocol/cell_specific/gimme.py`,
-   `thg-run` `cell_specific` workflow), with the same thresholds for every
-   model. Do not port or use other extraction methods. Map THG and Human2
-   gene IDs to DepMap gene identifiers and report coverage per model.
-3. Predict single-gene knockouts (growth below a set fraction of wild type) and
-   score against DepMap: ROC-AUC, PR-AUC, MCC, at a stated Chronos threshold.
-4. Bootstrap or permutation test the difference between THG and Human2.
-
-Output: `publication/ws6/` with per-cell-line predictions, metrics and data
-versions (DepMap release).
-Done when: metrics exist for every model × cell line, with confidence
-intervals. Report the result honestly even if THG does not win.
+Skipped by user decision. No cell-line extraction, DepMap download or
+essentiality figures are required.
 
 ### WS7: Release and reproducibility package
 
@@ -503,28 +544,19 @@ number in `publication/`.
 
 ## 5. Order and dependencies
 
-```
-WS0 (Human2 baseline) ──> WS1 ──> WS5a: VerifyModel gate on new THG
-                                     │  (any task feasible → STOP, hand to user)
-                                     ▼
-                       ┌─────────────┼──────────────┬─────────────┐
-                       ▼             ▼              ▼             ▼
-                      WS4      WS5b: Essential/    WS6          WS3
-                               Full, all models                  │
-                       └─────────────┴──────────────┴─────────────┘
-                                     ▼
-                              figures/tables ──> WS7
+Numerical task diagnostics → pinned settings → corrected WS1 build → stage
+and final VerifyModel gates → WS4 quality/coverage and WS5 functional tasks →
+figures and Results. Run the independent replay once the candidate is stable.
+Complete WS0 baseline validation with the same settings, scheduling heavy jobs
+sequentially. WS2 and manuscript Introduction/Methods can proceed independently.
 
-WS2 (independent, can start immediately; continues during a stop)
-WS3 steps 2 and 5 (Human1/DB-2023 attribution run, merge comparison) do not
-use the new THG model and can run before or during a stop.
-```
+If the THG gate fails, follow the WS5 stop condition for model-dependent work.
+Numerically unreliable results remain unresolved until investigated. Continue
+independent writing and correctness evidence, applying the Day-2 fallback.
 
-Suggested sequence: **WS0 first**, and report its results to the user → WS2 and
-WS1 in parallel (plus the WS3 attribution run) → WS5a VerifyModel gate on the
-new model (**stop and hand over to the user if any task is feasible**) → WS4 →
-WS5b → WS3 (remaining steps) → WS6 → figures → WS7. The model is not frozen for
-the paper until it passes the gate, because the user's fix may change it.
+WS7 draft scope is local provenance, commands and artifact completeness. Hosted
+release CI, tagging and archiving are later release requirements; publishing
+still requires the user's approval. WS3 is deferred and WS6 is dropped.
 
 ## 6. Decisions the user must make
 
@@ -535,7 +567,7 @@ Ask; do not decide alone.
 3. **Leak fixes:** if the new THG model fails VerifyModel, the user
    investigates and decides the fix. The agent stops and does not choose (see
    the WS5 stop condition).
-4. **Venue:** deferred; no manuscript text is written yet.
+4. **Venue:** deferred; does not block the internal draft.
 5. **Dedup isomer leak:** *decided 2026-11-09: merge only if all database IDs
    agree* (WS1 finding 1).
 6. **Unbalanced-parent expansion:** *decided 2026-11-09: never copy an
