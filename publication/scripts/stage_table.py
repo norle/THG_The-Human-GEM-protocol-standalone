@@ -109,7 +109,7 @@ def export(run, out):
         )
     out.mkdir(parents=True, exist_ok=True)
     with (out / "stage_table.csv").open("w", newline="") as stream:
-        writer = csv.DictWriter(stream, fieldnames=rows[0])
+        writer = csv.DictWriter(stream, fieldnames=rows[0], lineterminator="\n")
         writer.writeheader()
         writer.writerows(rows)
     (out / "run_manifest.json").write_bytes(manifest_bytes)
