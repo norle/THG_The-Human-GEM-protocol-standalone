@@ -1,10 +1,14 @@
 {
-  "status": "draft: essentiality benchmark skipped by user decision (2026-11-04)",
-  "code_commit": "968c2a858e2a5216ce8252244133a54308bf115f",
+  "status": "Task numerical settings pinned 2026-11-09; prior results require refresh",
   "solver": {
     "name": "gurobi",
     "interface": "cobrapy/optlang",
-    "threads": 2
+    "threads": 2,
+    "tolerances": {
+      "feasibility": 1e-07,
+      "optimality": 1e-07,
+      "integrality": 1e-07
+    }
   },
   "validation": {
     "profile": "final-standard",
@@ -23,7 +27,9 @@
     "mapping_sha256": "f12d0918055f69b284236d1b462119d154cb9ed4eb8a19f9bb481d5f0737b137",
     "medium": "closed",
     "forced_flux_relaxation": "non-boundary reactions with LB>0 set LB=0 and UB<0 set UB=0",
-    "script": "publication/scripts/run_tasks.py"
+    "script": "publication/scripts/run_tasks.py",
+    "residual_reliability_threshold": 1e-07,
+    "numerical_policy": "Every optimal solve requires finite primal bound and constraint residuals <= 1e-7; otherwise unresolved (error), never a biological outcome. Infeasible residuals are null."
   },
   "depmap": {
     "skipped": true,
@@ -46,5 +52,6 @@
     "patch": "MAR20193 bounds set to [0,0] (publication/scripts/patch_human211.py)",
     "reason": "VerifyModel task 21 feasible on unpatched 2.1.1",
     "decided_by": "user, 2026-11-04"
-  }
+  },
+  "initial_settings_code_commit": "968c2a858e2a5216ce8252244133a54308bf115f"
 }

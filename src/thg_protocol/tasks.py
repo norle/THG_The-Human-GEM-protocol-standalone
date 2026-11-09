@@ -31,6 +31,10 @@ Task contract (``TASK_SCHEMA_VERSION``), following RAVEN task semantics:
 * ``expected`` is ``False`` for tasks that should fail. Only a biological
   failure (infeasible, or optimal but short of the threshold) satisfies it;
   invalid definitions and solver/infrastructure errors never pass.
+* An optimal solution requires finite primal bound and constraint violations
+  no greater than ``RESIDUAL_RELIABILITY_THRESHOLD``. Unreliable or unavailable
+  residuals produce an error with no biological outcome. Infeasible solves
+  retain null residuals; solver tolerances are recorded in the diagnostics.
 * ``metadata`` is an optional JSON object preserved verbatim. Imported legacy
   rows are stored as ordered ``source_rows`` entries of ``file``, ``row``, and
   ``columns`` (ordered ``[name, value]`` pairs, missing cells as ``null``).
@@ -49,6 +53,7 @@ from typing import Any
 TASK_SCHEMA_VERSION = 2
 REPORT_SCHEMA_VERSION = 2
 OBJECTIVE_TOLERANCE = 1e-6
+RESIDUAL_RELIABILITY_THRESHOLD = 1e-7
 MEDIUM_MODES = ("closed", "model")
 OBJECTIVE_DIRECTIONS = ("max", "min")
 SOURCE_PREFIX = "TASK_IN_"
@@ -589,6 +594,47 @@ def _result(task: MetabolicTask, **values: object) -> dict[str, object]:
     return result
 
 
+def _solve_diagnostics(solver: Any, status: str) -> dict[str, object]:
+    """Check unscaled primal residuals before the task context is restored."""
+    tolerances = solver.configuration.tolerances
+    result = {
+        "solver_tolerances": {
+            name: getattr(tolerances, name) for name in dir(tolerances)
+        },
+        "residual_reliability_threshold": RESIDUAL_RELIABILITY_THRESHOLD,
+        "max_bound_violation": None,
+        "max_constraint_violation": None,
+        "numerical_reliability": "unavailable",
+    }
+    if status != "optimal":
+        return result
+    try:
+        for key, items in (
+            ("max_bound_violation", solver.variables),
+            ("max_constraint_violation", solver.constraints),
+        ):
+            maximum = 0.0
+            for item in items:
+                primal = item.primal
+                if primal is None or not math.isfinite(primal):
+                    raise ValueError(f"unavailable primal for {item.name}")
+                maximum = max(
+                    maximum,
+                    0.0 if item.lb is None else item.lb - primal,
+                    0.0 if item.ub is None else primal - item.ub,
+                )
+            result[key] = maximum
+        result["numerical_reliability"] = (
+            "reliable"
+            if max(result["max_bound_violation"], result["max_constraint_violation"])
+            <= RESIDUAL_RELIABILITY_THRESHOLD
+            else "unreliable"
+        )
+    except Exception as error:
+        result["residual_error"] = str(error)
+    return result
+
+
 def _evaluate(working: Any, task: MetabolicTask) -> dict[str, object]:
     """Evaluate one task inside a model context so every change is reverted."""
     problems = _definition_problems(working, task)
@@ -640,6 +686,7 @@ def _evaluate(working: Any, task: MetabolicTask) -> dict[str, object]:
             working.objective_direction = task.objective.direction
         working.solver.optimize()
         solver_status = str(working.solver.status)
+        diagnostics = _solve_diagnostics(working.solver, solver_status)
         value = (
             float(working.solver.objective.value)
             if solver_status == "optimal" and task.objective is not None
@@ -650,11 +697,18 @@ def _evaluate(working: Any, task: MetabolicTask) -> dict[str, object]:
     if task.objective is None:
         # A zero objective cannot be unbounded, so this status is infeasible.
         infeasible.add("infeasible_or_unbounded")
-    diagnostics = {}
     if task.objective is not None:
         diagnostics["objective"] = task.objective.to_dict()
         diagnostics["tolerance"] = OBJECTIVE_TOLERANCE
     if solver_status == "optimal":
+        if diagnostics["numerical_reliability"] != "reliable":
+            return _result(
+                task,
+                status="error",
+                solver_status=solver_status,
+                objective_value=value,
+                diagnostics=diagnostics,
+            )
         success = value is None or task.objective.satisfied_by(value)  # type: ignore[union-attr]
         actual = "success" if success else "failure"
     elif solver_status in infeasible:
@@ -751,6 +805,7 @@ def run_task_suite(model: Any, suite: TaskSuite) -> dict[str, object]:
 
 __all__ = [
     "OBJECTIVE_TOLERANCE",
+    "RESIDUAL_RELIABILITY_THRESHOLD",
     "TASK_SCHEMA_VERSION",
     "MetabolicTask",
     "TaskObjective",

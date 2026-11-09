@@ -416,3 +416,53 @@ def test_metadata_round_trips_through_json(tmp_path):
     assert loaded == suite
     assert loaded.tasks[0].metadata == metadata
     assert json.loads(path.read_text(encoding="utf-8")) == suite.to_dict()
+
+
+def test_optimal_residual_diagnostics_and_infeasible_nulls():
+    report = run_task(
+        network(), task(inputs={"a_c": [0, 10]}, outputs={"b_c": [1, 10]})
+    )
+    diagnostics = report["diagnostics"]
+    assert diagnostics["numerical_reliability"] == "reliable"
+    assert diagnostics["max_bound_violation"] <= 1e-7
+    assert diagnostics["max_constraint_violation"] <= 1e-7
+    assert "feasibility" in diagnostics["solver_tolerances"]
+    report = run_task(network(), task(outputs={"b_c": [1, 10]}, expected=False))
+    assert report["solver_status"] == "infeasible"
+    assert report["diagnostics"]["max_bound_violation"] is None
+    assert report["diagnostics"]["max_constraint_violation"] is None
+
+
+@pytest.mark.parametrize("expected", [True, False])
+@pytest.mark.parametrize("violation", ["bound", "constraint", "unavailable"])
+def test_unreliable_optimum_never_becomes_a_biological_outcome(
+    monkeypatch, expected, violation
+):
+    from thg_protocol import tasks
+
+    original = tasks._solve_diagnostics
+
+    def diagnostics(solver, status):
+        from types import SimpleNamespace
+
+        item = SimpleNamespace(name="violating", lb=0, ub=1, primal=1 + 3e-7)
+        if violation == "unavailable":
+            item.primal = None
+        return original(
+            SimpleNamespace(
+                configuration=solver.configuration,
+                variables=[item] if violation != "constraint" else [],
+                constraints=[item] if violation == "constraint" else [],
+            ),
+            status,
+        )
+
+    monkeypatch.setattr(tasks, "_solve_diagnostics", diagnostics)
+    report = run_task(network(), task(expected=expected))
+    assert report["solver_status"] == "optimal"
+    assert report["status"] == "error"
+    assert report["actual_outcome"] is None
+    assert report["passed"] is False
+    assert report["diagnostics"]["numerical_reliability"] == (
+        "unavailable" if violation == "unavailable" else "unreliable"
+    )

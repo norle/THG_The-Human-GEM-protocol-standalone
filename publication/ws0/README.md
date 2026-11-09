@@ -39,3 +39,30 @@ python publication/scripts/verifymodel_leak.py MODEL REF TASK OUT.json
 python publication/scripts/patch_human211.py IN.xml OUT.xml
 thg-run validate publication/ws0/validation-config-211.json
 ```
+
+## Numerical refresh (2026-11-09)
+
+Command (318.39 s):
+```sh
+python publication/scripts/run_tasks.py runs/human211-patched/Human_211_patched.xml human211-patched publication/ws0/numerical-refresh
+```
+
+Evidence: `numerical-refresh/task_results_human211-patched.json` and `.csv`.
+Gurobi; feasibility/optimality/integrality 1e-7, two threads; closed medium,
+stored name mapping; no forced bounds needed relaxation. The JSON records
+commit `eac7144` and the working-diff checksum (numerical diagnostics were
+uncommitted during this run). Later script changes add input-checksum checking;
+the exact run script checksum is retained in the JSON.
+
+- VerifyModel: 21 passed; all solver statuses infeasible. Residuals are null.
+- Essential: 57 passed; maximum optimal-solve violation 1.03e-8.
+- Full: 255 passed / 257 total, 2 invalid, no errors or failed tasks; maximum
+  optimal-solve violation 1.14e-13.
+- Invalid Full tasks: 180 (row 320 OUT, cytosol) and 239 (row 437 IN,
+  extracellular). `10,13,16-docosatriynoic acid` does not map to the model's
+  annotated docosatrienoic-acid species. Candidate names are retained in JSON;
+  no biochemical identity substitution was made.
+
+These results supersede the patched-model task row for numerical reliability.
+Positive-control refresh and matched MEMOTE/quality validation remain pending.
+Historical counts elsewhere in this README have not been refreshed.

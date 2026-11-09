@@ -4,3 +4,4 @@ test_lines_python,14266,find tests -name '*.py' | xargs cat | wc -l,"2026-11-04,
 tests_passed_audit_run,2495,"python -m pytest -q (reviews/2026-11-03-function-audit/pytest-fixed.log, 81 s)",2026-11-03; not rerun with -m 'not online' yet
 ci_python_versions,"3.10, 3.11, 3.12",.github/workflows/ci.yml matrix,hosted CI run on release commit pending (WS7)
 legacy_comparison,pending,needs adjacent legacy checkout line/test counts,pending
+tests_passed_publication_offline,2513,"publication/ws2/pytest-offline.log; python -m pytest -m ""not online"" --ignore=tests/docs -q","2026-11-09; GLPK default, Gurobi-specific tests licensed; 350.38 s; numerical prerequisite working tree; later focused task tests: 69 passed"
