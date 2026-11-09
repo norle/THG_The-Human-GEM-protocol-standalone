@@ -72,3 +72,19 @@ after each solve in `task_numerics.json`; input/script/runner checksums and
 solver diagnostics are retained. A reliable feasible result on the current
 beta1 sets an investigation flag and stops the experiment. No biochemical
 model modification is performed.
+
+Cold construction probe: `task_numerics_cold.json` and
+`task-numerics-cold.log` record six infeasible task-21 solves (both models;
+Gurobi direct/copy and GLPK copy), with no current-model investigation flag.
+The historical numerical artifact was not reproduced in those cold trials.
+The artifact records the exact script commit/hash. This negative result does
+not establish absence of numerical instability during sequential tasks.
+
+Protocol 2 extends the same command to cold versus sequential VerifyModel
+evaluation and a labelled control reenacting the previous publication runner's
+unsupported thread attribute under native default zero. That control is not a
+pinned benchmark condition. Full sequential task reports are retained; the
+corrected beta1 runs under native two-thread Gurobi and GLPK can also serve as
+stage-gate evidence. The protocol has 12 planned experiments and stops early
+if any current-beta1 task has a reliable feasible outcome. The task/core-source
+hashes, input hashes and model-restoration assertions remain part of the record.

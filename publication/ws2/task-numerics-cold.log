@@ -1,0 +1,18 @@
+Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2780343
+Academic license 2780343 - for non-commercial use only - registered to ig___@biosustain.dtu.dk
+Set parameter Threads to value 2
+current-beta1 gurobi direct passed {'solver_interface': 'optlang.gurobi_interface', 'solver_threads': 2, 'solver_tolerances': {'feasibility': 1e-07, 'integrality': 1e-07, 'optimality': 1e-07}, 'residual_reliability_threshold': 1e-07, 'max_bound_violation': None, 'max_constraint_violation': None, 'numerical_reliability': 'unavailable'}
+Read LP format model from file /tmp/tmpt8wq39cx.lp
+Reading time = 0.04 seconds
+: 8374 rows, 25496 columns, 108650 nonzeros
+current-beta1 gurobi LP-copy passed {'solver_interface': 'optlang.gurobi_interface', 'solver_threads': 2, 'solver_tolerances': {'feasibility': 1e-07, 'integrality': 1e-07, 'optimality': 1e-07}, 'residual_reliability_threshold': 1e-07, 'max_bound_violation': None, 'max_constraint_violation': None, 'numerical_reliability': 'unavailable'}
+current-beta1 glpk LP-copy passed {'solver_interface': 'optlang.glpk_interface', 'solver_threads': None, 'solver_tolerances': {'feasibility': 1e-07, 'integrality': 1e-05}, 'residual_reliability_threshold': 1e-07, 'max_bound_violation': None, 'max_constraint_violation': None, 'numerical_reliability': 'unavailable'}
+archived-beta2 gurobi direct passed {'solver_interface': 'optlang.gurobi_interface', 'solver_threads': 2, 'solver_tolerances': {'feasibility': 1e-07, 'integrality': 1e-07, 'optimality': 1e-07}, 'residual_reliability_threshold': 1e-07, 'max_bound_violation': None, 'max_constraint_violation': None, 'numerical_reliability': 'unavailable'}
+Read LP format model from file /tmp/tmpif1by6n_.lp
+Reading time = 0.04 seconds
+: 12916 rows, 29768 columns, 132434 nonzeros
+archived-beta2 gurobi LP-copy passed {'solver_interface': 'optlang.gurobi_interface', 'solver_threads': 2, 'solver_tolerances': {'feasibility': 1e-07, 'integrality': 1e-07, 'optimality': 1e-07}, 'residual_reliability_threshold': 1e-07, 'max_bound_violation': None, 'max_constraint_violation': None, 'numerical_reliability': 'unavailable'}
+archived-beta2 glpk LP-copy passed {'solver_interface': 'optlang.glpk_interface', 'solver_threads': None, 'solver_tolerances': {'feasibility': 1e-07, 'integrality': 1e-05}, 'residual_reliability_threshold': 1e-07, 'max_bound_violation': None, 'max_constraint_violation': None, 'numerical_reliability': 'unavailable'}
+Warning: environment still referenced so free is deferred (Continue to use WLS)

@@ -1,0 +1,272 @@
+{
+  "command": "python publication/scripts/measure_task_numerics.py",
+  "code_commit": "f8b0914845b8fb0515066b76522e91ba0c12db09",
+  "script_sha256": "abb0d6589516580b56512b0d1347ebf6e193ee3adbff429c3309431aea49e4d7",
+  "task_runner_sha256": "cf943c510a341712df57670c714c0d9174761077cc317f5c9b1d1b3a1ecc49ab",
+  "settings": {
+    "status": "Task settings pinned; patched-baseline native threads and tolerances verified 2026-11-09",
+    "solver": {
+      "name": "gurobi",
+      "interface": "cobrapy/optlang",
+      "threads": 2,
+      "tolerances": {
+        "feasibility": 1e-07,
+        "optimality": 1e-07,
+        "integrality": 1e-07
+      }
+    },
+    "validation": {
+      "profile": "final-standard",
+      "run_memote": true,
+      "run_solver": true
+    },
+    "tasks": {
+      "tables_dir": "files/metabolic_tasks",
+      "source": "Human-GEM develop 2f1d3e33ce591b357accc08d85aebc27bdcf4244",
+      "sha256": {
+        "metabolicTasks_Essential.txt": "d0c58503fc44d1eb49ea1b89f4cc90930a06bcd2c3972083c0986cfb126a0f18",
+        "metabolicTasks_Full.txt": "75f338da2635bf8cd0f77d319f4880abb2a3fbbacc2217806940b79424108ad9",
+        "metabolicTasks_VerifyModel.txt": "17409a25af172813647370557814879446feaed0236e4595a25180abe0e9faed"
+      },
+      "mapping": "files/metabolic_tasks/human_gem_names.json",
+      "mapping_sha256": "f12d0918055f69b284236d1b462119d154cb9ed4eb8a19f9bb481d5f0737b137",
+      "medium": "closed",
+      "forced_flux_relaxation": "non-boundary reactions with LB>0 set LB=0 and UB<0 set UB=0",
+      "script": "publication/scripts/run_tasks.py",
+      "residual_reliability_threshold": 1e-07,
+      "numerical_policy": "Every optimal solve requires finite primal bound and constraint residuals <= 1e-7; otherwise unresolved (error), never a biological outcome. Infeasible residuals are null."
+    },
+    "depmap": {
+      "skipped": true,
+      "reason": "user decision; WS0 step 6 and WS6 not performed"
+    },
+    "human2_identity": {
+      "inputs/models/Human2.xml": {
+        "sha256": "cc5a4383c6116b0c91f4db089cc640f29aec7e840249b573b74d3792c9ca4a7a",
+        "version": "believed to be Human-GEM 2.0 (user, unverified)"
+      },
+      "inputs/models/Human_211.xml": {
+        "sha256": "dc0efd8009a8b680bde7040440f2e3592027dd118833445092ebd8d7bc425ddf",
+        "version": "Human-GEM 2.1.1 (user)"
+      }
+    },
+    "benchmark_human2": {
+      "path": "runs/human211-patched/Human_211_patched.xml",
+      "sha256": "04cb9de9e9ea3236c2ba06487847348ec2b7d5576d2e1c33e2f1ef9c58ab3f38",
+      "base": "inputs/models/Human_211.xml (Human-GEM 2.1.1)",
+      "patch": "MAR20193 bounds set to [0,0] (publication/scripts/patch_human211.py)",
+      "reason": "VerifyModel task 21 feasible on unpatched 2.1.1",
+      "decided_by": "user, 2026-11-04"
+    },
+    "initial_settings_code_commit": "968c2a858e2a5216ce8252244133a54308bf115f"
+  },
+  "cases": [
+    {
+      "model": "current-beta1",
+      "path": "runs/thg-ws1-a/artifacts/export-beta1/attempt-0002/thg-beta1-candidate.json",
+      "sha256": "50f9e3aeb332b8187ee0707c06d4651acfe29f51180e083a8a8ccac968b02cb6",
+      "solver": "gurobi",
+      "construction": "direct",
+      "result": {
+        "id": "21",
+        "version": "1",
+        "group": "core",
+        "kind": "feasibility",
+        "identity": null,
+        "solver": null,
+        "expected_outcome": "failure",
+        "actual_outcome": "failure",
+        "solver_status": "infeasible",
+        "objective_value": null,
+        "diagnostics": {
+          "solver_interface": "optlang.gurobi_interface",
+          "solver_threads": 2,
+          "solver_tolerances": {
+            "feasibility": 1e-07,
+            "integrality": 1e-07,
+            "optimality": 1e-07
+          },
+          "residual_reliability_threshold": 1e-07,
+          "max_bound_violation": null,
+          "max_constraint_violation": null,
+          "numerical_reliability": "unavailable"
+        },
+        "status": "passed",
+        "passed": true
+      }
+    },
+    {
+      "model": "current-beta1",
+      "path": "runs/thg-ws1-a/artifacts/export-beta1/attempt-0002/thg-beta1-candidate.json",
+      "sha256": "50f9e3aeb332b8187ee0707c06d4651acfe29f51180e083a8a8ccac968b02cb6",
+      "solver": "gurobi",
+      "construction": "LP-copy",
+      "result": {
+        "id": "21",
+        "version": "1",
+        "group": "core",
+        "kind": "feasibility",
+        "identity": null,
+        "solver": null,
+        "expected_outcome": "failure",
+        "actual_outcome": "failure",
+        "solver_status": "infeasible",
+        "objective_value": null,
+        "diagnostics": {
+          "solver_interface": "optlang.gurobi_interface",
+          "solver_threads": 2,
+          "solver_tolerances": {
+            "feasibility": 1e-07,
+            "integrality": 1e-07,
+            "optimality": 1e-07
+          },
+          "residual_reliability_threshold": 1e-07,
+          "max_bound_violation": null,
+          "max_constraint_violation": null,
+          "numerical_reliability": "unavailable"
+        },
+        "status": "passed",
+        "passed": true
+      }
+    },
+    {
+      "model": "current-beta1",
+      "path": "runs/thg-ws1-a/artifacts/export-beta1/attempt-0002/thg-beta1-candidate.json",
+      "sha256": "50f9e3aeb332b8187ee0707c06d4651acfe29f51180e083a8a8ccac968b02cb6",
+      "solver": "glpk",
+      "construction": "LP-copy",
+      "result": {
+        "id": "21",
+        "version": "1",
+        "group": "core",
+        "kind": "feasibility",
+        "identity": null,
+        "solver": null,
+        "expected_outcome": "failure",
+        "actual_outcome": "failure",
+        "solver_status": "infeasible",
+        "objective_value": null,
+        "diagnostics": {
+          "solver_interface": "optlang.glpk_interface",
+          "solver_threads": null,
+          "solver_tolerances": {
+            "feasibility": 1e-07,
+            "integrality": 1e-05
+          },
+          "residual_reliability_threshold": 1e-07,
+          "max_bound_violation": null,
+          "max_constraint_violation": null,
+          "numerical_reliability": "unavailable"
+        },
+        "status": "passed",
+        "passed": true
+      }
+    },
+    {
+      "model": "archived-beta2",
+      "path": "runs/thg-ws1-a/artifacts/export-beta2/attempt-0002/thg-beta2-candidate.json",
+      "sha256": "8aef371abb499276e0215ad4bf3aa946a8454cabc5378b2a6ef091220ad98314",
+      "solver": "gurobi",
+      "construction": "direct",
+      "result": {
+        "id": "21",
+        "version": "1",
+        "group": "core",
+        "kind": "feasibility",
+        "identity": null,
+        "solver": null,
+        "expected_outcome": "failure",
+        "actual_outcome": "failure",
+        "solver_status": "infeasible",
+        "objective_value": null,
+        "diagnostics": {
+          "solver_interface": "optlang.gurobi_interface",
+          "solver_threads": 2,
+          "solver_tolerances": {
+            "feasibility": 1e-07,
+            "integrality": 1e-07,
+            "optimality": 1e-07
+          },
+          "residual_reliability_threshold": 1e-07,
+          "max_bound_violation": null,
+          "max_constraint_violation": null,
+          "numerical_reliability": "unavailable"
+        },
+        "status": "passed",
+        "passed": true
+      }
+    },
+    {
+      "model": "archived-beta2",
+      "path": "runs/thg-ws1-a/artifacts/export-beta2/attempt-0002/thg-beta2-candidate.json",
+      "sha256": "8aef371abb499276e0215ad4bf3aa946a8454cabc5378b2a6ef091220ad98314",
+      "solver": "gurobi",
+      "construction": "LP-copy",
+      "result": {
+        "id": "21",
+        "version": "1",
+        "group": "core",
+        "kind": "feasibility",
+        "identity": null,
+        "solver": null,
+        "expected_outcome": "failure",
+        "actual_outcome": "failure",
+        "solver_status": "infeasible",
+        "objective_value": null,
+        "diagnostics": {
+          "solver_interface": "optlang.gurobi_interface",
+          "solver_threads": 2,
+          "solver_tolerances": {
+            "feasibility": 1e-07,
+            "integrality": 1e-07,
+            "optimality": 1e-07
+          },
+          "residual_reliability_threshold": 1e-07,
+          "max_bound_violation": null,
+          "max_constraint_violation": null,
+          "numerical_reliability": "unavailable"
+        },
+        "status": "passed",
+        "passed": true
+      }
+    },
+    {
+      "model": "archived-beta2",
+      "path": "runs/thg-ws1-a/artifacts/export-beta2/attempt-0002/thg-beta2-candidate.json",
+      "sha256": "8aef371abb499276e0215ad4bf3aa946a8454cabc5378b2a6ef091220ad98314",
+      "solver": "glpk",
+      "construction": "LP-copy",
+      "result": {
+        "id": "21",
+        "version": "1",
+        "group": "core",
+        "kind": "feasibility",
+        "identity": null,
+        "solver": null,
+        "expected_outcome": "failure",
+        "actual_outcome": "failure",
+        "solver_status": "infeasible",
+        "objective_value": null,
+        "diagnostics": {
+          "solver_interface": "optlang.glpk_interface",
+          "solver_threads": null,
+          "solver_tolerances": {
+            "feasibility": 1e-07,
+            "integrality": 1e-05
+          },
+          "residual_reliability_threshold": 1e-07,
+          "max_bound_violation": null,
+          "max_constraint_violation": null,
+          "numerical_reliability": "unavailable"
+        },
+        "status": "passed",
+        "passed": true
+      }
+    }
+  ],
+  "needs_current_model_investigation": false,
+  "task_sha256": "17409a25af172813647370557814879446feaed0236e4595a25180abe0e9faed",
+  "mapping_sha256": "f12d0918055f69b284236d1b462119d154cb9ed4eb8a19f9bb481d5f0737b137",
+  "scope": "Task 21 only; LP construction comparison; no chemistry or bounds curated",
+  "runtime_seconds": 79.58281913500105
+}
