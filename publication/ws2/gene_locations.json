@@ -1,0 +1,24 @@
+{
+  "baseline_derived_genes": 2870,
+  "genes_with_evidence_records": 2870,
+  "localized_under_historical_rule": 1613,
+  "localized_under_current_rule": 2461,
+  "lost_under_historical_multi_location_rule": 848,
+  "without_mapped_targets": 409,
+  "sources": [
+    {
+      "path": "runs/thg-ws1-a/artifacts/apply-balance-proposals/attempt-0001/balanced-model.json",
+      "sha256": "50f9e3aeb332b8187ee0707c06d4651acfe29f51180e083a8a8ccac968b02cb6"
+    },
+    {
+      "path": "runs/thg-ws1-a/artifacts/resolve-compartment-evidence/attempt-0003/beta2-compartment-resolution-evidence.json",
+      "sha256": "30d73c7c14b1b94cbc446f66fc97c97397371def8c79107f004ebc9679dd0c39"
+    }
+  ],
+  "rule_change_commit": "0188ac599131edb27ec3c5933abef4aa0ffa41fd",
+  "command": "python publication/scripts/measure_locations.py",
+  "script_sha256": "45d6a20f4bcf7e05edf6bb72608b3507fc1669096c4fa7137ad0abb4d2243e3d",
+  "code_commit": "b1a9519e8fea5326ab18195c8eb3eb6885efc4de",
+  "scope": "Historical standalone policy applied to the same current resolved evidence; no legacy lookup execution or reaction-level effect claimed",
+  "legacy_attribution": "not established by this experiment"
+}

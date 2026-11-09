@@ -1,7 +1,8 @@
 # WS2: correctness fixes and engineering comparison (partial)
 
-Status (2026-11-09): two archived real-model proposal measurements completed;
-the numerical real-model case and corrected end-to-end effects remain pending.
+Status (2026-11-09): measured identity/parent-balance examples, whole-baseline
+location-policy ablation, numerical controls and the actual historical numerical
+artifact are saved. Final candidate evaluation remains incomplete.
 `fixes.csv` covers October changes, the November audits and subsequent safeguards,
 with evidence strength and reasons for deferred measurements. `engineering.csv`
 includes the new offline test run; legacy line counts and runtime comparisons
@@ -88,3 +89,37 @@ corrected beta1 runs under native two-thread Gurobi and GLPK can also serve as
 stage-gate evidence. The protocol has 12 planned experiments and stops early
 if any current-beta1 task has a reliable feasible outcome. The task/core-source
 hashes, input hashes and model-restoration assertions remain part of the record.
+
+## Final shutdown results
+
+`gene_locations.json` and `gene_locations.csv`: all 2,870 baseline-derived
+genes have evidence records. Under the historical standalone rejection rule,
+1,613 retain mapped targets; the current rule retains 2,461, including 848
+multi-location genes that would previously be rejected. 409 have no mapped
+target. Regenerate with `python publication/scripts/measure_locations.py`.
+This is a policy ablation on identical current evidence, not a legacy lookup
+execution; legacy attribution is not established.
+
+`task_numerics.json`: protocol 2 completed 12 experiments / 132 infeasible
+solves in 324.92 s. These are negative controls on corrected beta1 and the
+historically passing beta2 attempt 2. They do not test the historically failing
+beta1 artifact. Native parameter zero is automatic thread selection, not zero
+workers. Corrected beta1 passes all 21 VerifyModel tasks with Gurobi and GLPK.
+
+The actual failing beta1 artifact (attempt 1, SHA-256 `fb081fa8…07f5b1`) was
+then tested with:
+```sh
+python publication/scripts/run_tasks.py runs/thg-ws1-a/artifacts/export-beta1/attempt-0001/thg-beta1-candidate.json archived-beta1 publication/ws2/historical-failure VerifyModel
+```
+It gives 20 passes and one numerical error in 42.92 s. Task 21 reports optimal
+with maximum bound violation **3.0275567736916796e-7**, constraint violation
+0, native Threads=2 and tolerance 1e-7. The new harness returns unresolved with
+no biological outcome. This reproduces the numerical artifact; it is not a
+confirmed biochemical leak. Results: `historical-failure/`; raw console:
+`historical-beta1.log`. GLPK corroboration of this exact artifact is pending.
+
+The reference resume regression failed before `9174aea` and passes afterward;
+33 related workflow/artifact/publication checks passed (one Gurobi-marked test
+excluded). The final archive/localization check selection passed 13 tests,
+with one Gurobi test excluded. Full suite has not been repeated after these
+latest changes. The build was stopped cleanly for shutdown; see the handoff.

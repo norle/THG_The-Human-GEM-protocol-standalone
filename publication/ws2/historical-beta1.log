@@ -1,0 +1,12 @@
+Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2780343
+Academic license 2780343 - for non-commercial use only - registered to ig___@biosustain.dtu.dk
+Set parameter Threads to value 2
+Read LP format model from file /tmp/tmpte1933bw.lp
+Reading time = 0.03 seconds
+: 8363 rows, 25488 columns, 108630 nonzeros
+archived-beta1 VerifyModel {'passed': 20, 'failed': 0, 'invalid': 0, 'error': 1}
+VerifyModel gate unresolved or failed; functional tables skipped
+relaxed forced bounds: 0 commit b1a9519e8fea5326ab18195c8eb3eb6885efc4de
+Warning: environment still referenced so free is deferred (Continue to use WLS)

@@ -1,0 +1,2871 @@
+gene,status,mapped_locations,retained_before,retained_after,lost_under_old_multi_location_rule
+ENSG00000000419,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000001036,candidate,[],False,False,False
+ENSG00000001084,unresolved,[],False,False,False
+ENSG00000001630,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000002549,candidate,"[""Cytosol""]",True,True,False
+ENSG00000002587,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000002726,candidate,"[""cell membrane""]",True,True,False
+ENSG00000002746,candidate,"[""Cytosol""]",True,True,False
+ENSG00000003137,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000003987,candidate,"[""Cytosol""]",True,True,False
+ENSG00000003989,candidate,"[""cell membrane""]",True,True,False
+ENSG00000004455,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000004468,candidate,"[""cell membrane""]",True,True,False
+ENSG00000004478,candidate,"[""Cytosol"", ""Mitochondria"", ""Nucleus"", ""cytoskeleton""]",False,True,True
+ENSG00000004779,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000004799,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000004809,candidate,"[""cell membrane""]",True,True,False
+ENSG00000004864,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000004939,candidate,"[""cell membrane""]",True,True,False
+ENSG00000004961,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000005022,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000005075,candidate,"[""Nucleus""]",True,True,False
+ENSG00000005187,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000005339,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000005381,candidate,"[""Nucleus"", ""lysosome"", ""vesicle""]",False,True,True
+ENSG00000005421,candidate,[],False,False,False
+ENSG00000005469,candidate,"[""Peroxisome""]",True,True,False
+ENSG00000005471,candidate,"[""Cytosol"", ""cell membrane"", ""vesicle""]",False,True,True
+ENSG00000005810,candidate,"[""Nucleus"", ""cytoskeleton""]",False,True,True
+ENSG00000005882,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000006007,candidate,"[""cell membrane"", ""vesicle""]",False,True,True
+ENSG00000006071,candidate,"[""cell membrane""]",True,True,False
+ENSG00000006283,candidate,"[""Cytosol"", ""cell membrane""]",False,True,True
+ENSG00000006530,candidate,"[""Mitochondria"", ""inner mitochondria""]",False,True,True
+ENSG00000006534,candidate,"[""cell membrane""]",True,True,False
+ENSG00000006625,unresolved,[],False,False,False
+ENSG00000006695,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000006756,candidate,"[""lysosome""]",True,True,False
+ENSG00000006757,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000007001,unresolved,[],False,False,False
+ENSG00000007168,candidate,"[""Nucleus"", ""cytoskeleton""]",False,True,True
+ENSG00000007171,candidate,"[""Cytosol""]",True,True,False
+ENSG00000007216,candidate,"[""cell membrane""]",True,True,False
+ENSG00000007314,candidate,"[""cell membrane""]",True,True,False
+ENSG00000007350,candidate,"[""Cytosol""]",True,True,False
+ENSG00000007541,candidate,[],False,False,False
+ENSG00000007933,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000007944,candidate,"[""Cytosol"", ""cell membrane""]",False,True,True
+ENSG00000008130,unresolved,[],False,False,False
+ENSG00000008311,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000008394,candidate,"[""Endoplasmic reticulum"", ""Mitochondria""]",False,True,True
+ENSG00000008438,candidate,[],False,False,False
+ENSG00000008513,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000009335,unresolved,[],False,False,False
+ENSG00000009413,candidate,"[""Nucleus""]",True,True,False
+ENSG00000009830,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000010256,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000010379,candidate,"[""cell membrane""]",True,True,False
+ENSG00000010404,candidate,"[""lysosome""]",True,True,False
+ENSG00000010932,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000011009,candidate,"[""Cytosol""]",True,True,False
+ENSG00000011083,candidate,"[""cell membrane""]",True,True,False
+ENSG00000011198,candidate,"[""Cytosol""]",True,True,False
+ENSG00000011275,candidate,"[""Cytosol"", ""vesicle""]",False,True,True
+ENSG00000011405,candidate,"[""Cytosol"", ""Golgi apparatus"", ""Nucleus"", ""cell membrane"", ""vesicle""]",False,True,True
+ENSG00000012232,candidate,"[""Endoplasmic reticulum"", ""Golgi apparatus"", ""Nucleus"", ""cell membrane""]",False,True,True
+ENSG00000012660,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000012779,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000012963,unresolved,[],False,False,False
+ENSG00000013288,candidate,[],False,False,False
+ENSG00000013306,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000013375,unresolved,[],False,False,False
+ENSG00000013392,unresolved,[],False,False,False
+ENSG00000013503,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000013561,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000014138,candidate,"[""Nucleus""]",True,True,False
+ENSG00000014257,candidate,"[""Cytosol"", ""Nucleus"", ""cell membrane"", ""lysosome""]",False,True,True
+ENSG00000014641,candidate,"[""Cytosol""]",True,True,False
+ENSG00000015413,candidate,"[""cell membrane"", ""cytoskeleton""]",False,True,True
+ENSG00000015520,candidate,"[""cell membrane"", ""vesicle""]",False,True,True
+ENSG00000015532,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000016391,candidate,"[""Mitochondria"", ""inner mitochondria""]",False,True,True
+ENSG00000016864,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000017260,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000017483,candidate,"[""cell membrane""]",True,True,False
+ENSG00000017797,candidate,"[""Cytosol"", ""Mitochondria"", ""Nucleus"", ""cell membrane"", ""cytoskeleton""]",False,True,True
+ENSG00000018280,candidate,"[""lysosome"", ""vesicle""]",False,True,True
+ENSG00000018510,candidate,"[""Peroxisome""]",True,True,False
+ENSG00000018625,candidate,"[""cell membrane""]",True,True,False
+ENSG00000019186,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000021461,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000021488,candidate,"[""cell membrane""]",True,True,False
+ENSG00000021826,candidate,"[""Mitochondria"", ""Nucleus"", ""cell membrane""]",False,True,True
+ENSG00000023041,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000023228,candidate,"[""Mitochondria"", ""inner mitochondria""]",False,True,True
+ENSG00000023330,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000023572,candidate,"[""Mitochondria"", ""Nucleus""]",False,True,True
+ENSG00000023697,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000023839,candidate,"[""cell membrane""]",True,True,False
+ENSG00000023909,unresolved,[],False,False,False
+ENSG00000024048,candidate,"[""Nucleus""]",True,True,False
+ENSG00000025423,candidate,"[""vesicle""]",True,True,False
+ENSG00000025708,unresolved,[],False,False,False
+ENSG00000025800,unresolved,[],False,False,False
+ENSG00000026652,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000027847,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000030066,candidate,"[""Nucleus""]",True,True,False
+ENSG00000031698,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000032444,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000033011,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000033100,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000033170,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000033178,unresolved,[],False,False,False
+ENSG00000033627,candidate,"[""vesicle""]",True,True,False
+ENSG00000033867,candidate,"[""cell membrane"", ""cytoskeleton""]",False,True,True
+ENSG00000034677,candidate,"[""cytoskeleton""]",True,True,False
+ENSG00000035687,candidate,"[""Cytosol"", ""Mitochondria""]",False,True,True
+ENSG00000036473,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000036530,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000036565,candidate,"[""Endoplasmic reticulum"", ""vesicle""]",False,True,True
+ENSG00000036672,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000037757,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000037897,candidate,"[""Nucleus""]",True,True,False
+ENSG00000038002,candidate,"[""lysosome""]",True,True,False
+ENSG00000038210,candidate,"[""Cytosol"", ""Endoplasmic reticulum"", ""Golgi apparatus"", ""cell membrane"", ""vesicle""]",False,True,True
+ENSG00000039123,candidate,"[""Nucleus""]",True,True,False
+ENSG00000039650,candidate,"[""Nucleus""]",True,True,False
+ENSG00000040933,candidate,"[""Cytosol"", ""Nucleus"", ""cell membrane"", ""vesicle""]",False,True,True
+ENSG00000041880,candidate,"[""Nucleus"", ""cytoskeleton""]",False,True,True
+ENSG00000043514,candidate,"[""Cytosol"", ""Mitochondria""]",False,True,True
+ENSG00000044446,candidate,"[""cell membrane""]",True,True,False
+ENSG00000047230,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000047249,candidate,"[""vesicle""]",True,True,False
+ENSG00000047315,candidate,"[""Nucleus""]",True,True,False
+ENSG00000047410,candidate,"[""Cytosol"", ""Nucleus"", ""cytoskeleton""]",False,True,True
+ENSG00000047457,candidate,[],False,False,False
+ENSG00000048028,candidate,"[""Nucleus""]",True,True,False
+ENSG00000048392,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000049239,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000049759,candidate,"[""Cytosol"", ""Golgi apparatus"", ""vesicle""]",False,True,True
+ENSG00000049860,candidate,"[""lysosome"", ""vesicle""]",False,True,True
+ENSG00000050438,candidate,"[""cell membrane"", ""vesicle""]",False,True,True
+ENSG00000051341,candidate,"[""Nucleus""]",True,True,False
+ENSG00000051382,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000052802,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000053371,candidate,"[""Cytosol"", ""Golgi apparatus"", ""Mitochondria""]",False,True,True
+ENSG00000054148,candidate,"[""Cytosol""]",True,True,False
+ENSG00000054179,candidate,"[""Endoplasmic reticulum"", ""cell membrane""]",False,True,True
+ENSG00000054267,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000054983,candidate,"[""lysosome""]",True,True,False
+ENSG00000055483,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000055609,candidate,"[""Nucleus""]",True,True,False
+ENSG00000056998,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000057252,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000058056,candidate,"[""Cytosol""]",True,True,False
+ENSG00000058600,candidate,"[""Nucleus""]",True,True,False
+ENSG00000058668,candidate,"[""cell membrane""]",True,True,False
+ENSG00000058804,candidate,"[""Nucleus""]",True,True,False
+ENSG00000058866,candidate,"[""Cytosol"", ""cytoskeleton""]",False,True,True
+ENSG00000059377,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000059378,candidate,"[""Cytosol"", ""Golgi apparatus"", ""Nucleus""]",False,True,True
+ENSG00000059573,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000059804,candidate,"[""cell membrane""]",True,True,False
+ENSG00000060642,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000060762,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000060971,candidate,"[""Peroxisome""]",True,True,False
+ENSG00000060982,candidate,"[""Cytosol""]",True,True,False
+ENSG00000061918,candidate,"[""Cytosol""]",True,True,False
+ENSG00000062282,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000062485,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000062822,candidate,"[""Nucleus""]",True,True,False
+ENSG00000063176,candidate,"[""Cytosol"", ""Endoplasmic reticulum"", ""Nucleus"", ""inner mitochondria"", ""lysosome""]",False,True,True
+ENSG00000063601,candidate,"[""Cytosol"", ""cell membrane""]",False,True,True
+ENSG00000063854,candidate,"[""Cytosol"", ""Mitochondria""]",False,True,True
+ENSG00000064225,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000064270,candidate,"[""Golgi apparatus"", ""cell membrane""]",False,True,True
+ENSG00000064601,candidate,"[""lysosome""]",True,True,False
+ENSG00000064651,candidate,"[""cell membrane""]",True,True,False
+ENSG00000064763,candidate,"[""Peroxisome""]",True,True,False
+ENSG00000065154,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000065357,candidate,"[""Cytosol""]",True,True,False
+ENSG00000065427,candidate,"[""Cytosol"", ""Mitochondria"", ""Nucleus"", ""cell membrane""]",False,True,True
+ENSG00000065485,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000065518,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000065534,candidate,"[""Cytosol"", ""cell membrane"", ""cytoskeleton""]",False,True,True
+ENSG00000065615,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000065621,candidate,"[""cytoskeleton""]",True,True,False
+ENSG00000065833,candidate,"[""Cytosol""]",True,True,False
+ENSG00000065911,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000065923,candidate,"[""Golgi apparatus"", ""cell membrane"", ""vesicle""]",False,True,True
+ENSG00000065989,candidate,"[""Cytosol"", ""cell membrane""]",False,True,True
+ENSG00000066230,candidate,"[""cell membrane"", ""vesicle""]",False,True,True
+ENSG00000066322,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000066379,candidate,"[""Nucleus""]",True,True,False
+ENSG00000066651,candidate,"[""Cytosol""]",True,True,False
+ENSG00000066813,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000066926,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000067057,candidate,"[""Cytosol""]",True,True,False
+ENSG00000067064,candidate,"[""Peroxisome""]",True,True,False
+ENSG00000067113,candidate,"[""cell membrane""]",True,True,False
+ENSG00000067177,candidate,"[""cell membrane""]",True,True,False
+ENSG00000067225,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000067829,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000067840,candidate,[],False,False,False
+ENSG00000067842,candidate,"[""cell membrane""]",True,True,False
+ENSG00000067992,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000068001,candidate,"[""cell membrane""]",True,True,False
+ENSG00000068120,candidate,"[""Cytosol"", ""Mitochondria""]",False,True,True
+ENSG00000068308,candidate,"[""Nucleus""]",True,True,False
+ENSG00000068366,candidate,"[""Endoplasmic reticulum"", ""Mitochondria"", ""cell membrane""]",False,True,True
+ENSG00000068383,candidate,"[""cell membrane""]",True,True,False
+ENSG00000068650,candidate,"[""Endoplasmic reticulum"", ""cell membrane"", ""vesicle""]",False,True,True
+ENSG00000068654,candidate,"[""Nucleus""]",True,True,False
+ENSG00000068745,candidate,"[""Nucleus""]",True,True,False
+ENSG00000068903,candidate,"[""Cytosol"", ""Nucleus"", ""cytoskeleton""]",False,True,True
+ENSG00000068976,unresolved,[],False,False,False
+ENSG00000069248,candidate,"[""Nucleus""]",True,True,False
+ENSG00000069431,candidate,"[""cell membrane""]",True,True,False
+ENSG00000069535,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000069764,candidate,"[""lysosome"", ""vesicle""]",False,True,True
+ENSG00000069849,candidate,"[""cell membrane"", ""vesicle""]",False,True,True
+ENSG00000069869,candidate,"[""Cytosol"", ""Nucleus"", ""cell membrane""]",False,True,True
+ENSG00000069943,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000070019,candidate,"[""Endoplasmic reticulum"", ""cell membrane""]",False,True,True
+ENSG00000070214,candidate,"[""Mitochondria"", ""cell membrane""]",False,True,True
+ENSG00000070423,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000070501,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000070526,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000070610,candidate,"[""Endoplasmic reticulum"", ""Golgi apparatus""]",False,True,True
+ENSG00000070614,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000070669,unresolved,[],False,False,False
+ENSG00000070731,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000070748,unresolved,[],False,False,False
+ENSG00000070915,candidate,"[""cell membrane""]",True,True,False
+ENSG00000070950,candidate,"[""Nucleus"", ""cytoskeleton""]",False,True,True
+ENSG00000070961,candidate,"[""cell membrane"", ""vesicle""]",False,True,True
+ENSG00000071073,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000071553,candidate,"[""Endoplasmic reticulum"", ""vesicle""]",False,True,True
+ENSG00000071794,candidate,"[""Nucleus""]",True,True,False
+ENSG00000071967,candidate,"[""cell membrane""]",True,True,False
+ENSG00000072041,candidate,[],False,False,False
+ENSG00000072042,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000072210,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000072274,candidate,"[""cell membrane"", ""vesicle""]",False,True,True
+ENSG00000072401,candidate,"[""Cytosol""]",True,True,False
+ENSG00000072506,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000072609,candidate,"[""Nucleus""]",True,True,False
+ENSG00000072657,candidate,[],False,False,False
+ENSG00000072682,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000072778,candidate,"[""Mitochondria"", ""inner mitochondria""]",False,True,True
+ENSG00000073060,candidate,"[""cell membrane""]",True,True,False
+ENSG00000073417,unresolved,[],False,False,False
+ENSG00000073578,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000073734,candidate,"[""cell membrane"", ""vesicle""]",False,True,True
+ENSG00000073737,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000073756,candidate,"[""Endoplasmic reticulum"", ""Nucleus""]",False,True,True
+ENSG00000073849,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000074370,candidate,"[""Endoplasmic reticulum"", ""Nucleus""]",False,True,True
+ENSG00000074410,candidate,"[""cell membrane""]",True,True,False
+ENSG00000074416,candidate,"[""Cytosol""]",True,True,False
+ENSG00000074621,candidate,"[""cell membrane"", ""cilium""]",False,True,True
+ENSG00000074696,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000074800,candidate,"[""Cytosol"", ""Nucleus"", ""cell membrane""]",False,True,True
+ENSG00000074803,candidate,"[""cell membrane""]",True,True,False
+ENSG00000075188,candidate,"[""Nucleus""]",True,True,False
+ENSG00000075239,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000075303,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000075415,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000075651,candidate,"[""Endoplasmic reticulum"", ""Golgi apparatus"", ""vesicle""]",False,True,True
+ENSG00000075673,candidate,"[""cell membrane""]",True,True,False
+ENSG00000075975,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000076258,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000076351,candidate,"[""Cytosol"", ""cell membrane"", ""vesicle""]",False,True,True
+ENSG00000076555,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000076685,candidate,"[""Cytosol""]",True,True,False
+ENSG00000077009,unresolved,[],False,False,False
+ENSG00000077044,candidate,"[""Cytosol"", ""cell membrane""]",False,True,True
+ENSG00000077152,candidate,"[""Nucleus""]",True,True,False
+ENSG00000077254,candidate,"[""Golgi apparatus"", ""cytoskeleton""]",False,True,True
+ENSG00000077463,candidate,"[""Endoplasmic reticulum"", ""Nucleus""]",False,True,True
+ENSG00000077498,candidate,"[""vesicle""]",True,True,False
+ENSG00000077514,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000077721,candidate,"[""lysosome"", ""vesicle""]",False,True,True
+ENSG00000077800,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000078070,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000078124,candidate,"[""Endoplasmic reticulum"", ""Golgi apparatus""]",False,True,True
+ENSG00000078140,candidate,"[""Cytosol""]",True,True,False
+ENSG00000078142,candidate,"[""vesicle""]",True,True,False
+ENSG00000078237,candidate,"[""Cytosol"", ""Mitochondria"", ""Nucleus""]",False,True,True
+ENSG00000078269,candidate,"[""Cytosol"", ""cell membrane"", ""cytoskeleton""]",False,True,True
+ENSG00000078295,candidate,"[""Cytosol"", ""cell membrane""]",False,True,True
+ENSG00000078747,candidate,"[""Cytosol"", ""Nucleus"", ""cell membrane"", ""vesicle""]",False,True,True
+ENSG00000078967,unresolved,[],False,False,False
+ENSG00000079150,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000079215,candidate,"[""cell membrane""]",True,True,False
+ENSG00000079435,candidate,"[""Cytosol"", ""cell membrane""]",False,True,True
+ENSG00000079459,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000079462,candidate,"[""Cytosol""]",True,True,False
+ENSG00000079739,candidate,"[""Cytosol""]",True,True,False
+ENSG00000079805,candidate,"[""Cytosol"", ""cell membrane"", ""cytoskeleton"", ""vesicle""]",False,True,True
+ENSG00000080166,candidate,"[""vesicle""]",True,True,False
+ENSG00000080493,candidate,"[""cell membrane""]",True,True,False
+ENSG00000080511,candidate,[],False,False,False
+ENSG00000080802,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000080819,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000081181,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000081248,candidate,"[""cell membrane""]",True,True,False
+ENSG00000081479,candidate,"[""cell membrane"", ""vesicle""]",False,True,True
+ENSG00000081760,candidate,"[""Cytosol""]",True,True,False
+ENSG00000081800,candidate,"[""cell membrane""]",True,True,False
+ENSG00000081923,candidate,"[""Endoplasmic reticulum"", ""Golgi apparatus"", ""cell membrane"", ""cytoskeleton""]",False,True,True
+ENSG00000082212,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000082996,candidate,"[""Endoplasmic reticulum"", ""Nucleus"", ""lysosome"", ""vesicle""]",False,True,True
+ENSG00000083123,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000083168,candidate,"[""Nucleus""]",True,True,False
+ENSG00000083223,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000083444,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000083720,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000083799,candidate,"[""Cytosol"", ""cell membrane"", ""cytoskeleton""]",False,True,True
+ENSG00000083807,candidate,"[""Endoplasmic reticulum"", ""cell membrane""]",False,True,True
+ENSG00000084072,candidate,"[""Nucleus""]",True,True,False
+ENSG00000084073,candidate,"[""Endoplasmic reticulum"", ""Nucleus"", ""vesicle""]",False,True,True
+ENSG00000084090,candidate,"[""Cytosol"", ""Mitochondria""]",False,True,True
+ENSG00000084110,unresolved,[],False,False,False
+ENSG00000084207,candidate,"[""Cytosol"", ""Mitochondria"", ""Nucleus""]",False,True,True
+ENSG00000084453,candidate,"[""cell membrane""]",True,True,False
+ENSG00000084674,candidate,"[""Cytosol""]",True,True,False
+ENSG00000084676,candidate,"[""Nucleus""]",True,True,False
+ENSG00000084754,candidate,"[""Mitochondria"", ""inner mitochondria""]",False,True,True
+ENSG00000084774,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000085231,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000085377,candidate,"[""Cytosol""]",True,True,False
+ENSG00000085382,candidate,"[""Cytosol"", ""Endoplasmic reticulum"", ""Golgi apparatus""]",False,True,True
+ENSG00000085415,candidate,"[""Nucleus"", ""lysosome""]",False,True,True
+ENSG00000085563,candidate,"[""Cytosol"", ""cell membrane""]",False,True,True
+ENSG00000085662,candidate,"[""Cytosol""]",True,True,False
+ENSG00000085871,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000085982,candidate,"[""Cytosol""]",True,True,False
+ENSG00000085998,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000086062,candidate,"[""Golgi apparatus"", ""cell membrane"", ""cytoskeleton""]",False,True,True
+ENSG00000086159,candidate,"[""vesicle""]",True,True,False
+ENSG00000086475,candidate,"[""Cytosol"", ""Nucleus"", ""cell membrane""]",False,True,True
+ENSG00000086544,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000086696,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000086758,candidate,"[""Cytosol"", ""Mitochondria"", ""Nucleus""]",False,True,True
+ENSG00000086848,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000087008,candidate,"[""Peroxisome""]",True,True,False
+ENSG00000087053,candidate,"[""Cytosol"", ""vesicle""]",False,True,True
+ENSG00000087076,candidate,"[""Cytosol""]",True,True,False
+ENSG00000087085,candidate,"[""Nucleus"", ""cell membrane""]",False,True,True
+ENSG00000087111,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000087157,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000087253,candidate,"[""Endoplasmic reticulum"", ""Golgi apparatus"", ""cell membrane""]",False,True,True
+ENSG00000087299,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000087470,candidate,"[""Cytosol"", ""Golgi apparatus"", ""Mitochondria"", ""Peroxisome"", ""vesicle""]",False,True,True
+ENSG00000088002,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000088035,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000088305,candidate,"[""Nucleus""]",True,True,False
+ENSG00000088386,candidate,"[""cell membrane""]",True,True,False
+ENSG00000088451,candidate,"[""Endoplasmic reticulum"", ""Golgi apparatus""]",False,True,True
+ENSG00000088766,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000088826,candidate,"[""Cytosol"", ""Nucleus"", ""Peroxisome""]",False,True,True
+ENSG00000088832,candidate,"[""Cytosol"", ""Endoplasmic reticulum""]",False,True,True
+ENSG00000089057,candidate,"[""cell membrane""]",True,True,False
+ENSG00000089060,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000089234,candidate,"[""Cytosol""]",True,True,False
+ENSG00000089250,candidate,"[""cell membrane""]",True,True,False
+ENSG00000089472,candidate,"[""cell membrane""]",True,True,False
+ENSG00000089597,candidate,"[""Endoplasmic reticulum"", ""Golgi apparatus"", ""vesicle""]",False,True,True
+ENSG00000090013,candidate,"[""Cytosol""]",True,True,False
+ENSG00000090020,candidate,"[""cell membrane""]",True,True,False
+ENSG00000090054,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000090060,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000090266,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000090402,candidate,"[""cell membrane""]",True,True,False
+ENSG00000090432,candidate,"[""Mitochondria"", ""Peroxisome""]",False,True,True
+ENSG00000090661,candidate,"[""Endoplasmic reticulum"", ""Nucleus""]",False,True,True
+ENSG00000090686,candidate,"[""Cytosol"", ""Nucleus"", ""cilium""]",False,True,True
+ENSG00000090857,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000090861,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000090971,candidate,[],False,False,False
+ENSG00000091137,candidate,"[""cell membrane""]",True,True,False
+ENSG00000091138,candidate,"[""cell membrane""]",True,True,False
+ENSG00000091140,candidate,"[""Mitochondria"", ""Nucleus"", ""cilium"", ""vesicle""]",False,True,True
+ENSG00000091483,candidate,"[""Cytosol"", ""Mitochondria"", ""Nucleus""]",False,True,True
+ENSG00000091664,candidate,"[""cell membrane"", ""vesicle""]",False,True,True
+ENSG00000091704,candidate,[],False,False,False
+ENSG00000092009,candidate,[],False,False,False
+ENSG00000092068,candidate,"[""cell membrane""]",True,True,False
+ENSG00000092098,candidate,"[""Cytosol""]",True,True,False
+ENSG00000092148,unresolved,[],False,False,False
+ENSG00000092295,candidate,"[""Cytosol"", ""cell membrane""]",False,True,True
+ENSG00000092621,unresolved,[],False,False,False
+ENSG00000093000,candidate,"[""Nucleus""]",True,True,False
+ENSG00000093010,candidate,"[""Cytosol"", ""cell membrane""]",False,True,True
+ENSG00000093072,candidate,[],False,False,False
+ENSG00000093217,unresolved,[],False,False,False
+ENSG00000094841,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000094963,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000095059,unresolved,[],False,False,False
+ENSG00000095139,candidate,"[""Cytosol"", ""Golgi apparatus"", ""vesicle""]",False,True,True
+ENSG00000095303,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000095319,candidate,"[""Nucleus""]",True,True,False
+ENSG00000095321,candidate,"[""Endoplasmic reticulum"", ""Mitochondria"", ""Peroxisome"", ""inner mitochondria""]",False,True,True
+ENSG00000095380,unresolved,[],False,False,False
+ENSG00000095464,candidate,"[""cell membrane"", ""cilium""]",False,True,True
+ENSG00000095596,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000095917,candidate,[],False,False,False
+ENSG00000096006,candidate,[],False,False,False
+ENSG00000096060,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000096433,candidate,"[""Endoplasmic reticulum"", ""vesicle""]",False,True,True
+ENSG00000096717,candidate,"[""Cytosol"", ""Mitochondria"", ""Nucleus""]",False,True,True
+ENSG00000097021,candidate,"[""Cytosol"", ""Mitochondria""]",False,True,True
+ENSG00000097033,candidate,"[""Cytosol"", ""Golgi apparatus"", ""Mitochondria""]",False,True,True
+ENSG00000099194,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000099377,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000099381,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000099624,candidate,"[""Mitochondria"", ""inner mitochondria""]",False,True,True
+ENSG00000099785,candidate,"[""Cytosol"", ""Endoplasmic reticulum"", ""Golgi apparatus"", ""cell membrane"", ""lysosome"", ""vesicle""]",False,True,True
+ENSG00000099795,candidate,"[""Mitochondria"", ""inner mitochondria""]",False,True,True
+ENSG00000099797,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000099804,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000099810,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000099817,candidate,"[""Nucleus""]",True,True,False
+ENSG00000099821,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000099904,candidate,"[""Golgi apparatus"", ""Mitochondria""]",False,True,True
+ENSG00000099998,candidate,[],False,False,False
+ENSG00000100023,candidate,"[""Nucleus""]",True,True,False
+ENSG00000100024,candidate,"[""Cytosol""]",True,True,False
+ENSG00000100031,candidate,"[""cell membrane""]",True,True,False
+ENSG00000100033,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000100075,candidate,"[""Mitochondria"", ""inner mitochondria""]",False,True,True
+ENSG00000100077,candidate,[],False,False,False
+ENSG00000100078,candidate,"[""cell membrane"", ""cytoskeleton"", ""vesicle""]",False,True,True
+ENSG00000100092,candidate,"[""Cytosol"", ""Nucleus"", ""cell membrane""]",False,True,True
+ENSG00000100116,candidate,"[""Mitochondria"", ""Nucleus""]",False,True,True
+ENSG00000100121,unresolved,[],False,False,False
+ENSG00000100142,candidate,"[""Nucleus""]",True,True,False
+ENSG00000100156,candidate,"[""cell membrane""]",True,True,False
+ENSG00000100170,candidate,"[""cell membrane""]",True,True,False
+ENSG00000100197,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000100209,candidate,"[""Cytosol"", ""Mitochondria""]",False,True,True
+ENSG00000100243,candidate,"[""Cytosol"", ""Endoplasmic reticulum"", ""Mitochondria""]",False,True,True
+ENSG00000100253,candidate,"[""Cytosol""]",True,True,False
+ENSG00000100288,unresolved,[],False,False,False
+ENSG00000100292,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000100294,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000100299,candidate,"[""Endoplasmic reticulum"", ""lysosome""]",False,True,True
+ENSG00000100344,candidate,[],False,False,False
+ENSG00000100346,candidate,[],False,False,False
+ENSG00000100348,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000100354,candidate,[],False,False,False
+ENSG00000100372,candidate,"[""Cytosol"", ""Peroxisome""]",False,True,True
+ENSG00000100393,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000100412,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000100413,candidate,"[""Nucleus""]",True,True,False
+ENSG00000100416,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000100417,candidate,"[""Cytosol""]",True,True,False
+ENSG00000100422,candidate,"[""Golgi apparatus"", ""cell membrane""]",False,True,True
+ENSG00000100442,candidate,"[""Nucleus""]",True,True,False
+ENSG00000100448,candidate,"[""Cytosol"", ""Nucleus"", ""cell membrane"", ""lysosome""]",False,True,True
+ENSG00000100479,candidate,"[""Nucleus""]",True,True,False
+ENSG00000100504,candidate,"[""Cytosol""]",True,True,False
+ENSG00000100522,candidate,"[""Golgi apparatus"", ""vesicle""]",False,True,True
+ENSG00000100554,candidate,"[""cilium"", ""cytoskeleton"", ""lysosome"", ""vesicle""]",False,True,True
+ENSG00000100564,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000100577,candidate,"[""Cytosol""]",True,True,False
+ENSG00000100596,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000100600,candidate,"[""lysosome""]",True,True,False
+ENSG00000100605,unresolved,[],False,False,False
+ENSG00000100626,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000100644,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000100652,candidate,"[""cell membrane""]",True,True,False
+ENSG00000100678,candidate,"[""Endoplasmic reticulum"", ""Mitochondria"", ""cell membrane""]",False,True,True
+ENSG00000100714,candidate,"[""Cytosol""]",True,True,False
+ENSG00000100814,candidate,"[""Nucleus""]",True,True,False
+ENSG00000100867,candidate,"[""Mitochondria"", ""Nucleus""]",False,True,True
+ENSG00000100889,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000100938,unresolved,[],False,False,False
+ENSG00000100983,unresolved,[],False,False,False
+ENSG00000100994,unresolved,[],False,False,False
+ENSG00000100997,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000101146,candidate,"[""Cytosol"", ""Nucleus"", ""cytoskeleton""]",False,True,True
+ENSG00000101160,candidate,"[""lysosome""]",True,True,False
+ENSG00000101187,candidate,"[""cell membrane""]",True,True,False
+ENSG00000101276,candidate,"[""Cytosol"", ""Nucleus"", ""cell membrane""]",False,True,True
+ENSG00000101290,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000101306,candidate,"[""Cytosol""]",True,True,False
+ENSG00000101323,candidate,"[""Peroxisome""]",True,True,False
+ENSG00000101333,candidate,"[""cell membrane""]",True,True,False
+ENSG00000101365,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000101438,candidate,"[""vesicle""]",True,True,False
+ENSG00000101444,candidate,"[""Cytosol"", ""Endoplasmic reticulum"", ""Nucleus"", ""vesicle""]",False,True,True
+ENSG00000101464,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000101473,candidate,"[""Peroxisome""]",True,True,False
+ENSG00000101557,candidate,"[""Cytosol"", ""cell membrane""]",False,True,True
+ENSG00000101577,candidate,"[""Cytosol"", ""Endoplasmic reticulum"", ""Nucleus""]",False,True,True
+ENSG00000101638,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000101654,candidate,"[""Nucleus""]",True,True,False
+ENSG00000101670,candidate,[],False,False,False
+ENSG00000101695,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000101751,candidate,"[""Nucleus""]",True,True,False
+ENSG00000101752,candidate,"[""Cytosol"", ""cell membrane"", ""cytoskeleton""]",False,True,True
+ENSG00000101846,unresolved,[],False,False,False
+ENSG00000101868,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000101871,candidate,"[""Cytosol"", ""cytoskeleton""]",False,True,True
+ENSG00000101890,candidate,"[""cell membrane"", ""cilium""]",False,True,True
+ENSG00000101892,candidate,"[""Nucleus""]",True,True,False
+ENSG00000101901,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000101911,unresolved,[],False,False,False
+ENSG00000101945,candidate,"[""Nucleus"", ""cell membrane""]",False,True,True
+ENSG00000101974,candidate,"[""Endoplasmic reticulum"", ""cell membrane"", ""vesicle""]",False,True,True
+ENSG00000101986,candidate,"[""Endoplasmic reticulum"", ""Mitochondria"", ""Peroxisome"", ""lysosome""]",False,True,True
+ENSG00000102001,candidate,[],False,False,False
+ENSG00000102030,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000102032,unresolved,[],False,False,False
+ENSG00000102043,candidate,"[""Nucleus""]",True,True,False
+ENSG00000102078,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000102100,candidate,"[""Endoplasmic reticulum"", ""Golgi apparatus""]",False,True,True
+ENSG00000102144,candidate,"[""Cytosol"", ""Mitochondria""]",False,True,True
+ENSG00000102172,unresolved,[],False,False,False
+ENSG00000102226,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000102230,candidate,"[""Cytosol"", ""Endoplasmic reticulum""]",False,True,True
+ENSG00000102309,candidate,"[""Cytosol"", ""Mitochondria"", ""Nucleus"", ""cytoskeleton""]",False,True,True
+ENSG00000102312,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000102383,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000102393,candidate,"[""lysosome""]",True,True,False
+ENSG00000102452,candidate,"[""cell membrane""]",True,True,False
+ENSG00000102575,candidate,"[""lysosome""]",True,True,False
+ENSG00000102699,candidate,"[""Cytosol"", ""Nucleus"", ""cytoskeleton""]",False,True,True
+ENSG00000102743,candidate,"[""Mitochondria"", ""inner mitochondria""]",False,True,True
+ENSG00000102780,candidate,"[""Cytosol"", ""cell membrane""]",False,True,True
+ENSG00000102794,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000102858,candidate,"[""Cytosol"", ""Nucleus"", ""cell membrane"", ""vesicle""]",False,True,True
+ENSG00000102893,candidate,"[""cell membrane""]",True,True,False
+ENSG00000102900,candidate,"[""Nucleus""]",True,True,False
+ENSG00000102967,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000102978,candidate,"[""Nucleus""]",True,True,False
+ENSG00000103024,candidate,"[""Cytosol"", ""Mitochondria""]",False,True,True
+ENSG00000103044,candidate,"[""Golgi apparatus"", ""cell membrane"", ""vesicle""]",False,True,True
+ENSG00000103056,candidate,"[""Golgi apparatus"", ""cell membrane""]",False,True,True
+ENSG00000103064,candidate,"[""cell membrane""]",True,True,False
+ENSG00000103066,candidate,"[""lysosome""]",True,True,False
+ENSG00000103150,candidate,"[""Cytosol"", ""Mitochondria"", ""Peroxisome""]",False,True,True
+ENSG00000103174,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000103194,candidate,"[""Cytosol"", ""Nucleus"", ""vesicle""]",False,True,True
+ENSG00000103202,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000103222,candidate,"[""cell membrane""]",True,True,False
+ENSG00000103253,unresolved,[],False,False,False
+ENSG00000103257,candidate,"[""cell membrane"", ""lysosome""]",False,True,True
+ENSG00000103266,candidate,"[""Cytosol"", ""Mitochondria"", ""Nucleus""]",False,True,True
+ENSG00000103275,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000103375,candidate,"[""Endoplasmic reticulum"", ""cell membrane"", ""inner mitochondria""]",False,True,True
+ENSG00000103404,unresolved,[],False,False,False
+ENSG00000103415,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000103485,unresolved,[],False,False,False
+ENSG00000103489,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000103502,candidate,"[""Endoplasmic reticulum"", ""cell membrane""]",False,True,True
+ENSG00000103507,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000103510,candidate,"[""Mitochondria"", ""Nucleus""]",False,True,True
+ENSG00000103546,candidate,"[""cell membrane""]",True,True,False
+ENSG00000103549,candidate,"[""Nucleus""]",True,True,False
+ENSG00000103569,candidate,"[""cell membrane""]",True,True,False
+ENSG00000103657,candidate,"[""Cytosol"", ""Golgi apparatus""]",False,True,True
+ENSG00000103707,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000103740,candidate,"[""Cytosol"", ""Endoplasmic reticulum"", ""cell membrane"", ""vesicle""]",False,True,True
+ENSG00000103811,candidate,"[""lysosome""]",True,True,False
+ENSG00000103876,unresolved,[],False,False,False
+ENSG00000104044,candidate,"[""vesicle""]",True,True,False
+ENSG00000104055,candidate,"[""Cytosol""]",True,True,False
+ENSG00000104219,candidate,"[""Endoplasmic reticulum"", ""Golgi apparatus"", ""cell membrane"", ""vesicle""]",False,True,True
+ENSG00000104267,candidate,"[""Cytosol"", ""cell membrane""]",False,True,True
+ENSG00000104325,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000104331,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000104343,candidate,"[""Nucleus""]",True,True,False
+ENSG00000104517,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000104522,unresolved,[],False,False,False
+ENSG00000104524,candidate,"[""Cytosol""]",True,True,False
+ENSG00000104549,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000104635,candidate,"[""cell membrane"", ""lysosome"", ""vesicle""]",False,True,True
+ENSG00000104687,candidate,"[""Cytosol"", ""Mitochondria""]",False,True,True
+ENSG00000104723,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000104763,candidate,"[""Cytosol"", ""Nucleus"", ""lysosome""]",False,True,True
+ENSG00000104774,candidate,"[""lysosome""]",True,True,False
+ENSG00000104808,unresolved,[],False,False,False
+ENSG00000104812,unresolved,[],False,False,False
+ENSG00000104823,candidate,"[""Mitochondria"", ""Peroxisome""]",False,True,True
+ENSG00000104879,candidate,"[""Cytosol""]",True,True,False
+ENSG00000104885,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000104888,candidate,"[""cell membrane"", ""vesicle""]",False,True,True
+ENSG00000104907,candidate,"[""Cytosol"", ""Mitochondria"", ""Nucleus""]",False,True,True
+ENSG00000104951,candidate,"[""lysosome"", ""vesicle""]",False,True,True
+ENSG00000105143,candidate,"[""cell membrane""]",True,True,False
+ENSG00000105220,candidate,"[""Cytosol""]",True,True,False
+ENSG00000105254,candidate,"[""Cytosol"", ""cytoskeleton""]",False,True,True
+ENSG00000105258,candidate,"[""Nucleus""]",True,True,False
+ENSG00000105281,candidate,"[""cell membrane"", ""vesicle""]",False,True,True
+ENSG00000105355,candidate,"[""Cytosol"", ""vesicle""]",False,True,True
+ENSG00000105379,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000105398,candidate,"[""Cytosol""]",True,True,False
+ENSG00000105409,candidate,"[""cell membrane""]",True,True,False
+ENSG00000105499,candidate,"[""Endoplasmic reticulum"", ""Mitochondria"", ""cell membrane""]",False,True,True
+ENSG00000105509,candidate,[],False,False,False
+ENSG00000105516,candidate,"[""Nucleus""]",True,True,False
+ENSG00000105520,candidate,[],False,False,False
+ENSG00000105552,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000105607,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000105641,candidate,"[""Cytosol"", ""cell membrane""]",False,True,True
+ENSG00000105647,candidate,[],False,False,False
+ENSG00000105650,candidate,"[""cilium""]",True,True,False
+ENSG00000105655,candidate,"[""Cytosol""]",True,True,False
+ENSG00000105669,candidate,"[""Cytosol"", ""Golgi apparatus"", ""vesicle""]",False,True,True
+ENSG00000105675,candidate,"[""cell membrane""]",True,True,False
+ENSG00000105679,candidate,"[""Cytosol""]",True,True,False
+ENSG00000105701,candidate,"[""Cytosol"", ""Mitochondria"", ""Nucleus"", ""cytoskeleton""]",False,True,True
+ENSG00000105755,candidate,"[""Cytosol"", ""Mitochondria"", ""Nucleus""]",False,True,True
+ENSG00000105835,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000105851,candidate,"[""Cytosol"", ""cell membrane""]",False,True,True
+ENSG00000105852,candidate,[],False,False,False
+ENSG00000105854,candidate,[],False,False,False
+ENSG00000105879,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000105929,candidate,"[""cell membrane""]",True,True,False
+ENSG00000105939,candidate,"[""Cytosol"", ""Nucleus"", ""lysosome"", ""vesicle""]",False,True,True
+ENSG00000105953,candidate,"[""Mitochondria"", ""Nucleus""]",False,True,True
+ENSG00000106049,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000106080,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000106105,candidate,"[""Cytosol"", ""Mitochondria""]",False,True,True
+ENSG00000106258,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000106302,candidate,[],False,False,False
+ENSG00000106304,candidate,"[""cell membrane""]",True,True,False
+ENSG00000106346,unresolved,[],False,False,False
+ENSG00000106348,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000106384,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000106392,candidate,[],False,False,False
+ENSG00000106397,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000106462,candidate,"[""Nucleus""]",True,True,False
+ENSG00000106605,candidate,"[""Cytosol""]",True,True,False
+ENSG00000106628,candidate,"[""Nucleus""]",True,True,False
+ENSG00000106633,candidate,"[""Cytosol"", ""Mitochondria"", ""Nucleus""]",False,True,True
+ENSG00000106688,candidate,"[""cell membrane"", ""vesicle""]",False,True,True
+ENSG00000106733,unresolved,[],False,False,False
+ENSG00000106853,candidate,"[""Cytosol""]",True,True,False
+ENSG00000106976,candidate,"[""cell membrane"", ""vesicle""]",False,True,True
+ENSG00000106992,candidate,"[""Cytosol""]",True,True,False
+ENSG00000107159,candidate,"[""Nucleus"", ""cell membrane"", ""cytoskeleton""]",False,True,True
+ENSG00000107165,candidate,"[""vesicle""]",True,True,False
+ENSG00000107242,candidate,"[""Cytosol"", ""cell membrane""]",False,True,True
+ENSG00000107317,candidate,"[""Endoplasmic reticulum"", ""Golgi apparatus"", ""Nucleus""]",False,True,True
+ENSG00000107341,unresolved,[],False,False,False
+ENSG00000107537,candidate,"[""Peroxisome""]",True,True,False
+ENSG00000107611,candidate,"[""cell membrane"", ""lysosome"", ""vesicle""]",False,True,True
+ENSG00000107614,candidate,"[""Cytosol""]",True,True,False
+ENSG00000107669,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000107789,candidate,"[""Endoplasmic reticulum"", ""cell membrane""]",False,True,True
+ENSG00000107798,candidate,"[""lysosome""]",True,True,False
+ENSG00000107819,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000107854,candidate,"[""Cytosol"", ""Golgi apparatus"", ""Nucleus""]",False,True,True
+ENSG00000107902,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000107951,candidate,"[""Cytosol"", ""Mitochondria""]",False,True,True
+ENSG00000107954,candidate,"[""cell membrane""]",True,True,False
+ENSG00000108106,unresolved,[],False,False,False
+ENSG00000108179,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000108242,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000108381,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000108439,unresolved,[],False,False,False
+ENSG00000108474,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000108479,unresolved,[],False,False,False
+ENSG00000108515,candidate,"[""Cytosol""]",True,True,False
+ENSG00000108523,candidate,"[""Cytosol"", ""Endoplasmic reticulum"", ""cell membrane"", ""lysosome"", ""vesicle""]",False,True,True
+ENSG00000108528,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000108559,candidate,"[""Nucleus""]",True,True,False
+ENSG00000108576,candidate,"[""cell membrane"", ""vesicle""]",False,True,True
+ENSG00000108602,candidate,"[""Cytosol""]",True,True,False
+ENSG00000108773,candidate,"[""Nucleus"", ""cytoskeleton""]",False,True,True
+ENSG00000108784,candidate,"[""lysosome""]",True,True,False
+ENSG00000108786,candidate,"[""Cytosol""]",True,True,False
+ENSG00000108799,candidate,"[""Nucleus""]",True,True,False
+ENSG00000108839,candidate,"[""Cytosol""]",True,True,False
+ENSG00000108846,candidate,"[""cell membrane""]",True,True,False
+ENSG00000108854,candidate,"[""Cytosol"", ""Nucleus"", ""cell membrane""]",False,True,True
+ENSG00000108932,candidate,"[""cell membrane""]",True,True,False
+ENSG00000109065,unresolved,[],False,False,False
+ENSG00000109107,unresolved,[],False,False,False
+ENSG00000109181,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000109189,candidate,"[""Cytosol""]",True,True,False
+ENSG00000109193,candidate,"[""Cytosol""]",True,True,False
+ENSG00000109323,candidate,"[""lysosome""]",True,True,False
+ENSG00000109332,candidate,"[""cell membrane"", ""vesicle""]",False,True,True
+ENSG00000109390,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000109424,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000109452,unresolved,[],False,False,False
+ENSG00000109576,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000109586,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000109610,candidate,"[""Golgi apparatus"", ""vesicle""]",False,True,True
+ENSG00000109667,candidate,"[""cell membrane""]",True,True,False
+ENSG00000109685,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000109743,candidate,"[""cell membrane""]",True,True,False
+ENSG00000109814,unresolved,[],False,False,False
+ENSG00000109854,candidate,"[""Cytosol""]",True,True,False
+ENSG00000109861,candidate,"[""lysosome""]",True,True,False
+ENSG00000109929,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000109956,candidate,"[""Endoplasmic reticulum"", ""Golgi apparatus""]",False,True,True
+ENSG00000110013,candidate,"[""Cytosol"", ""lysosome""]",False,True,True
+ENSG00000110066,candidate,"[""Nucleus""]",True,True,False
+ENSG00000110080,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000110090,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000110195,candidate,"[""cell membrane"", ""vesicle""]",False,True,True
+ENSG00000110203,candidate,[],False,False,False
+ENSG00000110245,candidate,[],False,False,False
+ENSG00000110328,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000110344,candidate,"[""Cytosol""]",True,True,False
+ENSG00000110395,candidate,"[""Cytosol"", ""Golgi apparatus"", ""cell membrane"", ""cilium""]",False,True,True
+ENSG00000110435,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000110436,candidate,"[""cell membrane""]",True,True,False
+ENSG00000110446,candidate,"[""lysosome"", ""vesicle""]",False,True,True
+ENSG00000110536,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000110583,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000110619,candidate,"[""Cytosol""]",True,True,False
+ENSG00000110628,candidate,"[""cell membrane""]",True,True,False
+ENSG00000110713,candidate,"[""Nucleus""]",True,True,False
+ENSG00000110717,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000110719,candidate,[],False,False,False
+ENSG00000110721,candidate,"[""Cytosol""]",True,True,False
+ENSG00000110871,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000110887,candidate,"[""Cytosol"", ""Peroxisome""]",False,True,True
+ENSG00000110911,candidate,"[""Golgi apparatus"", ""Mitochondria"", ""cell membrane"", ""lysosome"", ""vesicle""]",False,True,True
+ENSG00000110921,candidate,"[""Cytosol"", ""Peroxisome""]",False,True,True
+ENSG00000110955,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000110958,candidate,"[""Cytosol""]",True,True,False
+ENSG00000111012,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000111058,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000111077,candidate,"[""Cytosol"", ""cell membrane""]",False,True,True
+ENSG00000111144,candidate,"[""Cytosol""]",True,True,False
+ENSG00000111181,candidate,"[""cell membrane""]",True,True,False
+ENSG00000111224,candidate,"[""Nucleus""]",True,True,False
+ENSG00000111261,candidate,[],False,False,False
+ENSG00000111275,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000111319,candidate,"[""Cytosol"", ""cell membrane"", ""cilium"", ""vesicle""]",False,True,True
+ENSG00000111339,candidate,"[""cell membrane""]",True,True,False
+ENSG00000111371,candidate,"[""cell membrane""]",True,True,False
+ENSG00000111445,candidate,"[""Nucleus""]",True,True,False
+ENSG00000111581,candidate,"[""Nucleus""]",True,True,False
+ENSG00000111640,candidate,"[""Cytosol"", ""Nucleus"", ""cytoskeleton""]",False,True,True
+ENSG00000111666,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000111667,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000111669,candidate,"[""Cytosol""]",True,True,False
+ENSG00000111670,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000111674,candidate,"[""Cytosol"", ""cell membrane""]",False,True,True
+ENSG00000111684,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000111696,unresolved,[],False,False,False
+ENSG00000111700,candidate,"[""cell membrane""]",True,True,False
+ENSG00000111713,unresolved,[],False,False,False
+ENSG00000111716,candidate,"[""Cytosol"", ""inner mitochondria""]",False,True,True
+ENSG00000111726,candidate,"[""Nucleus""]",True,True,False
+ENSG00000111728,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000111732,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000111775,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000111817,candidate,"[""Endoplasmic reticulum"", ""Golgi apparatus"", ""vesicle""]",False,True,True
+ENSG00000111846,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000111880,candidate,"[""Nucleus""]",True,True,False
+ENSG00000111885,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000111962,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000112053,candidate,[],False,False,False
+ENSG00000112077,candidate,[],False,False,False
+ENSG00000112096,unresolved,[],False,False,False
+ENSG00000112130,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000112293,candidate,[],False,False,False
+ENSG00000112294,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000112299,candidate,"[""cell membrane""]",True,True,False
+ENSG00000112303,candidate,"[""cell membrane""]",True,True,False
+ENSG00000112304,candidate,"[""Cytosol"", ""Mitochondria"", ""Nucleus"", ""cytoskeleton""]",False,True,True
+ENSG00000112309,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000112337,candidate,"[""Endoplasmic reticulum"", ""cell membrane""]",False,True,True
+ENSG00000112367,candidate,"[""vesicle""]",True,True,False
+ENSG00000112394,candidate,"[""cell membrane""]",True,True,False
+ENSG00000112473,candidate,"[""Endoplasmic reticulum"", ""Golgi apparatus""]",False,True,True
+ENSG00000112499,candidate,"[""cell membrane""]",True,True,False
+ENSG00000112541,candidate,"[""Cytosol""]",True,True,False
+ENSG00000112695,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000112699,unresolved,[],False,False,False
+ENSG00000112759,candidate,"[""cell membrane""]",True,True,False
+ENSG00000112874,candidate,"[""Cytosol"", ""Peroxisome""]",False,True,True
+ENSG00000112893,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000112941,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000112972,candidate,"[""Cytosol""]",True,True,False
+ENSG00000112992,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000113013,candidate,"[""Cytosol"", ""Mitochondria"", ""Nucleus""]",False,True,True
+ENSG00000113073,candidate,"[""cell membrane""]",True,True,False
+ENSG00000113083,candidate,[],False,False,False
+ENSG00000113161,candidate,"[""Endoplasmic reticulum"", ""Peroxisome""]",False,True,True
+ENSG00000113163,candidate,"[""Cytosol"", ""Endoplasmic reticulum"", ""Golgi apparatus"", ""vesicle""]",False,True,True
+ENSG00000113231,unresolved,[],False,False,False
+ENSG00000113269,candidate,"[""Cytosol""]",True,True,False
+ENSG00000113273,candidate,"[""lysosome""]",True,True,False
+ENSG00000113356,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000113396,candidate,"[""cell membrane""]",True,True,False
+ENSG00000113407,candidate,"[""Cytosol""]",True,True,False
+ENSG00000113448,candidate,"[""Cytosol"", ""cell membrane"", ""cytoskeleton""]",False,True,True
+ENSG00000113456,candidate,"[""Nucleus""]",True,True,False
+ENSG00000113492,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000113504,candidate,"[""cell membrane""]",True,True,False
+ENSG00000113532,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000113552,candidate,"[""Cytosol""]",True,True,False
+ENSG00000113569,candidate,"[""Nucleus""]",True,True,False
+ENSG00000113593,candidate,"[""Nucleus""]",True,True,False
+ENSG00000113643,candidate,"[""Cytosol""]",True,True,False
+ENSG00000113732,candidate,[],False,False,False
+ENSG00000113790,candidate,"[""Peroxisome""]",True,True,False
+ENSG00000113924,unresolved,[],False,False,False
+ENSG00000114021,candidate,"[""Cytosol""]",True,True,False
+ENSG00000114054,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000114062,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000114113,candidate,"[""Cytosol""]",True,True,False
+ENSG00000114115,candidate,"[""Cytosol""]",True,True,False
+ENSG00000114120,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000114124,candidate,"[""cilium""]",True,True,False
+ENSG00000114166,candidate,"[""Cytosol"", ""Nucleus"", ""cytoskeleton""]",False,True,True
+ENSG00000114200,candidate,[],False,False,False
+ENSG00000114268,unresolved,[],False,False,False
+ENSG00000114316,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000114374,unresolved,[],False,False,False
+ENSG00000114378,candidate,"[""lysosome""]",True,True,False
+ENSG00000114423,candidate,"[""Cytosol""]",True,True,False
+ENSG00000114480,unresolved,[],False,False,False
+ENSG00000114491,unresolved,[],False,False,False
+ENSG00000114573,candidate,"[""Cytosol"", ""lysosome"", ""vesicle""]",False,True,True
+ENSG00000114770,candidate,"[""Golgi apparatus"", ""cell membrane"", ""vesicle""]",False,True,True
+ENSG00000114771,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000114805,candidate,"[""Cytosol"", ""cell membrane""]",False,True,True
+ENSG00000114857,candidate,"[""cell membrane""]",True,True,False
+ENSG00000114902,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000114923,candidate,"[""cell membrane""]",True,True,False
+ENSG00000114956,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000114982,candidate,"[""Mitochondria"", ""Nucleus"", ""cytoskeleton""]",False,True,True
+ENSG00000114999,unresolved,[],False,False,False
+ENSG00000115020,candidate,"[""vesicle""]",True,True,False
+ENSG00000115159,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000115252,unresolved,[],False,False,False
+ENSG00000115275,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000115286,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000115339,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000115350,candidate,"[""Nucleus""]",True,True,False
+ENSG00000115361,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000115392,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000115419,candidate,"[""Cytosol"", ""Mitochondria""]",False,True,True
+ENSG00000115421,candidate,"[""Nucleus""]",True,True,False
+ENSG00000115425,candidate,"[""Peroxisome""]",True,True,False
+ENSG00000115464,unresolved,[],False,False,False
+ENSG00000115488,candidate,"[""Cytosol""]",True,True,False
+ENSG00000115525,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000115526,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000115556,candidate,"[""Cytosol"", ""Endoplasmic reticulum"", ""Nucleus"", ""cell membrane""]",False,True,True
+ENSG00000115616,candidate,"[""cell membrane""]",True,True,False
+ENSG00000115652,candidate,"[""Endoplasmic reticulum"", ""Golgi apparatus""]",False,True,True
+ENSG00000115657,candidate,"[""Endoplasmic reticulum"", ""Golgi apparatus"", ""Mitochondria"", ""cell membrane"", ""lysosome"", ""vesicle""]",False,True,True
+ENSG00000115665,candidate,"[""cell membrane"", ""vesicle""]",False,True,True
+ENSG00000115677,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000115705,candidate,[],False,False,False
+ENSG00000115758,unresolved,[],False,False,False
+ENSG00000115760,candidate,"[""Golgi apparatus"", ""cytoskeleton"", ""vesicle""]",False,True,True
+ENSG00000115828,candidate,[],False,False,False
+ENSG00000115840,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000115850,candidate,"[""cell membrane""]",True,True,False
+ENSG00000115866,candidate,"[""Cytosol""]",True,True,False
+ENSG00000115884,candidate,[],False,False,False
+ENSG00000115902,candidate,"[""cell membrane"", ""vesicle""]",False,True,True
+ENSG00000115919,candidate,"[""Cytosol""]",True,True,False
+ENSG00000116005,candidate,"[""lysosome""]",True,True,False
+ENSG00000116039,candidate,"[""cell membrane""]",True,True,False
+ENSG00000116096,candidate,"[""Cytosol""]",True,True,False
+ENSG00000116120,candidate,"[""Cytosol""]",True,True,False
+ENSG00000116133,candidate,"[""Endoplasmic reticulum"", ""Golgi apparatus""]",False,True,True
+ENSG00000116157,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000116171,candidate,"[""Cytosol"", ""Endoplasmic reticulum"", ""Mitochondria"", ""Peroxisome""]",False,True,True
+ENSG00000116199,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000116237,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000116337,unresolved,[],False,False,False
+ENSG00000116353,candidate,"[""Cytosol"", ""Mitochondria"", ""Nucleus""]",False,True,True
+ENSG00000116459,candidate,"[""Mitochondria"", ""inner mitochondria""]",False,True,True
+ENSG00000116514,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000116539,candidate,"[""Nucleus""]",True,True,False
+ENSG00000116649,unresolved,[],False,False,False
+ENSG00000116704,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000116711,candidate,"[""Cytosol"", ""Golgi apparatus"", ""Nucleus""]",False,True,True
+ENSG00000116745,candidate,"[""Cytosol"", ""cell membrane""]",False,True,True
+ENSG00000116748,unresolved,[],False,False,False
+ENSG00000116761,candidate,"[""Cytosol""]",True,True,False
+ENSG00000116771,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000116791,candidate,"[""Cytosol""]",True,True,False
+ENSG00000116906,candidate,"[""Peroxisome""]",True,True,False
+ENSG00000116981,candidate,"[""Cytosol""]",True,True,False
+ENSG00000116984,candidate,"[""Cytosol""]",True,True,False
+ENSG00000117009,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000117054,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000117069,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000117115,candidate,"[""Cytosol""]",True,True,False
+ENSG00000117118,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000117143,candidate,"[""Cytosol""]",True,True,False
+ENSG00000117215,candidate,[],False,False,False
+ENSG00000117305,candidate,"[""Mitochondria"", ""Peroxisome""]",False,True,True
+ENSG00000117308,unresolved,[],False,False,False
+ENSG00000117394,candidate,"[""cell membrane"", ""vesicle""]",False,True,True
+ENSG00000117410,candidate,"[""vesicle""]",True,True,False
+ENSG00000117411,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000117448,candidate,"[""Cytosol"", ""cell membrane""]",False,True,True
+ENSG00000117450,candidate,"[""Cytosol"", ""vesicle""]",False,True,True
+ENSG00000117461,unresolved,[],False,False,False
+ENSG00000117479,candidate,"[""cell membrane""]",True,True,False
+ENSG00000117480,candidate,"[""cytoskeleton""]",True,True,False
+ENSG00000117528,candidate,"[""Peroxisome""]",True,True,False
+ENSG00000117543,unresolved,[],False,False,False
+ENSG00000117592,candidate,"[""Cytosol"", ""lysosome""]",False,True,True
+ENSG00000117594,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000117600,candidate,"[""cell membrane""]",True,True,False
+ENSG00000117643,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000117682,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000117834,candidate,"[""cell membrane""]",True,True,False
+ENSG00000117984,candidate,"[""lysosome"", ""vesicle""]",False,True,True
+ENSG00000118017,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000118058,candidate,"[""Nucleus""]",True,True,False
+ENSG00000118094,candidate,"[""cell membrane""]",True,True,False
+ENSG00000118160,candidate,"[""cell membrane""]",True,True,False
+ENSG00000118276,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000118298,candidate,[],False,False,False
+ENSG00000118363,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000118369,candidate,"[""Cytosol"", ""Mitochondria""]",False,True,True
+ENSG00000118402,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000118514,candidate,"[""Cytosol""]",True,True,False
+ENSG00000118518,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000118520,candidate,"[""Cytosol""]",True,True,False
+ENSG00000118596,candidate,"[""Cytosol"", ""cell membrane""]",False,True,True
+ENSG00000118705,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000118777,candidate,"[""Mitochondria"", ""cell membrane""]",False,True,True
+ENSG00000119013,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000119048,candidate,"[""Nucleus"", ""cell membrane""]",False,True,True
+ENSG00000119125,unresolved,[],False,False,False
+ENSG00000119227,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000119392,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000119401,candidate,"[""Cytosol"", ""Endoplasmic reticulum"", ""Mitochondria""]",False,True,True
+ENSG00000119421,candidate,"[""Mitochondria"", ""inner mitochondria""]",False,True,True
+ENSG00000119514,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000119523,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000119537,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000119640,unresolved,[],False,False,False
+ENSG00000119673,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000119689,candidate,"[""Mitochondria"", ""Nucleus""]",False,True,True
+ENSG00000119711,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000119723,candidate,"[""Golgi apparatus"", ""inner mitochondria""]",False,True,True
+ENSG00000119772,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000119782,candidate,"[""Cytosol"", ""Endoplasmic reticulum""]",False,True,True
+ENSG00000119899,candidate,"[""Endoplasmic reticulum"", ""cell membrane"", ""lysosome"", ""vesicle""]",False,True,True
+ENSG00000119915,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000119927,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000119938,unresolved,[],False,False,False
+ENSG00000120053,candidate,"[""Cytosol""]",True,True,False
+ENSG00000120137,candidate,"[""Cytosol""]",True,True,False
+ENSG00000120253,candidate,"[""Nucleus""]",True,True,False
+ENSG00000120254,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000120265,candidate,"[""Cytosol""]",True,True,False
+ENSG00000120329,candidate,"[""Mitochondria"", ""inner mitochondria""]",False,True,True
+ENSG00000120437,candidate,"[""Cytosol""]",True,True,False
+ENSG00000120563,candidate,[],False,False,False
+ENSG00000120697,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000120820,candidate,[],False,False,False
+ENSG00000120915,candidate,"[""Cytosol"", ""Peroxisome""]",False,True,True
+ENSG00000120942,candidate,"[""Cytosol"", ""Endoplasmic reticulum"", ""Golgi apparatus"", ""Mitochondria"", ""Nucleus""]",False,True,True
+ENSG00000120992,candidate,"[""Cytosol"", ""Endoplasmic reticulum"", ""Nucleus"", ""cell membrane""]",False,True,True
+ENSG00000121039,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000121053,candidate,[],False,False,False
+ENSG00000121207,candidate,"[""Endoplasmic reticulum"", ""vesicle""]",False,True,True
+ENSG00000121270,candidate,"[""cell membrane"", ""vesicle""]",False,True,True
+ENSG00000121281,candidate,[],False,False,False
+ENSG00000121310,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000121361,candidate,[],False,False,False
+ENSG00000121481,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000121578,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000121691,candidate,"[""Peroxisome""]",True,True,False
+ENSG00000121769,candidate,"[""Cytosol""]",True,True,False
+ENSG00000121851,candidate,"[""Nucleus""]",True,True,False
+ENSG00000121879,unresolved,[],False,False,False
+ENSG00000121897,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000122008,candidate,"[""Nucleus""]",True,True,False
+ENSG00000122126,candidate,"[""Golgi apparatus"", ""cilium"", ""lysosome"", ""vesicle""]",False,True,True
+ENSG00000122194,candidate,[],False,False,False
+ENSG00000122254,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000122257,candidate,"[""Nucleus"", ""cytoskeleton""]",False,True,True
+ENSG00000122390,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000122642,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000122643,candidate,"[""Cytosol"", ""Endoplasmic reticulum""]",False,True,True
+ENSG00000122678,candidate,"[""Nucleus""]",True,True,False
+ENSG00000122729,candidate,"[""Cytosol""]",True,True,False
+ENSG00000122787,candidate,"[""Cytosol""]",True,True,False
+ENSG00000122824,candidate,"[""Cytosol""]",True,True,False
+ENSG00000122863,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000122884,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000122912,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000122971,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000123104,candidate,"[""Endoplasmic reticulum"", ""vesicle""]",False,True,True
+ENSG00000123124,candidate,"[""Cytosol"", ""Nucleus"", ""cell membrane"", ""cilium""]",False,True,True
+ENSG00000123130,candidate,"[""Mitochondria"", ""inner mitochondria""]",False,True,True
+ENSG00000123213,candidate,"[""Cytosol"", ""Mitochondria""]",False,True,True
+ENSG00000123360,candidate,"[""Cytosol""]",True,True,False
+ENSG00000123453,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000123454,candidate,"[""vesicle""]",True,True,False
+ENSG00000123505,unresolved,[],False,False,False
+ENSG00000123552,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000123643,candidate,"[""cell membrane"", ""lysosome""]",False,True,True
+ENSG00000123684,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000123739,candidate,"[""Cytosol""]",True,True,False
+ENSG00000123836,unresolved,[],False,False,False
+ENSG00000123983,candidate,"[""Endoplasmic reticulum"", ""Mitochondria"", ""Peroxisome""]",False,True,True
+ENSG00000123989,candidate,"[""Cytosol"", ""Golgi apparatus"", ""Mitochondria""]",False,True,True
+ENSG00000124003,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000124067,candidate,"[""cell membrane""]",True,True,False
+ENSG00000124091,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000124140,candidate,"[""cell membrane""]",True,True,False
+ENSG00000124151,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000124155,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000124164,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000124172,candidate,"[""Mitochondria"", ""inner mitochondria""]",False,True,True
+ENSG00000124181,candidate,[],False,False,False
+ENSG00000124212,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000124253,candidate,"[""Cytosol"", ""Endoplasmic reticulum""]",False,True,True
+ENSG00000124275,candidate,"[""Cytosol""]",True,True,False
+ENSG00000124299,unresolved,[],False,False,False
+ENSG00000124356,candidate,"[""Cytosol"", ""Nucleus"", ""vesicle""]",False,True,True
+ENSG00000124357,unresolved,[],False,False,False
+ENSG00000124370,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000124406,candidate,"[""Endoplasmic reticulum"", ""Golgi apparatus"", ""cell membrane"", ""cilium"", ""vesicle""]",False,True,True
+ENSG00000124422,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000124486,candidate,"[""Cytosol"", ""cilium"", ""cytoskeleton""]",False,True,True
+ENSG00000124491,candidate,"[""Cytosol""]",True,True,False
+ENSG00000124523,candidate,"[""Cytosol"", ""Mitochondria"", ""Nucleus""]",False,True,True
+ENSG00000124564,candidate,"[""Endoplasmic reticulum"", ""cell membrane""]",False,True,True
+ENSG00000124568,candidate,"[""cell membrane""]",True,True,False
+ENSG00000124588,candidate,"[""Cytosol""]",True,True,False
+ENSG00000124596,candidate,"[""Nucleus""]",True,True,False
+ENSG00000124615,candidate,"[""Cytosol"", ""Mitochondria""]",False,True,True
+ENSG00000124713,candidate,"[""Cytosol""]",True,True,False
+ENSG00000124767,unresolved,[],False,False,False
+ENSG00000124789,candidate,"[""Nucleus""]",True,True,False
+ENSG00000125166,candidate,"[""Mitochondria"", ""cell membrane""]",False,True,True
+ENSG00000125246,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000125255,candidate,[],False,False,False
+ENSG00000125257,candidate,"[""cell membrane""]",True,True,False
+ENSG00000125356,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000125430,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000125450,candidate,"[""Cytosol"", ""Nucleus"", ""cytoskeleton""]",False,True,True
+ENSG00000125454,candidate,"[""Mitochondria"", ""inner mitochondria""]",False,True,True
+ENSG00000125458,candidate,"[""Cytosol""]",True,True,False
+ENSG00000125484,candidate,"[""Nucleus""]",True,True,False
+ENSG00000125505,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000125630,candidate,"[""Nucleus""]",True,True,False
+ENSG00000125772,candidate,"[""Cytosol""]",True,True,False
+ENSG00000125779,candidate,"[""Cytosol"", ""Mitochondria"", ""Nucleus""]",False,True,True
+ENSG00000125780,candidate,"[""Cytosol""]",True,True,False
+ENSG00000125877,candidate,"[""Cytosol""]",True,True,False
+ENSG00000126088,candidate,"[""Cytosol""]",True,True,False
+ENSG00000126091,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000126107,candidate,[],False,False,False
+ENSG00000126261,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000126267,candidate,"[""Mitochondria"", ""inner mitochondria""]",False,True,True
+ENSG00000126432,candidate,"[""Cytosol"", ""Mitochondria"", ""Peroxisome""]",False,True,True
+ENSG00000126522,unresolved,[],False,False,False
+ENSG00000126821,candidate,"[""Endoplasmic reticulum"", ""cell membrane""]",False,True,True
+ENSG00000126883,candidate,"[""Nucleus""]",True,True,False
+ENSG00000127080,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000127125,unresolved,[],False,False,False
+ENSG00000127184,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000127412,candidate,"[""cell membrane""]",True,True,False
+ENSG00000127415,candidate,"[""lysosome""]",True,True,False
+ENSG00000127445,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000127472,candidate,"[""Golgi apparatus"", ""cell membrane"", ""vesicle""]",False,True,True
+ENSG00000127481,candidate,"[""Cytosol"", ""Nucleus"", ""cytoskeleton"", ""vesicle""]",False,True,True
+ENSG00000127540,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000127884,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000127948,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000128039,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000128050,unresolved,[],False,False,False
+ENSG00000128059,unresolved,[],False,False,False
+ENSG00000128242,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000128268,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000128274,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000128294,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000128309,candidate,"[""Cytosol"", ""Mitochondria""]",False,True,True
+ENSG00000128311,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000128524,candidate,"[""vesicle""]",True,True,False
+ENSG00000128609,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000128655,candidate,"[""Cytosol""]",True,True,False
+ENSG00000128683,unresolved,[],False,False,False
+ENSG00000128708,candidate,"[""Cytosol"", ""Mitochondria"", ""Nucleus""]",False,True,True
+ENSG00000128731,candidate,"[""Cytosol"", ""Nucleus"", ""cytoskeleton""]",False,True,True
+ENSG00000128918,candidate,"[""Cytosol""]",True,True,False
+ENSG00000128928,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000128951,candidate,"[""Mitochondria"", ""Nucleus""]",False,True,True
+ENSG00000129128,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000129151,candidate,"[""Cytosol""]",True,True,False
+ENSG00000129167,unresolved,[],False,False,False
+ENSG00000129187,unresolved,[],False,False,False
+ENSG00000129204,candidate,"[""Cytosol"", ""cell membrane"", ""vesicle""]",False,True,True
+ENSG00000129219,candidate,"[""cell membrane""]",True,True,False
+ENSG00000129244,candidate,"[""cell membrane""]",True,True,False
+ENSG00000129353,candidate,"[""Mitochondria"", ""cell membrane""]",False,True,True
+ENSG00000129467,candidate,"[""Cytosol"", ""cell membrane""]",False,True,True
+ENSG00000129484,candidate,"[""Nucleus""]",True,True,False
+ENSG00000129562,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000129596,unresolved,[],False,False,False
+ENSG00000129673,candidate,"[""Cytosol""]",True,True,False
+ENSG00000129744,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000129873,candidate,"[""Nucleus""]",True,True,False
+ENSG00000129951,candidate,[],False,False,False
+ENSG00000130005,unresolved,[],False,False,False
+ENSG00000130035,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000130052,candidate,[],False,False,False
+ENSG00000130055,candidate,"[""cell membrane""]",True,True,False
+ENSG00000130066,candidate,"[""Cytosol""]",True,True,False
+ENSG00000130164,candidate,"[""Golgi apparatus"", ""cell membrane"", ""lysosome"", ""vesicle""]",False,True,True
+ENSG00000130203,candidate,"[""vesicle""]",True,True,False
+ENSG00000130208,candidate,[],False,False,False
+ENSG00000130227,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000130234,candidate,"[""Cytosol"", ""cell membrane"", ""cilium""]",False,True,True
+ENSG00000130304,candidate,"[""Cytosol"", ""cell membrane""]",False,True,True
+ENSG00000130309,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000130313,candidate,"[""Cytosol""]",True,True,False
+ENSG00000130377,candidate,"[""Cytosol""]",True,True,False
+ENSG00000130383,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000130414,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000130508,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000130540,candidate,"[""Cytosol""]",True,True,False
+ENSG00000130649,candidate,"[""Endoplasmic reticulum"", ""inner mitochondria""]",False,True,True
+ENSG00000130653,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000130707,candidate,"[""Cytosol""]",True,True,False
+ENSG00000130714,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000130717,unresolved,[],False,False,False
+ENSG00000130725,unresolved,[],False,False,False
+ENSG00000130816,candidate,"[""Nucleus""]",True,True,False
+ENSG00000130821,candidate,"[""cell membrane""]",True,True,False
+ENSG00000130822,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000130876,candidate,"[""cell membrane""]",True,True,False
+ENSG00000130939,candidate,"[""Cytosol"", ""Nucleus"", ""vesicle""]",False,True,True
+ENSG00000130948,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000130957,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000130958,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000130985,candidate,"[""Cytosol"", ""Mitochondria"", ""Nucleus""]",False,True,True
+ENSG00000130988,candidate,"[""Cytosol""]",True,True,False
+ENSG00000130997,candidate,"[""Nucleus""]",True,True,False
+ENSG00000131013,candidate,"[""Nucleus""]",True,True,False
+ENSG00000131055,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000131067,candidate,[],False,False,False
+ENSG00000131069,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000131100,candidate,"[""cell membrane"", ""lysosome"", ""vesicle""]",False,True,True
+ENSG00000131143,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000131174,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000131183,candidate,"[""cell membrane""]",True,True,False
+ENSG00000131203,candidate,"[""Cytosol""]",True,True,False
+ENSG00000131238,candidate,"[""Endoplasmic reticulum"", ""Golgi apparatus"", ""lysosome""]",False,True,True
+ENSG00000131373,candidate,"[""Peroxisome""]",True,True,False
+ENSG00000131386,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000131389,candidate,"[""cell membrane"", ""inner mitochondria""]",False,True,True
+ENSG00000131446,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000131459,unresolved,[],False,False,False
+ENSG00000131471,candidate,"[""cell membrane""]",True,True,False
+ENSG00000131473,candidate,"[""Cytosol""]",True,True,False
+ENSG00000131480,candidate,"[""Cytosol"", ""cell membrane""]",False,True,True
+ENSG00000131482,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000131495,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000131508,unresolved,[],False,False,False
+ENSG00000131653,candidate,"[""Cytosol"", ""Nucleus"", ""vesicle""]",False,True,True
+ENSG00000131686,candidate,[],False,False,False
+ENSG00000131730,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000131748,candidate,"[""vesicle""]",True,True,False
+ENSG00000131781,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000131828,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000131844,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000131864,candidate,[],False,False,False
+ENSG00000131873,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000131979,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000132164,candidate,"[""cell membrane""]",True,True,False
+ENSG00000132182,candidate,"[""Endoplasmic reticulum"", ""Nucleus""]",False,True,True
+ENSG00000132196,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000132256,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000132330,candidate,"[""Cytosol""]",True,True,False
+ENSG00000132376,candidate,"[""Cytosol"", ""Endoplasmic reticulum""]",False,True,True
+ENSG00000132388,unresolved,[],False,False,False
+ENSG00000132423,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000132437,unresolved,[],False,False,False
+ENSG00000132517,candidate,"[""cell membrane""]",True,True,False
+ENSG00000132518,candidate,"[""Endoplasmic reticulum"", ""cell membrane"", ""cilium""]",False,True,True
+ENSG00000132570,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000132664,candidate,"[""Nucleus""]",True,True,False
+ENSG00000132677,candidate,"[""cell membrane""]",True,True,False
+ENSG00000132681,candidate,"[""cell membrane""]",True,True,False
+ENSG00000132744,candidate,"[""Cytosol"", ""cell membrane""]",False,True,True
+ENSG00000132746,candidate,[],False,False,False
+ENSG00000132793,candidate,"[""Nucleus""]",True,True,False
+ENSG00000132837,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000132840,unresolved,[],False,False,False
+ENSG00000132874,candidate,"[""cell membrane""]",True,True,False
+ENSG00000132915,candidate,"[""cell membrane"", ""cilium""]",False,True,True
+ENSG00000132958,candidate,"[""Cytosol"", ""Endoplasmic reticulum"", ""Golgi apparatus"", ""cell membrane""]",False,True,True
+ENSG00000133027,candidate,"[""Endoplasmic reticulum"", ""Mitochondria""]",False,True,True
+ENSG00000133056,candidate,"[""Cytosol"", ""Endoplasmic reticulum"", ""Nucleus"", ""cell membrane""]",False,True,True
+ENSG00000133063,candidate,"[""lysosome""]",True,True,False
+ENSG00000133065,candidate,"[""cell membrane""]",True,True,False
+ENSG00000133116,candidate,"[""cell membrane""]",True,True,False
+ENSG00000133121,candidate,"[""Cytosol"", ""Mitochondria""]",False,True,True
+ENSG00000133135,candidate,"[""Cytosol"", ""cytoskeleton""]",False,True,True
+ENSG00000133247,candidate,"[""Nucleus""]",True,True,False
+ENSG00000133256,candidate,"[""cell membrane"", ""cilium""]",False,True,True
+ENSG00000133275,candidate,"[""Cytosol""]",True,True,False
+ENSG00000133313,candidate,"[""Cytosol""]",True,True,False
+ENSG00000133315,candidate,"[""Nucleus""]",True,True,False
+ENSG00000133328,candidate,"[""Cytosol""]",True,True,False
+ENSG00000133433,candidate,"[""Cytosol""]",True,True,False
+ENSG00000133460,candidate,"[""cell membrane""]",True,True,False
+ENSG00000133606,unresolved,[],False,False,False
+ENSG00000133706,candidate,"[""Cytosol""]",True,True,False
+ENSG00000133731,candidate,"[""Cytosol""]",True,True,False
+ENSG00000133742,candidate,"[""Cytosol""]",True,True,False
+ENSG00000133805,unresolved,[],False,False,False
+ENSG00000133835,candidate,"[""Peroxisome""]",True,True,False
+ENSG00000134013,candidate,"[""Endoplasmic reticulum"", ""Nucleus""]",False,True,True
+ENSG00000134184,candidate,"[""Cytosol""]",True,True,False
+ENSG00000134201,candidate,"[""Cytosol""]",True,True,False
+ENSG00000134202,candidate,"[""Cytosol""]",True,True,False
+ENSG00000134216,candidate,"[""Cytosol""]",True,True,False
+ENSG00000134240,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000134255,candidate,"[""Endoplasmic reticulum"", ""Nucleus""]",False,True,True
+ENSG00000134285,candidate,[],False,False,False
+ENSG00000134294,candidate,"[""cell membrane""]",True,True,False
+ENSG00000134324,candidate,"[""Cytosol"", ""Endoplasmic reticulum"", ""Nucleus""]",False,True,True
+ENSG00000134326,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000134333,candidate,"[""Cytosol""]",True,True,False
+ENSG00000134440,candidate,"[""Cytosol""]",True,True,False
+ENSG00000134538,candidate,"[""cell membrane""]",True,True,False
+ENSG00000134575,candidate,"[""lysosome""]",True,True,False
+ENSG00000134588,candidate,"[""Nucleus""]",True,True,False
+ENSG00000134684,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000134716,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000134744,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000134758,candidate,[],False,False,False
+ENSG00000134780,candidate,"[""cell membrane"", ""vesicle""]",False,True,True
+ENSG00000134812,candidate,[],False,False,False
+ENSG00000134824,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000134852,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000134864,unresolved,[],False,False,False
+ENSG00000134882,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000134910,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000135002,candidate,"[""Cytosol""]",True,True,False
+ENSG00000135047,candidate,"[""Nucleus"", ""cell membrane"", ""lysosome"", ""vesicle""]",False,True,True
+ENSG00000135069,unresolved,[],False,False,False
+ENSG00000135070,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000135093,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000135094,candidate,"[""Cytosol""]",True,True,False
+ENSG00000135218,candidate,"[""Golgi apparatus"", ""cell membrane""]",False,True,True
+ENSG00000135220,candidate,[],False,False,False
+ENSG00000135226,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000135241,candidate,"[""Endoplasmic reticulum"", ""Mitochondria"", ""Peroxisome""]",False,True,True
+ENSG00000135318,candidate,"[""cell membrane""]",True,True,False
+ENSG00000135390,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000135423,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000135437,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000135454,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000135587,candidate,"[""cell membrane""]",True,True,False
+ENSG00000135655,candidate,"[""Cytosol"", ""Mitochondria"", ""Nucleus""]",False,True,True
+ENSG00000135677,candidate,"[""lysosome""]",True,True,False
+ENSG00000135679,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000135697,candidate,"[""Cytosol""]",True,True,False
+ENSG00000135702,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000135740,candidate,"[""cell membrane"", ""vesicle""]",False,True,True
+ENSG00000135778,unresolved,[],False,False,False
+ENSG00000135821,candidate,"[""Cytosol"", ""Mitochondria"", ""cell membrane""]",False,True,True
+ENSG00000135838,candidate,"[""Cytosol""]",True,True,False
+ENSG00000135845,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000135913,candidate,"[""Nucleus""]",True,True,False
+ENSG00000135917,candidate,[],False,False,False
+ENSG00000135929,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000135940,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000136003,candidate,"[""Cytosol"", ""Mitochondria"", ""Nucleus""]",False,True,True
+ENSG00000136010,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000136014,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000136052,candidate,"[""cell membrane""]",True,True,False
+ENSG00000136143,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000136169,candidate,"[""Nucleus""]",True,True,False
+ENSG00000136213,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000136243,candidate,"[""Nucleus""]",True,True,False
+ENSG00000136247,candidate,"[""Endoplasmic reticulum"", ""Golgi apparatus"", ""cell membrane""]",False,True,True
+ENSG00000136250,candidate,"[""vesicle""]",True,True,False
+ENSG00000136267,candidate,"[""Cytosol"", ""cell membrane""]",False,True,True
+ENSG00000136371,candidate,"[""Cytosol""]",True,True,False
+ENSG00000136448,candidate,"[""Cytosol""]",True,True,False
+ENSG00000136504,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000136521,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000136531,candidate,"[""cell membrane""]",True,True,False
+ENSG00000136536,candidate,"[""Cytosol""]",True,True,False
+ENSG00000136542,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000136546,candidate,"[""cell membrane""]",True,True,False
+ENSG00000136628,candidate,"[""Cytosol""]",True,True,False
+ENSG00000136699,candidate,"[""Endoplasmic reticulum"", ""Golgi apparatus"", ""Nucleus"", ""cell membrane""]",False,True,True
+ENSG00000136720,candidate,[],False,False,False
+ENSG00000136750,candidate,"[""Cytosol"", ""Golgi apparatus"", ""cell membrane"", ""vesicle""]",False,True,True
+ENSG00000136810,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000136840,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000136856,candidate,"[""cell membrane"", ""vesicle""]",False,True,True
+ENSG00000136868,candidate,"[""cell membrane"", ""vesicle""]",False,True,True
+ENSG00000136872,candidate,"[""Cytosol"", ""cytoskeleton""]",False,True,True
+ENSG00000136877,candidate,"[""Cytosol"", ""Mitochondria"", ""inner mitochondria""]",False,True,True
+ENSG00000136878,candidate,"[""Cytosol"", ""Endoplasmic reticulum"", ""cytoskeleton""]",False,True,True
+ENSG00000136881,candidate,"[""Cytosol"", ""Peroxisome""]",False,True,True
+ENSG00000136888,candidate,"[""cell membrane""]",True,True,False
+ENSG00000136908,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000136943,candidate,"[""lysosome""]",True,True,False
+ENSG00000136960,candidate,[],False,False,False
+ENSG00000137054,candidate,"[""Nucleus""]",True,True,False
+ENSG00000137106,unresolved,[],False,False,False
+ENSG00000137124,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000137168,candidate,"[""Nucleus""]",True,True,False
+ENSG00000137198,unresolved,[],False,False,False
+ENSG00000137200,candidate,"[""Nucleus""]",True,True,False
+ENSG00000137204,candidate,"[""Cytosol"", ""cell membrane""]",False,True,True
+ENSG00000137364,candidate,"[""Cytosol""]",True,True,False
+ENSG00000137392,candidate,[],False,False,False
+ENSG00000137393,candidate,"[""Cytosol"", ""Mitochondria""]",False,True,True
+ENSG00000137491,candidate,"[""cell membrane""]",True,True,False
+ENSG00000137563,candidate,"[""lysosome"", ""vesicle""]",False,True,True
+ENSG00000137714,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000137731,candidate,[],False,False,False
+ENSG00000137767,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000137770,candidate,"[""Nucleus""]",True,True,False
+ENSG00000137817,unresolved,[],False,False,False
+ENSG00000137825,candidate,"[""cytoskeleton""]",True,True,False
+ENSG00000137841,unresolved,[],False,False,False
+ENSG00000137857,candidate,"[""cell membrane""]",True,True,False
+ENSG00000137860,candidate,"[""cell membrane""]",True,True,False
+ENSG00000137868,candidate,"[""cell membrane""]",True,True,False
+ENSG00000137869,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000137944,unresolved,[],False,False,False
+ENSG00000137968,candidate,"[""cell membrane""]",True,True,False
+ENSG00000137992,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000137996,candidate,"[""Nucleus""]",True,True,False
+ENSG00000138018,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000138029,candidate,"[""Endoplasmic reticulum"", ""Mitochondria"", ""inner mitochondria""]",False,True,True
+ENSG00000138030,unresolved,[],False,False,False
+ENSG00000138031,candidate,"[""Cytosol"", ""Golgi apparatus"", ""cell membrane"", ""cilium""]",False,True,True
+ENSG00000138061,candidate,"[""Endoplasmic reticulum"", ""Mitochondria""]",False,True,True
+ENSG00000138074,candidate,"[""cell membrane""]",True,True,False
+ENSG00000138075,candidate,"[""cell membrane""]",True,True,False
+ENSG00000138079,candidate,"[""cell membrane""]",True,True,False
+ENSG00000138109,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000138115,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000138134,unresolved,[],False,False,False
+ENSG00000138135,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000138185,candidate,"[""cell membrane""]",True,True,False
+ENSG00000138193,candidate,"[""Cytosol"", ""Golgi apparatus"", ""cell membrane""]",False,True,True
+ENSG00000138207,candidate,[],False,False,False
+ENSG00000138356,candidate,"[""Cytosol""]",True,True,False
+ENSG00000138363,candidate,"[""Cytosol""]",True,True,False
+ENSG00000138376,candidate,"[""Nucleus""]",True,True,False
+ENSG00000138398,candidate,"[""Nucleus""]",True,True,False
+ENSG00000138400,unresolved,[],False,False,False
+ENSG00000138411,candidate,"[""Cytosol"", ""cytoskeleton""]",False,True,True
+ENSG00000138413,candidate,"[""Cytosol"", ""Peroxisome""]",False,True,True
+ENSG00000138449,candidate,"[""cell membrane""]",True,True,False
+ENSG00000138496,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000138592,candidate,"[""Cytosol"", ""Nucleus"", ""cell membrane"", ""vesicle""]",False,True,True
+ENSG00000138604,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000138617,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000138621,unresolved,[],False,False,False
+ENSG00000138622,candidate,"[""cell membrane""]",True,True,False
+ENSG00000138641,candidate,"[""Cytosol"", ""vesicle""]",False,True,True
+ENSG00000138653,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000138678,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000138735,unresolved,[],False,False,False
+ENSG00000138744,candidate,"[""lysosome""]",True,True,False
+ENSG00000138750,candidate,"[""Nucleus""]",True,True,False
+ENSG00000138772,unresolved,[],False,False,False
+ENSG00000138777,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000138796,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000138801,unresolved,[],False,False,False
+ENSG00000138821,candidate,"[""cell membrane"", ""lysosome""]",False,True,True
+ENSG00000138942,candidate,"[""Endoplasmic reticulum"", ""Mitochondria""]",False,True,True
+ENSG00000139044,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000139053,candidate,"[""cell membrane"", ""cilium""]",False,True,True
+ENSG00000139133,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000139144,candidate,[],False,False,False
+ENSG00000139151,candidate,"[""Cytosol"", ""Nucleus"", ""vesicle""]",False,True,True
+ENSG00000139155,candidate,"[""cell membrane""]",True,True,False
+ENSG00000139163,candidate,"[""Cytosol""]",True,True,False
+ENSG00000139180,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000139209,candidate,"[""cell membrane"", ""cytoskeleton""]",False,True,True
+ENSG00000139266,candidate,"[""Golgi apparatus"", ""lysosome""]",False,True,True
+ENSG00000139287,unresolved,[],False,False,False
+ENSG00000139304,candidate,"[""cell membrane"", ""cytoskeleton""]",False,True,True
+ENSG00000139344,candidate,"[""Cytosol""]",True,True,False
+ENSG00000139370,candidate,"[""lysosome"", ""vesicle""]",False,True,True
+ENSG00000139410,unresolved,[],False,False,False
+ENSG00000139428,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000139433,candidate,"[""Cytosol""]",True,True,False
+ENSG00000139496,candidate,"[""Nucleus""]",True,True,False
+ENSG00000139505,candidate,"[""Cytosol"", ""Endoplasmic reticulum"", ""cell membrane""]",False,True,True
+ENSG00000139514,candidate,"[""cell membrane""]",True,True,False
+ENSG00000139531,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000139540,candidate,"[""cell membrane""]",True,True,False
+ENSG00000139547,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000139624,candidate,"[""Endoplasmic reticulum"", ""Nucleus""]",False,True,True
+ENSG00000139629,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000139631,unresolved,[],False,False,False
+ENSG00000139684,candidate,"[""Cytosol"", ""vesicle""]",False,True,True
+ENSG00000139718,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000139914,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000139988,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000140057,candidate,"[""Cytosol"", ""cilium""]",False,True,True
+ENSG00000140090,candidate,"[""Cytosol"", ""cell membrane""]",False,True,True
+ENSG00000140105,candidate,"[""Cytosol""]",True,True,False
+ENSG00000140199,candidate,"[""cell membrane""]",True,True,False
+ENSG00000140263,candidate,"[""Mitochondria"", ""cilium""]",False,True,True
+ENSG00000140279,candidate,"[""cell membrane""]",True,True,False
+ENSG00000140284,candidate,"[""Endoplasmic reticulum"", ""Peroxisome"", ""cell membrane""]",False,True,True
+ENSG00000140287,unresolved,[],False,False,False
+ENSG00000140297,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000140367,candidate,"[""Cytosol""]",True,True,False
+ENSG00000140374,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000140400,candidate,"[""Cytosol""]",True,True,False
+ENSG00000140455,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000140459,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000140465,candidate,"[""Cytosol"", ""Endoplasmic reticulum"", ""inner mitochondria""]",False,True,True
+ENSG00000140505,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000140519,candidate,"[""cell membrane""]",True,True,False
+ENSG00000140521,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000140522,candidate,"[""Cytosol""]",True,True,False
+ENSG00000140598,unresolved,[],False,False,False
+ENSG00000140612,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000140650,candidate,"[""Cytosol""]",True,True,False
+ENSG00000140675,candidate,"[""cell membrane""]",True,True,False
+ENSG00000140740,candidate,"[""Mitochondria"", ""inner mitochondria""]",False,True,True
+ENSG00000140795,candidate,"[""Cytosol""]",True,True,False
+ENSG00000140835,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000140905,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000140990,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000141012,candidate,"[""lysosome""]",True,True,False
+ENSG00000141179,candidate,"[""Cytosol""]",True,True,False
+ENSG00000141279,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000141338,candidate,"[""cell membrane""]",True,True,False
+ENSG00000141349,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000141378,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000141401,candidate,"[""Cytosol""]",True,True,False
+ENSG00000141424,candidate,"[""cell membrane""]",True,True,False
+ENSG00000141429,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000141446,candidate,"[""Nucleus""]",True,True,False
+ENSG00000141458,candidate,"[""lysosome"", ""vesicle""]",False,True,True
+ENSG00000141469,candidate,"[""cell membrane""]",True,True,False
+ENSG00000141485,candidate,"[""cell membrane""]",True,True,False
+ENSG00000141504,candidate,"[""Cytosol""]",True,True,False
+ENSG00000141506,candidate,"[""Cytosol"", ""Nucleus"", ""cell membrane""]",False,True,True
+ENSG00000141526,candidate,"[""cell membrane""]",True,True,False
+ENSG00000141552,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000141560,unresolved,[],False,False,False
+ENSG00000141698,candidate,"[""Cytosol""]",True,True,False
+ENSG00000141744,unresolved,[],False,False,False
+ENSG00000141756,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000141837,candidate,"[""cell membrane""]",True,True,False
+ENSG00000141873,candidate,"[""cell membrane""]",True,True,False
+ENSG00000141934,candidate,"[""Endoplasmic reticulum"", ""cell membrane"", ""vesicle""]",False,True,True
+ENSG00000141959,candidate,"[""Cytosol""]",True,True,False
+ENSG00000142082,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000142102,unresolved,[],False,False,False
+ENSG00000142168,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000142182,candidate,"[""Nucleus""]",True,True,False
+ENSG00000142230,candidate,"[""Nucleus""]",True,True,False
+ENSG00000142273,unresolved,[],False,False,False
+ENSG00000142319,candidate,"[""cell membrane""]",True,True,False
+ENSG00000142494,candidate,"[""cell membrane""]",True,True,False
+ENSG00000142513,candidate,[],False,False,False
+ENSG00000142583,candidate,"[""cell membrane""]",True,True,False
+ENSG00000142619,candidate,"[""Cytosol""]",True,True,False
+ENSG00000142623,candidate,"[""Cytosol""]",True,True,False
+ENSG00000142657,candidate,"[""Cytosol""]",True,True,False
+ENSG00000142892,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000142973,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000143036,candidate,"[""cell membrane""]",True,True,False
+ENSG00000143149,candidate,"[""Cytosol""]",True,True,False
+ENSG00000143153,candidate,"[""cell membrane""]",True,True,False
+ENSG00000143156,candidate,"[""Cytosol"", ""Nucleus"", ""cilium"", ""cytoskeleton""]",False,True,True
+ENSG00000143158,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000143179,unresolved,[],False,False,False
+ENSG00000143183,candidate,"[""Endoplasmic reticulum"", ""Golgi apparatus"", ""Mitochondria""]",False,True,True
+ENSG00000143198,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000143199,candidate,"[""Cytosol"", ""Mitochondria"", ""Nucleus"", ""cell membrane"", ""cilium"", ""cytoskeleton""]",False,True,True
+ENSG00000143207,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000143224,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000143252,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000143258,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000143278,candidate,[],False,False,False
+ENSG00000143315,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000143324,candidate,"[""cell membrane""]",True,True,False
+ENSG00000143363,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000143379,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000143387,candidate,"[""cell membrane"", ""lysosome""]",False,True,True
+ENSG00000143393,candidate,"[""Endoplasmic reticulum"", ""Golgi apparatus"", ""Mitochondria""]",False,True,True
+ENSG00000143398,candidate,"[""Cytosol"", ""Nucleus"", ""cell membrane""]",False,True,True
+ENSG00000143418,candidate,"[""Endoplasmic reticulum"", ""Nucleus""]",False,True,True
+ENSG00000143515,candidate,"[""Endoplasmic reticulum"", ""cell membrane""]",False,True,True
+ENSG00000143554,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000143570,candidate,"[""Endoplasmic reticulum"", ""cell membrane""]",False,True,True
+ENSG00000143595,candidate,"[""cell membrane""]",True,True,False
+ENSG00000143627,unresolved,[],False,False,False
+ENSG00000143641,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000143653,unresolved,[],False,False,False
+ENSG00000143753,candidate,"[""Endoplasmic reticulum"", ""Mitochondria""]",False,True,True
+ENSG00000143772,candidate,"[""Cytosol"", ""Endoplasmic reticulum"", ""cytoskeleton""]",False,True,True
+ENSG00000143774,candidate,"[""Cytosol"", ""Mitochondria""]",False,True,True
+ENSG00000143797,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000143799,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000143811,candidate,"[""Cytosol"", ""Mitochondria""]",False,True,True
+ENSG00000143815,candidate,"[""Cytosol"", ""Endoplasmic reticulum"", ""Nucleus""]",False,True,True
+ENSG00000143819,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000143845,unresolved,[],False,False,False
+ENSG00000143870,candidate,"[""Endoplasmic reticulum"", ""cell membrane"", ""vesicle""]",False,True,True
+ENSG00000143882,unresolved,[],False,False,False
+ENSG00000143891,candidate,"[""Cytosol""]",True,True,False
+ENSG00000143921,candidate,"[""cell membrane""]",True,True,False
+ENSG00000143933,candidate,"[""cilium"", ""cytoskeleton""]",False,True,True
+ENSG00000144035,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000144048,candidate,"[""Nucleus""]",True,True,False
+ENSG00000144057,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000144136,candidate,"[""cell membrane""]",True,True,False
+ENSG00000144182,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000144231,candidate,"[""Nucleus""]",True,True,False
+ENSG00000144278,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000144285,candidate,"[""cell membrane""]",True,True,False
+ENSG00000144290,candidate,"[""cell membrane""]",True,True,False
+ENSG00000144357,candidate,[],False,False,False
+ENSG00000144362,unresolved,[],False,False,False
+ENSG00000144583,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000144591,candidate,"[""Cytosol""]",True,True,False
+ENSG00000144659,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000144741,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000144744,candidate,"[""Nucleus""]",True,True,False
+ENSG00000144843,unresolved,[],False,False,False
+ENSG00000144908,candidate,"[""Cytosol""]",True,True,False
+ENSG00000145020,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000145214,candidate,"[""Cytosol"", ""Nucleus"", ""cell membrane"", ""cytoskeleton""]",False,True,True
+ENSG00000145217,candidate,"[""cell membrane""]",True,True,False
+ENSG00000145283,candidate,[],False,False,False
+ENSG00000145284,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000145293,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000145321,candidate,[],False,False,False
+ENSG00000145337,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000145384,candidate,"[""Cytosol""]",True,True,False
+ENSG00000145391,candidate,"[""Nucleus""]",True,True,False
+ENSG00000145416,candidate,"[""Golgi apparatus"", ""cell membrane"", ""lysosome"", ""vesicle""]",False,True,True
+ENSG00000145439,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000145476,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000145494,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000145495,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000145545,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000145626,candidate,[],False,False,False
+ENSG00000145675,candidate,"[""Cytosol""]",True,True,False
+ENSG00000145692,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000145725,candidate,"[""Cytosol""]",True,True,False
+ENSG00000145730,candidate,"[""vesicle""]",True,True,False
+ENSG00000145949,unresolved,[],False,False,False
+ENSG00000146039,candidate,"[""Endoplasmic reticulum"", ""cell membrane""]",False,True,True
+ENSG00000146066,candidate,"[""Mitochondria"", ""inner mitochondria""]",False,True,True
+ENSG00000146070,candidate,[],False,False,False
+ENSG00000146085,candidate,"[""Cytosol"", ""Mitochondria""]",False,True,True
+ENSG00000146151,candidate,"[""Cytosol"", ""Endoplasmic reticulum""]",False,True,True
+ENSG00000146233,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000146373,candidate,"[""Cytosol""]",True,True,False
+ENSG00000146411,candidate,"[""cell membrane""]",True,True,False
+ENSG00000146414,candidate,"[""Nucleus""]",True,True,False
+ENSG00000146477,candidate,"[""Mitochondria"", ""Nucleus"", ""cell membrane""]",False,True,True
+ENSG00000146587,candidate,"[""Nucleus""]",True,True,False
+ENSG00000146701,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000146733,candidate,"[""Cytosol""]",True,True,False
+ENSG00000147003,candidate,"[""cell membrane""]",True,True,False
+ENSG00000147100,candidate,"[""cell membrane""]",True,True,False
+ENSG00000147119,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000147123,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000147155,candidate,"[""Endoplasmic reticulum"", ""Nucleus"", ""vesicle""]",False,True,True
+ENSG00000147160,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000147224,unresolved,[],False,False,False
+ENSG00000147383,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000147408,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000147416,candidate,"[""Cytosol"", ""cell membrane"", ""vesicle""]",False,True,True
+ENSG00000147454,candidate,"[""Mitochondria"", ""inner mitochondria""]",False,True,True
+ENSG00000147465,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000147535,candidate,"[""cell membrane""]",True,True,False
+ENSG00000147548,candidate,"[""Nucleus""]",True,True,False
+ENSG00000147576,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000147606,candidate,"[""cell membrane"", ""vesicle""]",False,True,True
+ENSG00000147614,unresolved,[],False,False,False
+ENSG00000147647,candidate,"[""Cytosol""]",True,True,False
+ENSG00000147669,candidate,"[""Nucleus""]",True,True,False
+ENSG00000147684,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000147804,candidate,"[""cell membrane"", ""vesicle""]",False,True,True
+ENSG00000147813,candidate,"[""Cytosol""]",True,True,False
+ENSG00000147853,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000147854,candidate,"[""Nucleus""]",True,True,False
+ENSG00000147872,candidate,[],False,False,False
+ENSG00000148057,unresolved,[],False,False,False
+ENSG00000148090,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000148154,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000148218,candidate,"[""Cytosol""]",True,True,False
+ENSG00000148229,candidate,"[""Nucleus""]",True,True,False
+ENSG00000148288,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000148334,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000148344,candidate,[],False,False,False
+ENSG00000148356,candidate,"[""Cytosol""]",True,True,False
+ENSG00000148377,candidate,"[""Peroxisome""]",True,True,False
+ENSG00000148384,candidate,"[""Cytosol"", ""Golgi apparatus"", ""Nucleus"", ""cell membrane"", ""cilium"", ""cytoskeleton""]",False,True,True
+ENSG00000148408,candidate,[],False,False,False
+ENSG00000148459,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000148606,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000148634,candidate,"[""Cytosol""]",True,True,False
+ENSG00000148672,candidate,"[""Endoplasmic reticulum"", ""Mitochondria""]",False,True,True
+ENSG00000148795,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000148832,candidate,"[""Cytosol"", ""Peroxisome""]",False,True,True
+ENSG00000148834,candidate,"[""Cytosol""]",True,True,False
+ENSG00000149016,candidate,"[""Nucleus""]",True,True,False
+ENSG00000149084,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000149089,candidate,"[""Cytosol""]",True,True,False
+ENSG00000149091,candidate,"[""Cytosol"", ""Nucleus"", ""cell membrane""]",False,True,True
+ENSG00000149124,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000149150,candidate,"[""Endoplasmic reticulum"", ""cell membrane""]",False,True,True
+ENSG00000149313,candidate,"[""Cytosol""]",True,True,False
+ENSG00000149380,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000149435,unresolved,[],False,False,False
+ENSG00000149452,candidate,"[""cell membrane""]",True,True,False
+ENSG00000149476,unresolved,[],False,False,False
+ENSG00000149485,candidate,"[""Endoplasmic reticulum"", ""Mitochondria""]",False,True,True
+ENSG00000149527,candidate,"[""Cytosol"", ""cell membrane""]",False,True,True
+ENSG00000149541,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000149742,candidate,"[""cell membrane""]",True,True,False
+ENSG00000149782,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000149809,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000149925,candidate,[],False,False,False
+ENSG00000149929,candidate,"[""Nucleus""]",True,True,False
+ENSG00000150540,candidate,"[""Cytosol""]",True,True,False
+ENSG00000150656,candidate,[],False,False,False
+ENSG00000150712,candidate,"[""Cytosol"", ""Endoplasmic reticulum""]",False,True,True
+ENSG00000150768,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000150787,unresolved,[],False,False,False
+ENSG00000150867,candidate,"[""Cytosol"", ""Nucleus"", ""cell membrane"", ""cilium"", ""lysosome""]",False,True,True
+ENSG00000150995,candidate,"[""Endoplasmic reticulum"", ""vesicle""]",False,True,True
+ENSG00000151005,unresolved,[],False,False,False
+ENSG00000151012,candidate,"[""cell membrane"", ""cytoskeleton"", ""lysosome""]",False,True,True
+ENSG00000151067,candidate,"[""cell membrane""]",True,True,False
+ENSG00000151092,candidate,"[""Cytosol""]",True,True,False
+ENSG00000151093,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000151148,candidate,[],False,False,False
+ENSG00000151151,candidate,"[""Nucleus""]",True,True,False
+ENSG00000151224,unresolved,[],False,False,False
+ENSG00000151229,candidate,"[""cell membrane""]",True,True,False
+ENSG00000151348,candidate,"[""Endoplasmic reticulum"", ""Golgi apparatus""]",False,True,True
+ENSG00000151360,unresolved,[],False,False,False
+ENSG00000151366,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000151376,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000151418,unresolved,[],False,False,False
+ENSG00000151498,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000151552,unresolved,[],False,False,False
+ENSG00000151576,candidate,"[""Cytosol"", ""Mitochondria""]",False,True,True
+ENSG00000151611,candidate,"[""Cytosol"", ""Mitochondria""]",False,True,True
+ENSG00000151632,candidate,"[""Cytosol""]",True,True,False
+ENSG00000151665,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000151689,unresolved,[],False,False,False
+ENSG00000151692,candidate,"[""Endoplasmic reticulum"", ""cell membrane"", ""vesicle""]",False,True,True
+ENSG00000151726,candidate,"[""Endoplasmic reticulum"", ""Mitochondria"", ""Peroxisome""]",False,True,True
+ENSG00000151729,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000151790,unresolved,[],False,False,False
+ENSG00000151883,unresolved,[],False,False,False
+ENSG00000152127,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000152234,candidate,"[""Mitochondria"", ""cell membrane"", ""inner mitochondria""]",False,True,True
+ENSG00000152254,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000152256,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000152270,candidate,[],False,False,False
+ENSG00000152402,candidate,"[""Cytosol""]",True,True,False
+ENSG00000152455,candidate,"[""Nucleus""]",True,True,False
+ENSG00000152463,candidate,"[""Cytosol""]",True,True,False
+ENSG00000152465,candidate,"[""Cytosol""]",True,True,False
+ENSG00000152484,candidate,"[""Cytosol"", ""Nucleus"", ""cell membrane""]",False,True,True
+ENSG00000152556,candidate,"[""Cytosol""]",True,True,False
+ENSG00000152620,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000152642,candidate,"[""Cytosol""]",True,True,False
+ENSG00000152683,candidate,"[""Golgi apparatus"", ""cell membrane""]",False,True,True
+ENSG00000152779,candidate,"[""cell membrane""]",True,True,False
+ENSG00000152782,candidate,"[""Cytosol"", ""Nucleus"", ""vesicle""]",False,True,True
+ENSG00000152904,candidate,"[""Cytosol""]",True,True,False
+ENSG00000152952,candidate,"[""Cytosol"", ""Endoplasmic reticulum""]",False,True,True
+ENSG00000153015,candidate,"[""Nucleus""]",True,True,False
+ENSG00000153086,unresolved,[],False,False,False
+ENSG00000153201,candidate,"[""Nucleus""]",True,True,False
+ENSG00000153207,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000153253,candidate,"[""cell membrane""]",True,True,False
+ENSG00000153291,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000153395,candidate,"[""Endoplasmic reticulum"", ""Golgi apparatus"", ""cell membrane""]",False,True,True
+ENSG00000153574,unresolved,[],False,False,False
+ENSG00000153786,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000153827,candidate,"[""Nucleus""]",True,True,False
+ENSG00000153904,unresolved,[],False,False,False
+ENSG00000153933,candidate,"[""Cytosol""]",True,True,False
+ENSG00000153936,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000153976,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000154025,candidate,"[""cell membrane""]",True,True,False
+ENSG00000154027,candidate,"[""Cytosol""]",True,True,False
+ENSG00000154080,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000154227,candidate,"[""Endoplasmic reticulum"", ""Nucleus""]",False,True,True
+ENSG00000154252,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000154269,candidate,"[""cell membrane""]",True,True,False
+ENSG00000154370,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000154447,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000154518,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000154678,candidate,"[""lysosome""]",True,True,False
+ENSG00000154723,candidate,"[""Mitochondria"", ""inner mitochondria""]",False,True,True
+ENSG00000154914,unresolved,[],False,False,False
+ENSG00000154930,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000155016,candidate,"[""Endoplasmic reticulum"", ""inner mitochondria""]",False,True,True
+ENSG00000155085,candidate,"[""Cytosol"", ""Nucleus"", ""cilium"", ""cytoskeleton""]",False,True,True
+ENSG00000155097,candidate,"[""vesicle""]",True,True,False
+ENSG00000155099,candidate,"[""cell membrane"", ""lysosome"", ""vesicle""]",False,True,True
+ENSG00000155189,candidate,"[""Endoplasmic reticulum"", ""Mitochondria"", ""Nucleus""]",False,True,True
+ENSG00000155252,candidate,"[""Golgi apparatus"", ""Mitochondria"", ""cell membrane"", ""vesicle""]",False,True,True
+ENSG00000155287,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000155313,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000155368,candidate,"[""Endoplasmic reticulum"", ""Golgi apparatus""]",False,True,True
+ENSG00000155380,candidate,"[""cell membrane""]",True,True,False
+ENSG00000155465,candidate,"[""cell membrane""]",True,True,False
+ENSG00000155561,candidate,"[""Nucleus""]",True,True,False
+ENSG00000155660,candidate,"[""Endoplasmic reticulum"", ""vesicle""]",False,True,True
+ENSG00000155827,candidate,"[""Nucleus""]",True,True,False
+ENSG00000155850,candidate,"[""cell membrane""]",True,True,False
+ENSG00000155886,candidate,"[""cell membrane"", ""cilium""]",False,True,True
+ENSG00000155893,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000155897,candidate,"[""cell membrane"", ""vesicle""]",False,True,True
+ENSG00000156006,candidate,"[""Cytosol""]",True,True,False
+ENSG00000156096,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000156110,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000156136,candidate,"[""Nucleus""]",True,True,False
+ENSG00000156219,candidate,"[""cell membrane""]",True,True,False
+ENSG00000156222,candidate,"[""cell membrane""]",True,True,False
+ENSG00000156256,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000156411,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000156413,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000156463,candidate,"[""Nucleus""]",True,True,False
+ENSG00000156467,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000156471,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000156508,candidate,"[""Cytosol"", ""Nucleus"", ""cell membrane""]",False,True,True
+ENSG00000156510,candidate,"[""Cytosol"", ""Mitochondria""]",False,True,True
+ENSG00000156515,candidate,"[""Cytosol"", ""Mitochondria""]",False,True,True
+ENSG00000156587,unresolved,[],False,False,False
+ENSG00000156599,candidate,"[""Golgi apparatus"", ""cell membrane""]",False,True,True
+ENSG00000156650,candidate,"[""Nucleus""]",True,True,False
+ENSG00000156689,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000156795,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000156873,unresolved,[],False,False,False
+ENSG00000156885,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000156958,unresolved,[],False,False,False
+ENSG00000156966,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000156983,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000157020,candidate,"[""Endoplasmic reticulum"", ""Nucleus"", ""lysosome"", ""vesicle""]",False,True,True
+ENSG00000157045,candidate,"[""Cytosol""]",True,True,False
+ENSG00000157064,candidate,"[""Cytosol"", ""Golgi apparatus"", ""vesicle""]",False,True,True
+ENSG00000157087,candidate,"[""cell membrane""]",True,True,False
+ENSG00000157103,candidate,"[""cell membrane""]",True,True,False
+ENSG00000157184,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000157326,candidate,"[""Nucleus"", ""Peroxisome""]",False,True,True
+ENSG00000157349,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000157350,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000157353,unresolved,[],False,False,False
+ENSG00000157388,candidate,[],False,False,False
+ENSG00000157399,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000157426,unresolved,[],False,False,False
+ENSG00000157593,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000157680,candidate,"[""Cytosol"", ""Nucleus"", ""cell membrane"", ""vesicle""]",False,True,True
+ENSG00000157765,candidate,"[""cell membrane""]",True,True,False
+ENSG00000157881,candidate,"[""Cytosol""]",True,True,False
+ENSG00000158006,candidate,"[""Cytosol"", ""Endoplasmic reticulum""]",False,True,True
+ENSG00000158008,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000158022,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000158089,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000158104,candidate,"[""Cytosol"", ""Endoplasmic reticulum"", ""Golgi apparatus"", ""Nucleus""]",False,True,True
+ENSG00000158125,candidate,"[""Cytosol"", ""Peroxisome""]",False,True,True
+ENSG00000158296,candidate,"[""cell membrane""]",True,True,False
+ENSG00000158467,candidate,"[""Cytosol""]",True,True,False
+ENSG00000158470,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000158516,candidate,[],False,False,False
+ENSG00000158525,candidate,[],False,False,False
+ENSG00000158571,unresolved,[],False,False,False
+ENSG00000158578,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000158623,candidate,"[""Cytosol"", ""Golgi apparatus"", ""vesicle""]",False,True,True
+ENSG00000158669,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000158786,candidate,"[""cell membrane""]",True,True,False
+ENSG00000158825,unresolved,[],False,False,False
+ENSG00000158850,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000158864,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000158865,candidate,"[""cell membrane""]",True,True,False
+ENSG00000159063,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000159082,candidate,[],False,False,False
+ENSG00000159131,unresolved,[],False,False,False
+ENSG00000159199,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000159202,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000159228,candidate,"[""Cytosol""]",True,True,False
+ENSG00000159231,candidate,"[""Cytosol""]",True,True,False
+ENSG00000159267,candidate,"[""Cytosol"", ""Mitochondria""]",False,True,True
+ENSG00000159322,candidate,[],False,False,False
+ENSG00000159337,candidate,"[""Cytosol""]",True,True,False
+ENSG00000159339,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000159348,candidate,[],False,False,False
+ENSG00000159398,candidate,[],False,False,False
+ENSG00000159399,candidate,"[""Cytosol"", ""Mitochondria""]",False,True,True
+ENSG00000159423,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000159433,candidate,"[""Nucleus"", ""cytoskeleton""]",False,True,True
+ENSG00000159445,candidate,"[""Cytosol"", ""Mitochondria"", ""cell membrane"", ""inner mitochondria""]",False,True,True
+ENSG00000159459,candidate,"[""Cytosol""]",True,True,False
+ENSG00000159461,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000159495,unresolved,[],False,False,False
+ENSG00000159527,candidate,[],False,False,False
+ENSG00000159593,candidate,"[""cell membrane""]",True,True,False
+ENSG00000159640,candidate,"[""Cytosol"", ""cell membrane""]",False,True,True
+ENSG00000159650,unresolved,[],False,False,False
+ENSG00000159692,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000159714,candidate,"[""Endoplasmic reticulum"", ""Golgi apparatus"", ""vesicle""]",False,True,True
+ENSG00000159720,candidate,"[""lysosome"", ""vesicle""]",False,True,True
+ENSG00000159899,candidate,"[""cell membrane""]",True,True,False
+ENSG00000159921,candidate,"[""Cytosol""]",True,True,False
+ENSG00000160014,candidate,"[""cilium"", ""cytoskeleton""]",False,True,True
+ENSG00000160087,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000160179,candidate,"[""Endoplasmic reticulum"", ""Golgi apparatus"", ""cell membrane""]",False,True,True
+ENSG00000160191,candidate,"[""Cytosol"", ""Endoplasmic reticulum"", ""Golgi apparatus"", ""cell membrane""]",False,True,True
+ENSG00000160194,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000160200,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000160209,candidate,"[""Cytosol""]",True,True,False
+ENSG00000160211,candidate,"[""Cytosol""]",True,True,False
+ENSG00000160216,candidate,"[""Endoplasmic reticulum"", ""Nucleus""]",False,True,True
+ENSG00000160282,candidate,"[""Cytosol"", ""Golgi apparatus"", ""cytoskeleton""]",False,True,True
+ENSG00000160285,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000160326,candidate,"[""cell membrane"", ""lysosome""]",False,True,True
+ENSG00000160408,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000160439,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000160446,candidate,"[""Endoplasmic reticulum"", ""Golgi apparatus""]",False,True,True
+ENSG00000160471,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000160688,candidate,"[""Cytosol"", ""Mitochondria"", ""Nucleus""]",False,True,True
+ENSG00000160714,candidate,"[""Cytosol"", ""Nucleus"", ""cytoskeleton""]",False,True,True
+ENSG00000160752,candidate,"[""Cytosol""]",True,True,False
+ENSG00000160868,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000160870,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000160882,candidate,"[""Mitochondria"", ""inner mitochondria""]",False,True,True
+ENSG00000160883,unresolved,[],False,False,False
+ENSG00000160991,candidate,"[""cell membrane""]",True,True,False
+ENSG00000161013,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000161031,candidate,[],False,False,False
+ENSG00000161133,unresolved,[],False,False,False
+ENSG00000161217,candidate,"[""Cytosol"", ""Endoplasmic reticulum"", ""Nucleus""]",False,True,True
+ENSG00000161267,candidate,"[""Mitochondria"", ""inner mitochondria""]",False,True,True
+ENSG00000161281,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000161513,candidate,"[""Mitochondria"", ""inner mitochondria""]",False,True,True
+ENSG00000161533,candidate,"[""Peroxisome""]",True,True,False
+ENSG00000161653,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000161714,candidate,"[""Cytosol"", ""cell membrane""]",False,True,True
+ENSG00000161798,candidate,"[""cell membrane"", ""vesicle""]",False,True,True
+ENSG00000161896,candidate,"[""Cytosol""]",True,True,False
+ENSG00000161905,candidate,"[""Cytosol"", ""cell membrane""]",False,True,True
+ENSG00000161980,candidate,"[""Nucleus""]",True,True,False
+ENSG00000162040,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000162066,unresolved,[],False,False,False
+ENSG00000162104,candidate,"[""cell membrane""]",True,True,False
+ENSG00000162139,candidate,"[""cell membrane"", ""lysosome"", ""vesicle""]",False,True,True
+ENSG00000162174,candidate,"[""Cytosol""]",True,True,False
+ENSG00000162298,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000162341,candidate,"[""lysosome"", ""vesicle""]",False,True,True
+ENSG00000162365,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000162368,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000162383,candidate,"[""cell membrane""]",True,True,False
+ENSG00000162390,candidate,"[""Cytosol"", ""Mitochondria""]",False,True,True
+ENSG00000162402,unresolved,[],False,False,False
+ENSG00000162407,candidate,"[""Endoplasmic reticulum"", ""Golgi apparatus"", ""cell membrane""]",False,True,True
+ENSG00000162433,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000162482,candidate,"[""Cytosol""]",True,True,False
+ENSG00000162496,candidate,[],False,False,False
+ENSG00000162551,candidate,"[""Mitochondria"", ""cell membrane""]",False,True,True
+ENSG00000162572,candidate,"[""cell membrane""]",True,True,False
+ENSG00000162607,candidate,"[""Nucleus""]",True,True,False
+ENSG00000162630,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000162688,candidate,"[""Cytosol""]",True,True,False
+ENSG00000162694,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000162695,candidate,"[""Cytosol"", ""Endoplasmic reticulum"", ""Golgi apparatus"", ""Mitochondria"", ""vesicle""]",False,True,True
+ENSG00000162813,unresolved,[],False,False,False
+ENSG00000162836,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000162882,candidate,"[""Cytosol""]",True,True,False
+ENSG00000162885,candidate,"[""Endoplasmic reticulum"", ""Golgi apparatus""]",False,True,True
+ENSG00000163002,candidate,"[""Nucleus""]",True,True,False
+ENSG00000163012,unresolved,[],False,False,False
+ENSG00000163082,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000163106,candidate,"[""Cytosol""]",True,True,False
+ENSG00000163114,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000163131,candidate,"[""lysosome"", ""vesicle""]",False,True,True
+ENSG00000163162,candidate,[],False,False,False
+ENSG00000163218,candidate,[],False,False,False
+ENSG00000163281,candidate,"[""Cytosol""]",True,True,False
+ENSG00000163283,candidate,"[""cell membrane""]",True,True,False
+ENSG00000163286,candidate,"[""cell membrane""]",True,True,False
+ENSG00000163295,candidate,"[""cell membrane""]",True,True,False
+ENSG00000163344,candidate,"[""Cytosol""]",True,True,False
+ENSG00000163352,unresolved,[],False,False,False
+ENSG00000163393,candidate,"[""cell membrane""]",True,True,False
+ENSG00000163399,candidate,"[""cell membrane"", ""vesicle""]",False,True,True
+ENSG00000163406,candidate,"[""cell membrane"", ""vesicle""]",False,True,True
+ENSG00000163481,candidate,"[""Cytosol""]",True,True,False
+ENSG00000163521,unresolved,[],False,False,False
+ENSG00000163527,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000163541,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000163581,candidate,"[""cell membrane""]",True,True,False
+ENSG00000163586,candidate,"[""Cytosol""]",True,True,False
+ENSG00000163590,candidate,[],False,False,False
+ENSG00000163624,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000163631,candidate,[],False,False,False
+ENSG00000163655,candidate,"[""Cytosol""]",True,True,False
+ENSG00000163659,candidate,"[""Nucleus""]",True,True,False
+ENSG00000163686,candidate,"[""Mitochondria"", ""lysosome"", ""vesicle""]",False,True,True
+ENSG00000163719,candidate,"[""Cytosol""]",True,True,False
+ENSG00000163738,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000163743,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000163751,candidate,"[""vesicle""]",True,True,False
+ENSG00000163754,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000163755,candidate,"[""Cytosol""]",True,True,False
+ENSG00000163803,candidate,"[""cell membrane""]",True,True,False
+ENSG00000163810,unresolved,[],False,False,False
+ENSG00000163812,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000163817,candidate,"[""cell membrane""]",True,True,False
+ENSG00000163864,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000163882,candidate,"[""Nucleus""]",True,True,False
+ENSG00000163902,candidate,"[""Endoplasmic reticulum"", ""vesicle""]",False,True,True
+ENSG00000163931,unresolved,[],False,False,False
+ENSG00000163958,candidate,"[""Golgi apparatus"", ""cell membrane""]",False,True,True
+ENSG00000163959,candidate,"[""cell membrane""]",True,True,False
+ENSG00000163964,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000164023,candidate,"[""Golgi apparatus"", ""cell membrane""]",False,True,True
+ENSG00000164039,candidate,"[""Cytosol""]",True,True,False
+ENSG00000164068,candidate,"[""Cytosol""]",True,True,False
+ENSG00000164089,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000164100,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000164116,candidate,"[""Cytosol""]",True,True,False
+ENSG00000164120,candidate,"[""Cytosol""]",True,True,False
+ENSG00000164172,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000164181,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000164197,candidate,"[""Endoplasmic reticulum"", ""Nucleus""]",False,True,True
+ENSG00000164211,candidate,"[""Cytosol"", ""Endoplasmic reticulum""]",False,True,True
+ENSG00000164258,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000164294,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000164303,candidate,"[""cell membrane""]",True,True,False
+ENSG00000164329,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000164347,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000164363,candidate,[],False,False,False
+ENSG00000164398,candidate,"[""Endoplasmic reticulum"", ""Mitochondria"", ""Peroxisome""]",False,True,True
+ENSG00000164405,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000164414,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000164434,candidate,"[""Cytosol""]",True,True,False
+ENSG00000164466,candidate,"[""Mitochondria"", ""inner mitochondria""]",False,True,True
+ENSG00000164494,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000164535,candidate,"[""cell membrane""]",True,True,False
+ENSG00000164574,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000164588,candidate,"[""cell membrane""]",True,True,False
+ENSG00000164638,candidate,"[""cell membrane""]",True,True,False
+ENSG00000164663,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000164687,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000164707,candidate,[],False,False,False
+ENSG00000164708,unresolved,[],False,False,False
+ENSG00000164733,candidate,"[""cell membrane"", ""lysosome"", ""vesicle""]",False,True,True
+ENSG00000164742,candidate,"[""Cytosol"", ""cell membrane""]",False,True,True
+ENSG00000164776,unresolved,[],False,False,False
+ENSG00000164867,candidate,"[""Golgi apparatus"", ""cell membrane"", ""cytoskeleton""]",False,True,True
+ENSG00000164879,candidate,"[""Cytosol""]",True,True,False
+ENSG00000164889,candidate,"[""cell membrane""]",True,True,False
+ENSG00000164904,candidate,"[""Cytosol"", ""Golgi apparatus"", ""Mitochondria"", ""Nucleus"", ""cell membrane""]",False,True,True
+ENSG00000164919,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000164933,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000164951,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000164978,unresolved,[],False,False,False
+ENSG00000165029,candidate,"[""cell membrane"", ""vesicle""]",False,True,True
+ENSG00000165060,candidate,"[""Cytosol"", ""Mitochondria""]",False,True,True
+ENSG00000165078,candidate,[],False,False,False
+ENSG00000165092,candidate,"[""Cytosol""]",True,True,False
+ENSG00000165102,candidate,"[""lysosome""]",True,True,False
+ENSG00000165125,candidate,"[""cell membrane""]",True,True,False
+ENSG00000165140,unresolved,[],False,False,False
+ENSG00000165195,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000165264,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000165269,candidate,"[""cell membrane"", ""vesicle""]",False,True,True
+ENSG00000165272,candidate,"[""cell membrane""]",True,True,False
+ENSG00000165282,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000165338,unresolved,[],False,False,False
+ENSG00000165349,candidate,"[""cell membrane""]",True,True,False
+ENSG00000165406,candidate,"[""Endoplasmic reticulum"", ""Golgi apparatus"", ""lysosome"", ""vesicle""]",False,True,True
+ENSG00000165434,candidate,"[""Cytosol""]",True,True,False
+ENSG00000165449,candidate,"[""cell membrane""]",True,True,False
+ENSG00000165457,candidate,"[""cell membrane""]",True,True,False
+ENSG00000165458,candidate,"[""Cytosol"", ""Nucleus"", ""cell membrane"", ""cytoskeleton""]",False,True,True
+ENSG00000165475,candidate,"[""Cytosol""]",True,True,False
+ENSG00000165526,candidate,"[""Cytosol"", ""Mitochondria"", ""Nucleus""]",False,True,True
+ENSG00000165591,candidate,[],False,False,False
+ENSG00000165609,candidate,"[""Nucleus""]",True,True,False
+ENSG00000165629,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000165646,candidate,"[""vesicle""]",True,True,False
+ENSG00000165671,candidate,"[""Nucleus""]",True,True,False
+ENSG00000165672,candidate,"[""Cytosol"", ""Mitochondria"", ""vesicle""]",False,True,True
+ENSG00000165688,candidate,"[""Mitochondria"", ""inner mitochondria""]",False,True,True
+ENSG00000165695,candidate,"[""Cytosol"", ""cilium"", ""cytoskeleton""]",False,True,True
+ENSG00000165704,candidate,"[""Cytosol""]",True,True,False
+ENSG00000165782,candidate,"[""cell membrane"", ""lysosome"", ""vesicle""]",False,True,True
+ENSG00000165794,candidate,"[""cell membrane""]",True,True,False
+ENSG00000165819,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000165841,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000165898,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000165970,candidate,"[""cell membrane""]",True,True,False
+ENSG00000165996,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000166016,unresolved,[],False,False,False
+ENSG00000166035,candidate,[],False,False,False
+ENSG00000166123,candidate,"[""Cytosol""]",True,True,False
+ENSG00000166126,candidate,"[""cell membrane"", ""vesicle""]",False,True,True
+ENSG00000166135,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000166136,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000166165,candidate,"[""Cytosol"", ""Mitochondria"", ""cell membrane""]",False,True,True
+ENSG00000166169,candidate,"[""Nucleus""]",True,True,False
+ENSG00000166183,unresolved,[],False,False,False
+ENSG00000166224,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000166228,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000166311,candidate,"[""lysosome""]",True,True,False
+ENSG00000166340,candidate,"[""lysosome"", ""vesicle""]",False,True,True
+ENSG00000166349,candidate,"[""Nucleus""]",True,True,False
+ENSG00000166391,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000166394,unresolved,[],False,False,False
+ENSG00000166411,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000166479,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000166507,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000166548,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000166562,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000166741,candidate,"[""Cytosol""]",True,True,False
+ENSG00000166743,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000166747,candidate,"[""Cytosol"", ""Golgi apparatus"", ""vesicle""]",False,True,True
+ENSG00000166794,candidate,"[""Endoplasmic reticulum"", ""vesicle""]",False,True,True
+ENSG00000166796,candidate,"[""Cytosol"", ""cilium""]",False,True,True
+ENSG00000166800,candidate,"[""Cytosol""]",True,True,False
+ENSG00000166816,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000166819,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000166825,candidate,"[""cell membrane""]",True,True,False
+ENSG00000166828,candidate,"[""cell membrane""]",True,True,False
+ENSG00000166840,unresolved,[],False,False,False
+ENSG00000166908,candidate,"[""Cytosol"", ""Endoplasmic reticulum""]",False,True,True
+ENSG00000166948,candidate,"[""Cytosol""]",True,True,False
+ENSG00000166986,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000167004,candidate,"[""Endoplasmic reticulum"", ""vesicle""]",False,True,True
+ENSG00000167011,candidate,"[""Cytosol""]",True,True,False
+ENSG00000167080,candidate,"[""Golgi apparatus"", ""vesicle""]",False,True,True
+ENSG00000167103,candidate,"[""Cytosol""]",True,True,False
+ENSG00000167107,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000167114,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000167130,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000167165,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000167186,candidate,"[""Mitochondria"", ""Nucleus"", ""inner mitochondria""]",False,True,True
+ENSG00000167261,candidate,[],False,False,False
+ENSG00000167280,candidate,"[""Cytosol""]",True,True,False
+ENSG00000167283,candidate,"[""Mitochondria"", ""inner mitochondria""]",False,True,True
+ENSG00000167306,candidate,"[""Cytosol""]",True,True,False
+ENSG00000167311,candidate,[],False,False,False
+ENSG00000167315,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000167325,candidate,"[""Cytosol""]",True,True,False
+ENSG00000167363,unresolved,[],False,False,False
+ENSG00000167397,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000167419,candidate,"[""Cytosol""]",True,True,False
+ENSG00000167434,candidate,"[""cell membrane""]",True,True,False
+ENSG00000167468,candidate,"[""Cytosol"", ""Mitochondria""]",False,True,True
+ENSG00000167508,candidate,"[""Cytosol""]",True,True,False
+ENSG00000167531,candidate,[],False,False,False
+ENSG00000167548,candidate,"[""Nucleus""]",True,True,False
+ENSG00000167580,candidate,"[""Golgi apparatus"", ""cell membrane"", ""vesicle""]",False,True,True
+ENSG00000167588,candidate,"[""Cytosol""]",True,True,False
+ENSG00000167600,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000167658,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000167676,candidate,"[""Cytosol"", ""cell membrane""]",False,True,True
+ENSG00000167699,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000167701,candidate,"[""Cytosol""]",True,True,False
+ENSG00000167703,candidate,"[""cell membrane""]",True,True,False
+ENSG00000167720,unresolved,[],False,False,False
+ENSG00000167733,candidate,[],False,False,False
+ENSG00000167741,candidate,[],False,False,False
+ENSG00000167748,unresolved,[],False,False,False
+ENSG00000167751,unresolved,[],False,False,False
+ENSG00000167769,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000167780,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000167792,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000167815,candidate,"[""Cytosol""]",True,True,False
+ENSG00000167862,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000167863,candidate,"[""Mitochondria"", ""inner mitochondria""]",False,True,True
+ENSG00000167889,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000167900,candidate,"[""Cytosol""]",True,True,False
+ENSG00000167910,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000167969,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000167972,candidate,"[""lysosome"", ""vesicle""]",False,True,True
+ENSG00000167996,candidate,"[""Cytosol"", ""lysosome""]",False,True,True
+ENSG00000168000,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000168002,candidate,"[""Nucleus""]",True,True,False
+ENSG00000168003,candidate,"[""cell membrane"", ""lysosome"", ""vesicle""]",False,True,True
+ENSG00000168032,candidate,"[""cell membrane""]",True,True,False
+ENSG00000168065,candidate,"[""cell membrane""]",True,True,False
+ENSG00000168092,candidate,"[""Cytosol""]",True,True,False
+ENSG00000168159,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000168237,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000168282,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000168291,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000168306,candidate,"[""Peroxisome""]",True,True,False
+ENSG00000168350,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000168356,candidate,"[""cell membrane""]",True,True,False
+ENSG00000168393,unresolved,[],False,False,False
+ENSG00000168411,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000168447,candidate,"[""cell membrane"", ""vesicle""]",False,True,True
+ENSG00000168487,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000168495,candidate,"[""Nucleus""]",True,True,False
+ENSG00000168522,unresolved,[],False,False,False
+ENSG00000168575,candidate,"[""cell membrane""]",True,True,False
+ENSG00000168653,candidate,"[""Mitochondria"", ""inner mitochondria""]",False,True,True
+ENSG00000168671,candidate,[],False,False,False
+ENSG00000168679,candidate,"[""cell membrane""]",True,True,False
+ENSG00000168748,candidate,"[""Cytosol""]",True,True,False
+ENSG00000168765,candidate,"[""Cytosol""]",True,True,False
+ENSG00000168781,candidate,"[""Cytosol"", ""cell membrane""]",False,True,True
+ENSG00000168827,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000168906,unresolved,[],False,False,False
+ENSG00000168907,candidate,"[""Cytosol"", ""Mitochondria"", ""cell membrane""]",False,True,True
+ENSG00000168918,candidate,"[""Cytosol"", ""cell membrane"", ""cytoskeleton""]",False,True,True
+ENSG00000168938,candidate,"[""Cytosol""]",True,True,False
+ENSG00000169020,candidate,"[""Mitochondria"", ""inner mitochondria""]",False,True,True
+ENSG00000169021,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000169100,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000169105,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000169154,candidate,"[""Cytosol""]",True,True,False
+ENSG00000169169,candidate,"[""Endoplasmic reticulum"", ""Mitochondria""]",False,True,True
+ENSG00000169180,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000169239,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000169255,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000169299,candidate,"[""Cytosol""]",True,True,False
+ENSG00000169359,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000169418,candidate,[],False,False,False
+ENSG00000169432,candidate,"[""cell membrane""]",True,True,False
+ENSG00000169599,candidate,"[""Cytosol"", ""Mitochondria""]",False,True,True
+ENSG00000169660,candidate,"[""Cytosol"", ""Nucleus"", ""vesicle""]",False,True,True
+ENSG00000169692,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000169710,candidate,"[""Cytosol"", ""vesicle""]",False,True,True
+ENSG00000169738,candidate,"[""cell membrane"", ""vesicle""]",False,True,True
+ENSG00000169764,candidate,"[""Cytosol""]",True,True,False
+ENSG00000169814,candidate,[],False,False,False
+ENSG00000169826,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000169902,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000169919,candidate,"[""lysosome""]",True,True,False
+ENSG00000170035,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000170142,candidate,"[""Nucleus""]",True,True,False
+ENSG00000170185,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000170190,candidate,"[""cell membrane""]",True,True,False
+ENSG00000170191,unresolved,[],False,False,False
+ENSG00000170222,unresolved,[],False,False,False
+ENSG00000170231,candidate,"[""Cytosol""]",True,True,False
+ENSG00000170242,candidate,"[""Cytosol""]",True,True,False
+ENSG00000170266,candidate,"[""lysosome""]",True,True,False
+ENSG00000170271,candidate,"[""Cytosol""]",True,True,False
+ENSG00000170323,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000170340,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000170364,candidate,"[""Nucleus""]",True,True,False
+ENSG00000170385,candidate,"[""Cytosol"", ""Endoplasmic reticulum"", ""Golgi apparatus"", ""Nucleus"", ""cell membrane"", ""vesicle""]",False,True,True
+ENSG00000170426,candidate,"[""Cytosol""]",True,True,False
+ENSG00000170430,candidate,"[""Nucleus""]",True,True,False
+ENSG00000170445,candidate,"[""Cytosol""]",True,True,False
+ENSG00000170482,candidate,"[""cell membrane""]",True,True,False
+ENSG00000170502,candidate,"[""Cytosol"", ""Mitochondria""]",False,True,True
+ENSG00000170516,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000170522,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000170525,unresolved,[],False,False,False
+ENSG00000170634,unresolved,[],False,False,False
+ENSG00000170734,candidate,"[""Nucleus""]",True,True,False
+ENSG00000170786,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000170832,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000170835,candidate,[],False,False,False
+ENSG00000170881,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000170890,candidate,[],False,False,False
+ENSG00000170899,candidate,"[""Cytosol""]",True,True,False
+ENSG00000170906,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000170950,candidate,"[""Cytosol""]",True,True,False
+ENSG00000170961,candidate,"[""Endoplasmic reticulum"", ""Golgi apparatus"", ""cell membrane"", ""lysosome"", ""vesicle""]",False,True,True
+ENSG00000171004,candidate,[],False,False,False
+ENSG00000171097,candidate,"[""Cytosol""]",True,True,False
+ENSG00000171100,candidate,"[""Cytosol"", ""cell membrane"", ""cytoskeleton"", ""vesicle""]",False,True,True
+ENSG00000171124,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000171155,candidate,[],False,False,False
+ENSG00000171174,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000171234,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000171298,candidate,"[""lysosome""]",True,True,False
+ENSG00000171302,candidate,"[""Endoplasmic reticulum"", ""Golgi apparatus"", ""cell membrane""]",False,True,True
+ENSG00000171310,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000171314,unresolved,[],False,False,False
+ENSG00000171320,candidate,"[""Nucleus""]",True,True,False
+ENSG00000171408,unresolved,[],False,False,False
+ENSG00000171428,candidate,"[""Cytosol""]",True,True,False
+ENSG00000171453,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000171497,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000171503,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000171560,candidate,[],False,False,False
+ENSG00000171608,candidate,"[""Cytosol""]",True,True,False
+ENSG00000171612,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000171723,candidate,"[""Cytosol"", ""cell membrane"", ""cytoskeleton""]",False,True,True
+ENSG00000171759,unresolved,[],False,False,False
+ENSG00000171766,candidate,"[""Cytosol"", ""inner mitochondria""]",False,True,True
+ENSG00000171793,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000171848,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000171862,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000171885,candidate,"[""cell membrane"", ""vesicle""]",False,True,True
+ENSG00000171903,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000171954,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000171960,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000171989,unresolved,[],False,False,False
+ENSG00000172009,candidate,"[""Cytosol""]",True,True,False
+ENSG00000172046,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000172053,candidate,"[""Cytosol""]",True,True,False
+ENSG00000172113,candidate,"[""Mitochondria"", ""inner mitochondria""]",False,True,True
+ENSG00000172197,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000172236,candidate,[],False,False,False
+ENSG00000172264,candidate,"[""Nucleus""]",True,True,False
+ENSG00000172269,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000172288,candidate,"[""Nucleus""]",True,True,False
+ENSG00000172292,candidate,"[""Endoplasmic reticulum"", ""Nucleus""]",False,True,True
+ENSG00000172296,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000172318,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000172331,unresolved,[],False,False,False
+ENSG00000172339,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000172340,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000172345,unresolved,[],False,False,False
+ENSG00000172352,candidate,"[""Nucleus""]",True,True,False
+ENSG00000172456,unresolved,[],False,False,False
+ENSG00000172461,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000172482,candidate,"[""Peroxisome""]",True,True,False
+ENSG00000172497,candidate,"[""Cytosol""]",True,True,False
+ENSG00000172508,unresolved,[],False,False,False
+ENSG00000172543,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000172572,candidate,"[""Cytosol""]",True,True,False
+ENSG00000172613,candidate,"[""Nucleus""]",True,True,False
+ENSG00000172728,candidate,"[""Endoplasmic reticulum"", ""Golgi apparatus"", ""lysosome""]",False,True,True
+ENSG00000172817,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000172828,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000172831,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000172840,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000172890,unresolved,[],False,False,False
+ENSG00000172893,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000172940,candidate,"[""cell membrane""]",True,True,False
+ENSG00000172954,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000172955,candidate,"[""Cytosol""]",True,True,False
+ENSG00000172977,candidate,"[""Cytosol"", ""Nucleus"", ""cytoskeleton""]",False,True,True
+ENSG00000172985,unresolved,[],False,False,False
+ENSG00000172987,candidate,[],False,False,False
+ENSG00000173020,candidate,"[""Cytosol"", ""cell membrane"", ""cilium""]",False,True,True
+ENSG00000173083,candidate,"[""Nucleus"", ""lysosome""]",False,True,True
+ENSG00000173085,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000173175,candidate,"[""cell membrane"", ""cilium""]",False,True,True
+ENSG00000173193,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000173200,candidate,"[""Nucleus""]",True,True,False
+ENSG00000173208,candidate,"[""Peroxisome""]",True,True,False
+ENSG00000173221,candidate,"[""Cytosol""]",True,True,False
+ENSG00000173262,candidate,"[""cell membrane""]",True,True,False
+ENSG00000173273,candidate,"[""Cytosol"", ""Golgi apparatus"", ""Nucleus"", ""cytoskeleton""]",False,True,True
+ENSG00000173281,unresolved,[],False,False,False
+ENSG00000173486,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000173540,candidate,"[""Cytosol""]",True,True,False
+ENSG00000173597,candidate,"[""Cytosol""]",True,True,False
+ENSG00000173598,candidate,"[""Cytosol""]",True,True,False
+ENSG00000173599,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000173610,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000173614,candidate,"[""Nucleus""]",True,True,False
+ENSG00000173627,unresolved,[],False,False,False
+ENSG00000173638,candidate,"[""cell membrane""]",True,True,False
+ENSG00000173660,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000173786,candidate,"[""cell membrane"", ""cytoskeleton"", ""inner mitochondria"", ""vesicle""]",False,True,True
+ENSG00000173838,unresolved,[],False,False,False
+ENSG00000173868,candidate,"[""vesicle""]",True,True,False
+ENSG00000173915,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000173926,candidate,"[""vesicle""]",True,True,False
+ENSG00000174080,candidate,"[""lysosome""]",True,True,False
+ENSG00000174156,candidate,"[""Cytosol""]",True,True,False
+ENSG00000174165,candidate,[],False,False,False
+ENSG00000174227,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000174233,candidate,"[""cell membrane"", ""cilium"", ""cytoskeleton""]",False,True,True
+ENSG00000174327,candidate,"[""Golgi apparatus"", ""cell membrane""]",False,True,True
+ENSG00000174358,candidate,"[""cell membrane""]",True,True,False
+ENSG00000174437,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000174448,unresolved,[],False,False,False
+ENSG00000174473,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000174502,candidate,"[""cell membrane""]",True,True,False
+ENSG00000174607,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000174640,candidate,"[""Cytosol"", ""cell membrane"", ""lysosome""]",False,True,True
+ENSG00000174669,candidate,"[""cell membrane""]",True,True,False
+ENSG00000174684,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000174876,candidate,[],False,False,False
+ENSG00000174886,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000174915,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000174951,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000174990,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000175003,candidate,"[""Mitochondria"", ""Nucleus"", ""cell membrane""]",False,True,True
+ENSG00000175040,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000175048,candidate,"[""Endoplasmic reticulum"", ""Golgi apparatus""]",False,True,True
+ENSG00000175063,unresolved,[],False,False,False
+ENSG00000175066,candidate,"[""Cytosol""]",True,True,False
+ENSG00000175164,candidate,[],False,False,False
+ENSG00000175198,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000175264,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000175283,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000175309,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000175445,candidate,"[""cell membrane""]",True,True,False
+ENSG00000175482,candidate,"[""Nucleus""]",True,True,False
+ENSG00000175505,candidate,[],False,False,False
+ENSG00000175535,candidate,[],False,False,False
+ENSG00000175536,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000175548,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000175564,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000175567,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000175806,candidate,"[""Cytosol"", ""Mitochondria"", ""Nucleus""]",False,True,True
+ENSG00000175809,candidate,"[""Cytosol""]",True,True,False
+ENSG00000175893,candidate,"[""Golgi apparatus"", ""cell membrane""]",False,True,True
+ENSG00000175931,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000175938,candidate,"[""cell membrane""]",True,True,False
+ENSG00000176022,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000176095,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000176153,candidate,"[""Cytosol""]",True,True,False
+ENSG00000176170,candidate,"[""Cytosol"", ""Nucleus"", ""cell membrane"", ""vesicle""]",False,True,True
+ENSG00000176340,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000176383,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000176387,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000176393,candidate,[],False,False,False
+ENSG00000176454,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000176463,candidate,"[""cell membrane""]",True,True,False
+ENSG00000176485,candidate,"[""Cytosol"", ""Endoplasmic reticulum"", ""Mitochondria"", ""Nucleus"", ""Peroxisome"", ""cell membrane"", ""lysosome""]",False,True,True
+ENSG00000176597,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000176641,candidate,"[""lysosome""]",True,True,False
+ENSG00000176715,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000176890,candidate,"[""Cytosol"", ""Mitochondria"", ""Nucleus"", ""inner mitochondria""]",False,True,True
+ENSG00000176894,candidate,"[""Peroxisome""]",True,True,False
+ENSG00000176920,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000176928,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000176974,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000177000,unresolved,[],False,False,False
+ENSG00000177054,candidate,"[""Golgi apparatus"", ""vesicle""]",False,True,True
+ENSG00000177076,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000177084,candidate,"[""Nucleus""]",True,True,False
+ENSG00000177108,candidate,"[""Endoplasmic reticulum"", ""Golgi apparatus""]",False,True,True
+ENSG00000177156,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000177191,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000177192,candidate,"[""Cytosol"", ""Mitochondria"", ""Nucleus""]",False,True,True
+ENSG00000177239,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000177414,unresolved,[],False,False,False
+ENSG00000177465,candidate,"[""Peroxisome""]",True,True,False
+ENSG00000177542,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000177628,candidate,"[""lysosome""]",True,True,False
+ENSG00000177646,candidate,"[""Mitochondria"", ""inner mitochondria""]",False,True,True
+ENSG00000177666,candidate,"[""Cytosol"", ""cell membrane""]",False,True,True
+ENSG00000177669,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000177700,candidate,"[""Nucleus""]",True,True,False
+ENSG00000177889,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000178035,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000178127,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000178234,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000178301,candidate,"[""Endoplasmic reticulum"", ""cell membrane"", ""vesicle""]",False,True,True
+ENSG00000178445,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000178537,candidate,"[""Mitochondria"", ""inner mitochondria""]",False,True,True
+ENSG00000178685,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000178700,candidate,"[""Mitochondria"", ""inner mitochondria""]",False,True,True
+ENSG00000178741,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000178773,candidate,"[""Cytosol"", ""Nucleus"", ""cell membrane""]",False,True,True
+ENSG00000178802,candidate,"[""Cytosol""]",True,True,False
+ENSG00000178814,candidate,"[""Cytosol""]",True,True,False
+ENSG00000178921,candidate,"[""Cytosol""]",True,True,False
+ENSG00000178922,unresolved,[],False,False,False
+ENSG00000179085,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000179091,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000179115,candidate,"[""Cytosol""]",True,True,False
+ENSG00000179142,candidate,"[""Mitochondria"", ""inner mitochondria""]",False,True,True
+ENSG00000179148,candidate,"[""Cytosol""]",True,True,False
+ENSG00000179163,candidate,"[""lysosome""]",True,True,False
+ENSG00000179455,candidate,"[""Nucleus""]",True,True,False
+ENSG00000179477,candidate,"[""Cytosol""]",True,True,False
+ENSG00000179520,candidate,"[""cell membrane"", ""vesicle""]",False,True,True
+ENSG00000179593,candidate,"[""Cytosol"", ""Nucleus"", ""cell membrane"", ""cytoskeleton""]",False,True,True
+ENSG00000179598,candidate,"[""Golgi apparatus"", ""Mitochondria""]",False,True,True
+ENSG00000179761,candidate,"[""Peroxisome""]",True,True,False
+ENSG00000179913,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000179918,candidate,"[""Cytosol""]",True,True,False
+ENSG00000179958,candidate,"[""Cytosol"", ""Mitochondria"", ""Nucleus""]",False,True,True
+ENSG00000180011,candidate,"[""Peroxisome""]",True,True,False
+ENSG00000180176,candidate,"[""Cytosol"", ""Nucleus"", ""vesicle""]",False,True,True
+ENSG00000180185,candidate,"[""Cytosol"", ""Mitochondria""]",False,True,True
+ENSG00000180210,candidate,[],False,False,False
+ENSG00000180233,candidate,"[""Cytosol"", ""cell membrane"", ""lysosome"", ""vesicle""]",False,True,True
+ENSG00000180251,candidate,"[""cell membrane"", ""vesicle""]",False,True,True
+ENSG00000180389,unresolved,[],False,False,False
+ENSG00000180432,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000180537,candidate,"[""Cytosol""]",True,True,False
+ENSG00000180549,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000180638,candidate,"[""cell membrane""]",True,True,False
+ENSG00000180767,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000180773,candidate,"[""lysosome""]",True,True,False
+ENSG00000180817,candidate,"[""Cytosol""]",True,True,False
+ENSG00000180902,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000181019,candidate,"[""Cytosol""]",True,True,False
+ENSG00000181035,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000181045,candidate,"[""cell membrane"", ""lysosome""]",False,True,True
+ENSG00000181090,candidate,"[""Nucleus""]",True,True,False
+ENSG00000181191,unresolved,[],False,False,False
+ENSG00000181192,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000181222,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000181523,candidate,"[""lysosome""]",True,True,False
+ENSG00000181555,candidate,"[""Nucleus""]",True,True,False
+ENSG00000181788,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000181789,candidate,"[""Cytosol"", ""Golgi apparatus"", ""vesicle""]",False,True,True
+ENSG00000181804,candidate,"[""cell membrane"", ""vesicle""]",False,True,True
+ENSG00000181830,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000181852,unresolved,[],False,False,False
+ENSG00000181856,candidate,"[""cell membrane""]",True,True,False
+ENSG00000181867,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000181873,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000181915,unresolved,[],False,False,False
+ENSG00000182022,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000182050,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000182054,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000182156,candidate,"[""cell membrane""]",True,True,False
+ENSG00000182179,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000182197,candidate,"[""Endoplasmic reticulum"", ""Golgi apparatus""]",False,True,True
+ENSG00000182199,candidate,"[""Cytosol"", ""Mitochondria"", ""Nucleus"", ""inner mitochondria""]",False,True,True
+ENSG00000182247,unresolved,[],False,False,False
+ENSG00000182272,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000182333,candidate,[],False,False,False
+ENSG00000182415,candidate,"[""Nucleus""]",True,True,False
+ENSG00000182512,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000182551,candidate,"[""Cytosol"", ""Nucleus"", ""cell membrane""]",False,True,True
+ENSG00000182601,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000182621,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000182670,candidate,"[""Cytosol"", ""Golgi apparatus"", ""Nucleus""]",False,True,True
+ENSG00000182793,candidate,"[""Cytosol""]",True,True,False
+ENSG00000182858,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000182870,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000182890,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000182902,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000183010,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000183023,candidate,"[""cell membrane""]",True,True,False
+ENSG00000183032,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000183044,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000183048,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000183077,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000183196,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000183463,candidate,"[""Peroxisome""]",True,True,False
+ENSG00000183479,candidate,"[""Nucleus""]",True,True,False
+ENSG00000183549,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000183648,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000183654,candidate,"[""vesicle""]",True,True,False
+ENSG00000183696,unresolved,[],False,False,False
+ENSG00000183747,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000183760,candidate,[],False,False,False
+ENSG00000183778,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000183828,candidate,"[""Cytosol""]",True,True,False
+ENSG00000183873,candidate,"[""cell membrane""]",True,True,False
+ENSG00000183921,unresolved,[],False,False,False
+ENSG00000183955,candidate,"[""Nucleus""]",True,True,False
+ENSG00000184005,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000184076,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000184154,candidate,"[""Cytosol""]",True,True,False
+ENSG00000184182,unresolved,[],False,False,False
+ENSG00000184207,unresolved,[],False,False,False
+ENSG00000184227,candidate,"[""Cytosol""]",True,True,False
+ENSG00000184254,candidate,"[""Cytosol""]",True,True,False
+ENSG00000184304,candidate,"[""Cytosol"", ""Golgi apparatus"", ""cell membrane""]",False,True,True
+ENSG00000184343,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000184381,candidate,"[""Cytosol"", ""Mitochondria"", ""cell membrane""]",False,True,True
+ENSG00000184470,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000184588,candidate,"[""Cytosol"", ""cell membrane""]",False,True,True
+ENSG00000184752,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000184787,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000184788,unresolved,[],False,False,False
+ENSG00000184860,candidate,[],False,False,False
+ENSG00000184979,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000184983,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000184999,candidate,[],False,False,False
+ENSG00000185000,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000185013,candidate,"[""Cytosol""]",True,True,False
+ENSG00000185015,candidate,"[""Cytosol""]",True,True,False
+ENSG00000185052,candidate,"[""cell membrane""]",True,True,False
+ENSG00000185100,candidate,"[""Cytosol""]",True,True,False
+ENSG00000185133,candidate,"[""Cytosol""]",True,True,False
+ENSG00000185274,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000185313,candidate,"[""cell membrane""]",True,True,False
+ENSG00000185344,candidate,"[""cell membrane"", ""vesicle""]",False,True,True
+ENSG00000185345,candidate,"[""Cytosol"", ""Endoplasmic reticulum"", ""Mitochondria"", ""Nucleus""]",False,True,True
+ENSG00000185352,candidate,[],False,False,False
+ENSG00000185420,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000185527,candidate,"[""cilium""]",True,True,False
+ENSG00000185624,candidate,"[""Endoplasmic reticulum"", ""cell membrane"", ""vesicle""]",False,True,True
+ENSG00000185651,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000185803,candidate,"[""cell membrane""]",True,True,False
+ENSG00000185808,candidate,[],False,False,False
+ENSG00000185813,unresolved,[],False,False,False
+ENSG00000185818,candidate,"[""Cytosol"", ""Endoplasmic reticulum"", ""Mitochondria""]",False,True,True
+ENSG00000185825,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000185875,unresolved,[],False,False,False
+ENSG00000185883,candidate,"[""lysosome"", ""vesicle""]",False,True,True
+ENSG00000185973,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000185974,candidate,"[""cell membrane"", ""cilium""]",False,True,True
+ENSG00000186009,candidate,"[""cell membrane""]",True,True,False
+ENSG00000186010,candidate,"[""Nucleus"", ""inner mitochondria""]",False,True,True
+ENSG00000186104,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000186111,candidate,"[""Cytosol"", ""Nucleus"", ""cell membrane""]",False,True,True
+ENSG00000186115,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000186141,candidate,"[""Nucleus""]",True,True,False
+ENSG00000186153,candidate,"[""Cytosol"", ""Golgi apparatus"", ""Mitochondria"", ""Nucleus"", ""lysosome""]",False,True,True
+ENSG00000186160,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000186184,candidate,"[""Nucleus""]",True,True,False
+ENSG00000186187,candidate,"[""lysosome"", ""vesicle""]",False,True,True
+ENSG00000186198,candidate,"[""cell membrane""]",True,True,False
+ENSG00000186204,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000186281,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000186334,candidate,[],False,False,False
+ENSG00000186335,candidate,"[""Endoplasmic reticulum"", ""cell membrane"", ""vesicle""]",False,True,True
+ENSG00000186377,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000186526,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000186529,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000186591,unresolved,[],False,False,False
+ENSG00000186642,candidate,"[""Cytosol"", ""Mitochondria"", ""cell membrane"", ""inner mitochondria""]",False,True,True
+ENSG00000186792,candidate,"[""Endoplasmic reticulum"", ""cell membrane"", ""vesicle""]",False,True,True
+ENSG00000186815,candidate,"[""lysosome"", ""vesicle""]",False,True,True
+ENSG00000186908,candidate,"[""Golgi apparatus"", ""cell membrane"", ""vesicle""]",False,True,True
+ENSG00000187021,candidate,[],False,False,False
+ENSG00000187024,unresolved,[],False,False,False
+ENSG00000187048,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000187091,candidate,"[""Cytosol"", ""cell membrane""]",False,True,True
+ENSG00000187097,candidate,"[""Endoplasmic reticulum"", ""Golgi apparatus"", ""cell membrane""]",False,True,True
+ENSG00000187134,candidate,"[""Cytosol""]",True,True,False
+ENSG00000187210,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000187486,candidate,[],False,False,False
+ENSG00000187531,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000187553,candidate,[],False,False,False
+ENSG00000187555,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000187566,candidate,"[""Endoplasmic reticulum"", ""Nucleus""]",False,True,True
+ENSG00000187630,candidate,[],False,False,False
+ENSG00000187676,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000187714,candidate,"[""vesicle""]",True,True,False
+ENSG00000187733,candidate,[],False,False,False
+ENSG00000187758,candidate,"[""Cytosol""]",True,True,False
+ENSG00000188050,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000188089,candidate,"[""Cytosol"", ""cell membrane"", ""lysosome"", ""vesicle""]",False,True,True
+ENSG00000188167,candidate,[],False,False,False
+ENSG00000188257,candidate,"[""Mitochondria"", ""cell membrane""]",False,True,True
+ENSG00000188266,candidate,"[""Cytosol""]",True,True,False
+ENSG00000188338,candidate,"[""cell membrane""]",True,True,False
+ENSG00000188467,candidate,"[""Golgi apparatus"", ""vesicle""]",False,True,True
+ENSG00000188611,candidate,"[""Golgi apparatus"", ""Mitochondria"", ""cell membrane""]",False,True,True
+ENSG00000188641,candidate,"[""Cytosol""]",True,True,False
+ENSG00000188676,unresolved,[],False,False,False
+ENSG00000188687,candidate,"[""cell membrane""]",True,True,False
+ENSG00000188690,candidate,"[""Cytosol""]",True,True,False
+ENSG00000188706,candidate,"[""Endoplasmic reticulum"", ""Golgi apparatus""]",False,True,True
+ENSG00000188784,candidate,"[""Cytosol""]",True,True,False
+ENSG00000188818,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000188833,candidate,"[""cell membrane""]",True,True,False
+ENSG00000188921,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000189043,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000189221,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000189283,candidate,"[""Cytosol"", ""Mitochondria"", ""Nucleus""]",False,True,True
+ENSG00000196136,candidate,[],False,False,False
+ENSG00000196139,candidate,"[""Cytosol""]",True,True,False
+ENSG00000196177,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000196188,candidate,"[""vesicle""]",True,True,False
+ENSG00000196218,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000196262,candidate,"[""Cytosol"", ""Nucleus"", ""cell membrane""]",False,True,True
+ENSG00000196296,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000196305,candidate,"[""Cytosol""]",True,True,False
+ENSG00000196313,candidate,"[""Endoplasmic reticulum"", ""Nucleus""]",False,True,True
+ENSG00000196344,candidate,"[""Cytosol""]",True,True,False
+ENSG00000196368,candidate,"[""Cytosol""]",True,True,False
+ENSG00000196371,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000196407,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000196433,unresolved,[],False,False,False
+ENSG00000196470,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000196475,candidate,"[""Cytosol"", ""Mitochondria""]",False,True,True
+ENSG00000196497,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000196502,candidate,"[""Cytosol""]",True,True,False
+ENSG00000196511,unresolved,[],False,False,False
+ENSG00000196517,candidate,"[""cell membrane""]",True,True,False
+ENSG00000196547,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000196557,candidate,"[""cell membrane""]",True,True,False
+ENSG00000196616,candidate,"[""Cytosol""]",True,True,False
+ENSG00000196620,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000196743,candidate,"[""lysosome""]",True,True,False
+ENSG00000196839,candidate,"[""Cytosol"", ""cell membrane"", ""lysosome"", ""vesicle""]",False,True,True
+ENSG00000196876,candidate,"[""cell membrane"", ""cytoskeleton"", ""vesicle""]",False,True,True
+ENSG00000196950,candidate,"[""cell membrane""]",True,True,False
+ENSG00000196968,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000197093,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000197121,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000197142,candidate,"[""Endoplasmic reticulum"", ""Mitochondria"", ""cell membrane""]",False,True,True
+ENSG00000197165,candidate,"[""Cytosol""]",True,True,False
+ENSG00000197208,candidate,"[""Mitochondria"", ""cell membrane""]",False,True,True
+ENSG00000197217,candidate,"[""Golgi apparatus"", ""lysosome"", ""vesicle""]",False,True,True
+ENSG00000197241,candidate,"[""cell membrane""]",True,True,False
+ENSG00000197249,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000197253,candidate,[],False,False,False
+ENSG00000197296,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000197323,candidate,"[""Nucleus""]",True,True,False
+ENSG00000197355,unresolved,[],False,False,False
+ENSG00000197375,candidate,"[""Endoplasmic reticulum"", ""cell membrane""]",False,True,True
+ENSG00000197406,candidate,"[""cell membrane"", ""vesicle""]",False,True,True
+ENSG00000197408,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000197416,unresolved,[],False,False,False
+ENSG00000197417,candidate,"[""Cytosol""]",True,True,False
+ENSG00000197446,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000197448,candidate,"[""Peroxisome""]",True,True,False
+ENSG00000197496,candidate,"[""Cytosol""]",True,True,False
+ENSG00000197506,candidate,"[""Endoplasmic reticulum"", ""cell membrane""]",False,True,True
+ENSG00000197530,candidate,"[""Cytosol"", ""vesicle""]",False,True,True
+ENSG00000197563,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000197579,candidate,"[""Nucleus""]",True,True,False
+ENSG00000197580,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000197586,candidate,"[""Golgi apparatus"", ""cell membrane""]",False,True,True
+ENSG00000197594,candidate,"[""cell membrane""]",True,True,False
+ENSG00000197601,candidate,"[""Peroxisome""]",True,True,False
+ENSG00000197713,unresolved,[],False,False,False
+ENSG00000197746,candidate,"[""lysosome""]",True,True,False
+ENSG00000197763,candidate,"[""Cytosol"", ""Endoplasmic reticulum"", ""Nucleus""]",False,True,True
+ENSG00000197818,candidate,"[""Golgi apparatus"", ""cell membrane"", ""vesicle""]",False,True,True
+ENSG00000197838,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000197858,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000197888,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000197891,candidate,"[""cell membrane""]",True,True,False
+ENSG00000197894,candidate,"[""Cytosol""]",True,True,False
+ENSG00000197901,candidate,"[""cell membrane""]",True,True,False
+ENSG00000197943,candidate,[],False,False,False
+ENSG00000197959,candidate,"[""Cytosol"", ""cytoskeleton""]",False,True,True
+ENSG00000197977,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000198060,candidate,"[""Endoplasmic reticulum"", ""Mitochondria"", ""Peroxisome""]",False,True,True
+ENSG00000198074,candidate,"[""Cytosol"", ""lysosome""]",False,True,True
+ENSG00000198075,candidate,"[""Cytosol""]",True,True,False
+ENSG00000198077,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000198099,candidate,"[""Cytosol""]",True,True,False
+ENSG00000198108,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000198130,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000198162,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000198189,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000198203,candidate,"[""Cytosol"", ""Mitochondria"", ""lysosome""]",False,True,True
+ENSG00000198216,candidate,[],False,False,False
+ENSG00000198246,candidate,"[""Mitochondria"", ""cell membrane"", ""lysosome"", ""vesicle""]",False,True,True
+ENSG00000198276,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000198363,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000198373,candidate,"[""Nucleus""]",True,True,False
+ENSG00000198380,unresolved,[],False,False,False
+ENSG00000198431,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000198488,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000198569,candidate,"[""cell membrane""]",True,True,False
+ENSG00000198610,candidate,"[""Cytosol""]",True,True,False
+ENSG00000198626,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000198650,unresolved,[],False,False,False
+ENSG00000198668,candidate,"[""cilium"", ""cytoskeleton""]",False,True,True
+ENSG00000198682,unresolved,[],False,False,False
+ENSG00000198691,candidate,"[""Endoplasmic reticulum"", ""cilium"", ""vesicle""]",False,True,True
+ENSG00000198695,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000198704,candidate,[],False,False,False
+ENSG00000198712,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000198721,candidate,"[""Mitochondria"", ""Peroxisome""]",False,True,True
+ENSG00000198727,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000198742,candidate,"[""Cytosol"", ""cell membrane""]",False,True,True
+ENSG00000198743,candidate,"[""cell membrane""]",True,True,False
+ENSG00000198754,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000198756,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000198763,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000198786,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000198804,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000198805,candidate,"[""Cytosol""]",True,True,False
+ENSG00000198814,candidate,"[""Cytosol"", ""Mitochondria"", ""Nucleus""]",False,True,True
+ENSG00000198825,candidate,"[""vesicle""]",True,True,False
+ENSG00000198833,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000198838,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000198840,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000198848,candidate,"[""Cytosol"", ""Endoplasmic reticulum""]",False,True,True
+ENSG00000198881,unresolved,[],False,False,False
+ENSG00000198886,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000198888,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000198899,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000198919,candidate,"[""Cytosol""]",True,True,False
+ENSG00000198931,candidate,"[""Cytosol""]",True,True,False
+ENSG00000198938,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000198951,candidate,"[""lysosome""]",True,True,False
+ENSG00000198959,candidate,"[""Cytosol"", ""Mitochondria"", ""Nucleus"", ""cell membrane""]",False,True,True
+ENSG00000198961,candidate,"[""Cytosol"", ""Endoplasmic reticulum"", ""Golgi apparatus"", ""cell membrane"", ""cytoskeleton""]",False,True,True
+ENSG00000198964,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000203797,candidate,"[""Cytosol"", ""Peroxisome""]",False,True,True
+ENSG00000203805,candidate,[],False,False,False
+ENSG00000203837,candidate,[],False,False,False
+ENSG00000203857,candidate,"[""Endoplasmic reticulum"", ""Mitochondria""]",False,True,True
+ENSG00000203859,candidate,"[""Endoplasmic reticulum"", ""Mitochondria""]",False,True,True
+ENSG00000204007,candidate,[],False,False,False
+ENSG00000204084,candidate,"[""Cytosol"", ""Golgi apparatus"", ""vesicle""]",False,True,True
+ENSG00000204099,candidate,"[""Endoplasmic reticulum"", ""Mitochondria"", ""cell membrane"", ""inner mitochondria"", ""lysosome""]",False,True,True
+ENSG00000204195,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000204227,candidate,"[""Nucleus""]",True,True,False
+ENSG00000204228,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000204308,candidate,"[""Endoplasmic reticulum"", ""Mitochondria"", ""cell membrane""]",False,True,True
+ENSG00000204310,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000204370,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000204371,candidate,"[""Nucleus""]",True,True,False
+ENSG00000204385,candidate,"[""cell membrane""]",True,True,False
+ENSG00000204386,candidate,"[""cell membrane"", ""lysosome""]",False,True,True
+ENSG00000204394,unresolved,[],False,False,False
+ENSG00000205060,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000205186,candidate,"[""Cytosol"", ""cytoskeleton""]",False,True,True
+ENSG00000205268,candidate,"[""Cytosol""]",True,True,False
+ENSG00000205309,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000205560,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000205669,candidate,"[""Cytosol"", ""Peroxisome""]",False,True,True
+ENSG00000205678,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000205808,candidate,"[""Endoplasmic reticulum"", ""Nucleus""]",False,True,True
+ENSG00000205923,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000206077,candidate,[],False,False,False
+ENSG00000206190,candidate,"[""Endoplasmic reticulum"", ""cell membrane""]",False,True,True
+ENSG00000206527,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000211445,candidate,[],False,False,False
+ENSG00000211448,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000211452,candidate,"[""Endoplasmic reticulum"", ""cell membrane""]",False,True,True
+ENSG00000211456,candidate,"[""Endoplasmic reticulum"", ""Golgi apparatus""]",False,True,True
+ENSG00000212907,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000213024,candidate,"[""Nucleus"", ""cytoskeleton""]",False,True,True
+ENSG00000213160,unresolved,[],False,False,False
+ENSG00000213316,candidate,"[""Endoplasmic reticulum"", ""Nucleus""]",False,True,True
+ENSG00000213339,candidate,"[""Cytosol"", ""Mitochondria""]",False,True,True
+ENSG00000213366,candidate,"[""Cytosol""]",True,True,False
+ENSG00000213398,candidate,[],False,False,False
+ENSG00000213614,candidate,"[""lysosome""]",True,True,False
+ENSG00000213619,candidate,"[""Mitochondria"", ""inner mitochondria""]",False,True,True
+ENSG00000213648,candidate,"[""Cytosol""]",True,True,False
+ENSG00000213689,candidate,"[""Cytosol"", ""Endoplasmic reticulum"", ""Nucleus""]",False,True,True
+ENSG00000213759,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000213760,candidate,"[""vesicle""]",True,True,False
+ENSG00000213920,unresolved,[],False,False,False
+ENSG00000213930,unresolved,[],False,False,False
+ENSG00000214013,unresolved,[],False,False,False
+ENSG00000214113,candidate,"[""Mitochondria"", ""Nucleus""]",False,True,True
+ENSG00000214160,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000214357,candidate,"[""Cytosol""]",True,True,False
+ENSG00000214435,candidate,"[""Cytosol""]",True,True,False
+ENSG00000214530,candidate,"[""Cytosol"", ""cilium""]",False,True,True
+ENSG00000215009,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000215218,candidate,"[""Nucleus""]",True,True,False
+ENSG00000215883,unresolved,[],False,False,False
+ENSG00000218823,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000221968,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000221988,candidate,"[""lysosome""]",True,True,False
+ENSG00000223443,candidate,"[""Endoplasmic reticulum"", ""Nucleus""]",False,True,True
+ENSG00000223572,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000223802,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000224586,candidate,"[""vesicle""]",True,True,False
+ENSG00000225697,candidate,"[""cell membrane"", ""vesicle""]",False,True,True
+ENSG00000226784,unresolved,[],False,False,False
+ENSG00000227140,candidate,"[""Endoplasmic reticulum"", ""Nucleus""]",False,True,True
+ENSG00000227471,candidate,"[""Cytosol"", ""Mitochondria""]",False,True,True
+ENSG00000228253,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000228716,candidate,"[""Cytosol"", ""Mitochondria"", ""Nucleus""]",False,True,True
+ENSG00000228727,unresolved,[],False,False,False
+ENSG00000228856,candidate,"[""Endoplasmic reticulum"", ""Nucleus""]",False,True,True
+ENSG00000229579,candidate,"[""Endoplasmic reticulum"", ""Nucleus""]",False,True,True
+ENSG00000229894,candidate,"[""Cytosol"", ""Mitochondria""]",False,True,True
+ENSG00000229937,unresolved,[],False,False,False
+ENSG00000230430,candidate,"[""Endoplasmic reticulum"", ""Nucleus""]",False,True,True
+ENSG00000231051,candidate,"[""Endoplasmic reticulum"", ""Nucleus""]",False,True,True
+ENSG00000231637,candidate,"[""Endoplasmic reticulum"", ""Nucleus""]",False,True,True
+ENSG00000231852,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000232264,candidate,"[""Endoplasmic reticulum"", ""Nucleus""]",False,True,True
+ENSG00000233276,candidate,"[""Cytosol"", ""Mitochondria""]",False,True,True
+ENSG00000234906,candidate,[],False,False,False
+ENSG00000235376,unresolved,[],False,False,False
+ENSG00000235780,candidate,"[""Endoplasmic reticulum"", ""Nucleus""]",False,True,True
+ENSG00000235863,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000236334,candidate,"[""Cytosol""]",True,True,False
+ENSG00000237172,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000237289,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000237763,candidate,[],False,False,False
+ENSG00000238205,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000239305,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000239672,candidate,"[""Cytosol"", ""Nucleus"", ""cell membrane""]",False,True,True
+ENSG00000239900,unresolved,[],False,False,False
+ENSG00000240038,candidate,[],False,False,False
+ENSG00000240303,candidate,"[""Mitochondria"", ""Peroxisome""]",False,True,True
+ENSG00000240344,unresolved,[],False,False,False
+ENSG00000240583,candidate,"[""cell membrane""]",True,True,False
+ENSG00000240857,unresolved,[],False,False,False
+ENSG00000240891,candidate,"[""Nucleus""]",True,True,False
+ENSG00000240972,candidate,"[""Cytosol""]",True,True,False
+ENSG00000241119,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000241360,candidate,"[""Cytosol"", ""cell membrane"", ""cytoskeleton""]",False,True,True
+ENSG00000241404,candidate,[],False,False,False
+ENSG00000241468,candidate,"[""Mitochondria"", ""inner mitochondria""]",False,True,True
+ENSG00000241635,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000241644,candidate,"[""Cytosol""]",True,True,False
+ENSG00000241837,candidate,"[""Mitochondria"", ""inner mitochondria""]",False,True,True
+ENSG00000241878,candidate,"[""Cytosol"", ""inner mitochondria""]",False,True,True
+ENSG00000241935,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000241973,candidate,"[""Cytosol"", ""cell membrane""]",False,True,True
+ENSG00000242110,candidate,"[""Mitochondria"", ""Peroxisome""]",False,True,True
+ENSG00000242366,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000242515,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000242612,candidate,"[""Peroxisome""]",True,True,False
+ENSG00000243477,candidate,"[""Cytosol""]",True,True,False
+ENSG00000243480,candidate,[],False,False,False
+ENSG00000243678,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000243708,candidate,"[""Cytosol"", ""Mitochondria"", ""vesicle""]",False,True,True
+ENSG00000243955,candidate,"[""Cytosol""]",True,True,False
+ENSG00000243989,candidate,"[""Cytosol""]",True,True,False
+ENSG00000244005,candidate,"[""Cytosol"", ""Mitochondria"", ""Nucleus"", ""cytoskeleton""]",False,True,True
+ENSG00000244038,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000244067,candidate,"[""Cytosol""]",True,True,False
+ENSG00000244122,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000244474,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000244486,candidate,[],False,False,False
+ENSG00000247626,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000247746,candidate,[],False,False,False
+ENSG00000248098,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000248144,candidate,"[""Cytosol""]",True,True,False
+ENSG00000248933,candidate,"[""Endoplasmic reticulum"", ""Nucleus""]",False,True,True
+ENSG00000249222,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000249853,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000249948,unresolved,[],False,False,False
+ENSG00000250565,unresolved,[],False,False,False
+ENSG00000250799,unresolved,[],False,False,False
+ENSG00000251287,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000253710,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000254685,candidate,"[""Cytosol""]",True,True,False
+ENSG00000255072,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000255974,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000256043,candidate,"[""lysosome""]",True,True,False
+ENSG00000256269,candidate,"[""Cytosol""]",True,True,False
+ENSG00000256525,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000256870,candidate,"[""cell membrane""]",True,True,False
+ENSG00000257335,candidate,"[""cell membrane""]",True,True,False
+ENSG00000257365,unresolved,[],False,False,False
+ENSG00000257594,candidate,"[""Golgi apparatus""]",True,True,False
+ENSG00000258429,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000259431,candidate,"[""Cytosol""]",True,True,False
+ENSG00000261052,candidate,"[""Cytosol""]",True,True,False
+ENSG00000263353,candidate,"[""Cytosol""]",True,True,False
+ENSG00000263464,unresolved,[],False,False,False
+ENSG00000265203,candidate,[],False,False,False
+ENSG00000265491,candidate,"[""Cytosol"", ""Endoplasmic reticulum"", ""Golgi apparatus"", ""Nucleus""]",False,True,True
+ENSG00000266200,unresolved,[],False,False,False
+ENSG00000267673,candidate,"[""Mitochondria""]",True,True,False
+ENSG00000267855,candidate,"[""inner mitochondria""]",True,True,False
+ENSG00000268104,candidate,"[""cell membrane""]",True,True,False
+ENSG00000271567,candidate,"[""Cytosol""]",True,True,False
+ENSG00000272325,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000272333,candidate,"[""Nucleus""]",True,True,False
+ENSG00000273820,candidate,"[""Cytosol"", ""Nucleus""]",False,True,True
+ENSG00000273841,candidate,"[""Nucleus""]",True,True,False
+ENSG00000274252,unresolved,[],False,False,False
+ENSG00000274588,candidate,"[""cell membrane""]",True,True,False
+ENSG00000276043,candidate,"[""Nucleus""]",True,True,False
+ENSG00000276045,candidate,"[""cell membrane""]",True,True,False
+ENSG00000276293,candidate,"[""Cytosol"", ""Endoplasmic reticulum"", ""Nucleus"", ""cell membrane""]",False,True,True
+ENSG00000276747,candidate,"[""Cytosol"", ""Nucleus"", ""vesicle""]",False,True,True
+ENSG00000277161,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000277494,candidate,"[""cell membrane""]",True,True,False
+ENSG00000277893,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000278540,candidate,"[""Cytosol""]",True,True,False
+ENSG00000281500,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000288702,candidate,"[""Endoplasmic reticulum""]",True,True,False
+ENSG00000288705,candidate,"[""Endoplasmic reticulum""]",True,True,False
