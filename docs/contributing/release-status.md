@@ -84,3 +84,13 @@ Hosted Python 3.10–3.12 CI on the release commit, tagging and archiving are
 deferred beyond the internal draft. Before public release, run the matrix on
 the chosen commit and record its result. Publication requires user approval. The credential-gated
 BioCyc fixture remains optional and does not block the offline release gate.
+
+## Native solver settings caveat
+
+The first numerical task refresh did not record the effective Gurobi thread
+count: assigning `configuration.threads` does not set the native parameter.
+The corrected runner sets the native default before task copies are created
+and records their actual thread setting. A licensed regression passes; the
+baseline still needs a refresh under these settings before matched comparison.
+The historical results and their limitation are preserved in
+`publication/ws0/numerical-refresh/`.

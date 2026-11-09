@@ -52,7 +52,9 @@ numerically unreliable optimal solves as unresolved errors (`ac56d01`).
 
 Human-GEM 2.1.1 with MAR20193 blocked has refreshed results of VerifyModel
 21/21, Essential 57/57, and Full 255 pass / 257 total with two invalid mappings
-(`publication/ws0/numerical-refresh/`). Archived real-model consolidation and
+(`publication/ws0/numerical-refresh/`). That first refresh did not verify its
+native Gurobi thread count and requires a corrected, thread-verified refresh
+before a matched comparison; see its `limitations.json`. Archived real-model consolidation and
 parent-balance proposal measurements are in `publication/ws2/correctness.json`.
 The corrected WS1 build, final-model evaluation and independent replay remain
 incomplete. No final THG model or 2023-artifact reproduction is claimed.

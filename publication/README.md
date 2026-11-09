@@ -13,12 +13,13 @@ JSON and workflow manifests; new-job estimates below are not measured results.
 | Work | Regeneration command | Runtime / status |
 |---|---|---|
 | Model provenance | `python publication/scripts/pin_models.py` | seconds; file hashes only, no validation |
-| WS0 patched tasks | `python publication/scripts/run_tasks.py runs/human211-patched/Human_211_patched.xml human211-patched publication/ws0/numerical-refresh` | 318.39 s; 21/21 VerifyModel, 57/57 Essential, Full 255 pass + 2 invalid |
+| WS0 patched tasks | `python publication/scripts/run_tasks.py runs/human211-patched/Human_211_patched.xml human211-patched publication/ws0/pinned-refresh` | refresh pending after native-thread correction; earlier counts retained with limitations |
 | WS0 control | `python publication/scripts/run_tasks.py models/Human-GEM_2022-06-21.xml Human1 publication/ws0/numerical-refresh VerifyModel` | refresh pending |
 | WS0 validation | `thg-run validate publication/ws0/validation-config-211-patched.json` | pending; potentially hours |
 | WS1 corrected build | `thg-run resume runs/thg-ws1-a --force-step deduplicate-and-clean -v` | running from source `ac56d01`; earlier attempts preserved |
 | WS1 fresh checkout | `thg-run reference publication/ws1/reference-a.json -v` | existing run resumes; full build not yet measured |
-| WS1 independent replay | `thg-run reference publication/ws1/reference-b.json -v` | pending; frozen offline evidence still required |
+| WS1 freeze evidence | `python publication/scripts/freeze_evidence.py runs/thg-ws1-a publication/ws1/reference-b.json publication/ws1/frozen` | pending fresh beta2 export; destination must be empty |
+| WS1 independent replay | `thg-run reference publication/ws1/reference-b-frozen.json -v` | pending freezer output and stable candidate |
 | WS1 stage sizes/runtime | `python publication/scripts/stage_table.py runs/thg-ws1-a publication/ws1/current` | live checkpoint; pending/stale outputs omitted |
 | WS1 stage task gate | `python publication/scripts/run_tasks.py MODEL STAGE publication/ws1/numerical-refresh VerifyModel` | pending corrected artifacts |
 | WS1 corroboration | `THG_SOLVER=glpk python publication/scripts/run_tasks.py MODEL STAGE-glpk publication/ws1/numerical-refresh VerifyModel` | pending; separate solver retained in provenance |
@@ -26,6 +27,7 @@ JSON and workflow manifests; new-job estimates below are not measured results.
 | WS2 tests | `python -m pytest -m "not online" --ignore=tests/docs -q` | 350.38 s; 2,513 passed; `ws2/pytest-offline.log`; six docs checks passed separately |
 | WS4 quality/coverage | matched baseline/candidate validation | pending candidate and VerifyModel gate; command not yet available |
 | WS5 functional tasks | same `run_tasks.py` command on candidate, with all three tables | blocked on candidate; VerifyModel failure/unresolved result skips later tables |
+| Fig 1 | `python publication/scripts/plot_workflow.py` | generated SVG/PDF/PNG; protocol diagram and source table |
 | WS7 internal draft | `publication/manuscript/draft.md` | Introduction/Methods drafted; results, figures and evidence audit incomplete |
 
 `run_tasks.py` reads pinned numerical settings from `benchmark_settings.json`
@@ -40,3 +42,8 @@ it does not re-establish their source-byte comparison. Input source-tag and
 download-date information not available locally remains explicitly unknown.
 
 No public tag, archive or hosted release was created.
+
+The first task refresh has an unverified native Gurobi thread count
+(`ws0/numerical-refresh/limitations.json`). Its numerical task counts are
+historical evidence; a thread-verified refresh is required before matched
+comparison. The corrected runner records the effective native count per solve.

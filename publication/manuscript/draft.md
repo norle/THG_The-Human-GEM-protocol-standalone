@@ -38,6 +38,14 @@ Build configurations are `publication/ws1/reference-a.json` and
 replay with frozen service evidence. Replay and output identity have not yet
 been established; cached evidence alone does not establish an offline replay.
 
+![Protocol stages, gates and provenance](../figures/figure1_workflow.svg)
+
+**Figure 1.** Registered reference-workflow stages and scientific gates, with
+publication evaluation shown separately from construction. Optional/disabled
+stages are included in the displayed counts; execution success is not implied.
+Source: `publication/ws1/figure1_workflow.csv`. Regenerate with
+`python publication/scripts/plot_workflow.py`.
+
 ### Reference intervention and comparison conditions
 
 The benchmark reference is **Human-GEM 2.1.1 with MAR20193 blocked**. The patch
@@ -67,7 +75,12 @@ solves are null. An expected-infeasible task passes only when the solver reports
 infeasibility; an unreliable optimum cannot establish a leak or a pass.
 
 The pinned primary solver is Gurobi, with feasibility, optimality and integrality
-tolerances of 1e-7 and two threads. GLPK runs provide corroboration and retain
+tolerances of 1e-7 and two threads. The first numerical refresh assigned an
+unsupported optlang thread attribute; its effective thread count is unverified.
+It is retained as historical evidence and requires a native-thread-verified
+refresh before a matched comparison. The corrected runner sets Gurobi's native
+default before constructing models and records the effective thread count on
+every solve, including copied task models. GLPK runs provide corroboration and retain
 their own supported tolerances in the reports. They do not replace residual
 checks. `publication/scripts/run_tasks.py` writes per-task CSV and detailed JSON,
 including model checksum, source commit, working-diff checksum, script checksum,
