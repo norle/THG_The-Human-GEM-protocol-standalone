@@ -4,10 +4,10 @@ python publication/scripts/freeze_evidence.py RUN_DIR REPLAY_CONFIG OUTDIR
 This freezes collected evidence, not the original remote HTTP responses.
 """
 
+import argparse
 import hashlib
 import json
 import os
-import sys
 from pathlib import Path
 
 from thg_protocol.runtime.hashing import sha256_json
@@ -23,11 +23,13 @@ SOURCES = {
 }
 
 
-def freeze(run, template, out):
+def freeze(run, template, out, *, archived=False):
     if out.exists() and any(out.iterdir()):
         raise FileExistsError(f"Freeze destination must be empty: {out}")
     raw_manifest = (run / "manifest.json").read_bytes()
     manifest = json.loads(raw_manifest)
+    if archived and manifest.get("overall_status") not in {"completed", "failed"}:
+        raise ValueError("Archived input capture requires a terminal source run")
     steps = manifest["steps"]
     definitions = {stage.id: stage for stage in REFERENCE_STAGES}
     context = StageContext(load_snapshot(run), run.resolve(), manifest)
@@ -35,7 +37,7 @@ def freeze(run, template, out):
     def require_current(stage_id):
         if steps[stage_id]["status"] != "completed":
             raise ValueError(f"Cannot freeze incomplete stage: {stage_id}")
-        if steps[stage_id]["fingerprint"] != sha256_json(
+        if not archived and steps[stage_id]["fingerprint"] != sha256_json(
             definitions[stage_id].fingerprint_data(context)
         ):
             raise ValueError(f"Cannot freeze stale stage fingerprint: {stage_id}")
@@ -108,6 +110,10 @@ def freeze(run, template, out):
         json.dumps(
             {
                 "source_run": str(run.resolve()),
+                "runtime_fingerprints_verified": not archived,
+                "input_status": "archived acquisition outputs"
+                if archived
+                else "current runtime artifacts",
                 "source_manifest_sha256": hashlib.sha256(raw_manifest).hexdigest(),
                 "script_sha256": hashlib.sha256(
                     Path(__file__).read_bytes()
@@ -131,4 +137,17 @@ def freeze(run, template, out):
 
 
 if __name__ == "__main__":
-    print(freeze(*(Path(value) for value in sys.argv[1:4])))
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("run", type=Path)
+    parser.add_argument("template", type=Path)
+    parser.add_argument("out", type=Path)
+    parser.add_argument(
+        "--archived",
+        action="store_true",
+        help=(
+            "Capture terminal acquisition outputs as archived inputs; "
+            "do not certify their runtime fingerprints"
+        ),
+    )
+    args = parser.parse_args()
+    print(freeze(args.run, args.template, args.out, archived=args.archived))
