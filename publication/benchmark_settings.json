@@ -1,0 +1,50 @@
+{
+  "status": "draft: essentiality benchmark skipped by user decision (2026-11-04)",
+  "code_commit": "968c2a858e2a5216ce8252244133a54308bf115f",
+  "solver": {
+    "name": "gurobi",
+    "interface": "cobrapy/optlang",
+    "threads": 2
+  },
+  "validation": {
+    "profile": "final-standard",
+    "run_memote": true,
+    "run_solver": true
+  },
+  "tasks": {
+    "tables_dir": "files/metabolic_tasks",
+    "source": "Human-GEM develop 2f1d3e33ce591b357accc08d85aebc27bdcf4244",
+    "sha256": {
+      "metabolicTasks_Essential.txt": "d0c58503fc44d1eb49ea1b89f4cc90930a06bcd2c3972083c0986cfb126a0f18",
+      "metabolicTasks_Full.txt": "75f338da2635bf8cd0f77d319f4880abb2a3fbbacc2217806940b79424108ad9",
+      "metabolicTasks_VerifyModel.txt": "17409a25af172813647370557814879446feaed0236e4595a25180abe0e9faed"
+    },
+    "mapping": "files/metabolic_tasks/human_gem_names.json",
+    "mapping_sha256": "f12d0918055f69b284236d1b462119d154cb9ed4eb8a19f9bb481d5f0737b137",
+    "medium": "closed",
+    "forced_flux_relaxation": "non-boundary reactions with LB>0 set LB=0 and UB<0 set UB=0",
+    "script": "publication/scripts/run_tasks.py"
+  },
+  "depmap": {
+    "skipped": true,
+    "reason": "user decision; WS0 step 6 and WS6 not performed"
+  },
+  "human2_identity": {
+    "inputs/models/Human2.xml": {
+      "sha256": "cc5a4383c6116b0c91f4db089cc640f29aec7e840249b573b74d3792c9ca4a7a",
+      "version": "believed to be Human-GEM 2.0 (user, unverified)"
+    },
+    "inputs/models/Human_211.xml": {
+      "sha256": "dc0efd8009a8b680bde7040440f2e3592027dd118833445092ebd8d7bc425ddf",
+      "version": "Human-GEM 2.1.1 (user)"
+    }
+  },
+  "benchmark_human2": {
+    "path": "runs/human211-patched/Human_211_patched.xml",
+    "sha256": "04cb9de9e9ea3236c2ba06487847348ec2b7d5576d2e1c33e2f1ef9c58ab3f38",
+    "base": "inputs/models/Human_211.xml (Human-GEM 2.1.1)",
+    "patch": "MAR20193 bounds set to [0,0] (publication/scripts/patch_human211.py)",
+    "reason": "VerifyModel task 21 feasible on unpatched 2.1.1",
+    "decided_by": "user, 2026-11-04"
+  }
+}

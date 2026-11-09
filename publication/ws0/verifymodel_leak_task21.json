@@ -1,0 +1,5793 @@
+{
+ "model": "inputs/models/Human_211.xml",
+ "reference": "inputs/models/Human2.xml",
+ "task": "21",
+ "description": "ATP production from Pi and O2 [#102]",
+ "n_active": 385,
+ "reactions": [
+  {
+   "id": "MAR06328",
+   "flux": 1.0176808137802824,
+   "equation": "MAM01285c + MAM01371m <=> MAM01285m + MAM01371c",
+   "names": "ADP + ATP <=> ADP + ATP",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Transport reactions",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "TEMPORARY_1",
+   "flux": 1.0,
+   "equation": "MAM01371c + MAM02040c --> MAM01285c + MAM02039c + MAM02751c",
+   "names": "ATP + H2O --> ADP + H+ + Pi",
+   "temporary": true,
+   "mass_charge_imbalance": {},
+   "in_reference_model": false,
+   "identical_to_reference": null,
+   "subsystem": "",
+   "bounds": [
+    1.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR05043",
+   "flux": 0.9999964396267049,
+   "equation": "MAM02039i + MAM02751c --> MAM02039m + MAM02751m",
+   "names": "H+ + Pi --> H+ + Pi",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Transport reactions",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR04888",
+   "flux": -0.994202644164633,
+   "equation": "MAM02040c <=> MAM02040m",
+   "names": "H2O <=> H2O",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Transport reactions",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR06916",
+   "flux": 0.9410569519982461,
+   "equation": "MAM01285m + 3.0 MAM02039i + MAM02751m --> MAM01371m + 2.0 MAM02039m + MAM02040m",
+   "names": "ADP + 3.0 H+ + Pi --> ATP + 2.0 H+ + H2O",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Oxidative phosphorylation",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR07638",
+   "flux": 0.8550258718975912,
+   "equation": "MAM02039c --> MAM02039m",
+   "names": "H+ --> H+",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Transport reactions",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR06918",
+   "flux": 0.43798786571375636,
+   "equation": "2.0 MAM01824m + 2.0 MAM02039m + MAM03102m --> 2.0 MAM01826m + 4.0 MAM02039i + MAM03103m",
+   "names": "2.0 ferricytochrome C + 2.0 H+ + ubiquinol --> 2.0 ferrocytochrome C + 4.0 H+ + ubiquinone",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Oxidative phosphorylation",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR06921",
+   "flux": 0.2988100253347263,
+   "equation": "5.0 MAM02039m + MAM02553m + MAM03103m --> 4.0 MAM02039i + MAM02552m + MAM03102m",
+   "names": "5.0 H+ + NADH + ubiquinone --> 4.0 H+ + NAD+ + ubiquinol",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Oxidative phosphorylation",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR04896",
+   "flux": -0.2191174778101959,
+   "equation": "MAM02630c <=> MAM02630e",
+   "names": "O2 <=> O2",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Transport reactions",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "TASK_IN_MAM02630e",
+   "flux": 0.2191174778101959,
+   "equation": " --> MAM02630e",
+   "names": " --> O2",
+   "temporary": true,
+   "mass_charge_imbalance": {},
+   "in_reference_model": false,
+   "identical_to_reference": null,
+   "subsystem": "",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR04898",
+   "flux": 0.21899393285687818,
+   "equation": "MAM02630c <=> MAM02630m",
+   "names": "O2 <=> O2",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Transport reactions",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR06914",
+   "flux": 0.21899393285687818,
+   "equation": "4.0 MAM01826m + 8.0 MAM02039m + MAM02630m --> 4.0 MAM01824m + 4.0 MAM02039i + 2.0 MAM02040m",
+   "names": "4.0 ferrocytochrome C + 8.0 H+ + O2 --> 4.0 ferricytochrome C + 4.0 H+ + 2.0 H2O",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Oxidative phosphorylation",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR02225",
+   "flux": -0.15383838949362325,
+   "equation": "MAM02046c <=> MAM02046m",
+   "names": "HCO3- <=> HCO3-",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Transport reactions",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR03956",
+   "flux": 0.15383838949362325,
+   "equation": "MAM01596m + MAM02040m <=> MAM02039m + MAM02046m",
+   "names": "CO2 + H2O <=> H+ + HCO3-",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Arginine and proline metabolism",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "TASK_OUT_MAM02046e",
+   "flux": 0.1376062916068563,
+   "equation": "MAM02046e --> ",
+   "names": "HCO3- --> ",
+   "temporary": true,
+   "mass_charge_imbalance": {},
+   "in_reference_model": false,
+   "identical_to_reference": null,
+   "subsystem": "",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "TASK_OUT_MAM02039e",
+   "flux": 0.12848781956241745,
+   "equation": "MAM02039e --> ",
+   "names": "H+ --> ",
+   "temporary": true,
+   "mass_charge_imbalance": {},
+   "in_reference_model": false,
+   "identical_to_reference": null,
+   "subsystem": "",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR11318",
+   "flux": -0.0897338683268922,
+   "equation": "MAM02039e <=> MAM02039c",
+   "names": "H+ <=> H+",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Transport reactions",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR04141",
+   "flux": -0.07699698890329554,
+   "equation": "MAM02039m + MAM02553m + MAM02633m <=> MAM02439m + MAM02552m",
+   "names": "H+ + NADH + OAA <=> malate + NAD+",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Tricarboxylic acid cycle and glyoxylate/dicarboxylate metabolism",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR04145",
+   "flux": 0.07699698890329554,
+   "equation": "MAM01261m + MAM02040m + MAM02633m --> MAM01587m + MAM01597m + MAM02039m",
+   "names": "acetyl-CoA + H2O + OAA --> citrate + CoA + H+",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Tricarboxylic acid cycle and glyoxylate/dicarboxylate metabolism",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR04152",
+   "flux": 0.07699698890329554,
+   "equation": "MAM01285m + MAM02751m + MAM02944m <=> MAM01371m + MAM01597m + MAM02943m",
+   "names": "ADP + Pi + succinyl-CoA <=> ATP + CoA + succinate",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Tricarboxylic acid cycle and glyoxylate/dicarboxylate metabolism",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR04209",
+   "flux": 0.07699698890329554,
+   "equation": "MAM01306m + MAM02039m + MAM02984m --> MAM00765m + MAM01596m",
+   "names": "AKG + H+ + thiamin-PP --> 3-carboxy-1-hydroxypropyl-ThPP + CO2",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Tricarboxylic acid cycle and glyoxylate/dicarboxylate metabolism",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR04410",
+   "flux": 0.07699698890329554,
+   "equation": "MAM01862m + MAM02040m <=> MAM02439m",
+   "names": "fumarate + H2O <=> malate",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Tricarboxylic acid cycle and glyoxylate/dicarboxylate metabolism",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR04652",
+   "flux": -0.07699698890329554,
+   "equation": "MAM01862m + MAM03102m <=> MAM02943m + MAM03103m",
+   "names": "fumarate + ubiquinol <=> succinate + ubiquinone",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Tricarboxylic acid cycle and glyoxylate/dicarboxylate metabolism",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR06409",
+   "flux": -0.07699698890329554,
+   "equation": "MAM02039m + MAM02393m + MAM02553m <=> MAM01701m + MAM02552m",
+   "names": "H+ + lipoamide + NADH <=> dihydrolipoamide + NAD+",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Glycine, serine and threonine metabolism",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR06413",
+   "flux": 0.07699698890329554,
+   "equation": "MAM00765m + MAM02393m --> MAM02934m + MAM02984m",
+   "names": "3-carboxy-1-hydroxypropyl-ThPP + lipoamide --> S-succinyldihydrolipoamide + thiamin-PP",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Tricarboxylic acid cycle and glyoxylate/dicarboxylate metabolism",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR06414",
+   "flux": 0.07699698890329554,
+   "equation": "MAM01597m + MAM02934m <=> MAM01701m + MAM02944m",
+   "names": "CoA + S-succinyldihydrolipoamide <=> dihydrolipoamide + succinyl-CoA",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Tricarboxylic acid cycle and glyoxylate/dicarboxylate metabolism",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR03957",
+   "flux": 0.07683499191839768,
+   "equation": "MAM02183m + MAM02552m --> MAM01306m + MAM01596m + MAM02553m",
+   "names": "isocitrate + NAD+ --> AKG + CO2 + NADH",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Tricarboxylic acid cycle and glyoxylate/dicarboxylate metabolism",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR04458",
+   "flux": -0.07683499191839768,
+   "equation": "MAM01580m + MAM02040m <=> MAM01587m",
+   "names": "cis-aconitate + H2O <=> citrate",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Tricarboxylic acid cycle and glyoxylate/dicarboxylate metabolism",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR04589",
+   "flux": 0.07683499191839768,
+   "equation": "MAM01580m + MAM02040m <=> MAM02183m",
+   "names": "cis-aconitate + H2O <=> isocitrate",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Tricarboxylic acid cycle and glyoxylate/dicarboxylate metabolism",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR06911",
+   "flux": 0.062180851475734544,
+   "equation": "MAM01803m + MAM03103m <=> MAM01802m + MAM03102m",
+   "names": "FADH2 + ubiquinone <=> FAD + ubiquinol",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Oxidative phosphorylation",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR08077",
+   "flux": 0.049427950372312755,
+   "equation": "3.0 MAM02046c + MAM02519c --> 3.0 MAM02046e + MAM02519e",
+   "names": "3.0 HCO3- + Na+ --> 3.0 HCO3- + Na+",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Transport reactions",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR04939",
+   "flux": 0.024713975186156378,
+   "equation": "2.0 MAM02519e + MAM02943e --> 2.0 MAM02519c + MAM02943c",
+   "names": "2.0 Na+ + succinate --> 2.0 Na+ + succinate",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Transport reactions",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR20193",
+   "flux": 0.024713975186156378,
+   "equation": "2.0 MAM02039c + MAM02943c --> 2.0 MAM02039e + MAM02943e",
+   "names": "2.0 H+ + succinate --> 2.0 H+ + succinate",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": false,
+   "identical_to_reference": null,
+   "subsystem": "Transport reactions",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "TASK_OUT_MAM01596e",
+   "flux": 0.016394094871664797,
+   "equation": "MAM01596e --> ",
+   "names": "CO2 --> ",
+   "temporary": true,
+   "mass_charge_imbalance": {},
+   "in_reference_model": false,
+   "identical_to_reference": null,
+   "subsystem": "",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR00011",
+   "flux": 0.010681119883376415,
+   "equation": "0.5 MAM01807e + 0.5 MAM01820e --> MAM01819e",
+   "names": "0.5 fatty acid-chylomicron pool + 0.5 fatty acid-VLDL pool --> fatty acid-uptake pool",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Pool reactions",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR00012",
+   "flux": 0.010681119883376415,
+   "equation": "MAM01819e --> 0.0001 MAM00003e + 0.0001 MAM00008e + 0.0001 MAM00010e + 0.0001 MAM00017e + 0.0001 MAM00019e + 0.0001 MAM00021e + 0.0001 MAM00094e + 0.0001 MAM00104e + 0.0001 MAM00111e + 0.0001 MAM00114e + 0.0001 MAM00115e + 0.0001 MAM00117e + 0.0001 MAM00128e + 0.0001 MAM00132e + 0.0001 MAM00135e + 0.0001 MAM00260e + 0.0001 MAM00265e + 0.0001 MAM00315e + 0.0001 MAM00341e + 0.0001 MAM01197e + 0.0001 MAM01207e + 0.0001 MAM01235e + 0.0001 MAM01238e + 0.0001 MAM01291e + 0.0082 MAM01362e + 0.0001 MAM01373e + 0.0001 MAM01432e + 0.0001 MAM01582e + 0.0001 MAM01583e + 0.0001 MAM01584e + 0.0001 MAM01585e + 0.0041 MAM01689e + 0.002 MAM01696e + 0.0001 MAM01741e + 0.0001 MAM01771e + 0.0001 MAM01778e + 0.001 MAM01784e + 0.0001 MAM01932e + 0.0001 MAM02053e + 0.0001 MAM02344e + 0.0001 MAM02385e + 0.1535 MAM02387e + 0.0092 MAM02389e + 0.0001 MAM02456e + 0.0001 MAM02457e + 0.0338 MAM02494e + 0.0001 MAM02564e + 0.0001 MAM02613e + 0.3837 MAM02646e + 0.0001 MAM02648e + 0.3015 MAM02674e + 0.0522 MAM02675e + 0.0001 MAM02690e + 0.0001 MAM02745e + 0.046 MAM02938e + 0.0001 MAM02939e + 0.0001 MAM03045e + 0.0001 MAM03051e + 0.0001 MAM03153e",
+   "names": "fatty acid-uptake pool --> 0.0001 (10Z)-heptadecenoic acid + 0.0001 (11Z,14Z)-eicosadienoic acid + 0.0001 (11Z,14Z,17Z)-eicosatrienoic acid + 0.0001 (13Z)-eicosenoic acid + 0.0001 (13Z)-octadecenoic acid + 0.0001 (13Z,16Z)-docosadienoic acid + 0.0001 (4Z,7Z,10Z,13Z,16Z)-DPA + 0.0001 (6Z,9Z)-octadecadienoic acid + 0.0001 (6Z,9Z,12Z,15Z,18Z)-TPA + 0.0001 (6Z,9Z,12Z,15Z,18Z,21Z)-THA + 0.0001 (7Z)-octadecenoic acid + 0.0001 (7Z)-tetradecenoic acid + 0.0001 (9E)-tetradecenoic acid + 0.0001 (9Z,12Z,15Z,18Z)-TTA + 0.0001 (9Z,12Z,15Z,18Z,21Z)-TPA + 0.0001 10,13,16,19-docosatetraenoic acid + 0.0001 (10Z,13Z,16Z)-docosatrienoic acid + 0.0001 12,15,18,21-tetracosatetraenoic acid + 0.0001 13,16,19-docosatrienoic acid + 0.0001 7-palmitoleic acid + 0.0001 8,11-eicosadienoic acid + 0.0001 9-eicosenoic acid + 0.0001 9-heptadecylenic acid + 0.0001 adrenic acid + 0.0082 arachidonate + 0.0001 behenic acid + 0.0001 cerotic acid + 0.0001 cis-cetoleic acid + 0.0001 cis-erucic acid + 0.0001 cis-gondoic acid + 0.0001 cis-vaccenic acid + 0.0041 DHA + 0.002 dihomo-gamma-linolenate + 0.0001 DPA + 0.0001 eicosanoate + 0.0001 elaidate + 0.001 EPA + 0.0001 gamma-linolenate + 0.0001 heneicosanoic acid + 0.0001 lauric acid + 0.0001 lignocerate + 0.1535 linoleate + 0.0092 linolenate + 0.0001 margaric acid + 0.0001 mead acid + 0.0338 myristic acid + 0.0001 nervonic acid + 0.0001 nonadecylic acid + 0.3837 oleate + 0.0001 omega-3-arachidonic acid + 0.3015 palmitate + 0.0522 palmitolate + 0.0001 pentadecylic acid + 0.0001 physeteric acid + 0.046 stearate + 0.0001 stearidonic acid + 0.0001 tricosanoic acid + 0.0001 tridecylic acid + 0.0001 ximenic acid",
+   "temporary": false,
+   "mass_charge_imbalance": {
+    "charge": -0.9999999999999999,
+    "C": 16.205600000000004,
+    "H": 30.715400000000002,
+    "R": -1.0
+   },
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Pool reactions",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR05407",
+   "flux": -0.010677559510081959,
+   "equation": "MAM01596e + MAM02040e <=> MAM02039e + MAM02046e",
+   "names": "CO2 + H2O <=> H+ + HCO3-",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Miscellaneous",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR06912",
+   "flux": 0.009028750637418084,
+   "equation": "MAM02040m + MAM02759m --> MAM02039m + 2.0 MAM02751m",
+   "names": "H2O + PPi --> H+ + 2.0 Pi",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Oxidative phosphorylation",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR08987",
+   "flux": 0.008842187076788442,
+   "equation": "MAM02759c <=> MAM02759m",
+   "names": "PPi <=> PPi",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Transport reactions",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR04002",
+   "flux": -0.008842187076788435,
+   "equation": "2.0 MAM01285c <=> MAM01334c + MAM01371c",
+   "names": "2.0 ADP <=> AMP + ATP",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Purine metabolism",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR04919",
+   "flux": 0.005716535361582838,
+   "equation": "MAM01596c <=> MAM01596e",
+   "names": "CO2 <=> CO2",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Transport reactions",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR03955",
+   "flux": -0.005554538376684983,
+   "equation": "MAM01596c + MAM02040c <=> MAM02039c + MAM02046c",
+   "names": "CO2 + H2O <=> H+ + HCO3-",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Miscellaneous",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR02659",
+   "flux": -0.00410261814720488,
+   "equation": "MAM00020m + MAM02348m <=> MAM01597m + MAM02639m",
+   "names": "(13Z)-octadecenoyl-CoA + L-carnitine <=> CoA + octadecenoylcarnitine(5)",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Carnitine shuttle (mitochondrial)",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR03406",
+   "flux": 0.00410261814720488,
+   "equation": "MAM00020m + 8.0 MAM01597m + 7.0 MAM01802m + 8.0 MAM02040m + 8.0 MAM02552m --> 9.0 MAM01261m + 7.0 MAM01803m + 8.0 MAM02039m + 8.0 MAM02553m",
+   "names": "(13Z)-octadecenoyl-CoA + 8.0 CoA + 7.0 FAD + 8.0 H2O + 8.0 NAD+ --> 9.0 acetyl-CoA + 7.0 FADH2 + 8.0 H+ + 8.0 NADH",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Beta oxidation of even-chain fatty acids (mitochondrial)",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR07156",
+   "flux": 0.004098345699251531,
+   "equation": "MAM01371c + MAM01597c + MAM02646e --> MAM01334c + MAM02647c + MAM02759c",
+   "names": "ATP + CoA + oleate --> AMP + oleoyl-CoA + PPi",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Transport reactions",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR00108",
+   "flux": 0.004098345699251528,
+   "equation": "MAM02348c + MAM02647c <=> MAM01597c + MAM02639c",
+   "names": "L-carnitine + oleoyl-CoA <=> CoA + octadecenoylcarnitine(5)",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Fatty acid oxidation",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR02658",
+   "flux": -0.0040727110115314396,
+   "equation": "MAM02348c + MAM02639m <=> MAM02348m + MAM02639c",
+   "names": "L-carnitine + octadecenoylcarnitine(5) <=> L-carnitine + octadecenoylcarnitine(5)",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Carnitine shuttle (mitochondrial)",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR00756",
+   "flux": 0.0035924166541089326,
+   "equation": "7.0 MAM01597m + 7.0 MAM01802m + 7.0 MAM02040m + 7.0 MAM02552m + MAM02678m --> 8.0 MAM01261m + 7.0 MAM01803m + 7.0 MAM02039m + 7.0 MAM02553m",
+   "names": "7.0 CoA + 7.0 FAD + 7.0 H2O + 7.0 NAD+ + palmitoyl-CoA --> 8.0 acetyl-CoA + 7.0 FADH2 + 7.0 H+ + 7.0 NADH",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Fatty acid oxidation",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR02629",
+   "flux": -0.003220357644837989,
+   "equation": "MAM02348c + MAM02411m <=> MAM02348m + MAM02411c",
+   "names": "L-carnitine + L-palmitoylcarnitine <=> L-carnitine + L-palmitoylcarnitine",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Carnitine shuttle (mitochondrial)",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR02630",
+   "flux": 0.003220357644837989,
+   "equation": "MAM01597m + MAM02411m <=> MAM02348m + MAM02678m",
+   "names": "CoA + L-palmitoylcarnitine <=> L-carnitine + palmitoyl-CoA",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Carnitine shuttle (mitochondrial)",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR07157",
+   "flux": 0.003220357644837989,
+   "equation": "MAM01371c + MAM01597c + MAM02674e --> MAM01334c + MAM02678c + MAM02759c",
+   "names": "ATP + CoA + palmitate --> AMP + palmitoyl-CoA + PPi",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Transport reactions",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR02626",
+   "flux": -0.003218933495520206,
+   "equation": "MAM01597c + MAM02411c <=> MAM02348c + MAM02678c",
+   "names": "CoA + L-palmitoylcarnitine <=> L-carnitine + palmitoyl-CoA",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Carnitine shuttle (cytosolic)",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR00002",
+   "flux": 0.0026702799708441037,
+   "equation": "MAM02040e + MAM02956e --> MAM00234e + MAM01807e",
+   "names": "H2O + TAG-chylomicron pool --> 1,2-diacylglycerol-chylomicron pool + fatty acid-chylomicron pool",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Acylglycerides metabolism",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR00003",
+   "flux": 0.0026702799708441037,
+   "equation": "MAM00234e + MAM02040e --> MAM00503e + MAM01807e",
+   "names": "1,2-diacylglycerol-chylomicron pool + H2O --> 1-acylglycerol-chylomicron pool + fatty acid-chylomicron pool",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Acylglycerides metabolism",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "TASK_OUT_MAM00503e",
+   "flux": 0.0026702799708441037,
+   "equation": "MAM00503e --> ",
+   "names": "1-acylglycerol-chylomicron pool --> ",
+   "temporary": true,
+   "mass_charge_imbalance": {},
+   "in_reference_model": false,
+   "identical_to_reference": null,
+   "subsystem": "",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR00007",
+   "flux": 0.0026684997841968762,
+   "equation": "MAM02040e + MAM02959e --> MAM00241e + MAM01820e",
+   "names": "H2O + TAG-VLDL pool --> 1,2-diacylglycerol-VLDL pool + fatty acid-VLDL pool",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Transport reactions",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR00008",
+   "flux": 0.0026684997841968762,
+   "equation": "MAM00241e + MAM02040e --> MAM00510e + MAM01820e",
+   "names": "1,2-diacylglycerol-VLDL pool + H2O --> 1-acylglycerol-VLDL pool + fatty acid-VLDL pool",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Transport reactions",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "TASK_OUT_MAM00510e",
+   "flux": 0.0026649394109024217,
+   "equation": "MAM00510e --> ",
+   "names": "1-acylglycerol-VLDL pool --> ",
+   "temporary": true,
+   "mass_charge_imbalance": {},
+   "in_reference_model": false,
+   "identical_to_reference": null,
+   "subsystem": "",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "TASK_OUT_MAM02387e",
+   "flux": 0.0016395519020982797,
+   "equation": "MAM02387e --> ",
+   "names": "linoleate --> ",
+   "temporary": true,
+   "mass_charge_imbalance": {},
+   "in_reference_model": false,
+   "identical_to_reference": null,
+   "subsystem": "",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR00225",
+   "flux": 0.0005575544579122488,
+   "equation": "MAM02675e --> MAM02675c",
+   "names": "palmitolate --> palmitolate",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Transport reactions",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR02668",
+   "flux": -0.000494535850600328,
+   "equation": "MAM00127m + MAM02348m <=> MAM00126m + MAM01597m",
+   "names": "(9E)-octadecenoyl-CoA + L-carnitine <=> (9E)-octadecenoylcarnitine + CoA",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Carnitine shuttle (mitochondrial)",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR03407",
+   "flux": 0.000494535850600328,
+   "equation": "MAM00127m + 8.0 MAM01597m + 7.0 MAM01802m + 8.0 MAM02040m + 8.0 MAM02552m --> 9.0 MAM01261m + 7.0 MAM01803m + 8.0 MAM02039m + 8.0 MAM02553m",
+   "names": "(9E)-octadecenoyl-CoA + 8.0 CoA + 7.0 FAD + 8.0 H2O + 8.0 NAD+ --> 9.0 acetyl-CoA + 7.0 FADH2 + 8.0 H+ + 8.0 NADH",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Beta oxidation of even-chain fatty acids (mitochondrial)",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR00455",
+   "flux": -0.0004934677386119903,
+   "equation": "MAM00126m + MAM01597m <=> MAM00057m + MAM02348m",
+   "names": "(9E)-octadecenoylcarnitine + CoA <=> (2E)-octadecenoyl-CoA + L-carnitine",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Fatty acid oxidation",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR03115",
+   "flux": 0.0004934677386119903,
+   "equation": "MAM01802m + MAM02941m --> MAM00057m + MAM01803m",
+   "names": "FAD + stearoyl-CoA --> (2E)-octadecenoyl-CoA + FADH2",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Beta oxidation of even-chain fatty acids (mitochondrial)",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR02654",
+   "flux": -0.0004913315146353151,
+   "equation": "MAM01597c + MAM02940c <=> MAM02348c + MAM02941c",
+   "names": "CoA + stearoylcarnitine <=> L-carnitine + stearoyl-CoA",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Carnitine shuttle (cytosolic)",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR02655",
+   "flux": -0.0004913315146353151,
+   "equation": "MAM02348c + MAM02940m <=> MAM02348m + MAM02940c",
+   "names": "L-carnitine + stearoylcarnitine <=> L-carnitine + stearoylcarnitine",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Carnitine shuttle (mitochondrial)",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR02656",
+   "flux": 0.0004913315146353151,
+   "equation": "MAM01597m + MAM02940m <=> MAM02348m + MAM02941m",
+   "names": "CoA + stearoylcarnitine <=> L-carnitine + stearoyl-CoA",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Carnitine shuttle (mitochondrial)",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR08983",
+   "flux": 0.0004913315146353151,
+   "equation": "MAM01371c + MAM01597c + MAM02938e --> MAM01334c + MAM02759c + MAM02941c",
+   "names": "ATP + CoA + stearate --> AMP + PPi + stearoyl-CoA",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Transport reactions",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR00104",
+   "flux": 0.0003720590092709435,
+   "equation": "MAM01597m + MAM02117m <=> MAM00051m + MAM02348m",
+   "names": "CoA + hexadecenoylcarnitine(9) <=> (2E)-hexadecenoyl-CoA + L-carnitine",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Fatty acid oxidation",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR02028",
+   "flux": -0.0003720590092709435,
+   "equation": "MAM02554m + MAM02678m <=> MAM00051m + MAM02039m + MAM02555m",
+   "names": "NADP+ + palmitoyl-CoA <=> (2E)-hexadecenoyl-CoA + H+ + NADPH",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Fatty acid oxidation",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR02634",
+   "flux": -0.0003720590092709435,
+   "equation": "MAM02117m + MAM02348c <=> MAM02117c + MAM02348m",
+   "names": "hexadecenoylcarnitine(9) + L-carnitine <=> hexadecenoylcarnitine(9) + L-carnitine",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Carnitine shuttle (mitochondrial)",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR00103",
+   "flux": 0.00037099089728260615,
+   "equation": "MAM00051c + MAM02348c <=> MAM01597c + MAM02117c",
+   "names": "(2E)-hexadecenoyl-CoA + L-carnitine <=> CoA + hexadecenoylcarnitine(9)",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Fatty acid oxidation",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR02312",
+   "flux": 0.00037099089728260615,
+   "equation": "MAM01371c + MAM01597c + MAM02675c --> MAM00051c + MAM01334c + MAM02759c",
+   "names": "ATP + CoA + palmitolate --> (2E)-hexadecenoyl-CoA + AMP + PPi",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Fatty acid oxidation",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR00752",
+   "flux": 0.0003610218520581228,
+   "equation": "6.0 MAM01597m + 6.0 MAM01802m + 6.0 MAM02040m + MAM02495m + 6.0 MAM02552m --> 7.0 MAM01261m + 6.0 MAM01803m + 6.0 MAM02039m + 6.0 MAM02553m",
+   "names": "6.0 CoA + 6.0 FAD + 6.0 H2O + myristoyl-CoA + 6.0 NAD+ --> 7.0 acetyl-CoA + 6.0 FADH2 + 6.0 H+ + 6.0 NADH",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Fatty acid oxidation",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR02608",
+   "flux": -0.0003610218520581228,
+   "equation": "MAM01597c + MAM02973c <=> MAM02348c + MAM02495c",
+   "names": "CoA + tetradecanoylcarnitine <=> L-carnitine + myristoyl-CoA",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Carnitine shuttle (cytosolic)",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR02609",
+   "flux": -0.0003610218520581228,
+   "equation": "MAM02348c + MAM02973m <=> MAM02348m + MAM02973c",
+   "names": "L-carnitine + tetradecanoylcarnitine <=> L-carnitine + tetradecanoylcarnitine",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Carnitine shuttle (mitochondrial)",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR02610",
+   "flux": 0.0003610218520581228,
+   "equation": "MAM01597m + MAM02973m <=> MAM02348m + MAM02495m",
+   "names": "CoA + tetradecanoylcarnitine <=> L-carnitine + myristoyl-CoA",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Carnitine shuttle (mitochondrial)",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR08996",
+   "flux": 0.0003610218520581228,
+   "equation": "MAM01371c + MAM01597c + MAM02494e --> MAM01334c + MAM02495c + MAM02759c",
+   "names": "ATP + CoA + myristic acid --> AMP + myristoyl-CoA + PPi",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Transport reactions",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR00772",
+   "flux": 0.0001865635606296428,
+   "equation": "4.0 MAM01597m + 3.0 MAM01802m + 4.0 MAM02040m + 4.0 MAM02552m + MAM02677m --> 4.0 MAM01261m + 3.0 MAM01803m + 4.0 MAM02039m + 4.0 MAM02553m + MAM02644m",
+   "names": "4.0 CoA + 3.0 FAD + 4.0 H2O + 4.0 NAD+ + palmitoleoyl-CoA --> 4.0 acetyl-CoA + 3.0 FADH2 + 4.0 H+ + 4.0 NADH + octanoyl-CoA",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Fatty acid oxidation",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR02148",
+   "flux": 0.0001865635606296428,
+   "equation": "MAM02554m + MAM02644m <=> MAM00059m + MAM02039m + MAM02555m",
+   "names": "NADP+ + octanoyl-CoA <=> (2E)-octenoyl-CoA + H+ + NADPH",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Fatty acid oxidation",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR03150",
+   "flux": 0.0001865635606296428,
+   "equation": "MAM00059m + MAM02040m --> MAM00183m",
+   "names": "(2E)-octenoyl-CoA + H2O --> (S)-hydroxyoctanoyl-CoA",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Beta oxidation of even-chain fatty acids (mitochondrial)",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR03151",
+   "flux": 0.0001865635606296428,
+   "equation": "MAM00183m + MAM02552m --> MAM00892m + MAM02039m + MAM02553m",
+   "names": "(S)-hydroxyoctanoyl-CoA + NAD+ --> 3-oxooctanoyl-CoA + H+ + NADH",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Beta oxidation of even-chain fatty acids (mitochondrial)",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR03153",
+   "flux": 0.0001865635606296428,
+   "equation": "MAM00892m + MAM01597m --> MAM01261m + MAM02122m",
+   "names": "3-oxooctanoyl-CoA + CoA --> acetyl-CoA + hexanoyl-CoA",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Beta oxidation of even-chain fatty acids (mitochondrial)",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR03273",
+   "flux": 0.0001865635606296428,
+   "equation": "MAM01371m + MAM01597m + MAM02675m --> MAM01334m + MAM02677m + MAM02759m",
+   "names": "ATP + CoA + palmitolate --> AMP + palmitoleoyl-CoA + PPi",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Fatty acid oxidation",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR04004",
+   "flux": -0.0001865635606296428,
+   "equation": "2.0 MAM01285m <=> MAM01334m + MAM01371m",
+   "names": "2.0 ADP <=> AMP + ATP",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Purine metabolism",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR11304",
+   "flux": 0.0001865635606296428,
+   "equation": "MAM02348m + MAM02675c <=> MAM02348c + MAM02675m",
+   "names": "L-carnitine + palmitolate <=> L-carnitine + palmitolate",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Transport reactions",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR02207",
+   "flux": -0.00018656356062963803,
+   "equation": "MAM00053m + MAM02039m + MAM02555m <=> MAM02122m + MAM02554m",
+   "names": "(2E)-hexenoyl-CoA + H+ + NADPH <=> hexanoyl-CoA + NADP+",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Fatty acid oxidation",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR03157",
+   "flux": 0.00018656356062963803,
+   "equation": "MAM00053m + MAM02040m --> MAM00182m",
+   "names": "(2E)-hexenoyl-CoA + H2O --> (S)-hydroxyhexanoyl-CoA",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Beta oxidation of even-chain fatty acids (mitochondrial)",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR03158",
+   "flux": 0.00018656356062963803,
+   "equation": "MAM00182m + MAM02552m --> MAM00882m + MAM02039m + MAM02553m",
+   "names": "(S)-hydroxyhexanoyl-CoA + NAD+ --> 3-oxohexanoyl-CoA + H+ + NADH",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Beta oxidation of even-chain fatty acids (mitochondrial)",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR03160",
+   "flux": 0.00018656356062963803,
+   "equation": "MAM00882m + MAM01597m --> MAM01261m + MAM01412m",
+   "names": "3-oxohexanoyl-CoA + CoA --> acetyl-CoA + butyryl-CoA",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Beta oxidation of even-chain fatty acids (mitochondrial)",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR03163",
+   "flux": 0.00018656356062963803,
+   "equation": "MAM01412m + MAM01802m --> MAM01622m + MAM01803m",
+   "names": "butyryl-CoA + FAD --> crotonyl-CoA + FADH2",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Butanoate metabolism",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR03164",
+   "flux": 0.00018656356062963803,
+   "equation": "MAM01622m + MAM02040m --> MAM00173m",
+   "names": "crotonyl-CoA + H2O --> (S)-3-hydroxybutyryl-CoA",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Tryptophan metabolism",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR03166",
+   "flux": 0.00018656356062963803,
+   "equation": "MAM00173m + MAM02552m --> MAM01255m + MAM02039m + MAM02553m",
+   "names": "(S)-3-hydroxybutyryl-CoA + NAD+ --> acetoacetyl-CoA + H+ + NADH",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Tryptophan metabolism",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR03885",
+   "flux": 0.00018656356062963803,
+   "equation": "MAM01255m + MAM01597m <=> 2.0 MAM01261m",
+   "names": "acetoacetyl-CoA + CoA <=> 2.0 acetyl-CoA",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Tryptophan metabolism",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR00710",
+   "flux": 0.0001619969848978553,
+   "equation": "MAM02183c + MAM02554c <=> MAM01306c + MAM01596c + MAM02555c",
+   "names": "isocitrate + NADP+ <=> AKG + CO2 + NADPH",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Tricarboxylic acid cycle and glyoxylate/dicarboxylate metabolism",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR02405",
+   "flux": 0.0001619969848978553,
+   "equation": "MAM01306c + MAM01587m <=> MAM01306m + MAM01587c",
+   "names": "AKG + citrate <=> AKG + citrate",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Transport reactions",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR04454",
+   "flux": 0.0001619969848978553,
+   "equation": "MAM01587c <=> MAM02183c",
+   "names": "citrate <=> isocitrate",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Tricarboxylic acid cycle and glyoxylate/dicarboxylate metabolism",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR00916",
+   "flux": 0.00011001553479877708,
+   "equation": "MAM01364m + 9.0 MAM01597m + 5.0 MAM01802m + 9.0 MAM02040m + 9.0 MAM02552m --> 10.0 MAM01261m + 5.0 MAM01803m + 9.0 MAM02039m + 9.0 MAM02553m",
+   "names": "arachidonoyl-CoA + 9.0 CoA + 5.0 FAD + 9.0 H2O + 9.0 NAD+ --> 10.0 acetyl-CoA + 5.0 FADH2 + 9.0 H+ + 9.0 NADH",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Fatty acid oxidation",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR00111",
+   "flux": 0.00010894742281043944,
+   "equation": "MAM01363c <=> MAM01363m",
+   "names": "arachidonyl-carnitine <=> arachidonyl-carnitine",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Fatty acid oxidation",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR02755",
+   "flux": -0.00010894742281043944,
+   "equation": "MAM01363c + MAM01597c <=> MAM01364c + MAM02348c",
+   "names": "arachidonyl-carnitine + CoA <=> arachidonoyl-CoA + L-carnitine",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Carnitine shuttle (cytosolic)",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR02758",
+   "flux": 0.00010894742281043944,
+   "equation": "MAM01363m + MAM01597m <=> MAM01364m + MAM02348m",
+   "names": "arachidonyl-carnitine + CoA <=> arachidonoyl-CoA + L-carnitine",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Carnitine shuttle (mitochondrial)",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR02714",
+   "flux": 9.933441491540064e-05,
+   "equation": "MAM00108c + MAM02348c <=> MAM00107c + MAM01597c",
+   "names": "(6Z,9Z,12Z,15Z)-octadecatetraenoyl-CoA + L-carnitine <=> (6Z,9Z,12Z,15Z)-octadecatetraenoylcarnitine + CoA",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Carnitine shuttle (cytosolic)",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR02715",
+   "flux": 9.933441491540064e-05,
+   "equation": "MAM00107c + MAM02348m <=> MAM00107m + MAM02348c",
+   "names": "(6Z,9Z,12Z,15Z)-octadecatetraenoylcarnitine + L-carnitine <=> (6Z,9Z,12Z,15Z)-octadecatetraenoylcarnitine + L-carnitine",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Carnitine shuttle (mitochondrial)",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR02716",
+   "flux": -9.933441491540064e-05,
+   "equation": "MAM00108m + MAM02348m <=> MAM00107m + MAM01597m",
+   "names": "(6Z,9Z,12Z,15Z)-octadecatetraenoyl-CoA + L-carnitine <=> (6Z,9Z,12Z,15Z)-octadecatetraenoylcarnitine + CoA",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Carnitine shuttle (mitochondrial)",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR09719",
+   "flux": 9.933441491540064e-05,
+   "equation": "MAM00108m + 8.0 MAM01597m + 4.0 MAM01802m + 8.0 MAM02040m + 8.0 MAM02552m --> 9.0 MAM01261m + 4.0 MAM01803m + 8.0 MAM02039m + 8.0 MAM02553m",
+   "names": "(6Z,9Z,12Z,15Z)-octadecatetraenoyl-CoA + 8.0 CoA + 4.0 FAD + 8.0 H2O + 8.0 NAD+ --> 9.0 acetyl-CoA + 4.0 FADH2 + 8.0 H+ + 8.0 NADH",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Beta oxidation of even-chain fatty acids (mitochondrial)",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR00348",
+   "flux": 9.826630292706302e-05,
+   "equation": "MAM02389e --> MAM02389c",
+   "names": "linolenate --> linolenate",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Transport reactions",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR00349",
+   "flux": 9.826630292706302e-05,
+   "equation": "MAM01371c + MAM01597c + MAM02389c --> MAM01334c + MAM02390c + MAM02759c",
+   "names": "ATP + CoA + linolenate --> AMP + linolenoyl-CoA + PPi",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Fatty acid activation (cytosolic)",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR02472",
+   "flux": 9.577404162093572e-05,
+   "equation": "MAM02039c + MAM02390c + MAM02555c + MAM02630c --> MAM00108c + 2.0 MAM02040c + MAM02554c",
+   "names": "H+ + linolenoyl-CoA + NADPH + O2 --> (6Z,9Z,12Z,15Z)-octadecatetraenoyl-CoA + 2.0 H2O + NADP+",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Omega-3 fatty acid metabolism",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR09870",
+   "flux": 8.758518304368661e-05,
+   "equation": "MAM01362e + MAM01371c + MAM01597c --> MAM01334c + MAM01364c + MAM02759c",
+   "names": "arachidonate + ATP + CoA --> AMP + arachidonoyl-CoA + PPi",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Transport reactions",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR00064",
+   "flux": 4.877711413408566e-05,
+   "equation": "MAM02636c <=> MAM02636m",
+   "names": "docosatetraenoylcarnitine <=> docosatetraenoylcarnitine",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Fatty acid oxidation",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR02759",
+   "flux": 4.877711413408566e-05,
+   "equation": "MAM00119c + MAM02348c <=> MAM01597c + MAM02636c",
+   "names": "(7Z,10Z,13Z,16Z)-docosatetraenoyl-CoA + L-carnitine <=> CoA + docosatetraenoylcarnitine",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Carnitine shuttle (cytosolic)",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR02761",
+   "flux": -4.877711413408566e-05,
+   "equation": "MAM00119m + MAM02348m <=> MAM01597m + MAM02636m",
+   "names": "(7Z,10Z,13Z,16Z)-docosatetraenoyl-CoA + L-carnitine <=> CoA + docosatetraenoylcarnitine",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Carnitine shuttle (mitochondrial)",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR03421",
+   "flux": 4.877711413408566e-05,
+   "equation": "MAM00119m + 10.0 MAM01597m + 6.0 MAM01802m + 10.0 MAM02040m + 10.0 MAM02552m --> 11.0 MAM01261m + 6.0 MAM01803m + 10.0 MAM02039m + 10.0 MAM02553m",
+   "names": "(7Z,10Z,13Z,16Z)-docosatetraenoyl-CoA + 10.0 CoA + 6.0 FAD + 10.0 H2O + 10.0 NAD+ --> 11.0 acetyl-CoA + 6.0 FADH2 + 10.0 H+ + 10.0 NADH",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Beta oxidation of even-chain fatty acids (mitochondrial)",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR03437",
+   "flux": 4.5572778169072735e-05,
+   "equation": "MAM00095c + 3.0 MAM02039c + MAM02555c <=> MAM00119c + MAM02554c",
+   "names": "(4Z,7Z,10Z,13Z,16Z,19Z)-docosahexaenoyl-CoA + 3.0 H+ + NADPH <=> (7Z,10Z,13Z,16Z)-docosatetraenoyl-CoA + NADP+",
+   "temporary": false,
+   "mass_charge_imbalance": {
+    "charge": -2.0
+   },
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Fatty acid oxidation",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR00376",
+   "flux": 4.3792591521843304e-05,
+   "equation": "MAM01689e --> MAM01689c",
+   "names": "DHA --> DHA",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Transport reactions",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR00377",
+   "flux": 4.3792591521843304e-05,
+   "equation": "MAM01371c + MAM01597c + MAM01689c --> MAM00095c + MAM01334c + MAM02759c",
+   "names": "ATP + CoA + DHA --> (4Z,7Z,10Z,13Z,16Z,19Z)-docosahexaenoyl-CoA + AMP + PPi",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Fatty acid activation (cytosolic)",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR00110",
+   "flux": 2.77709116967631e-05,
+   "equation": "MAM02639c <=> MAM02639m",
+   "names": "octadecenoylcarnitine(5) <=> octadecenoylcarnitine(5)",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Fatty acid oxidation",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR00404",
+   "flux": 2.136223976675283e-05,
+   "equation": "MAM01696e --> MAM01696c",
+   "names": "dihomo-gamma-linolenate --> dihomo-gamma-linolenate",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Transport reactions",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR00405",
+   "flux": 2.136223976675283e-05,
+   "equation": "MAM01371c + MAM01597c + MAM01696c --> MAM01334c + MAM01697c + MAM02759c",
+   "names": "ATP + CoA + dihomo-gamma-linolenate --> AMP + dihomo-gamma-linolenoyl-CoA + PPi",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Fatty acid activation (cytosolic)",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR02380",
+   "flux": 2.136223976675283e-05,
+   "equation": "MAM01697c + MAM02039c + MAM02555c + MAM02630c --> MAM01364c + 2.0 MAM02040c + MAM02554c",
+   "names": "dihomo-gamma-linolenoyl-CoA + H+ + NADPH + O2 --> arachidonoyl-CoA + 2.0 H2O + NADP+",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Omega-6 fatty acid metabolism",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR00360",
+   "flux": 1.0681119883376414e-05,
+   "equation": "MAM01784e --> MAM01784c",
+   "names": "EPA --> EPA",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Transport reactions",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR00361",
+   "flux": 1.0681119883376414e-05,
+   "equation": "MAM01371c + MAM01597c + MAM01784c --> MAM00103c + MAM01334c + MAM02759c",
+   "names": "ATP + CoA + EPA --> (5Z,8Z,11Z,14Z,17Z)-eicosapentaenoyl-CoA + AMP + PPi",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Fatty acid activation (cytosolic)",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR02720",
+   "flux": 1.0681119883376414e-05,
+   "equation": "MAM00103c + MAM02348c <=> MAM00102c + MAM01597c",
+   "names": "(5Z,8Z,11Z,14Z,17Z)-eicosapentaenoyl-CoA + L-carnitine <=> (5Z,8Z,11Z,14Z,17Z)-eicosapentaenoylcarnitine + CoA",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Carnitine shuttle (cytosolic)",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR02722",
+   "flux": 1.0681119883376414e-05,
+   "equation": "MAM00102c + MAM02348m <=> MAM00102m + MAM02348c",
+   "names": "(5Z,8Z,11Z,14Z,17Z)-eicosapentaenoylcarnitine + L-carnitine <=> (5Z,8Z,11Z,14Z,17Z)-eicosapentaenoylcarnitine + L-carnitine",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Carnitine shuttle (mitochondrial)",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR02724",
+   "flux": -1.0681119883376414e-05,
+   "equation": "MAM00103m + MAM02348m <=> MAM00102m + MAM01597m",
+   "names": "(5Z,8Z,11Z,14Z,17Z)-eicosapentaenoyl-CoA + L-carnitine <=> (5Z,8Z,11Z,14Z,17Z)-eicosapentaenoylcarnitine + CoA",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Carnitine shuttle (mitochondrial)",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR03428",
+   "flux": 1.0681119883376414e-05,
+   "equation": "MAM00103m + 9.0 MAM01597m + 4.0 MAM01802m + 9.0 MAM02040m + 9.0 MAM02552m --> 10.0 MAM01261m + 4.0 MAM01803m + 9.0 MAM02039m + 9.0 MAM02553m",
+   "names": "(5Z,8Z,11Z,14Z,17Z)-eicosapentaenoyl-CoA + 9.0 CoA + 4.0 FAD + 9.0 H2O + 9.0 NAD+ --> 10.0 acetyl-CoA + 4.0 FADH2 + 9.0 H+ + 9.0 NADH",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Beta oxidation of even-chain fatty acids (mitochondrial)",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR03212",
+   "flux": 6.4086719300258495e-06,
+   "equation": "MAM01802m + MAM02774m --> MAM01265m + MAM01803m",
+   "names": "FAD + propanoyl-CoA --> acrylyl-CoA + FADH2",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Propanoate metabolism",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR04282",
+   "flux": 6.4086719300258495e-06,
+   "equation": "MAM00900m + MAM01597m + MAM02552m --> MAM01261m + MAM01596m + MAM02553m",
+   "names": "3-oxopropanoate + CoA + NAD+ --> acetyl-CoA + CO2 + NADH",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Propanoate metabolism",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR04497",
+   "flux": 6.4086719300258495e-06,
+   "equation": "MAM02142m + MAM02552m --> MAM00900m + MAM02039m + MAM02553m",
+   "names": "hydracrylate + NAD+ --> 3-oxopropanoate + H+ + NADH",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Propanoate metabolism",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR04735",
+   "flux": 6.4086719300258495e-06,
+   "equation": "MAM01265m + MAM02040m <=> MAM00799m",
+   "names": "acrylyl-CoA + H2O <=> 3-hydroxypropionyl-CoA",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Beta-alanine metabolism",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR04741",
+   "flux": 6.4086719300258495e-06,
+   "equation": "MAM00799m + MAM02040m --> MAM01597m + MAM02039m + MAM02142m",
+   "names": "3-hydroxypropionyl-CoA + H2O --> CoA + H+ + hydracrylate",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Propanoate metabolism",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR20114",
+   "flux": 4.272447953350566e-06,
+   "equation": "MAM01803x + MAM02630x --> MAM01802x + MAM02041x",
+   "names": "FADH2 + O2 --> FAD + H2O2",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Miscellaneous",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR00009",
+   "flux": 3.5603732944546624e-06,
+   "equation": "MAM00510e --> MAM00510c",
+   "names": "1-acylglycerol-VLDL pool --> 1-acylglycerol-VLDL pool",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Transport reactions",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR00010",
+   "flux": 3.5603732944546624e-06,
+   "equation": "MAM00510c + MAM02040c --> MAM01820c + MAM01983c",
+   "names": "1-acylglycerol-VLDL pool + H2O --> fatty acid-VLDL pool + glycerol",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Pool reactions",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR00453",
+   "flux": -3.5603732944546624e-06,
+   "equation": "MAM01981c + MAM02039c + MAM02555c <=> MAM01983c + MAM02554c",
+   "names": "glyceraldehyde + H+ + NADPH <=> glycerol + NADP+",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Glycerolipid metabolism",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR00454",
+   "flux": 3.5603732944546624e-06,
+   "equation": "MAM01371c + MAM01981c --> MAM01285c + MAM01939c + MAM02039c",
+   "names": "ATP + glyceraldehyde --> ADP + D-glyceraldehyde 3-phosphate + H+",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Fructose and mannose metabolism",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR04281",
+   "flux": 3.5603732944546624e-06,
+   "equation": "MAM02039x + MAM02553x + MAM02819x <=> MAM02403x + MAM02552x",
+   "names": "H+ + NADH + pyruvate <=> L-lactate + NAD+",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Glycolysis / Gluconeogenesis",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR04358",
+   "flux": 3.5603732944546624e-06,
+   "equation": "MAM01285c + MAM02039c + MAM02696c --> MAM01371c + MAM02819c",
+   "names": "ADP + H+ + PEP --> ATP + pyruvate",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Glycolysis / Gluconeogenesis",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR04363",
+   "flux": 3.5603732944546624e-06,
+   "equation": "MAM00674c <=> MAM02040c + MAM02696c",
+   "names": "2-phospho-D-glycerate <=> H2O + PEP",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Glycolysis / Gluconeogenesis",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR04365",
+   "flux": -3.5603732944546624e-06,
+   "equation": "MAM00674c <=> MAM00913c",
+   "names": "2-phospho-D-glycerate <=> 3-phospho-D-glycerate",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Glycolysis / Gluconeogenesis",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR04368",
+   "flux": 3.5603732944546624e-06,
+   "equation": "MAM00247c + MAM01285c <=> MAM00913c + MAM01371c",
+   "names": "1,3-bisphospho-D-glycerate + ADP <=> 3-phospho-D-glycerate + ATP",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Glycolysis / Gluconeogenesis",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR04373",
+   "flux": -3.5603732944546624e-06,
+   "equation": "MAM00247c + MAM02039c + MAM02553c <=> MAM01939c + MAM02552c + MAM02751c",
+   "names": "1,3-bisphospho-D-glycerate + H+ + NADH <=> D-glyceraldehyde 3-phosphate + NAD+ + Pi",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Glycolysis / Gluconeogenesis",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR04930",
+   "flux": 3.5603732944546624e-06,
+   "equation": "MAM02039c + MAM02819c <=> MAM02039x + MAM02819x",
+   "names": "H+ + pyruvate <=> H+ + pyruvate",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Transport reactions",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR05998",
+   "flux": -3.5603732944546624e-06,
+   "equation": "MAM02039e + MAM02403e <=> MAM02039c + MAM02403c",
+   "names": "H+ + L-lactate <=> H+ + L-lactate",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Transport reactions",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR10051",
+   "flux": 3.5603732944546624e-06,
+   "equation": "MAM01820c --> MAM01820e",
+   "names": "fatty acid-VLDL pool --> fatty acid-VLDL pool",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Transport reactions",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "TASK_OUT_MAM02403e",
+   "flux": 3.5603732944546624e-06,
+   "equation": "MAM02403e --> ",
+   "names": "L-lactate --> ",
+   "temporary": true,
+   "mass_charge_imbalance": {},
+   "in_reference_model": false,
+   "identical_to_reference": null,
+   "subsystem": "",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR00774",
+   "flux": 3.2043359650129248e-06,
+   "equation": "7.0 MAM01597m + 7.0 MAM01802m + 7.0 MAM02040m + MAM02101m + 7.0 MAM02552m --> 7.0 MAM01261m + 7.0 MAM01803m + 7.0 MAM02039m + 7.0 MAM02553m + MAM02774m",
+   "names": "7.0 CoA + 7.0 FAD + 7.0 H2O + heptadecanoyl-CoA + 7.0 NAD+ --> 7.0 acetyl-CoA + 7.0 FADH2 + 7.0 H+ + 7.0 NADH + propanoyl-CoA",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Fatty acid oxidation",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR03007",
+   "flux": -2.8482986355670646e-06,
+   "equation": "MAM02039c + MAM02403c <=> MAM02039x + MAM02403x",
+   "names": "H+ + L-lactate <=> H+ + L-lactate",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Transport reactions",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR04900",
+   "flux": 2.8482986355670646e-06,
+   "equation": "MAM02630c <=> MAM02630x",
+   "names": "O2 <=> O2",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Transport reactions",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR00145",
+   "flux": 2.492261306127292e-06,
+   "equation": "MAM02039c + MAM02390c + MAM02553c + MAM02630c --> MAM00108c + 2.0 MAM02040c + MAM02552c",
+   "names": "H+ + linolenoyl-CoA + NADH + O2 --> (6Z,9Z,12Z,15Z)-octadecatetraenoyl-CoA + 2.0 H2O + NAD+",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Fatty acid biosynthesis",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR00109",
+   "flux": -2.1362239766772873e-06,
+   "equation": "MAM01597m + MAM02639m <=> MAM02348m + MAM02647m",
+   "names": "CoA + octadecenoylcarnitine(5) <=> L-carnitine + oleoyl-CoA",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Fatty acid oxidation",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR00063",
+   "flux": -2.136223976675283e-06,
+   "equation": "MAM00119c <=> MAM00119x",
+   "names": "(7Z,10Z,13Z,16Z)-docosatetraenoyl-CoA <=> (7Z,10Z,13Z,16Z)-docosatetraenoyl-CoA",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Transport reactions",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR00869",
+   "flux": 2.136223976675283e-06,
+   "equation": "MAM01597m + MAM01773m + MAM01802m + MAM02040m + MAM02552m --> MAM01261m + MAM01803m + MAM02039m + MAM02553m + MAM02941m",
+   "names": "CoA + eicosanoyl-CoA + FAD + H2O + NAD+ --> acetyl-CoA + FADH2 + H+ + NADH + stearoyl-CoA",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Fatty acid oxidation",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR02657",
+   "flux": 2.136223976675283e-06,
+   "equation": "MAM00020c + MAM02348c <=> MAM01597c + MAM02639c",
+   "names": "(13Z)-octadecenoyl-CoA + L-carnitine <=> CoA + octadecenoylcarnitine(5)",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Carnitine shuttle (cytosolic)",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR02672",
+   "flux": 2.136223976675283e-06,
+   "equation": "MAM00106c + MAM02348c <=> MAM00105c + MAM01597c",
+   "names": "(6Z,9Z)-octadecadienoyl-CoA + L-carnitine <=> (6Z,9Z)-octadecadienoylcarnitine + CoA",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Carnitine shuttle (cytosolic)",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR02673",
+   "flux": 2.136223976675283e-06,
+   "equation": "MAM00105c + MAM02348m <=> MAM00105m + MAM02348c",
+   "names": "(6Z,9Z)-octadecadienoylcarnitine + L-carnitine <=> (6Z,9Z)-octadecadienoylcarnitine + L-carnitine",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Carnitine shuttle (mitochondrial)",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR02674",
+   "flux": -2.136223976675283e-06,
+   "equation": "MAM00106m + MAM02348m <=> MAM00105m + MAM01597m",
+   "names": "(6Z,9Z)-octadecadienoyl-CoA + L-carnitine <=> (6Z,9Z)-octadecadienoylcarnitine + CoA",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Carnitine shuttle (mitochondrial)",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR03174",
+   "flux": 2.136223976675283e-06,
+   "equation": "MAM01802m + MAM02612m --> MAM00054m + MAM01803m",
+   "names": "FAD + nonadecanoyl-CoA --> (2E)-nonadecenoyl-CoA + FADH2",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Beta oxidation of odd-chain fatty acids (mitochondrial)",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR03175",
+   "flux": 2.136223976675283e-06,
+   "equation": "MAM00054m + MAM02040m --> MAM00790m",
+   "names": "(2E)-nonadecenoyl-CoA + H2O --> 3-hydroxynonadecanoyl-CoA",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Beta oxidation of odd-chain fatty acids (mitochondrial)",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR03176",
+   "flux": 2.136223976675283e-06,
+   "equation": "MAM00790m + MAM02552m --> MAM00887m + MAM02039m + MAM02553m",
+   "names": "3-hydroxynonadecanoyl-CoA + NAD+ --> 3-oxononadecanoyl-CoA + H+ + NADH",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Beta oxidation of odd-chain fatty acids (mitochondrial)",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR03177",
+   "flux": 2.136223976675283e-06,
+   "equation": "MAM00887m + MAM01597m --> MAM01261m + MAM02101m",
+   "names": "3-oxononadecanoyl-CoA + CoA --> acetyl-CoA + heptadecanoyl-CoA",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Beta oxidation of odd-chain fatty acids (mitochondrial)",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR03222",
+   "flux": 2.136223976675283e-06,
+   "equation": "MAM00007m + MAM01802m --> MAM01803m + MAM03012m",
+   "names": "(11Z)-eicosenoyl-CoA + FAD --> FADH2 + trans,cis-2,11-eicosadienoyl-CoA",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Beta oxidation of unsaturated fatty acids (n-9) (mitochondrial)",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR03223",
+   "flux": 2.136223976675283e-06,
+   "equation": "MAM02040m + MAM03012m --> MAM00700m",
+   "names": "H2O + trans,cis-2,11-eicosadienoyl-CoA --> 3(S)-hydroxy-11-cis-eicosenoyl-CoA",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Beta oxidation of unsaturated fatty acids (n-9) (mitochondrial)",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR03224",
+   "flux": 2.136223976675283e-06,
+   "equation": "MAM00700m + MAM02552m --> MAM00840m + MAM02039m + MAM02553m",
+   "names": "3(S)-hydroxy-11-cis-eicosenoyl-CoA + NAD+ --> 3-oxo-11-cis-eicosenoyl-CoA + H+ + NADH",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Beta oxidation of unsaturated fatty acids (n-9) (mitochondrial)",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR03225",
+   "flux": 2.136223976675283e-06,
+   "equation": "MAM00840m + MAM01597m --> MAM01261m + MAM02647m",
+   "names": "3-oxo-11-cis-eicosenoyl-CoA + CoA --> acetyl-CoA + oleoyl-CoA",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Beta oxidation of unsaturated fatty acids (n-9) (mitochondrial)",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR03409",
+   "flux": 2.136223976675283e-06,
+   "equation": "MAM00106m + 8.0 MAM01597m + 6.0 MAM01802m + 8.0 MAM02040m + 8.0 MAM02552m --> 9.0 MAM01261m + 6.0 MAM01803m + 8.0 MAM02039m + 8.0 MAM02553m",
+   "names": "(6Z,9Z)-octadecadienoyl-CoA + 8.0 CoA + 6.0 FAD + 8.0 H2O + 8.0 NAD+ --> 9.0 acetyl-CoA + 6.0 FADH2 + 8.0 H+ + 8.0 NADH",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Beta oxidation of even-chain fatty acids (mitochondrial)",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR03984",
+   "flux": 2.136223976675283e-06,
+   "equation": "2.0 MAM02041x --> 2.0 MAM02040x + MAM02630x",
+   "names": "2.0 H2O2 --> 2.0 H2O + O2",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Glyoxylate and dicarboxylate metabolism",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR02514",
+   "flux": -1.780186647229423e-06,
+   "equation": "MAM00095c <=> MAM00095x",
+   "names": "(4Z,7Z,10Z,13Z,16Z,19Z)-docosahexaenoyl-CoA <=> (4Z,7Z,10Z,13Z,16Z,19Z)-docosahexaenoyl-CoA",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Transport reactions",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR01440",
+   "flux": 1.4241493177835628e-06,
+   "equation": "2.0 MAM02039c + MAM02131c + 2.0 MAM02555c --> MAM00167c + MAM01597c + 2.0 MAM02554c",
+   "names": "2.0 H+ + HMG-CoA + 2.0 NADPH --> (R)-mevalonate + CoA + 2.0 NADP+",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Cholesterol biosynthesis 1 (Bloch pathway)",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR01447",
+   "flux": -1.4241493177835628e-06,
+   "equation": "MAM02131c <=> MAM02131x",
+   "names": "HMG-CoA <=> HMG-CoA",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Transport reactions",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR03105",
+   "flux": -1.4241493177835628e-06,
+   "equation": "MAM01255x + MAM01597x <=> 2.0 MAM01261x",
+   "names": "acetoacetyl-CoA + CoA <=> 2.0 acetyl-CoA",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Cholesterol metabolism",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR04604",
+   "flux": 1.4241493177835628e-06,
+   "equation": "MAM01255x + MAM01261x + MAM02040x --> MAM01597x + MAM02039x + MAM02131x",
+   "names": "acetoacetyl-CoA + acetyl-CoA + H2O --> CoA + H+ + HMG-CoA",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Butanoate metabolism",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR11506",
+   "flux": 1.4241493177835628e-06,
+   "equation": "MAM00167c + MAM02039c <=> MAM02040c + MAM03777c",
+   "names": "(R)-mevalonate + H+ <=> H2O + Mevalonate-Lactone",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": false,
+   "subsystem": "Cholesterol metabolism",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR11507",
+   "flux": 1.4241493177835628e-06,
+   "equation": "MAM03777c --> MAM03777e",
+   "names": "Mevalonate-Lactone --> Mevalonate-Lactone",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Transport reactions",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "TASK_OUT_MAM03777e",
+   "flux": 1.4241493177835628e-06,
+   "equation": "MAM03777e --> ",
+   "names": "Mevalonate-Lactone --> ",
+   "temporary": true,
+   "mass_charge_imbalance": {},
+   "in_reference_model": false,
+   "identical_to_reference": null,
+   "subsystem": "",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR02726",
+   "flux": 1.4241493177835018e-06,
+   "equation": "MAM00121c + MAM02348c <=> MAM00120c + MAM01597c",
+   "names": "(7Z,10Z,13Z,16Z,19Z)-docosapentaenoyl-CoA + L-carnitine <=> (7Z,10Z,13Z,16Z,19Z)-docosapentaenoylcarnitine + CoA",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Carnitine shuttle (cytosolic)",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR02727",
+   "flux": 1.4241493177835018e-06,
+   "equation": "MAM00120c + MAM02348m <=> MAM00120m + MAM02348c",
+   "names": "(7Z,10Z,13Z,16Z,19Z)-docosapentaenoylcarnitine + L-carnitine <=> (7Z,10Z,13Z,16Z,19Z)-docosapentaenoylcarnitine + L-carnitine",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Carnitine shuttle (mitochondrial)",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR02729",
+   "flux": -1.4241493177835018e-06,
+   "equation": "MAM00121m + MAM02348m <=> MAM00120m + MAM01597m",
+   "names": "(7Z,10Z,13Z,16Z,19Z)-docosapentaenoyl-CoA + L-carnitine <=> (7Z,10Z,13Z,16Z,19Z)-docosapentaenoylcarnitine + CoA",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Carnitine shuttle (mitochondrial)",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR03429",
+   "flux": 1.4241493177835018e-06,
+   "equation": "MAM00121m + 10.0 MAM01597m + 5.0 MAM01802m + 10.0 MAM02040m + 10.0 MAM02552m --> 11.0 MAM01261m + 5.0 MAM01803m + 10.0 MAM02039m + 10.0 MAM02553m",
+   "names": "(7Z,10Z,13Z,16Z,19Z)-docosapentaenoyl-CoA + 10.0 CoA + 5.0 FAD + 10.0 H2O + 10.0 NAD+ --> 11.0 acetyl-CoA + 5.0 FADH2 + 10.0 H+ + 10.0 NADH",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Beta oxidation of even-chain fatty acids (mitochondrial)",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR01633",
+   "flux": 1.424149317783268e-06,
+   "equation": "MAM02678c <=> MAM02678x",
+   "names": "palmitoyl-CoA <=> palmitoyl-CoA",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Transport reactions",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR02121",
+   "flux": 1.424149317783268e-06,
+   "equation": "MAM02348x + MAM02678x <=> MAM01597x + MAM02411x",
+   "names": "L-carnitine + palmitoyl-CoA <=> CoA + L-palmitoylcarnitine",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Fatty acid oxidation",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR02278",
+   "flux": 1.424149317783268e-06,
+   "equation": "MAM02348c + MAM02411x <=> MAM02348x + MAM02411c",
+   "names": "L-carnitine + L-palmitoylcarnitine <=> L-carnitine + L-palmitoylcarnitine",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Transport reactions",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR02667",
+   "flux": 1.0681119883376678e-06,
+   "equation": "MAM00126c + MAM02348m <=> MAM00126m + MAM02348c",
+   "names": "(9E)-octadecenoylcarnitine + L-carnitine <=> (9E)-octadecenoylcarnitine + L-carnitine",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Carnitine shuttle (mitochondrial)",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR00143",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM00092c <=> MAM00092m",
+   "names": "(4Z,7Z,10Z,13Z,16Z)-docosapentaenoylcarnitine <=> (4Z,7Z,10Z,13Z,16Z)-docosapentaenoylcarnitine",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Fatty acid oxidation",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR00150",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM02039c + MAM02553c + MAM02630c + MAM03791c --> MAM00106c + 2.0 MAM02040c + MAM02552c",
+   "names": "H+ + NADH + O2 + 11-octadecenoyl-CoA --> (6Z,9Z)-octadecadienoyl-CoA + 2.0 H2O + NAD+",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Fatty acid biosynthesis",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR00199",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM00128e --> MAM00128c",
+   "names": "(9E)-tetradecenoic acid --> (9E)-tetradecenoic acid",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Transport reactions",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR00200",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM00128c + MAM01371c + MAM01597c --> MAM00129c + MAM01334c + MAM02759c",
+   "names": "(9E)-tetradecenoic acid + ATP + CoA --> (9E)-tetradecenoyl-CoA + AMP + PPi",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Fatty acid activation (cytosolic)",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR00212",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM02690e --> MAM02690c",
+   "names": "pentadecylic acid --> pentadecylic acid",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Transport reactions",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR00213",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM01371c + MAM01597c + MAM02690c --> MAM01334c + MAM02689c + MAM02759c",
+   "names": "ATP + CoA + pentadecylic acid --> AMP + pentadecanoyl-CoA + PPi",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Fatty acid activation (cytosolic)",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR00232",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM01197e --> MAM01197c",
+   "names": "7-palmitoleic acid --> 7-palmitoleic acid",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Transport reactions",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR00233",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM01197c + MAM01371c + MAM01597c --> MAM01191c + MAM01334c + MAM02759c",
+   "names": "7-palmitoleic acid + ATP + CoA --> 7-hexadecenoyl-CoA + AMP + PPi",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Fatty acid activation (cytosolic)",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR00236",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM02456e --> MAM02456c",
+   "names": "margaric acid --> margaric acid",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Transport reactions",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR00237",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM01371c + MAM01597c + MAM02456c --> MAM01334c + MAM02101c + MAM02759c",
+   "names": "ATP + CoA + margaric acid --> AMP + heptadecanoyl-CoA + PPi",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Fatty acid activation (cytosolic)",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR00240",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM00003e --> MAM00003c",
+   "names": "(10Z)-heptadecenoic acid --> (10Z)-heptadecenoic acid",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Transport reactions",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR00241",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM00003c + MAM01371c + MAM01597c --> MAM00004c + MAM01334c + MAM02759c",
+   "names": "(10Z)-heptadecenoic acid + ATP + CoA --> (10Z)-heptadecenoyl-CoA + AMP + PPi",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Fatty acid activation (cytosolic)",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR00244",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM01238e --> MAM01238c",
+   "names": "9-heptadecylenic acid --> 9-heptadecylenic acid",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Transport reactions",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR00245",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM01238c + MAM01371c + MAM01597c --> MAM01237c + MAM01334c + MAM02759c",
+   "names": "9-heptadecylenic acid + ATP + CoA --> 9-heptadecenoyl-CoA + AMP + PPi",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Fatty acid activation (cytosolic)",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR00254",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM00019e --> MAM00019c",
+   "names": "(13Z)-octadecenoic acid --> (13Z)-octadecenoic acid",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Transport reactions",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR00255",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM00019c + MAM01371c + MAM01597c --> MAM00020c + MAM01334c + MAM02759c",
+   "names": "(13Z)-octadecenoic acid + ATP + CoA --> (13Z)-octadecenoyl-CoA + AMP + PPi",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Fatty acid activation (cytosolic)",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR00266",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM01778e --> MAM01778c",
+   "names": "elaidate --> elaidate",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Transport reactions",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR00267",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM01371c + MAM01597c + MAM01778c --> MAM00127c + MAM01334c + MAM02759c",
+   "names": "ATP + CoA + elaidate --> (9E)-octadecenoyl-CoA + AMP + PPi",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Fatty acid activation (cytosolic)",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR00270",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM00115e --> MAM00115c",
+   "names": "(7Z)-octadecenoic acid --> (7Z)-octadecenoic acid",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Transport reactions",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR00271",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM00115c + MAM01371c + MAM01597c --> MAM00020c + MAM01334c + MAM02759c",
+   "names": "(7Z)-octadecenoic acid + ATP + CoA --> (13Z)-octadecenoyl-CoA + AMP + PPi",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Fatty acid activation (cytosolic)",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR00274",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM00104e --> MAM00104c",
+   "names": "(6Z,9Z)-octadecadienoic acid --> (6Z,9Z)-octadecadienoic acid",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Transport reactions",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR00275",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM00104c + MAM01371c + MAM01597c --> MAM00106c + MAM01334c + MAM02759c",
+   "names": "(6Z,9Z)-octadecadienoic acid + ATP + CoA --> (6Z,9Z)-octadecadienoyl-CoA + AMP + PPi",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Fatty acid activation (cytosolic)",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR00278",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM02613e --> MAM02613c",
+   "names": "nonadecylic acid --> nonadecylic acid",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Transport reactions",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR00279",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM01371c + MAM01597c + MAM02613c --> MAM01334c + MAM02612c + MAM02759c",
+   "names": "ATP + CoA + nonadecylic acid --> AMP + nonadecanoyl-CoA + PPi",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Fatty acid activation (cytosolic)",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR00292",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM01584e --> MAM01584c",
+   "names": "cis-gondoic acid --> cis-gondoic acid",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Transport reactions",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR00293",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM01371c + MAM01584c + MAM01597c --> MAM00007c + MAM01334c + MAM02759c",
+   "names": "ATP + cis-gondoic acid + CoA --> (11Z)-eicosenoyl-CoA + AMP + PPi",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Fatty acid activation (cytosolic)",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR00296",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM01235e --> MAM01235c",
+   "names": "9-eicosenoic acid --> 9-eicosenoic acid",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Transport reactions",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR00297",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM01235c + MAM01371c + MAM01597c --> MAM01236c + MAM01334c + MAM02759c",
+   "names": "9-eicosenoic acid + ATP + CoA --> 9-eicosenoyl-CoA + AMP + PPi",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Fatty acid activation (cytosolic)",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR00300",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM01207e --> MAM01207c",
+   "names": "8,11-eicosadienoic acid --> 8,11-eicosadienoic acid",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Transport reactions",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR00301",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM01207c + MAM01371c + MAM01597c --> MAM00123c + MAM01334c + MAM02759c",
+   "names": "8,11-eicosadienoic acid + ATP + CoA --> (8Z,11Z)-eicosadienoyl-CoA + AMP + PPi",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Fatty acid activation (cytosolic)",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR00304",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM02457e --> MAM02457c",
+   "names": "mead acid --> mead acid",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Transport reactions",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR00305",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM01371c + MAM01597c + MAM02457c --> MAM00101c + MAM01334c + MAM02759c",
+   "names": "ATP + CoA + mead acid --> (5Z,8Z,11Z)-eicosatrienoyl-CoA + AMP + PPi",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Fatty acid activation (cytosolic)",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR00308",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM02053e --> MAM02053c",
+   "names": "heneicosanoic acid --> heneicosanoic acid",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Transport reactions",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR00309",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM01371c + MAM01597c + MAM02053c --> MAM01334c + MAM02052c + MAM02759c",
+   "names": "ATP + CoA + heneicosanoic acid --> AMP + heneicosanoyl-CoA + PPi",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Fatty acid activation (cytosolic)",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR00312",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM01373e --> MAM01373c",
+   "names": "behenic acid --> behenic acid",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Transport reactions",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR00313",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM01371c + MAM01373c + MAM01597c --> MAM01334c + MAM01725c + MAM02759c",
+   "names": "ATP + behenic acid + CoA --> AMP + docosanoyl-CoA + PPi",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Fatty acid activation (cytosolic)",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR00318",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM01583e --> MAM01583c",
+   "names": "cis-erucic acid --> cis-erucic acid",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Transport reactions",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR00319",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM01371c + MAM01583c + MAM01597c --> MAM00016c + MAM01334c + MAM02759c",
+   "names": "ATP + cis-erucic acid + CoA --> (13Z)-docosenoyl-CoA + AMP + PPi",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Fatty acid activation (cytosolic)",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR00322",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM01582e --> MAM01582c",
+   "names": "cis-cetoleic acid --> cis-cetoleic acid",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Transport reactions",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR00323",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM01371c + MAM01582c + MAM01597c --> MAM00006c + MAM01334c + MAM02759c",
+   "names": "ATP + cis-cetoleic acid + CoA --> (11Z)-docosenoyl-CoA + AMP + PPi",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Fatty acid activation (cytosolic)",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR00352",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM02939e --> MAM02939c",
+   "names": "stearidonic acid --> stearidonic acid",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Transport reactions",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR00353",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM01371c + MAM01597c + MAM02939c --> MAM00108c + MAM01334c + MAM02759c",
+   "names": "ATP + CoA + stearidonic acid --> (6Z,9Z,12Z,15Z)-octadecatetraenoyl-CoA + AMP + PPi",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Fatty acid activation (cytosolic)",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR00356",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM02648e --> MAM02648c",
+   "names": "omega-3-arachidonic acid --> omega-3-arachidonic acid",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Transport reactions",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR00357",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM01371c + MAM01597c + MAM02648c --> MAM00125c + MAM01334c + MAM02759c",
+   "names": "ATP + CoA + omega-3-arachidonic acid --> (8Z,11Z,14Z,17Z)-eicosatetraenoyl-CoA + AMP + PPi",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Fatty acid activation (cytosolic)",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR00364",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM01741e --> MAM01741c",
+   "names": "DPA --> DPA",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Transport reactions",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR00365",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM01371c + MAM01597c + MAM01741c --> MAM00121c + MAM01334c + MAM02759c",
+   "names": "ATP + CoA + DPA --> (7Z,10Z,13Z,16Z,19Z)-docosapentaenoyl-CoA + AMP + PPi",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Fatty acid activation (cytosolic)",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR00368",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM00135e --> MAM00135c",
+   "names": "(9Z,12Z,15Z,18Z,21Z)-TPA --> (9Z,12Z,15Z,18Z,21Z)-TPA",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Transport reactions",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR00369",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM00135c + MAM01371c + MAM01597c --> MAM00134c + MAM01334c + MAM02759c",
+   "names": "(9Z,12Z,15Z,18Z,21Z)-TPA + ATP + CoA --> (9Z,12Z,15Z,18Z,21Z)-tetracosapentaenoyl-CoA + AMP + PPi",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Fatty acid activation (cytosolic)",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR00372",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM00114e --> MAM00114c",
+   "names": "(6Z,9Z,12Z,15Z,18Z,21Z)-THA --> (6Z,9Z,12Z,15Z,18Z,21Z)-THA",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Transport reactions",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR00373",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM00114c + MAM01371c + MAM01597c --> MAM00113c + MAM01334c + MAM02759c",
+   "names": "(6Z,9Z,12Z,15Z,18Z,21Z)-THA + ATP + CoA --> (6Z,9Z,12Z,15Z,18Z,21Z)-tetracosahexaenoyl-CoA + AMP + PPi",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Fatty acid activation (cytosolic)",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR00380",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM00010e --> MAM00010c",
+   "names": "(11Z,14Z,17Z)-eicosatrienoic acid --> (11Z,14Z,17Z)-eicosatrienoic acid",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Transport reactions",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR00381",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM00010c + MAM01371c + MAM01597c --> MAM00012c + MAM01334c + MAM02759c",
+   "names": "(11Z,14Z,17Z)-eicosatrienoic acid + ATP + CoA --> (11Z,14Z,17Z)-eicosatrienoyl-CoA + AMP + PPi",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Fatty acid activation (cytosolic)",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR00384",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM00341e --> MAM00341c",
+   "names": "13,16,19-docosatrienoic acid --> 13,16,19-docosatrienoic acid",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Transport reactions",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR00385",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM00341c + MAM01371c + MAM01597c --> MAM00343c + MAM01334c + MAM02759c",
+   "names": "13,16,19-docosatrienoic acid + ATP + CoA --> 13,16,19-docosatrienoyl-CoA + AMP + PPi",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Fatty acid activation (cytosolic)",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR00388",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM00260e --> MAM00260c",
+   "names": "10,13,16,19-docosatetraenoic acid --> 10,13,16,19-docosatetraenoic acid",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Transport reactions",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR00389",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM00260c + MAM01371c + MAM01597c --> MAM00262c + MAM01334c + MAM02759c",
+   "names": "10,13,16,19-docosatetraenoic acid + ATP + CoA --> 10,13,16,19-docosatetraenoyl-CoA + AMP + PPi",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Fatty acid activation (cytosolic)",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR00412",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM01291e --> MAM01291c",
+   "names": "adrenic acid --> adrenic acid",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Transport reactions",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR00413",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM01291c + MAM01371c + MAM01597c --> MAM00119c + MAM01334c + MAM02759c",
+   "names": "adrenic acid + ATP + CoA --> (7Z,10Z,13Z,16Z)-docosatetraenoyl-CoA + AMP + PPi",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Fatty acid activation (cytosolic)",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR00416",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM00132e --> MAM00132c",
+   "names": "(9Z,12Z,15Z,18Z)-TTA --> (9Z,12Z,15Z,18Z)-TTA",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Transport reactions",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR00417",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM00132c + MAM01371c + MAM01597c --> MAM00131c + MAM01334c + MAM02759c",
+   "names": "(9Z,12Z,15Z,18Z)-TTA + ATP + CoA --> (9Z,12Z,15Z,18Z)-tetracosatetraenoyl-CoA + AMP + PPi",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Fatty acid activation (cytosolic)",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR00420",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM00111e --> MAM00111c",
+   "names": "(6Z,9Z,12Z,15Z,18Z)-TPA --> (6Z,9Z,12Z,15Z,18Z)-TPA",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Transport reactions",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR00421",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM00111c + MAM01371c + MAM01597c --> MAM00110c + MAM01334c + MAM02759c",
+   "names": "(6Z,9Z,12Z,15Z,18Z)-TPA + ATP + CoA --> (6Z,9Z,12Z,15Z,18Z)-tetracosapentaenoyl-CoA + AMP + PPi",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Fatty acid activation (cytosolic)",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR00424",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM00094e --> MAM00094c",
+   "names": "(4Z,7Z,10Z,13Z,16Z)-DPA --> (4Z,7Z,10Z,13Z,16Z)-DPA",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Transport reactions",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR00425",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM00094c + MAM01371c + MAM01597c --> MAM00093c + MAM01334c + MAM02759c",
+   "names": "(4Z,7Z,10Z,13Z,16Z)-DPA + ATP + CoA --> (4Z,7Z,10Z,13Z,16Z)-docosapentaenoyl-CoA + AMP + PPi",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Fatty acid activation (cytosolic)",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR00428",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM00008e --> MAM00008c",
+   "names": "(11Z,14Z)-eicosadienoic acid --> (11Z,14Z)-eicosadienoic acid",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Transport reactions",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR00429",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM00008c + MAM01371c + MAM01597c --> MAM00009c + MAM01334c + MAM02759c",
+   "names": "(11Z,14Z)-eicosadienoic acid + ATP + CoA --> (11Z,14Z)-eicosadienoyl-CoA + AMP + PPi",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Fatty acid activation (cytosolic)",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR00432",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM00021e --> MAM00021c",
+   "names": "(13Z,16Z)-docosadienoic acid --> (13Z,16Z)-docosadienoic acid",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Transport reactions",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR00433",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM00021c + MAM01371c + MAM01597c --> MAM00023c + MAM01334c + MAM02759c",
+   "names": "(13Z,16Z)-docosadienoic acid + ATP + CoA --> (13Z,16Z)-docosadienoyl-CoA + AMP + PPi",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Fatty acid activation (cytosolic)",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR00436",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM00265e --> MAM00265c",
+   "names": "(10Z,13Z,16Z)-docosatrienoic acid --> (10Z,13Z,16Z)-docosatrienoic acid",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Transport reactions",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR00437",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM00265c + MAM01371c + MAM01597c --> MAM00264c + MAM01334c + MAM02759c",
+   "names": "(10Z,13Z,16Z)-docosatrienoic acid + ATP + CoA --> 10,13,16-docosatrienoyl-CoA + AMP + PPi",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Fatty acid activation (cytosolic)",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR00755",
+   "flux": 1.0681119883376416e-06,
+   "equation": "6.0 MAM01597m + 6.0 MAM01802m + 6.0 MAM02040m + 6.0 MAM02552m + MAM02689m --> 6.0 MAM01261m + 6.0 MAM01803m + 6.0 MAM02039m + 6.0 MAM02553m + MAM02774m",
+   "names": "6.0 CoA + 6.0 FAD + 6.0 H2O + 6.0 NAD+ + pentadecanoyl-CoA --> 6.0 acetyl-CoA + 6.0 FADH2 + 6.0 H+ + 6.0 NADH + propanoyl-CoA",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Fatty acid oxidation",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR00977",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM00131x + MAM01597x + MAM01802x + MAM02040x + MAM02552x --> MAM00119x + MAM01261x + MAM01803x + MAM02039x + MAM02553x",
+   "names": "(9Z,12Z,15Z,18Z)-tetracosatetraenoyl-CoA + CoA + FAD + H2O + NAD+ --> (7Z,10Z,13Z,16Z)-docosatetraenoyl-CoA + acetyl-CoA + FADH2 + H+ + NADH",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Fatty acid oxidation",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR00978",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM00134x + MAM01597x + MAM01802x + MAM02040x + MAM02552x --> MAM00121x + MAM01261x + MAM01803x + MAM02039x + MAM02553x",
+   "names": "(9Z,12Z,15Z,18Z,21Z)-tetracosapentaenoyl-CoA + CoA + FAD + H2O + NAD+ --> (7Z,10Z,13Z,16Z,19Z)-docosapentaenoyl-CoA + acetyl-CoA + FADH2 + H+ + NADH",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Fatty acid oxidation",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR01001",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM00113x + MAM01597x + MAM01802x + MAM02040x + MAM02552x --> MAM00095x + MAM01261x + MAM01803x + MAM02039x + MAM02553x",
+   "names": "(6Z,9Z,12Z,15Z,18Z,21Z)-tetracosahexaenoyl-CoA + CoA + FAD + H2O + NAD+ --> (4Z,7Z,10Z,13Z,16Z,19Z)-docosahexaenoyl-CoA + acetyl-CoA + FADH2 + H+ + NADH",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Fatty acid oxidation",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR02407",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM00110c <=> MAM00110x",
+   "names": "(6Z,9Z,12Z,15Z,18Z)-tetracosapentaenoyl-CoA <=> (6Z,9Z,12Z,15Z,18Z)-tetracosapentaenoyl-CoA",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Transport reactions",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR02408",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM00110x + MAM01802x --> MAM01803x + MAM03028x",
+   "names": "(6Z,9Z,12Z,15Z,18Z)-tetracosapentaenoyl-CoA + FAD --> FADH2 + trans-2-all-cis-6,9,12,15,18-tetracosahexaenoyl-CoA",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Omega-6 fatty acid metabolism",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR02409",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM02040x + MAM03028x --> MAM00717x",
+   "names": "H2O + trans-2-all-cis-6,9,12,15,18-tetracosahexaenoyl-CoA --> 3(S)-hydroxy-tetracosa-6,9,12,15,18-all-cis-pentaenoyl-CoA",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Omega-6 fatty acid metabolism",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR02410",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM00717x + MAM02552x --> MAM00853x + MAM02039x + MAM02553x",
+   "names": "3(S)-hydroxy-tetracosa-6,9,12,15,18-all-cis-pentaenoyl-CoA + NAD+ --> 3-oxo-all-cis-6,9,12,15,18-tetracosapentaenoyl-CoA + H+ + NADH",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Omega-6 fatty acid metabolism",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR02509",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM00113c <=> MAM00113x",
+   "names": "(6Z,9Z,12Z,15Z,18Z,21Z)-tetracosahexaenoyl-CoA <=> (6Z,9Z,12Z,15Z,18Z,21Z)-tetracosahexaenoyl-CoA",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Transport reactions",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR02611",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM00129c + MAM02348c <=> MAM01597c + MAM02974c",
+   "names": "(9E)-tetradecenoyl-CoA + L-carnitine <=> CoA + tetradecenoylcarnitine(5)",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Carnitine shuttle (cytosolic)",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR02612",
+   "flux": -1.0681119883376416e-06,
+   "equation": "MAM02348c + MAM02974m <=> MAM02348m + MAM02974c",
+   "names": "L-carnitine + tetradecenoylcarnitine(5) <=> L-carnitine + tetradecenoylcarnitine(5)",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Carnitine shuttle (mitochondrial)",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR02613",
+   "flux": -1.0681119883376416e-06,
+   "equation": "MAM00129m + MAM02348m <=> MAM01597m + MAM02974m",
+   "names": "(9E)-tetradecenoyl-CoA + L-carnitine <=> CoA + tetradecenoylcarnitine(5)",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Carnitine shuttle (mitochondrial)",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR02623",
+   "flux": -1.0681119883376416e-06,
+   "equation": "MAM01597c + MAM02688c <=> MAM02348c + MAM02689c",
+   "names": "CoA + pentadecanoylcarnitine <=> L-carnitine + pentadecanoyl-CoA",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Carnitine shuttle (cytosolic)",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR02624",
+   "flux": -1.0681119883376416e-06,
+   "equation": "MAM02348c + MAM02688m <=> MAM02348m + MAM02688c",
+   "names": "L-carnitine + pentadecanoylcarnitine <=> L-carnitine + pentadecanoylcarnitine",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Carnitine shuttle (mitochondrial)",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR02625",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM01597m + MAM02688m <=> MAM02348m + MAM02689m",
+   "names": "CoA + pentadecanoylcarnitine <=> L-carnitine + pentadecanoyl-CoA",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Carnitine shuttle (mitochondrial)",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR02633",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM01191c + MAM02348c <=> MAM01597c + MAM02117c",
+   "names": "7-hexadecenoyl-CoA + L-carnitine <=> CoA + hexadecenoylcarnitine(9)",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Carnitine shuttle (cytosolic)",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR02642",
+   "flux": -1.0681119883376416e-06,
+   "equation": "MAM01597c + MAM02100c <=> MAM02101c + MAM02348c",
+   "names": "CoA + heptadecanoylcarnitine <=> heptadecanoyl-CoA + L-carnitine",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Carnitine shuttle (cytosolic)",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR02644",
+   "flux": -1.0681119883376416e-06,
+   "equation": "MAM02100m + MAM02348c <=> MAM02100c + MAM02348m",
+   "names": "heptadecanoylcarnitine + L-carnitine <=> heptadecanoylcarnitine + L-carnitine",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Carnitine shuttle (mitochondrial)",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR02646",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM01597m + MAM02100m <=> MAM02101m + MAM02348m",
+   "names": "CoA + heptadecanoylcarnitine <=> heptadecanoyl-CoA + L-carnitine",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Carnitine shuttle (mitochondrial)",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR02648",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM00004c + MAM02348c <=> MAM01597c + MAM02102c",
+   "names": "(10Z)-heptadecenoyl-CoA + L-carnitine <=> CoA + heptadecenoylcarnitine(7)",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Carnitine shuttle (cytosolic)",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR02649",
+   "flux": -1.0681119883376416e-06,
+   "equation": "MAM02102m + MAM02348c <=> MAM02102c + MAM02348m",
+   "names": "heptadecenoylcarnitine(7) + L-carnitine <=> heptadecenoylcarnitine(7) + L-carnitine",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Carnitine shuttle (mitochondrial)",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR02650",
+   "flux": -1.0681119883376416e-06,
+   "equation": "MAM00004m + MAM02348m <=> MAM01597m + MAM02102m",
+   "names": "(10Z)-heptadecenoyl-CoA + L-carnitine <=> CoA + heptadecenoylcarnitine(7)",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Carnitine shuttle (mitochondrial)",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR02651",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM01237c + MAM02348c <=> MAM01597c + MAM02103c",
+   "names": "9-heptadecenoyl-CoA + L-carnitine <=> CoA + heptadecenoylcarnitine(8)",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Carnitine shuttle (cytosolic)",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR02652",
+   "flux": -1.0681119883376416e-06,
+   "equation": "MAM02103m + MAM02348c <=> MAM02103c + MAM02348m",
+   "names": "heptadecenoylcarnitine(8) + L-carnitine <=> heptadecenoylcarnitine(8) + L-carnitine",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Carnitine shuttle (mitochondrial)",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR02653",
+   "flux": -1.0681119883376416e-06,
+   "equation": "MAM01237m + MAM02348m <=> MAM01597m + MAM02103m",
+   "names": "9-heptadecenoyl-CoA + L-carnitine <=> CoA + heptadecenoylcarnitine(8)",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Carnitine shuttle (mitochondrial)",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR02666",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM00127c + MAM02348c <=> MAM00126c + MAM01597c",
+   "names": "(9E)-octadecenoyl-CoA + L-carnitine <=> (9E)-octadecenoylcarnitine + CoA",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Carnitine shuttle (cytosolic)",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR02675",
+   "flux": -1.0681119883376416e-06,
+   "equation": "MAM01597c + MAM02611c <=> MAM02348c + MAM02612c",
+   "names": "CoA + nonadecanoylcarnitine <=> L-carnitine + nonadecanoyl-CoA",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Carnitine shuttle (cytosolic)",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR02676",
+   "flux": -1.0681119883376416e-06,
+   "equation": "MAM02348c + MAM02611m <=> MAM02348m + MAM02611c",
+   "names": "L-carnitine + nonadecanoylcarnitine <=> L-carnitine + nonadecanoylcarnitine",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Carnitine shuttle (mitochondrial)",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR02677",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM01597m + MAM02611m <=> MAM02348m + MAM02612m",
+   "names": "CoA + nonadecanoylcarnitine <=> L-carnitine + nonadecanoyl-CoA",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Carnitine shuttle (mitochondrial)",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR02678",
+   "flux": -1.0681119883376416e-06,
+   "equation": "MAM01597c + MAM01772c <=> MAM01773c + MAM02348c",
+   "names": "CoA + eicosanoylcarnitine <=> eicosanoyl-CoA + L-carnitine",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Carnitine shuttle (cytosolic)",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR02679",
+   "flux": -1.0681119883376416e-06,
+   "equation": "MAM01772m + MAM02348c <=> MAM01772c + MAM02348m",
+   "names": "eicosanoylcarnitine + L-carnitine <=> eicosanoylcarnitine + L-carnitine",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Carnitine shuttle (mitochondrial)",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR02680",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM01597m + MAM01772m <=> MAM01773m + MAM02348m",
+   "names": "CoA + eicosanoylcarnitine <=> eicosanoyl-CoA + L-carnitine",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Carnitine shuttle (mitochondrial)",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR02684",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM00007c + MAM02348c <=> MAM01597c + MAM01777c",
+   "names": "(11Z)-eicosenoyl-CoA + L-carnitine <=> CoA + eicosenoylcarnitine(9)",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Carnitine shuttle (cytosolic)",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR02685",
+   "flux": -1.0681119883376416e-06,
+   "equation": "MAM01777m + MAM02348c <=> MAM01777c + MAM02348m",
+   "names": "eicosenoylcarnitine(9) + L-carnitine <=> eicosenoylcarnitine(9) + L-carnitine",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Carnitine shuttle (mitochondrial)",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR02686",
+   "flux": -1.0681119883376416e-06,
+   "equation": "MAM00007m + MAM02348m <=> MAM01597m + MAM01777m",
+   "names": "(11Z)-eicosenoyl-CoA + L-carnitine <=> CoA + eicosenoylcarnitine(9)",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Carnitine shuttle (mitochondrial)",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR02687",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM01236c + MAM02348c <=> MAM01597c + MAM01775c",
+   "names": "9-eicosenoyl-CoA + L-carnitine <=> CoA + eicosenoylcarnitine(11)",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Carnitine shuttle (cytosolic)",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR02688",
+   "flux": -1.0681119883376416e-06,
+   "equation": "MAM01775m + MAM02348c <=> MAM01775c + MAM02348m",
+   "names": "eicosenoylcarnitine(11) + L-carnitine <=> eicosenoylcarnitine(11) + L-carnitine",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Carnitine shuttle (mitochondrial)",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR02689",
+   "flux": -1.0681119883376416e-06,
+   "equation": "MAM01236m + MAM02348m <=> MAM01597m + MAM01775m",
+   "names": "9-eicosenoyl-CoA + L-carnitine <=> CoA + eicosenoylcarnitine(11)",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Carnitine shuttle (mitochondrial)",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR02690",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM00123c + MAM02348c <=> MAM00122c + MAM01597c",
+   "names": "(8Z,11Z)-eicosadienoyl-CoA + L-carnitine <=> (8Z,11Z)-eicosadienoylcarnitine + CoA",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Carnitine shuttle (cytosolic)",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR02691",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM00122c + MAM02348m <=> MAM00122m + MAM02348c",
+   "names": "(8Z,11Z)-eicosadienoylcarnitine + L-carnitine <=> (8Z,11Z)-eicosadienoylcarnitine + L-carnitine",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Carnitine shuttle (mitochondrial)",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR02692",
+   "flux": -1.0681119883376416e-06,
+   "equation": "MAM00123m + MAM02348m <=> MAM00122m + MAM01597m",
+   "names": "(8Z,11Z)-eicosadienoyl-CoA + L-carnitine <=> (8Z,11Z)-eicosadienoylcarnitine + CoA",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Carnitine shuttle (mitochondrial)",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR02693",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM00101c + MAM02348c <=> MAM00100c + MAM01597c",
+   "names": "(5Z,8Z,11Z)-eicosatrienoyl-CoA + L-carnitine <=> (5Z,8Z,11Z)-eicosatrienoylcarnitine + CoA",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Carnitine shuttle (cytosolic)",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR02695",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM00100c + MAM02348m <=> MAM00100m + MAM02348c",
+   "names": "(5Z,8Z,11Z)-eicosatrienoylcarnitine + L-carnitine <=> (5Z,8Z,11Z)-eicosatrienoylcarnitine + L-carnitine",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Carnitine shuttle (mitochondrial)",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR02697",
+   "flux": -1.0681119883376416e-06,
+   "equation": "MAM00101m + MAM02348m <=> MAM00100m + MAM01597m",
+   "names": "(5Z,8Z,11Z)-eicosatrienoyl-CoA + L-carnitine <=> (5Z,8Z,11Z)-eicosatrienoylcarnitine + CoA",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Carnitine shuttle (mitochondrial)",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR02699",
+   "flux": -1.0681119883376416e-06,
+   "equation": "MAM01597c + MAM02051c <=> MAM02052c + MAM02348c",
+   "names": "CoA + heneicosanoylcarnitine <=> heneicosanoyl-CoA + L-carnitine",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Carnitine shuttle (cytosolic)",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR02700",
+   "flux": -1.0681119883376416e-06,
+   "equation": "MAM02051m + MAM02348c <=> MAM02051c + MAM02348m",
+   "names": "heneicosanoylcarnitine + L-carnitine <=> heneicosanoylcarnitine + L-carnitine",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Carnitine shuttle (mitochondrial)",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR02701",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM01597m + MAM02051m <=> MAM02052m + MAM02348m",
+   "names": "CoA + heneicosanoylcarnitine <=> heneicosanoyl-CoA + L-carnitine",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Carnitine shuttle (mitochondrial)",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR02702",
+   "flux": -1.0681119883376416e-06,
+   "equation": "MAM01597c + MAM01724c <=> MAM01725c + MAM02348c",
+   "names": "CoA + docosanoylcarnitine <=> docosanoyl-CoA + L-carnitine",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Carnitine shuttle (cytosolic)",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR02703",
+   "flux": -1.0681119883376416e-06,
+   "equation": "MAM01724m + MAM02348c <=> MAM01724c + MAM02348m",
+   "names": "docosanoylcarnitine + L-carnitine <=> docosanoylcarnitine + L-carnitine",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Carnitine shuttle (mitochondrial)",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR02704",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM01597m + MAM01724m <=> MAM01725m + MAM02348m",
+   "names": "CoA + docosanoylcarnitine <=> docosanoyl-CoA + L-carnitine",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Carnitine shuttle (mitochondrial)",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR02705",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM00016c + MAM02348c <=> MAM01597c + MAM01727c",
+   "names": "(13Z)-docosenoyl-CoA + L-carnitine <=> CoA + docosenoylcarnitine",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Carnitine shuttle (cytosolic)",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR02706",
+   "flux": -1.0681119883376416e-06,
+   "equation": "MAM01727m + MAM02348c <=> MAM01727c + MAM02348m",
+   "names": "docosenoylcarnitine + L-carnitine <=> docosenoylcarnitine + L-carnitine",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Carnitine shuttle (mitochondrial)",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR02707",
+   "flux": -1.0681119883376416e-06,
+   "equation": "MAM00016m + MAM02348m <=> MAM01597m + MAM01727m",
+   "names": "(13Z)-docosenoyl-CoA + L-carnitine <=> CoA + docosenoylcarnitine",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Carnitine shuttle (mitochondrial)",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR02708",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM00006c + MAM02348c <=> MAM01597c + MAM01726c",
+   "names": "(11Z)-docosenoyl-CoA + L-carnitine <=> CoA + docosenoylcarnitine(11)",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Carnitine shuttle (cytosolic)",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR02709",
+   "flux": -1.0681119883376416e-06,
+   "equation": "MAM01726m + MAM02348c <=> MAM01726c + MAM02348m",
+   "names": "docosenoylcarnitine(11) + L-carnitine <=> docosenoylcarnitine(11) + L-carnitine",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Carnitine shuttle (mitochondrial)",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR02710",
+   "flux": -1.0681119883376416e-06,
+   "equation": "MAM00006m + MAM02348m <=> MAM01597m + MAM01726m",
+   "names": "(11Z)-docosenoyl-CoA + L-carnitine <=> CoA + docosenoylcarnitine(11)",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Carnitine shuttle (mitochondrial)",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR02717",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM00125c + MAM02348c <=> MAM00124c + MAM01597c",
+   "names": "(8Z,11Z,14Z,17Z)-eicosatetraenoyl-CoA + L-carnitine <=> (8Z,11Z,14Z,17Z)-eicosatetraenoylcarnitine + CoA",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Carnitine shuttle (cytosolic)",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR02718",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM00124c + MAM02348m <=> MAM00124m + MAM02348c",
+   "names": "(8Z,11Z,14Z,17Z)-eicosatetraenoylcarnitine + L-carnitine <=> (8Z,11Z,14Z,17Z)-eicosatetraenoylcarnitine + L-carnitine",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Carnitine shuttle (mitochondrial)",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR02719",
+   "flux": -1.0681119883376416e-06,
+   "equation": "MAM00125m + MAM02348m <=> MAM00124m + MAM01597m",
+   "names": "(8Z,11Z,14Z,17Z)-eicosatetraenoyl-CoA + L-carnitine <=> (8Z,11Z,14Z,17Z)-eicosatetraenoylcarnitine + CoA",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Carnitine shuttle (mitochondrial)",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR02733",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM00012c + MAM02348c <=> MAM00011c + MAM01597c",
+   "names": "(11Z,14Z,17Z)-eicosatrienoyl-CoA + L-carnitine <=> (11Z,14Z,17Z)-eicosatrienoylcarnitine + CoA",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Carnitine shuttle (cytosolic)",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR02734",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM00011c + MAM02348m <=> MAM00011m + MAM02348c",
+   "names": "(11Z,14Z,17Z)-eicosatrienoylcarnitine + L-carnitine <=> (11Z,14Z,17Z)-eicosatrienoylcarnitine + L-carnitine",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Carnitine shuttle (mitochondrial)",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR02735",
+   "flux": -1.0681119883376416e-06,
+   "equation": "MAM00012m + MAM02348m <=> MAM00011m + MAM01597m",
+   "names": "(11Z,14Z,17Z)-eicosatrienoyl-CoA + L-carnitine <=> (11Z,14Z,17Z)-eicosatrienoylcarnitine + CoA",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Carnitine shuttle (mitochondrial)",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR02736",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM00343c + MAM02348c <=> MAM00342c + MAM01597c",
+   "names": "13,16,19-docosatrienoyl-CoA + L-carnitine <=> 13,16,19-docosatrienoylcarnitine + CoA",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Carnitine shuttle (cytosolic)",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR02737",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM00342c + MAM02348m <=> MAM00342m + MAM02348c",
+   "names": "13,16,19-docosatrienoylcarnitine + L-carnitine <=> 13,16,19-docosatrienoylcarnitine + L-carnitine",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Carnitine shuttle (mitochondrial)",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR02738",
+   "flux": -1.0681119883376416e-06,
+   "equation": "MAM00343m + MAM02348m <=> MAM00342m + MAM01597m",
+   "names": "13,16,19-docosatrienoyl-CoA + L-carnitine <=> 13,16,19-docosatrienoylcarnitine + CoA",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Carnitine shuttle (mitochondrial)",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR02739",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM00262c + MAM02348c <=> MAM00261c + MAM01597c",
+   "names": "10,13,16,19-docosatetraenoyl-CoA + L-carnitine <=> 10,13,16,19-docosatetraenoylcarnitine + CoA",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Carnitine shuttle (cytosolic)",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR02740",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM00261c + MAM02348m <=> MAM00261m + MAM02348c",
+   "names": "10,13,16,19-docosatetraenoylcarnitine + L-carnitine <=> 10,13,16,19-docosatetraenoylcarnitine + L-carnitine",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Carnitine shuttle (mitochondrial)",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR02741",
+   "flux": -1.0681119883376416e-06,
+   "equation": "MAM00262m + MAM02348m <=> MAM00261m + MAM01597m",
+   "names": "10,13,16,19-docosatetraenoyl-CoA + L-carnitine <=> 10,13,16,19-docosatetraenoylcarnitine + CoA",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Carnitine shuttle (mitochondrial)",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR02762",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM00093c + MAM02348c <=> MAM00092c + MAM01597c",
+   "names": "(4Z,7Z,10Z,13Z,16Z)-docosapentaenoyl-CoA + L-carnitine <=> (4Z,7Z,10Z,13Z,16Z)-docosapentaenoylcarnitine + CoA",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Carnitine shuttle (cytosolic)",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR02766",
+   "flux": -1.0681119883376416e-06,
+   "equation": "MAM00093m + MAM02348m <=> MAM00092m + MAM01597m",
+   "names": "(4Z,7Z,10Z,13Z,16Z)-docosapentaenoyl-CoA + L-carnitine <=> (4Z,7Z,10Z,13Z,16Z)-docosapentaenoylcarnitine + CoA",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Carnitine shuttle (mitochondrial)",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR02768",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM00009c + MAM02348c <=> MAM01597c + MAM01770c",
+   "names": "(11Z,14Z)-eicosadienoyl-CoA + L-carnitine <=> CoA + eicosadienoylcarnitine",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Carnitine shuttle (cytosolic)",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR02769",
+   "flux": -1.0681119883376416e-06,
+   "equation": "MAM01770m + MAM02348c <=> MAM01770c + MAM02348m",
+   "names": "eicosadienoylcarnitine + L-carnitine <=> eicosadienoylcarnitine + L-carnitine",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Carnitine shuttle (mitochondrial)",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR02770",
+   "flux": -1.0681119883376416e-06,
+   "equation": "MAM00009m + MAM02348m <=> MAM01597m + MAM01770m",
+   "names": "(11Z,14Z)-eicosadienoyl-CoA + L-carnitine <=> CoA + eicosadienoylcarnitine",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Carnitine shuttle (mitochondrial)",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR02771",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM00023c + MAM02348c <=> MAM00022c + MAM01597c + MAM02039c",
+   "names": "(13Z,16Z)-docosadienoyl-CoA + L-carnitine <=> (13Z,16Z)-docosadienoylcarnitine + CoA + H+",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Carnitine shuttle (cytosolic)",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR02772",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM00022c + MAM02348m <=> MAM00022m + MAM02348c",
+   "names": "(13Z,16Z)-docosadienoylcarnitine + L-carnitine <=> (13Z,16Z)-docosadienoylcarnitine + L-carnitine",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Carnitine shuttle (mitochondrial)",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR02773",
+   "flux": -1.0681119883376416e-06,
+   "equation": "MAM00023m + MAM02348m <=> MAM00022m + MAM01597m + MAM02039m",
+   "names": "(13Z,16Z)-docosadienoyl-CoA + L-carnitine <=> (13Z,16Z)-docosadienoylcarnitine + CoA + H+",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Carnitine shuttle (mitochondrial)",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR02774",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM00264c + MAM02348c <=> MAM00263c + MAM01597c",
+   "names": "10,13,16-docosatrienoyl-CoA + L-carnitine <=> 10,13,16-docosatrienoylcarnitine + CoA",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Carnitine shuttle (cytosolic)",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR02775",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM00263c + MAM02348m <=> MAM00263m + MAM02348c",
+   "names": "10,13,16-docosatrienoylcarnitine + L-carnitine <=> 10,13,16-docosatrienoylcarnitine + L-carnitine",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Carnitine shuttle (mitochondrial)",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR02776",
+   "flux": -1.0681119883376416e-06,
+   "equation": "MAM00264m + MAM02348m <=> MAM00263m + MAM01597m",
+   "names": "10,13,16-docosatrienoyl-CoA + L-carnitine <=> 10,13,16-docosatrienoylcarnitine + CoA",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Carnitine shuttle (mitochondrial)",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR03024",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM00134c <=> MAM00134x",
+   "names": "(9Z,12Z,15Z,18Z,21Z)-tetracosapentaenoyl-CoA <=> (9Z,12Z,15Z,18Z,21Z)-tetracosapentaenoyl-CoA",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Transport reactions",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR03025",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM00131c <=> MAM00131x",
+   "names": "(9Z,12Z,15Z,18Z)-tetracosatetraenoyl-CoA <=> (9Z,12Z,15Z,18Z)-tetracosatetraenoyl-CoA",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Transport reactions",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR03107",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM01725m + MAM01802m --> MAM00040m + MAM01803m",
+   "names": "docosanoyl-CoA + FAD --> (2E)-docosenoyl-CoA + FADH2",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Beta oxidation of even-chain fatty acids (mitochondrial)",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR03108",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM00040m + MAM02040m --> MAM00776m",
+   "names": "(2E)-docosenoyl-CoA + H2O --> 3-hydroxydocosanoyl-CoA",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Beta oxidation of even-chain fatty acids (mitochondrial)",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR03109",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM00776m + MAM02552m --> MAM00866m + MAM02039m + MAM02553m",
+   "names": "3-hydroxydocosanoyl-CoA + NAD+ --> 3-oxodocosanoyl-CoA + H+ + NADH",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Beta oxidation of even-chain fatty acids (mitochondrial)",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR03110",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM00866m + MAM01597m --> MAM01261m + MAM01773m",
+   "names": "3-oxodocosanoyl-CoA + CoA --> acetyl-CoA + eicosanoyl-CoA",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Beta oxidation of even-chain fatty acids (mitochondrial)",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR03170",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM01802m + MAM02052m --> MAM00044m + MAM01803m",
+   "names": "FAD + heneicosanoyl-CoA --> (2E)-heneicosenoyl-CoA + FADH2",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Beta oxidation of odd-chain fatty acids (mitochondrial)",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR03171",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM00044m + MAM02040m --> MAM00778m",
+   "names": "(2E)-heneicosenoyl-CoA + H2O --> 3-hydroxyheneicosanoyl-CoA",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Beta oxidation of odd-chain fatty acids (mitochondrial)",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR03172",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM00778m + MAM02552m --> MAM00873m + MAM02039m + MAM02553m",
+   "names": "3-hydroxyheneicosanoyl-CoA + NAD+ --> 3-oxoheneicosanoyl-CoA + H+ + NADH",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Beta oxidation of odd-chain fatty acids (mitochondrial)",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR03173",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM00873m + MAM01597m --> MAM01261m + MAM02612m",
+   "names": "3-oxoheneicosanoyl-CoA + CoA --> acetyl-CoA + nonadecanoyl-CoA",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Beta oxidation of odd-chain fatty acids (mitochondrial)",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR03218",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM00016m + MAM01802m --> MAM01803m + MAM03013m",
+   "names": "(13Z)-docosenoyl-CoA + FAD --> FADH2 + trans,cis-2,13-docosadienoyl-CoA",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Beta oxidation of unsaturated fatty acids (n-9) (mitochondrial)",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR03219",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM02040m + MAM03013m --> MAM00701m",
+   "names": "H2O + trans,cis-2,13-docosadienoyl-CoA --> 3(S)-hydroxy-13-cis-docosenoyl-CoA",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Beta oxidation of unsaturated fatty acids (n-9) (mitochondrial)",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR03220",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM00701m + MAM02552m --> MAM00842m + MAM02039m + MAM02553m",
+   "names": "3(S)-hydroxy-13-cis-docosenoyl-CoA + NAD+ --> 3-oxo-13cis-docosenoyl-CoA + H+ + NADH",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Beta oxidation of unsaturated fatty acids (n-9) (mitochondrial)",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR03221",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM00842m + MAM01597m --> MAM00007m + MAM01261m",
+   "names": "3-oxo-13cis-docosenoyl-CoA + CoA --> (11Z)-eicosenoyl-CoA + acetyl-CoA",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Beta oxidation of unsaturated fatty acids (n-9) (mitochondrial)",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR03396",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM00004m + 7.0 MAM01597m + 6.0 MAM01802m + 7.0 MAM02040m + 7.0 MAM02552m --> 7.0 MAM01261m + 6.0 MAM01803m + 7.0 MAM02039m + 7.0 MAM02553m + MAM02774m",
+   "names": "(10Z)-heptadecenoyl-CoA + 7.0 CoA + 6.0 FAD + 7.0 H2O + 7.0 NAD+ --> 7.0 acetyl-CoA + 6.0 FADH2 + 7.0 H+ + 7.0 NADH + propanoyl-CoA",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Beta oxidation of odd-chain fatty acids (mitochondrial)",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR03397",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM01237m + 7.0 MAM01597m + 6.0 MAM01802m + 7.0 MAM02040m + 7.0 MAM02552m --> 7.0 MAM01261m + 6.0 MAM01803m + 7.0 MAM02039m + 7.0 MAM02553m + MAM02774m",
+   "names": "9-heptadecenoyl-CoA + 7.0 CoA + 6.0 FAD + 7.0 H2O + 7.0 NAD+ --> 7.0 acetyl-CoA + 6.0 FADH2 + 7.0 H+ + 7.0 NADH + propanoyl-CoA",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Beta oxidation of odd-chain fatty acids (mitochondrial)",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR03398",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM00129m + 6.0 MAM01597m + 5.0 MAM01802m + 6.0 MAM02040m + 6.0 MAM02552m --> 7.0 MAM01261m + 5.0 MAM01803m + 6.0 MAM02039m + 6.0 MAM02553m",
+   "names": "(9E)-tetradecenoyl-CoA + 6.0 CoA + 5.0 FAD + 6.0 H2O + 6.0 NAD+ --> 7.0 acetyl-CoA + 5.0 FADH2 + 6.0 H+ + 6.0 NADH",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Beta oxidation of even-chain fatty acids (mitochondrial)",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR03411",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM01236m + 9.0 MAM01597m + 8.0 MAM01802m + 9.0 MAM02040m + 9.0 MAM02552m --> 10.0 MAM01261m + 8.0 MAM01803m + 9.0 MAM02039m + 9.0 MAM02553m",
+   "names": "9-eicosenoyl-CoA + 9.0 CoA + 8.0 FAD + 9.0 H2O + 9.0 NAD+ --> 10.0 acetyl-CoA + 8.0 FADH2 + 9.0 H+ + 9.0 NADH",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Beta oxidation of even-chain fatty acids (mitochondrial)",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR03413",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM00123m + 9.0 MAM01597m + 7.0 MAM01802m + 9.0 MAM02040m + 9.0 MAM02552m --> 10.0 MAM01261m + 7.0 MAM01803m + 9.0 MAM02039m + 9.0 MAM02553m",
+   "names": "(8Z,11Z)-eicosadienoyl-CoA + 9.0 CoA + 7.0 FAD + 9.0 H2O + 9.0 NAD+ --> 10.0 acetyl-CoA + 7.0 FADH2 + 9.0 H+ + 9.0 NADH",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Beta oxidation of even-chain fatty acids (mitochondrial)",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR03414",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM00101m + 9.0 MAM01597m + 6.0 MAM01802m + 9.0 MAM02040m + 9.0 MAM02552m --> 10.0 MAM01261m + 6.0 MAM01803m + 9.0 MAM02039m + 9.0 MAM02553m",
+   "names": "(5Z,8Z,11Z)-eicosatrienoyl-CoA + 9.0 CoA + 6.0 FAD + 9.0 H2O + 9.0 NAD+ --> 10.0 acetyl-CoA + 6.0 FADH2 + 9.0 H+ + 9.0 NADH",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Beta oxidation of even-chain fatty acids (mitochondrial)",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR03416",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM00006m + 10.0 MAM01597m + 9.0 MAM01802m + 10.0 MAM02040m + 10.0 MAM02552m --> 11.0 MAM01261m + 9.0 MAM01803m + 10.0 MAM02039m + 10.0 MAM02553m",
+   "names": "(11Z)-docosenoyl-CoA + 10.0 CoA + 9.0 FAD + 10.0 H2O + 10.0 NAD+ --> 11.0 acetyl-CoA + 9.0 FADH2 + 10.0 H+ + 10.0 NADH",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Beta oxidation of even-chain fatty acids (mitochondrial)",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR03423",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM00009m + 9.0 MAM01597m + 7.0 MAM01802m + 9.0 MAM02040m + 9.0 MAM02552m --> 10.0 MAM01261m + 7.0 MAM01803m + 9.0 MAM02039m + 9.0 MAM02553m",
+   "names": "(11Z,14Z)-eicosadienoyl-CoA + 9.0 CoA + 7.0 FAD + 9.0 H2O + 9.0 NAD+ --> 10.0 acetyl-CoA + 7.0 FADH2 + 9.0 H+ + 9.0 NADH",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Beta oxidation of even-chain fatty acids (mitochondrial)",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR03424",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM00023m + 10.0 MAM01597m + 8.0 MAM01802m + 10.0 MAM02040m + 10.0 MAM02552m --> 11.0 MAM01261m + 8.0 MAM01803m + 10.0 MAM02039m + 10.0 MAM02553m",
+   "names": "(13Z,16Z)-docosadienoyl-CoA + 10.0 CoA + 8.0 FAD + 10.0 H2O + 10.0 NAD+ --> 11.0 acetyl-CoA + 8.0 FADH2 + 10.0 H+ + 10.0 NADH",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Beta oxidation of even-chain fatty acids (mitochondrial)",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR03425",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM00264m + 10.0 MAM01597m + 7.0 MAM01802m + 10.0 MAM02040m + 10.0 MAM02552m --> 11.0 MAM01261m + 7.0 MAM01803m + 10.0 MAM02039m + 10.0 MAM02553m",
+   "names": "10,13,16-docosatrienoyl-CoA + 10.0 CoA + 7.0 FAD + 10.0 H2O + 10.0 NAD+ --> 11.0 acetyl-CoA + 7.0 FADH2 + 10.0 H+ + 10.0 NADH",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Beta oxidation of even-chain fatty acids (mitochondrial)",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR03427",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM00125m + 9.0 MAM01597m + 5.0 MAM01802m + 9.0 MAM02040m + 9.0 MAM02552m --> 10.0 MAM01261m + 5.0 MAM01803m + 9.0 MAM02039m + 9.0 MAM02553m",
+   "names": "(8Z,11Z,14Z,17Z)-eicosatetraenoyl-CoA + 9.0 CoA + 5.0 FAD + 9.0 H2O + 9.0 NAD+ --> 10.0 acetyl-CoA + 5.0 FADH2 + 9.0 H+ + 9.0 NADH",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Beta oxidation of even-chain fatty acids (mitochondrial)",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR03431",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM00012m + 9.0 MAM01597m + 6.0 MAM01802m + 9.0 MAM02040m + 9.0 MAM02552m --> 10.0 MAM01261m + 6.0 MAM01803m + 9.0 MAM02039m + 9.0 MAM02553m",
+   "names": "(11Z,14Z,17Z)-eicosatrienoyl-CoA + 9.0 CoA + 6.0 FAD + 9.0 H2O + 9.0 NAD+ --> 10.0 acetyl-CoA + 6.0 FADH2 + 9.0 H+ + 9.0 NADH",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Beta oxidation of even-chain fatty acids (mitochondrial)",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR03432",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM00343m + 10.0 MAM01597m + 7.0 MAM01802m + 10.0 MAM02040m + 10.0 MAM02552m --> 11.0 MAM01261m + 7.0 MAM01803m + 10.0 MAM02039m + 10.0 MAM02553m",
+   "names": "13,16,19-docosatrienoyl-CoA + 10.0 CoA + 7.0 FAD + 10.0 H2O + 10.0 NAD+ --> 11.0 acetyl-CoA + 7.0 FADH2 + 10.0 H+ + 10.0 NADH",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Beta oxidation of even-chain fatty acids (mitochondrial)",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR03433",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM00262m + 10.0 MAM01597m + 6.0 MAM01802m + 10.0 MAM02040m + 10.0 MAM02552m --> 11.0 MAM01261m + 6.0 MAM01803m + 10.0 MAM02039m + 10.0 MAM02553m",
+   "names": "10,13,16,19-docosatetraenoyl-CoA + 10.0 CoA + 6.0 FAD + 10.0 H2O + 10.0 NAD+ --> 11.0 acetyl-CoA + 6.0 FADH2 + 10.0 H+ + 10.0 NADH",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Beta oxidation of even-chain fatty acids (mitochondrial)",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR03483",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM00853x + MAM01597x + 2.0 MAM02039x <=> MAM00119x + MAM01261x",
+   "names": "3-oxo-all-cis-6,9,12,15,18-tetracosapentaenoyl-CoA + CoA + 2.0 H+ <=> (7Z,10Z,13Z,16Z)-docosatetraenoyl-CoA + acetyl-CoA",
+   "temporary": false,
+   "mass_charge_imbalance": {
+    "charge": -2.0
+   },
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Fatty acid oxidation",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR05378",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM00074m + MAM01597m + MAM02040m + MAM02552m --> MAM01261m + MAM01364m + MAM02039m + MAM02553m",
+   "names": "(2E,7Z,10Z,13Z,16Z)-docosapentaenoyl-CoA + CoA + H2O + NAD+ --> acetyl-CoA + arachidonoyl-CoA + H+ + NADH",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": false,
+   "subsystem": "Fatty acid oxidation",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR05380",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM00093m + MAM01802m --> MAM01803m + MAM03557m",
+   "names": "(4Z,7Z,10Z,13Z,16Z)-docosapentaenoyl-CoA + FAD --> FADH2 + 2,4,7,10,13,16-docosahexenoyl-CoA",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Fatty acid oxidation",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR05383",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM03210m --> MAM00074m",
+   "names": "3,7,10,13,16-docosapentenoyl-CoA --> (2E,7Z,10Z,13Z,16Z)-docosapentaenoyl-CoA",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": false,
+   "subsystem": "Fatty acid oxidation",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR05404",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM02039m + MAM02555m + MAM03557m --> MAM02554m + MAM03210m",
+   "names": "H+ + NADPH + 2,4,7,10,13,16-docosahexenoyl-CoA --> NADP+ + 3,7,10,13,16-docosapentenoyl-CoA",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Fatty acid oxidation",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR06604",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM01371c + MAM01585e + MAM01597c --> MAM01334c + MAM02759c + MAM03791c",
+   "names": "ATP + cis-vaccenic acid + CoA --> AMP + PPi + 11-octadecenoyl-CoA",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Fatty acid oxidation",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR07807",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM01371c + MAM01597c + MAM01771e --> MAM01334c + MAM01773c + MAM02759c",
+   "names": "ATP + CoA + eicosanoate --> AMP + eicosanoyl-CoA + PPi",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Transport reactions",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "TASK_OUT_MAM00017e",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM00017e --> ",
+   "names": "(13Z)-eicosenoic acid --> ",
+   "temporary": true,
+   "mass_charge_imbalance": {},
+   "in_reference_model": false,
+   "identical_to_reference": null,
+   "subsystem": "",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "TASK_OUT_MAM00117e",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM00117e --> ",
+   "names": "(7Z)-tetradecenoic acid --> ",
+   "temporary": true,
+   "mass_charge_imbalance": {},
+   "in_reference_model": false,
+   "identical_to_reference": null,
+   "subsystem": "",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "TASK_OUT_MAM00315e",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM00315e --> ",
+   "names": "12,15,18,21-tetracosatetraenoic acid --> ",
+   "temporary": true,
+   "mass_charge_imbalance": {},
+   "in_reference_model": false,
+   "identical_to_reference": null,
+   "subsystem": "",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "TASK_OUT_MAM01432e",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM01432e --> ",
+   "names": "cerotic acid --> ",
+   "temporary": true,
+   "mass_charge_imbalance": {},
+   "in_reference_model": false,
+   "identical_to_reference": null,
+   "subsystem": "",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "TASK_OUT_MAM01932e",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM01932e --> ",
+   "names": "gamma-linolenate --> ",
+   "temporary": true,
+   "mass_charge_imbalance": {},
+   "in_reference_model": false,
+   "identical_to_reference": null,
+   "subsystem": "",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "TASK_OUT_MAM02344e",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM02344e --> ",
+   "names": "lauric acid --> ",
+   "temporary": true,
+   "mass_charge_imbalance": {},
+   "in_reference_model": false,
+   "identical_to_reference": null,
+   "subsystem": "",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "TASK_OUT_MAM02385e",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM02385e --> ",
+   "names": "lignocerate --> ",
+   "temporary": true,
+   "mass_charge_imbalance": {},
+   "in_reference_model": false,
+   "identical_to_reference": null,
+   "subsystem": "",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "TASK_OUT_MAM02564e",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM02564e --> ",
+   "names": "nervonic acid --> ",
+   "temporary": true,
+   "mass_charge_imbalance": {},
+   "in_reference_model": false,
+   "identical_to_reference": null,
+   "subsystem": "",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "TASK_OUT_MAM02745e",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM02745e --> ",
+   "names": "physeteric acid --> ",
+   "temporary": true,
+   "mass_charge_imbalance": {},
+   "in_reference_model": false,
+   "identical_to_reference": null,
+   "subsystem": "",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "TASK_OUT_MAM03045e",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM03045e --> ",
+   "names": "tricosanoic acid --> ",
+   "temporary": true,
+   "mass_charge_imbalance": {},
+   "in_reference_model": false,
+   "identical_to_reference": null,
+   "subsystem": "",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "TASK_OUT_MAM03051e",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM03051e --> ",
+   "names": "tridecylic acid --> ",
+   "temporary": true,
+   "mass_charge_imbalance": {},
+   "in_reference_model": false,
+   "identical_to_reference": null,
+   "subsystem": "",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "TASK_OUT_MAM03153e",
+   "flux": 1.0681119883376416e-06,
+   "equation": "MAM03153e --> ",
+   "names": "ximenic acid --> ",
+   "temporary": true,
+   "mass_charge_imbalance": {},
+   "in_reference_model": false,
+   "identical_to_reference": null,
+   "subsystem": "",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR00218",
+   "flux": 7.120746588917814e-07,
+   "equation": "MAM00121x + MAM02039x + MAM02553x + MAM02630x --> MAM00095x + 2.0 MAM02040x + MAM02552x",
+   "names": "(7Z,10Z,13Z,16Z,19Z)-docosapentaenoyl-CoA + H+ + NADH + O2 --> (4Z,7Z,10Z,13Z,16Z,19Z)-docosahexaenoyl-CoA + 2.0 H2O + NAD+",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Fatty acid biosynthesis",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR08977",
+   "flux": 7.120746588875979e-07,
+   "equation": "MAM02403x --> MAM02403c",
+   "names": "L-lactate --> L-lactate",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Transport reactions",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR00127",
+   "flux": -3.560373294458602e-07,
+   "equation": "MAM00121c <=> MAM00121x",
+   "names": "(7Z,10Z,13Z,16Z,19Z)-docosapentaenoyl-CoA <=> (7Z,10Z,13Z,16Z,19Z)-docosapentaenoyl-CoA",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Transport reactions",
+   "bounds": [
+    -1000.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "MAR00006",
+   "flux": 2.569571289549231e-07,
+   "equation": "MAM03147e --> 10385.0 MAM02959e + MAM03146e",
+   "names": "VLDL --> 10385.0 TAG-VLDL pool + VLDL remnant",
+   "temporary": false,
+   "mass_charge_imbalance": {},
+   "in_reference_model": true,
+   "identical_to_reference": true,
+   "subsystem": "Transport reactions",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "TASK_OUT_MAM03146e",
+   "flux": 2.569571289549231e-07,
+   "equation": "MAM03146e --> ",
+   "names": "VLDL remnant --> ",
+   "temporary": true,
+   "mass_charge_imbalance": {},
+   "in_reference_model": false,
+   "identical_to_reference": null,
+   "subsystem": "",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  },
+  {
+   "id": "TASK_OUT_MAM03147e",
+   "flux": -2.569571289549231e-07,
+   "equation": "MAM03147e --> ",
+   "names": "VLDL --> ",
+   "temporary": true,
+   "mass_charge_imbalance": {},
+   "in_reference_model": false,
+   "identical_to_reference": null,
+   "subsystem": "",
+   "bounds": [
+    0.0,
+    1000.0
+   ]
+  }
+ ]
+}

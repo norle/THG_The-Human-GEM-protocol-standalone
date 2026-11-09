@@ -1,0 +1,3 @@
+{"workflow": "validate",
+ "run": {"name": "human211-validation-memote", "output_dir": "../../runs/human2-validation-memote"},
+ "validation": {"input_model": "../../inputs/models/Human_211.xml", "profile": "final-standard", "run_memote": true, "run_solver": true}}

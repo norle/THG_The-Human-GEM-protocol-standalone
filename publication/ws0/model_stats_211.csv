@@ -1,0 +1,2 @@
+model,sha256,reactions,metabolites,genes,compartments,subsystems,exchange_reactions,boundary_reactions,met_xref_fraction,rxn_xref_fraction,gene_xref_fraction,sbml_warnings
+Human2.1.1,dc0efd8009a8b680bde7040440f2e3592027dd118833445092ebd8d7bc425ddf,12748,8374,2870,9,146,1654,1654,0.9987,0.9895,1.0,0

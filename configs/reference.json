@@ -5,7 +5,7 @@
     "output_dir": "../runs/thg-reference"
   },
   "beta1": {
-    "input_model": "../inputs/models/Human2.xml",
+    "input_model": "../runs/human211-patched/Human_211_patched.xml",
     "mode": "apply-all",
     "balance_strategy": "proton-water"
   },

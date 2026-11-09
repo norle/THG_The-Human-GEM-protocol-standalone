@@ -10,6 +10,60 @@ Read first: `docs/about/legacy-comparison.md`,
 `docs/plans/metabolic_task_leaks_plan.md`,
 `docs/protocol/implementation-status.md`.
 
+## Progress (updated 2026-11-09)
+
+| WS | State |
+|---|---|
+| WS0 | **Not done.** Harness validated (Human1 21/21). Human 2.1.1 leaks (task 21); patched model (`MAR20193` blocked) 21/21, Essential 57/57, Full 255/255 (2 invalid). Missing: MEMOTE/`final-standard` validation of the patched model, README final summary (Human1/legacy rows not needed for now, user 2026-11-09). Gene-essentiality dry run **skipped by user decision**. |
+| WS1 | **Started; fixes in, re-run pending.** Configs point at the patched model. Run `runs/thg-ws1-a` (2026-11-05, after `0e5584b`) failed `gate-beta2` ("added reactions include mass- or charge-unbalanced chemistry"). Both causes fixed 2026-11-09 (below); WS1 build must be re-run from `deduplicate-and-clean`. `thg-ws1-b` (determinism twin) not run. |
+| WS2 | Started: inventory only (`publication/ws2/fixes.csv`, `engineering.csv`); no real-data impact measured. |
+| WS3, WS4, WS5, WS7 | Not started; all wait on the WS1 model. WS3 legacy comparison deprioritised by user (2026-11-09). |
+| WS6 | **Dropped** (essentiality benchmark skipped by user; DepMap not used). Fig 5 loses its essentiality panel. |
+
+**WS1 findings from `thg-ws1-a` (resolved 2026-11-09):**
+
+1. **β1 dedup merged isomers.** All 11 metabolite merges on 2.1.1 joined
+   different isomers or a generic and a specific form (12-HETE vs 12(S)-HETE,
+   9-cis/13-cis retinoyl glucuronide, 8(S)/8(R) hydroxy acids,
+   `MAM04041m` trans-5,8- vs `MAM01576m` (5Z,8Z)-tetradecadienoyl-CoA, ...).
+   Human-GEM copies one isomer's InChI/MetaNetX/PubChem onto the other; only
+   BiGG, VMH, LIPID MAPS, HMDB or ChEBI differ. **Fix (user rule "must match all
+   database IDs"):** `consolidate_model` still needs an exact structure, and
+   now also vetoes a merge when any namespace annotated on both sides differs
+   (a namespace on one side only is not a conflict). On 2.1.1 this leaves 0
+   metabolite and 0 reaction merges; VerifyModel on the new dedup output is
+   21/21 with Gurobi and GLPK.
+2. **"β2 passes 21/21" was a numerical artefact, not a real fix.** β2
+   attempt 1 fails task 21, attempt 2 passes, and attempt 2 contains every β1
+   reaction unchanged (same stoichiometry and bounds; removing all 2,140 β2
+   additions still passes). The β1 "leak" is numerically marginal: Gurobi
+   reports optimal with an unscaled bound violation of 3.0e-7 (feasibility
+   tolerance 1e-7) on the VLDL/chylomicron exports, through `MAR00012` (48
+   coefficients of 0.0001, itself unbalanced: C +16.2, charge −1). GLPK calls
+   the same β1 LP infeasible, and Gurobi's verdict flips with how the LP is
+   built. So the task-21 result on β1, dedup and β2 depended on solver
+   numerics. Follow-up (open): make the task harness report the max bound and
+   constraint violation of every "optimal" task solve and flag > 1e-7 as
+   numerically unreliable, so VerifyModel cannot pass or fail on slack.
+3. **β2 copied unbalanced parents.** **Fix:** `generate_expansion_plan` no
+   longer copies a reaction whose parent is mass- or charge-unbalanced
+   (`reason: "unbalanced-parent"`); this removed 26 copies of 14 parents in
+   attempt 2. User preference: balance the parents instead where possible.
+   11 of the 14 are charge-only imbalances (±1/±2, elements balanced:
+   `MAR02032`, `MAR03992`, `MAR04549`, `MAR06634`, `MAR06729`, `MAR07025`–
+   `MAR07028`, `MAR07741`, `MAR08615`), which proton-water balancing cannot
+   fix; they probably need a metabolite charge correction in β1. The other 3
+   (`MAR00031`, `MAR07160`, `MAR07625`) are R/X pool reactions and stay
+   unbalanced and uncopied.
+
+**Next actions:** re-run WS1 (`thg-ws1-a` from `deduplicate-and-clean`, or a
+fresh run) → stage-wise VerifyModel with Gurobi and GLPK → `thg-ws1-b` for
+determinism. Then: charge curation of the 11 parents (β1), harness violation
+check, WS0 MEMOTE on the patched model.
+
+Results so far: `publication/ws0/` (task results, `verifymodel_leaks.md`), `publication/ws1/` (stage VerifyModel, dedup bisect, run configs), `publication/benchmark_settings.json`.
+Machine memory was exhausted on 2026-11-04; check `free -m` before MEMOTE runs (2026-11-09: ~11 GB available).
+
 Environment: conda env `thg_standalone` (has Gurobi). Use memote and
 optlang/Gurobi for model-scale LPs. mkdocs and ruff live only in the base env.
 
@@ -73,7 +127,9 @@ Pin every model by path and SHA-256 in `publication/models.json` (WS1).
 |---|---|---|
 | Human1 (2022-06-21) | `models/Human-GEM_2022-06-21.xml` | Legacy reference and input of the 2023 pipeline |
 | Human Database (2023-02-25) | `models/Human Database.xml` | Legacy Human Database used to build THG-2023 |
-| Human2 | `inputs/models/Human2.xml` | Current reference; record its exact version and source |
+| Human2 (benchmark) | `runs/human211-patched/Human_211_patched.xml` | Current reference: Human-GEM 2.1.1 (`inputs/models/Human_211.xml`, SHA-256 `dc0efd80…5ddf`) with reaction `MAR20193` blocked (bounds 0,0). Made by `publication/scripts/patch_human211.py`; SHA-256 `04cb9de9…3f38`. Decided 2026-11-05. Name it "Human-GEM 2.1.1 with MAR20193 blocked" in the paper |
+| Human2 unpatched | `inputs/models/Human_211.xml` | 2.1.1 as released. Fails VerifyModel task 21 (20 of 21); report it as is, Essential/Full as upper bounds |
+| Human2.0 (extra) | `inputs/models/Human2.xml` | Believed 2.0 (user, unverified). 21 of 21 VerifyModel. Optional comparison row |
 | THG-2023 (legacy final) | `models/THG-2023-02-25.xml` | Published legacy model |
 | THG-β1 / β2 (legacy) | `models/THG-beta1.xml`, `models/THG-beta2.xml` | Legacy intermediates |
 | THG current (β2, gapfilled, final) | produced by WS1 from `configs/reference.json` | The model being presented |
@@ -148,7 +204,7 @@ involved. Human2 is the input to the current pipeline and the main comparison
 model. Its results show the harness works, and they become the reference values
 for WS4, WS5 and WS6.
 
-1. **Identify Human2.** Record the exact version, source (repository, tag or
+1. **Identify Human2.** *Done: Human-GEM 2.1.1 (user), patched; see section 3. `Human2.xml` is believed to be 2.0, unverified.* Record the exact version, source (repository, tag or
    commit, download date) and SHA-256 of `inputs/models/Human2.xml`, and how it
    should be cited. If this cannot be determined from the repo, ask the user.
    Write it into `publication/models.json`.
@@ -170,6 +226,8 @@ for WS4, WS5 and WS6.
      "invalid" (did not map to Human2 IDs); an invalid task is not an
      infeasible one and does not count towards 21 of 21.
 
+   > *Triggered 2026-11-04 on unpatched 2.1.1 (task 21, via `MAR00012` and `MAR20193`); the user authorised a fix, the patched model passes. See `publication/ws0/verifymodel_leaks.md`.*
+   >
    > **STOP CONDITION.** If any VerifyModel task is feasible on Human2, stop
    > and report to the user. On Human2 this most likely means a harness problem
    > (task-to-model ID mapping, medium, bounds) rather than a real leak, and
@@ -180,7 +238,7 @@ for WS4, WS5 and WS6.
 5. **Essential and Full tasks.** Run them on Human2 with the same settings. Record
    each task's result. Note any task whose metabolites or reactions are not
    mapped to Human2 IDs ("invalid"), and why.
-6. **Gene-essentiality dry run.** Do the WS6 pipeline end to end on Human2 for
+6. **Gene-essentiality dry run.** *SKIPPED by user decision (2026-11-05); WS6 dropped.* Do the WS6 pipeline end to end on Human2 for
    one cell line: data download (pin the DepMap release), cell-specific model
    extraction with the package's GIMME, knockouts, scoring. This checks the method and the runtime before
    the THG models exist. Compare with Human1's published essentiality numbers
@@ -472,13 +530,19 @@ the paper until it passes the gate, because the user's fix may change it.
 
 Ask; do not decide alone.
 
-1. **Paper framing:** methods-led (recommended) or model-led.
-2. **Human2 identity:** exact version or source of `inputs/models/Human2.xml`
-   and how to cite it.
+1. **Paper framing:** *decided 2026-11-09: methods-led.*
+2. **Human2 identity:** *decided: Human-GEM 2.1.1 with `MAR20193` blocked.* `Human2.xml` is an older Human2 release. Citations deferred (user: not yet).
 3. **Leak fixes:** if the new THG model fails VerifyModel, the user
    investigates and decides the fix. The agent stops and does not choose (see
    the WS5 stop condition).
-4. **Venue,** because it sets length and figure limits.
+4. **Venue:** deferred; no manuscript text is written yet.
+5. **Dedup isomer leak:** *decided 2026-11-09: merge only if all database IDs
+   agree* (WS1 finding 1).
+6. **Unbalanced-parent expansion:** *decided 2026-11-09: never copy an
+   unbalanced reaction; balance the parent where possible* (WS1 finding 3;
+   charge curation still to do).
+7. **WS0 legacy/Human1 rows:** *decided 2026-11-09: not needed for now.*
+8. **Commits:** *decided 2026-11-09: commit now.*
 
 ## 7. Rules for the agent
 

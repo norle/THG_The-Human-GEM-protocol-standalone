@@ -1,0 +1,16 @@
+{
+ "none": "failure",
+ "MAM00324c->MAM00307c": "failure",
+ "MAM00324r->MAM00307r": "failure",
+ "MAM01206m->MAM01201m": "failure",
+ "MAM01233c->MAM00353c": "failure",
+ "MAM01233r->MAM00353r": "failure",
+ "MAM02836c->MAM00353c": "failure",
+ "MAM02836e->MAM00353e": "failure",
+ "MAM02836r->MAM00353r": "failure",
+ "MAM03346c->MAM01057c": "failure",
+ "MAM03543m->MAM03522m": "failure",
+ "MAM04041m->MAM01576m": "success",
+ "all-metabolites": "failure",
+ "all+reactions": "failure"
+}
