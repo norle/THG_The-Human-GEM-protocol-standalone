@@ -58,3 +58,17 @@ Historical narrative counts have not been promoted to current measurements.
 
 These six documentation checks supplement, rather than change the count in,
 the earlier 2,513-test offline run.
+
+## Numerical case study (prepared; results pending)
+
+`python publication/scripts/measure_task_numerics.py` compares direct task
+construction and COBRA's Gurobi LP-copy construction on the corrected beta1
+export and an archived beta2 export, with GLPK corroboration. It uses only
+VerifyModel task 21 under the pinned medium, forced-flux relaxation, mapping,
+tolerances and native Gurobi threads. It is not the complete VerifyModel gate.
+Runtime assertions check the task definition and that task contexts restore
+model bounds, metabolite/reaction IDs and the objective. Results are saved
+after each solve in `task_numerics.json`; input/script/runner checksums and
+solver diagnostics are retained. A reliable feasible result on the current
+beta1 sets an investigation flag and stops the experiment. No biochemical
+model modification is performed.
