@@ -1,5 +1,5 @@
 {
-  "status": "Task numerical settings pinned 2026-11-09; prior results require refresh",
+  "status": "Task settings pinned; native thread diagnostics added; thread-verified baseline refresh pending",
   "solver": {
     "name": "gurobi",
     "interface": "cobrapy/optlang",

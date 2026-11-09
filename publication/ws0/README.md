@@ -66,3 +66,35 @@ the exact run script checksum is retained in the JSON.
 These results supersede the patched-model task row for numerical reliability.
 Positive-control refresh and matched MEMOTE/quality validation remain pending.
 Historical counts elsewhere in this README have not been refreshed.
+
+## Native thread correction
+
+The first numerical refresh did **not** verify the requested two Gurobi threads:
+`configuration.threads` is not an optlang Gurobi setting. Its counts/residuals
+remain historical evidence, but cannot establish a comparison with pinned
+thread settings (`numerical-refresh/limitations.json`). The corrected runner
+sets the native Gurobi default before model construction so task copies inherit
+it, and records the effective native count for every solve. A licensed toy-model
+regression verifies two threads on the actual task copies.
+
+Required refresh:
+```sh
+python publication/scripts/run_tasks.py runs/human211-patched/Human_211_patched.xml human211-patched publication/ws0/pinned-refresh
+```
+
+Basic patched-model statistics are saved separately in `model_stats_patched.csv`
+(model SHA-256 `04cb9de9…3f38`). They require no optimization and were read with
+GLPK as the default solver:
+```sh
+python - <<'STATS'
+import cobra, runpy, sys
+cobra.Configuration().solver = "glpk"
+sys.argv = ["publication/scripts/model_stats.py", "runs/human211-patched/Human_211_patched.xml", "Human-GEM 2.1.1 with MAR20193 blocked", "publication/ws0/model_stats_patched.csv"]
+runpy.run_path(sys.argv[0], run_name="__main__")
+STATS
+```
+
+Counts: 12,748 reactions, 8,374 metabolites, 2,870 genes, nine compartments,
+146 subsystems and 1,654 exchanges. Cross-reference fractions (SBO excluded):
+metabolites 0.9987, reactions 0.9895, genes 1.0. No Python SBML warnings were
+captured. These are structural statistics, not MEMOTE/quality validation.

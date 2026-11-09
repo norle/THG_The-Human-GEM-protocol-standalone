@@ -61,6 +61,11 @@ def main():
     ):
         raise ValueError("Task mapping checksum differs")
     solver = os.environ.get("THG_SOLVER", settings["solver"]["name"])
+    if solver == "gurobi":
+        import gurobipy
+
+        # COBRA copies discard native parameters; new LP copies inherit this default.
+        gurobipy.setParam("Threads", settings["solver"]["threads"])
     cobra.Configuration().solver = solver
     cobra.Configuration().processes = 1
     model = (
@@ -68,8 +73,6 @@ def main():
         if model_path.endswith(".json")
         else cobra.io.read_sbml_model(model_path)
     )
-    if solver == "gurobi":
-        model.solver.configuration.threads = settings["solver"]["threads"]
     for key, value in settings["solver"]["tolerances"].items():
         if key in dir(model.solver.configuration.tolerances):
             setattr(model.solver.configuration.tolerances, key, value)
@@ -116,6 +119,8 @@ def main():
                     "actual": t["actual_outcome"],
                     "status": t["status"],
                     "solver_status": t["solver_status"],
+                    "solver_interface": d.get("solver_interface"),
+                    "solver_threads": d.get("solver_threads"),
                     "cause": cause,
                     "max_bound_violation": d.get("max_bound_violation"),
                     "max_constraint_violation": d.get("max_constraint_violation"),

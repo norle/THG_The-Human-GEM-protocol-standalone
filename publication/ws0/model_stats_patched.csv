@@ -1,0 +1,2 @@
+model,sha256,reactions,metabolites,genes,compartments,subsystems,exchange_reactions,boundary_reactions,met_xref_fraction,rxn_xref_fraction,gene_xref_fraction,sbml_warnings
+Human-GEM 2.1.1 with MAR20193 blocked,04cb9de9e9ea3236c2ba06487847348ec2b7d5576d2e1c33e2f1ef9c58ab3f38,12748,8374,2870,9,146,1654,1654,0.9987,0.9895,1.0,0

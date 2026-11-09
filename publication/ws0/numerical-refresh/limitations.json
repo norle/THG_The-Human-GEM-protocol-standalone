@@ -1,0 +1,11 @@
+{
+  "report": "publication/ws0/numerical-refresh/task_results_human211-patched.json",
+  "report_sha256": "5334d89706123c2e970be62e7f1b68dbb184ffd9659256a50a2bc4ba1160a0b6",
+  "issue": "The original script assigned optlang configuration.threads, which is not a Gurobi parameter; actual task-copy thread count was not recorded.",
+  "requested_threads": 2,
+  "effective_threads": null,
+  "numerical_results": "Retained as historical task/residual evidence; native thread count unverified.",
+  "matched_comparison_ready": false,
+  "required_refresh": "publication/ws0/pinned-refresh",
+  "correction": "Set native Gurobi default Threads before constructing/copying models and record solver_threads per solve."
+}

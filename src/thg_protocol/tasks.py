@@ -597,7 +597,12 @@ def _result(task: MetabolicTask, **values: object) -> dict[str, object]:
 def _solve_diagnostics(solver: Any, status: str) -> dict[str, object]:
     """Check unscaled primal residuals before the task context is restored."""
     tolerances = solver.configuration.tolerances
+    interface = type(solver).__module__
     result = {
+        "solver_interface": interface,
+        "solver_threads": solver.problem.Params.Threads
+        if interface == "optlang.gurobi_interface"
+        else None,
         "solver_tolerances": {
             name: getattr(tolerances, name) for name in dir(tolerances)
         },
