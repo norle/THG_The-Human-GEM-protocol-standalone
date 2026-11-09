@@ -293,6 +293,13 @@ def test_freeze_evidence_preserves_sources_and_requires_completed_run(
     definitions[0].fingerprint_data = lambda _: {"revision": 2}
     with pytest.raises(ValueError, match="stale stage fingerprint"):
         runner.freeze(tmp_path, template, out)
+    with pytest.raises(ValueError, match="terminal source run"):
+        runner.freeze(tmp_path, template, tmp_path / "archive", archived=True)
+    manifest.write_text(json.dumps({"steps": steps, "overall_status": "completed"}))
+    runner.freeze(tmp_path, template, tmp_path / "archive", archived=True)
+    archived = json.loads((tmp_path / "archive/manifest.json").read_text())
+    assert archived["runtime_fingerprints_verified"] is False
+    assert archived["input_status"] == "archived acquisition outputs"
     definitions[0].fingerprint_data = lambda _: {"revision": 1}
     generated = runner.freeze(tmp_path, template, out)
     config = json.loads(generated.read_text())
@@ -421,3 +428,27 @@ def test_publication_gurobi_threads_apply_to_actual_task_copies(tmp_path, monkey
     finally:
         gurobipy.setParam("Threads", previous_threads)
         cobra.Configuration().solver = previous_solver
+
+
+def test_location_policy_measurement_preserves_conflicts_and_unmapped_genes():
+    script = (
+        Path(__file__).resolve().parents[2] / "publication/scripts/measure_locations.py"
+    )
+    spec = importlib.util.spec_from_file_location("publication_locations", script)
+    runner = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(runner)
+    rows = runner.measure(
+        {"dual", "single", "conflict", "unmapped"},
+        {
+            "dual": {"locations": ["c", "m", "c"], "status": "candidate"},
+            "single": {"locations": ["c"], "status": "candidate"},
+            "conflict": {"locations": ["c", "m"], "status": "conflicting"},
+            "not-a-baseline-gene": {"locations": ["c", "m"]},
+        },
+    )
+    assert sum(row["retained_before"] for row in rows) == 1
+    assert sum(row["retained_after"] for row in rows) == 2
+    assert sum(row["lost_under_old_multi_location_rule"] for row in rows) == 1
+    assert len(rows) == 4
+    with pytest.raises(ValueError, match="Invalid resolved locations"):
+        runner.measure({"bad"}, {"bad": {"locations": "cytosol"}})
