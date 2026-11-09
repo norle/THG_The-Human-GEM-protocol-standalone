@@ -26,6 +26,7 @@ from thg_protocol.runtime.hashing import sha256_file
 from thg_protocol.runtime.stage import (
     StageContext,
     StageResult,
+    dependency_hashes,
 )
 from thg_protocol.runtime.stage import (
     dependency_path as _dependency_path,
@@ -236,19 +237,26 @@ class Beta2Stage:
                 for item in self.dependencies
             },
         }
-        upstream = section.get("upstream")
-        if upstream is None:
-            upstream = _reference_beta1_upstream(context)
+        implicit_upstream = _reference_beta1_upstream(context)
+        upstream = implicit_upstream or section.get("upstream")
         if isinstance(upstream, Mapping):
             try:
-                result["upstream"] = upstream_fingerprint(
-                    [upstream],
-                    base_dir=(
-                        context.config.source_path.parent
-                        if context.config.source_path is not None
-                        else None
-                    ),
-                )
+                if implicit_upstream is not None:
+                    resolve_artifact(implicit_upstream)
+                    # The same run's manifest changes after every stage.
+                    result["upstream"] = {
+                        "reference": implicit_upstream,
+                        "output_hashes": dependency_hashes(context, ("export-beta1",)),
+                    }
+                else:
+                    result["upstream"] = upstream_fingerprint(
+                        [upstream],
+                        base_dir=(
+                            context.config.source_path.parent
+                            if context.config.source_path is not None
+                            else None
+                        ),
+                    )
             except Exception as error:
                 result["upstream_error"] = f"{type(error).__name__}: {error}"
         decisions = section.get("decisions_file")
@@ -2477,9 +2485,9 @@ class Beta2Stage:
             raise ValueError(f"stage '{self.id}' did not produce complete artifacts")
 
 
-def beta2_stages() -> tuple[Beta2Stage, ...]:
+def beta2_stages(*, reference: bool = False) -> tuple[Beta2Stage, ...]:
     dependencies = {
-        "load-beta1": (),
+        "load-beta1": ("export-beta1",) if reference else (),
         "collect-catalysis-evidence": ("load-beta1",),
         "collect-gpr-evidence": ("collect-catalysis-evidence",),
         "resolve-gprs": ("collect-catalysis-evidence", "collect-gpr-evidence"),

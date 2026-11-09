@@ -146,6 +146,12 @@ def test_reference_workflow_hands_off_beta2_and_keeps_it_unchanged(tmp_path):
     assert beta2["sha256"] == source["sha256"]
     assert status["steps"]["gate-beta2"]["summary"]["status"] == "passed"
     assert status["steps"]["export-gapfilled-reference"]["status"] == "completed"
+    attempts = {stage: entry["attempt"] for stage, entry in status["steps"].items()}
+    resume(tmp_path / "run")
+    assert {
+        stage: entry["attempt"]
+        for stage, entry in get_status(tmp_path / "run")["steps"].items()
+    } == attempts
 
 
 def test_reference_workflow_accepts_an_intermediate_beta1_candidate(tmp_path):

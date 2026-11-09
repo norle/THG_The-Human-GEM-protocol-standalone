@@ -10,7 +10,7 @@ from .registry import WorkflowDefinition
 
 REFERENCE_STAGES = (
     *beta1_stages(),
-    *beta2_stages(),
+    *beta2_stages(reference=True),
     Beta2GateStage(),
     *human_database_stages(),
     HumanDatabaseIntegrationStage(
