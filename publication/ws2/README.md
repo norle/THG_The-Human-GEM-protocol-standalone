@@ -1,13 +1,11 @@
 # WS2: correctness fixes and engineering comparison (partial)
 
-Status: inventory only. `fixes.csv` lists every fix (refactoring doc, audit findings 1-20, β1 consolidation)
-with its status; most are marked fixture-only or pending. No real-data impact measurement is done yet.
-`engineering.csv` has only numbers verified on 2026-11-04 plus the 2026-11-03 audit test run; the
-`pytest -m "not online"` count, legacy-checkout numbers and runtime are pending. Memory was
-exhausted on the machine, so no pytest or model-loading job was run.
-
-Next: measure R1-R5, B1 on the full Human 2.1.1 model and run legacy vs standalone functions on the same
-input (separate legacy env, adjacent checkout `../THG_The-Human-GEM-protocol`).
+Status (2026-11-09): two archived real-model proposal measurements completed;
+the numerical real-model case and corrected end-to-end effects remain pending.
+`fixes.csv` covers October changes, the November audits and subsequent safeguards,
+with evidence strength and reasons for deferred measurements. `engineering.csv`
+includes the new offline test run; legacy line counts and runtime comparisons
+remain pending. Broad legacy attribution is deferred for the internal draft.
 
 ## Numerical prerequisite verification (2026-11-09)
 
@@ -39,3 +37,24 @@ measurements, not final-model or functional outcomes. The identity defect was
 introduced by the redesign; the parent imbalances are inherited. The original
 B1 narrative row remains historical and is not treated as refreshed task evidence.
 The numerical case and corrected end-to-end effects remain pending.
+
+## Supplement inventory scope
+
+`fixes.csv` now expands the October fixes, all 20 November 3 audit resolutions,
+the November 4 nested-expression/cycle/resume fixes (`cef04ea`), and the later
+identity/parent-balance/numerical safeguards. Scientific and engineering changes
+retain explicit evidence strength and a reason when impact is unmeasured.
+Historical narrative counts have not been promoted to current measurements.
+
+## Documentation checks (2026-11-09)
+
+- Base environment: `python -m pytest tests/docs/test_documentation.py -q` —
+  3 passed; strict site build, navigation, links and canonical API checks.
+  Saved log: `pytest-docs.log`.
+- `thg_standalone` with GLPK default: `python -m pytest
+  tests/docs/test_examples.py tests/docs/test_practical_quickstart.py -q` —
+  3 passed in 60.01 s; CLI subprocesses had Gurobi license access.
+  Saved log: `pytest-doc-examples.log`.
+
+These six documentation checks supplement, rather than change the count in,
+the earlier 2,513-test offline run.
