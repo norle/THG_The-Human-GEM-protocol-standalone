@@ -98,3 +98,17 @@ Counts: 12,748 reactions, 8,374 metabolites, 2,870 genes, nine compartments,
 146 subsystems and 1,654 exchanges. Cross-reference fractions (SBO excluded):
 metabolites 0.9987, reactions 0.9895, genes 1.0. No Python SBML warnings were
 captured. These are structural statistics, not MEMOTE/quality validation.
+
+## Native-thread-verified refresh complete (2026-11-09)
+
+`pinned-refresh/task_results_human211-patched.{json,csv}` supersedes the earlier
+refresh for benchmark use. Source commit `628c6f0`; runtime 278.85 s.
+The command above produced VerifyModel 21/21 (all infeasible), Essential 57/57,
+and Full 255 passed / 257 total with the same two invalid mappings. No failed
+tasks or numerical errors occurred. Every solve records Gurobi's effective
+native `Threads=2` and feasibility tolerance 1e-7; infeasible residuals remain
+null. The detailed JSON also records supported optimality/integrality
+tolerances. Raw console output: `pinned-refresh.log`.
+
+MEMOTE/final-standard validation, positive-control refresh and the final
+matched candidate comparison remain pending.

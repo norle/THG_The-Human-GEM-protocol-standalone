@@ -1,0 +1,19 @@
+Set parameter WLSAccessID
+Set parameter WLSSecret
+Set parameter LicenseID to value 2780343
+Academic license 2780343 - for non-commercial use only - registered to ig___@biosustain.dtu.dk
+Set parameter Threads to value 2
+Read LP format model from file /tmp/tmp81s5fv7q.lp
+Reading time = 0.03 seconds
+: 8374 rows, 25496 columns, 108650 nonzeros
+human211-patched VerifyModel {'passed': 21, 'failed': 0, 'invalid': 0, 'error': 0}
+Read LP format model from file /tmp/tmpwmnzxvea.lp
+Reading time = 0.03 seconds
+: 8374 rows, 25496 columns, 108650 nonzeros
+human211-patched Essential {'passed': 57, 'failed': 0, 'invalid': 0, 'error': 0}
+Read LP format model from file /tmp/tmprtv1djj_.lp
+Reading time = 0.03 seconds
+: 8374 rows, 25496 columns, 108650 nonzeros
+human211-patched Full {'passed': 255, 'failed': 0, 'invalid': 2, 'error': 0}
+relaxed forced bounds: 0 commit 628c6f0f8b1018ab7e0ff426a70b5f74801fe279
+Warning: environment still referenced so free is deferred (Continue to use WLS)
