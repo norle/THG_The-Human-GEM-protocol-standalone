@@ -1,0 +1,71 @@
+[
+  {
+    "label": "Human1",
+    "path": "models/Human-GEM_2022-06-21.xml",
+    "provenance": "2022-06-21 control; legacy commits fad16c2, 3ee4f60, 5ff6f1d, bbcae83; historical byte comparison recorded in publication plan",
+    "status": "present",
+    "sha256": "53a74c4495ca4af1334ce67b74cc09fc1ab30c7648eef561f478cac2363f13ab"
+  },
+  {
+    "label": "Human Database 2023",
+    "path": "models/Human Database.xml",
+    "provenance": "2023-02-25 legacy database; provenance comparison in publication plan; deferred benchmark",
+    "status": "present",
+    "sha256": "0d3fa83bdb5a4b82225eaea644c1e3bb620f196633b6cf9e1852316d46727905"
+  },
+  {
+    "label": "Human-GEM 2.1.1 with MAR20193 blocked",
+    "path": "runs/human211-patched/Human_211_patched.xml",
+    "provenance": "publication/scripts/patch_human211.py; inputs/models/Human_211.xml; MAR20193 bounds [0,0]; user decision",
+    "status": "present",
+    "sha256": "04cb9de9e9ea3236c2ba06487847348ec2b7d5576d2e1c33e2f1ef9c58ab3f38"
+  },
+  {
+    "label": "Human-GEM 2.1.1 unpatched",
+    "path": "inputs/models/Human_211.xml",
+    "provenance": "2.1.1 identity supplied by user; context for baseline intervention; download date/source tag not recorded",
+    "status": "present",
+    "sha256": "dc0efd8009a8b680bde7040440f2e3592027dd118833445092ebd8d7bc425ddf"
+  },
+  {
+    "label": "Human2 older release",
+    "path": "inputs/models/Human2.xml",
+    "provenance": "Believed 2.0 by user; version unverified; optional comparison deferred",
+    "status": "present",
+    "sha256": "cc5a4383c6116b0c91f4db089cc640f29aec7e840249b573b74d3792c9ca4a7a"
+  },
+  {
+    "label": "THG-2023",
+    "path": "models/THG-2023-02-25.xml",
+    "provenance": "2023-02-25 legacy model; provenance comparison in publication plan; benchmark deferred",
+    "status": "present",
+    "sha256": "72e90e562689eacd66fbfa1c20e2950826bd40fdea368ddf47aac1728dd014d1"
+  },
+  {
+    "label": "Legacy THG beta1",
+    "path": "models/THG-beta1.xml",
+    "provenance": "Legacy intermediate; benchmark deferred",
+    "status": "present",
+    "sha256": "9c2ec757edeedb44caa6afd92f931c2fbc86c3b7b172a8c09cffbf499328c75f"
+  },
+  {
+    "label": "Legacy THG beta2",
+    "path": "models/THG-beta2.xml",
+    "provenance": "Legacy intermediate; benchmark deferred",
+    "status": "present",
+    "sha256": "7077098ca6189ff0d5f9081f679c0055a3bf8bc060d65692a2dc802d76e529e2"
+  },
+  {
+    "label": "thg-ws1-a:export-beta2",
+    "path": "runs/thg-ws1-a/artifacts/export-beta2/attempt-0002/thg-beta2-candidate.json",
+    "provenance": "runs/thg-ws1-a/manifest.json; attempt 2; stage status completed; candidate, not yet final-gated",
+    "status": "present",
+    "sha256": "8aef371abb499276e0215ad4bf3aa946a8454cabc5378b2a6ef091220ad98314",
+    "matches_ledger": true
+  },
+  {
+    "label": "thg-ws1-b",
+    "status": "not built",
+    "sha256": null
+  }
+]

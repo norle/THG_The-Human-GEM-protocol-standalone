@@ -24,3 +24,20 @@ findings in `docs/plans/publication-plan.md`.
 ## Next
 Re-run the build, stage-wise VerifyModel with Gurobi and GLPK, then `thg-ws1-b`
 for determinism.
+
+## Corrected run started (2026-11-09)
+
+Numerical prerequisite implemented at `ac56d01`. Baseline refresh: VerifyModel
+21/21, Essential 57/57, Full 255 pass + 2 invalid; detailed numerical evidence
+is under `publication/ws0/numerical-refresh/`.
+
+After `thg-run unlock runs/thg-ws1-a` verified and cleared the stale lock:
+```sh
+thg-run resume runs/thg-ws1-a --force-step deduplicate-and-clean -v > publication/ws1/corrected-build.log 2>&1
+```
+
+The run is active at deduplication attempt 2; upstream artifacts were reused.
+The live manifest/log is authoritative. A fresh independent replay remains
+pending; reusing valid artifacts in this run is not independent replay evidence.
+This build uses source commit `ac56d01`; subsequent publication scripts and prose
+do not alter its workflow implementation.
