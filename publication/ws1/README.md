@@ -1,7 +1,8 @@
 # WS1: Frozen build of the current THG model
 
-Status (2026-11-09): **not done; re-run pending.** See the WS1 rows and
-findings in `docs/plans/publication-plan.md`.
+Status (2026-11-09): **corrected build running; not done.** Deduplication
+attempt 2 completed without merges; beta1 validation is running. The manifest
+and live log remain authoritative; independent replay is pending.
 
 ## Files
 | File | What |
@@ -41,3 +42,17 @@ The live manifest/log is authoritative. A fresh independent replay remains
 pending; reusing valid artifacts in this run is not independent replay evidence.
 This build uses source commit `ac56d01`; subsequent publication scripts and prose
 do not alter its workflow implementation.
+
+Deduplication attempt 2 completed in 484.60 s with zero metabolite/reaction
+merges; its model SHA-256 equals the `apply-balance-proposals` input
+(`50f9e3ae…b02cb6`). Beta1 validation is now running.
+
+Checkpoint export (solver-free, seconds):
+```sh
+python publication/scripts/stage_table.py runs/thg-ws1-a publication/ws1/current
+```
+
+`current/stage_table.csv` and its manifest snapshot report input/output sizes,
+runtime and cleanup merges. Completed states with incomplete upstream stages
+are labelled stale; their old outputs are omitted. The checkpoint is not a
+final run manifest or an independent-replay result.

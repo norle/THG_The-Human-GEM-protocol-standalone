@@ -137,3 +137,66 @@ def test_correctness_measurement_distinguishes_inherited_chemistry_and_identity(
     assert result["unbalanced_copy_count"] == result["unbalanced_parent_count"] == 1
     assert result["old_unbalanced_copies"][0]["imbalance"] == {"charge": 1}
     assert result["archived_corrected_exclusions_matching_old_copies"] == 1
+
+
+def test_stage_table_excludes_stale_downstream_artifacts(tmp_path, monkeypatch):
+    import hashlib
+
+    script = Path(__file__).resolve().parents[2] / "publication/scripts/stage_table.py"
+    spec = importlib.util.spec_from_file_location("publication_stages", script)
+    runner = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(runner)
+    monkeypatch.setattr(
+        runner,
+        "REFERENCE_STAGES",
+        (
+            SimpleNamespace(id="input", dependencies=()),
+            SimpleNamespace(id="clean", dependencies=("input",)),
+            SimpleNamespace(id="export", dependencies=("clean",)),
+        ),
+    )
+    model = tmp_path / "model.json"
+    model.write_text('{"reactions": [1, 2], "metabolites": [1], "genes": []}')
+    artifact = {
+        "role": "model",
+        "path": model.name,
+        "sha256": hashlib.sha256(model.read_bytes()).hexdigest(),
+    }
+    completed = {
+        "status": "completed",
+        "attempt": 1,
+        "outputs": [artifact],
+        "started_at": "2026-11-09T00:00:00Z",
+        "finished_at": "2026-11-09T00:00:02Z",
+    }
+    manifest = {
+        "overall_status": "running",
+        "steps": {
+            "input": completed,
+            "clean": {"status": "running", "attempt": 2},
+            "export": completed,
+        },
+    }
+    (tmp_path / "manifest.json").write_text(json.dumps(manifest))
+    rows = runner.export(tmp_path, tmp_path / "out")
+    assert rows[0]["runtime_seconds"] == 2
+    assert json.loads(rows[0]["output_models"])[0]["reactions"] == 2
+    assert rows[1]["output_models"] == rows[2]["output_models"] == "[]"
+    assert rows[2]["status"] == "stale"
+    model.write_text("changed")
+    with pytest.raises(ValueError, match="differs from ledger"):
+        runner.export(tmp_path, tmp_path / "out")
+
+
+def test_stage_table_counts_sbml_without_solver(tmp_path):
+    script = Path(__file__).resolve().parents[2] / "publication/scripts/stage_table.py"
+    spec = importlib.util.spec_from_file_location("publication_stages", script)
+    runner = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(runner)
+    model = tmp_path / "model.xml"
+    model.write_text(
+        '<sbml xmlns="sbml" xmlns:fbc="fbc"><model>'
+        "<species/><reaction><speciesReference/></reaction>"
+        "<fbc:geneProduct/></model></sbml>"
+    )
+    assert runner.model_size(model) == {"reactions": 1, "metabolites": 1, "genes": 1}
