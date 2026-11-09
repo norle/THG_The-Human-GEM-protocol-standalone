@@ -2,7 +2,7 @@
 
 Commit `968c2a8`; solver Gurobi via cobrapy/optlang, 2 threads; closed medium; non-boundary
 forced fluxes relaxed (none needed); name mapping `files/metabolic_tasks/human_gem_names.json`.
-Settings: `publication/benchmark_settings.json`. **Status: halted at the VerifyModel gate; WS0 not done.**
+Settings: `publication/benchmark_settings.json`. **Status (2026-11-09): gate resolved; benchmark Human2 is 2.1.1 with `MAR20193` blocked (user decision 2026-11-05). WS0 not done: MEMOTE validation of the patched model and final summary remain.**
 
 ## Models
 | Label | File | SHA-256 | Version |
@@ -28,7 +28,7 @@ See `verifymodel_leaks.md` (pFBA, imbalance, differences from 2.0, block tests).
 ## Not done
 - MEMOTE/`final-standard` validation: only partial (2.1.1 `validate-checks` finished; MEMOTE unfinished; no report). Patched model not validated.
 - Gene-essentiality dry run (step 6): skipped by user decision.
-- Patched-model baseline use: awaiting user decision.
+- Human1 Essential/Full and legacy THG rows: not needed for now (user, 2026-11-09).
 
 ## Commands
 ```

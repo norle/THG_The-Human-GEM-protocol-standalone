@@ -68,6 +68,27 @@ After a sanctioned run passes the gate, use
 [`release_beta1`][thg_protocol.curation.beta1.release_beta1] to promote the
 candidate files to `thg-beta1.json` and `thg-beta1.xml`.
 
+## Duplicate consolidation
+
+Stage `deduplicate-and-clean` merges two metabolites only when all of these
+hold:
+
+- same compartment, formula and charge;
+- an exact structure match (InChIKey, InChI or SMILES); ChEBI, KEGG or
+  PubChem alone are never enough, because Human-GEM uses them at class level;
+- no conflicting database ID: every namespace annotated on both metabolites
+  (BiGG, VMH, LIPID MAPS, HMDB, ChEBI, MetaNetX, ...) must have the same IDs.
+  A namespace present on only one side is not a conflict;
+- neither formula has an R or X group (lumped pools are never merged).
+
+The ID check exists because Human-GEM copies one isomer's structure and
+cross-references onto another (for example `MAM04041`
+trans-5,8-tetradecadienoyl-CoA carries the InChI of `MAM01576`
+(5Z,8Z)-tetradecadienoyl-CoA). Merging such pairs created leaks in the
+VerifyModel tasks. On Human-GEM 2.1.1 no metabolites meet all conditions.
+Reactions are merged when they become identical (same stoichiometry, bounds
+and GPR).
+
 ## Candidate and release-gate lifecycle
 
 Runs produce candidate artifacts. `beta1_release_gate` checks the required

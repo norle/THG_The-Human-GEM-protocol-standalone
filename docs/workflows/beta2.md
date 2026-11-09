@@ -94,8 +94,11 @@ work remain serial.
    resolved compartment becomes a proposal to copy the reaction there with
    compartment-specific metabolites. The original reaction is always kept, and
    no copy is made when an equivalent reaction already exists in the target
-   compartment. A reaction with no compartment evidence keeps its original
-   compartment.
+   compartment. No copy is made of a reaction that is mass- or
+   charge-unbalanced (`reason: "unbalanced-parent"`): the copy would inherit
+   the imbalance and the β2 release gate rejects unbalanced additions. Fix the
+   parent's balance in β1 to make it eligible. A reaction with no compartment
+   evidence keeps its original compartment.
 
 ## Stages
 
