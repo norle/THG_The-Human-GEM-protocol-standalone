@@ -182,3 +182,21 @@ def test_base_ids_strip_suffix_when_source_parent_was_removed():
         }
     )
     assert bases == {"THG_copy_e": "MAM01234", "MAM01234e": "MAM01234"}
+
+
+def test_expansion_skips_unbalanced_parent_reactions():
+    model = Model("beta2")
+    a = Metabolite("a_c", formula="C", charge=0, compartment="c")
+    b = Metabolite("b_c", formula="CO", charge=0, compartment="c")
+    reaction = Reaction("R1")
+    reaction.add_metabolites({a: -1, b: 1})
+    reaction.gene_reaction_rule = "G1"
+    model.add_reactions([reaction])
+    plans = generate_expansion_plan(
+        model,
+        {"R1": {"Mitochondria": "G1"}},
+        compartments={"c": "Cytosol", "m": "Mitochondria"},
+    )
+    assert [(p["action"], p["reason"]) for p in plans] == [
+        ("retain", "unbalanced-parent")
+    ]

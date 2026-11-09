@@ -387,6 +387,14 @@ def generate_expansion_plan(
             str(existing.id)
         )
 
+    from thg_protocol.analysis.consistency import charge_balance, reaction_balance
+
+    def parent_balanced(reaction: Any) -> bool:
+        if reaction_balance(reaction):
+            return False
+        charge = charge_balance(reaction)
+        return "missing" not in charge and abs(float(charge["charge"])) < 1e-9
+
     for reaction in ordered_reactions:
         policy = reaction_policy(reaction)
         eligible = bool(policy["eligible"])
@@ -426,6 +434,26 @@ def generate_expansion_plan(
                         "action": "reject",
                         "reason": "location-not-in-registry",
                         "location": location,
+                    }
+                )
+                continue
+            if eligible and not parent_balanced(reaction):
+                # A copy inherits the parent's imbalance, and the release gate
+                # rejects unbalanced additions, so do not propose it.
+                plans.append(
+                    {
+                        "proposal_id": proposal_id(
+                            operation="expand",
+                            object_type="reaction",
+                            object_id=str(reaction.id) + ":" + location,
+                            before={},
+                            after={"location": location},
+                        ),
+                        "reaction_id": str(reaction.id),
+                        "action": "retain",
+                        "reaction_class": reaction_class,
+                        "location": location,
+                        "reason": "unbalanced-parent",
                     }
                 )
                 continue
