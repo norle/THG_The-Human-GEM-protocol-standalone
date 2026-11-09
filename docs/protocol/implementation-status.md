@@ -41,6 +41,22 @@ behind each row.
 | `workflow.validation` | Reusable validation checks and release gates | Implemented | Integration-tested | Orchestrated stage | Not assessed | N/A | Mass and charge balance, stoichiometric consistency, identity and annotation conflicts, metabolite leakage, energy-generating cycles and loop detection, with a release-full profile that blocks on unevaluable balance and on energy cycles. Balance suggestions use a MILP in the model's own solver. Legacy checks were not compared |
 | `analysis.conservation` | Unconserved-metabolite analysis and repair review | Implemented | Integration-tested | Orchestrated stage | No legacy target | N/A | Finds, reviews and proposes fixes for unconserved metabolites using MEMOTE's consistency support; a maintained workflow, not part of the paper's protocol |
 
+## Publication validation update (2026-11-09)
+
+The registry above retains its 2026-11-02 evidence baseline. Later checks are
+recorded in `publication/`, without upgrading legacy parity or reproduction
+claims. The offline suite passed 2,513 tests in 350.38 seconds, excluding the
+MkDocs-dependent docs tests (`publication/ws2/pytest-offline.log`). The shared
+task runner now records solver tolerances and primal residuals, and rejects
+numerically unreliable optimal solves as unresolved errors (`ac56d01`).
+
+Human-GEM 2.1.1 with MAR20193 blocked has refreshed results of VerifyModel
+21/21, Essential 57/57, and Full 255 pass / 257 total with two invalid mappings
+(`publication/ws0/numerical-refresh/`). Archived real-model consolidation and
+parent-balance proposal measurements are in `publication/ws2/correctness.json`.
+The corrected WS1 build, final-model evaluation and independent replay remain
+incomplete. No final THG model or 2023-artifact reproduction is claimed.
+
 ## Controlled vocabulary
 
 | Axis | Allowed values |

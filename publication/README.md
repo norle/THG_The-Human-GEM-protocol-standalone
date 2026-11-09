@@ -19,10 +19,11 @@ JSON and workflow manifests; new-job estimates below are not measured results.
 | WS1 corrected build | `thg-run resume runs/thg-ws1-a --force-step deduplicate-and-clean -v` | running from source `ac56d01`; earlier attempts preserved |
 | WS1 fresh checkout | `thg-run reference publication/ws1/reference-a.json -v` | existing run resumes; full build not yet measured |
 | WS1 independent replay | `thg-run reference publication/ws1/reference-b.json -v` | pending; frozen offline evidence still required |
+| WS1 stage sizes/runtime | `python publication/scripts/stage_table.py runs/thg-ws1-a publication/ws1/current` | live checkpoint; pending/stale outputs omitted |
 | WS1 stage task gate | `python publication/scripts/run_tasks.py MODEL STAGE publication/ws1/numerical-refresh VerifyModel` | pending corrected artifacts |
 | WS1 corroboration | `THG_SOLVER=glpk python publication/scripts/run_tasks.py MODEL STAGE-glpk publication/ws1/numerical-refresh VerifyModel` | pending; separate solver retained in provenance |
 | WS2 fix inventory | `publication/ws2/fixes.csv` | two archived model measurements: `python publication/scripts/measure_correctness.py`; third example pending |
-| WS2 tests | `python -m pytest -m "not online" --ignore=tests/docs -q` | 350.38 s; 2,513 passed; `ws2/pytest-offline.log`; docs excluded |
+| WS2 tests | `python -m pytest -m "not online" --ignore=tests/docs -q` | 350.38 s; 2,513 passed; `ws2/pytest-offline.log`; six docs checks passed separately |
 | WS4 quality/coverage | matched baseline/candidate validation | pending candidate and VerifyModel gate; command not yet available |
 | WS5 functional tasks | same `run_tasks.py` command on candidate, with all three tables | blocked on candidate; VerifyModel failure/unresolved result skips later tables |
 | WS7 internal draft | `publication/manuscript/draft.md` | Introduction/Methods drafted; results, figures and evidence audit incomplete |

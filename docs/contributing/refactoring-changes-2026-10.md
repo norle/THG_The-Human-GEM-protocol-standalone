@@ -1,8 +1,8 @@
 # THG Protocol: what changed in the refactoring
 
-*Status report, 2026-10-14, branch `refactoring-cleanup`. Covers the 33
-commits from 2026-10-07 to 2026-10-09 (`e6b981b` to `41d28d2`) and the
-uncommitted work of 2026-10-13/14.*
+*Historical October report, refreshed 2026-11-09 on `main`. The original
+October scope covered `e6b981b` to `41d28d2` and changes subsequently committed.
+Current publication measurements are recorded separately below.*
 
 ## Changes by workflow step
 
@@ -55,8 +55,8 @@ uncommitted work of 2026-10-13/14.*
 - *Empty runs fail* (`cf0b827`). The reference workflow requires a β2
   location source, and `gate-beta2` blocks when β2 found no gene-location
   evidence.
-- Details are in `docs/protocol/beta2-compartment-resolution.md`, and (uncommitted)
-  in a new "Compartment expansion" section in `docs/workflows/beta2.md`.
+- Details are in `docs/protocol/beta2-compartment-resolution.md`, and
+  in the "Compartment expansion" section in `docs/workflows/beta2.md`.
 
 **Gap-filling**
 - New `sink-milp` method, the default in `configs/reference.json`
@@ -87,7 +87,7 @@ uncommitted work of 2026-10-13/14.*
   takes minutes on a genome-scale model. Loop detection clears GPRs, which
   otherwise grow without limit as merged reactions concatenate them
   (`004169a`).
-- *Uncommitted:* the report's balance suggestions now come from a MILP run
+- The report's balance suggestions now come from a MILP run
   in the model's own solver (Gurobi, CPLEX or GLPK through optlang). The
   previous SciPy/HiGHS version is kept as a legacy option and is used when
   the model's solver cannot solve MILPs. On all 268 unbalanced Human-GEM
@@ -108,3 +108,25 @@ uncommitted work of 2026-10-13/14.*
     modules (`b0c1e64`);
   - a test that needs gitignored inputs is skipped when they are absent
     (`20bab56`).
+
+## November publication safeguards and evidence
+
+- `4bc7a54`: beta1 consolidation vetoes differing shared database IDs, even
+  when exact structure annotations agree. This repairs a defect introduced by
+  the redesign. Archived real-model measurement: 11 former merge pairs all
+  have shared-namespace conflicts.
+- `9fe67fa`: beta2 does not copy unbalanced parents. Archived real-model
+  measurement: 26 copies of 14 inherited unbalanced parents match exclusions
+  in the revised plan; 11 parents have charge-only imbalance.
+- `ac56d01`: every optimal task solve records primal bound/constraint
+  violations and solver tolerances; residuals above 1e-7 or unavailable values
+  remain errors, not biological outcomes. Infeasible solves retain null
+  residuals. The patched baseline task results were refreshed with this harness.
+
+The first two measurements are in `publication/ws2/correctness.json`, regenerated
+by `python publication/scripts/measure_correctness.py`. They measure archived
+real-model proposals, not the new end-to-end build or task performance. The
+older October narrative counts above remain historical or sampled until
+regenerated; evidence strength is labelled in `publication/ws2/fixes.csv`.
+The numerical refresh is in `publication/ws0/numerical-refresh/`; build and
+independent replay remain incomplete.

@@ -1,6 +1,6 @@
 # THG Protocol: Current State
 
-Last reviewed: 2026-10-02
+Last reviewed: 2026-11-09
 
 The package structure cleanup is complete. Supported code
 lives under `src/thg_protocol`; tests use package APIs; preserved artifacts have
@@ -8,8 +8,8 @@ canonical locations. Historical implementation details remain in Git history.
 
 ## Current status
 
-- Branch: `refactoring-cleanup`
-- Reviewed commit: `00c52cd` plus the 2026-10-02 review fixes
+- Branch: `main`
+- Latest numerical prerequisite: `ac56d01`; publication evidence through `e2c5e68`
 - Supported Python: 3.10–3.12
 - Installed commands: `thg-gapfill`, `thg-pathway`, `thg-compare`, and `thg-run`
 - Legacy checkout directories: removed and excluded from distributions
@@ -31,11 +31,24 @@ publication-artifact reproduction remains unverified.
 
 ## Latest validation
 
-On 2026-10-02 the full local suite passed under Python 3.12 with memote and
-Gurobi installed: `2106 passed`. The mkdocs tests were run separately, from an
-environment with mkdocs installed (`6 passed`). The CI offline selection also
-passed with memote unavailable (`2100 passed`), and the solver/memote selection
-passed on GLPK. `ruff check` and `ruff format --check` are clean.
+On 2026-11-09 the offline suite passed under Python 3.12: **2,513 passed**,
+1,254 warnings, 350.38 seconds. It used GLPK as the default, with Gurobi
+available for solver-specific tests. The command excluded `tests/docs` because
+MkDocs is installed in the base environment. The saved log is
+`publication/ws2/pytest-offline.log`. Six docs checks subsequently passed
+separately: three strict-build/link/API checks in the base environment and
+three example/CLI checks in `thg_standalone` (logs under `publication/ws2/`). Focused task/importer/publication checks
+passed after the input-checksum guard was added; later publication exporters
+have their own targeted checks. These results do not establish hosted CI or
+final-model scientific validity.
+
+The patched reference task refresh passes VerifyModel 21/21 and Essential
+57/57; Full has 255 pass and two invalid mappings. Evidence and exact settings
+are in `publication/ws0/numerical-refresh/` and
+`publication/benchmark_settings.json`. The corrected WS1 build is in progress;
+its stage gates, final VerifyModel, matched MEMOTE validation and independent
+replay remain pending. The manuscript is a methods/validation draft, not a
+completed model-results paper.
 
 The isolated wheel build, `git lfs fsck`, and source-archive checks were last
 run at `601b9d9` and have not been repeated since.
@@ -62,10 +75,12 @@ Gurobi took:
   carry none.
 
 The curated `allowed_connections` (the 21 legacy pairs) contain no c–e and no
-m–i pair. The reference run has not yet been repeated with sink-milp.
+m–i pair. The corrected publication reference build is running; no new completed
+sink-milp result or gated final model is recorded yet.
 
 ## Remaining release gate
 
-Run the hosted Python 3.10–3.12 package matrix on the current head. If it passes,
-record the run here and publish the closeout changes. The credential-gated
+Hosted Python 3.10–3.12 CI on the release commit, tagging and archiving are
+deferred beyond the internal draft. Before public release, run the matrix on
+the chosen commit and record its result. Publication requires user approval. The credential-gated
 BioCyc fixture remains optional and does not block the offline release gate.

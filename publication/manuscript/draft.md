@@ -113,11 +113,29 @@ differences investigated if serialization differs.
 
 ### Correctness
 
-Three selected examples are consolidation safeguards, numerical reliability and
-unbalanced-parent exclusion. Their measured real-model effects and regeneration
-commands are pending. Supplementary fix inventory:
-`publication/ws2/fixes.csv`; evidence labels distinguish sampled, fixture-only
-and pending measurements.
+The archived Human-GEM 2.1.1 build proposed 11 metabolite consolidations.
+All 11 pairs have conflicting shared database identifiers and are vetoed by the
+current identifier safeguard (`publication/ws2/correctness.json`; regenerate
+with `python publication/scripts/measure_correctness.py`). This is a defect
+introduced by the redesign. The corrected deduplication attempt completed with
+zero metabolite and reaction merges; its output checksum equals the preceding
+balanced-model checksum (`publication/ws1/current/stage_table.csv` and
+`run_manifest.json`; regenerate with
+`python publication/scripts/stage_table.py runs/thg-ws1-a publication/ws1/current`).
+This checkpoint does not establish downstream task performance.
+
+The archived expansion plan proposed 26 copies of 14 unbalanced parents; every
+copy matches an `unbalanced-parent` exclusion in the revised archived plan.
+Eleven parents have charge-only imbalance. These inherited chemistry defects
+remain present in the parent model. The safeguard prevents their propagation;
+it does not establish a biochemical repair. Individual reactions and imbalance
+vectors are saved in `publication/ws2/correctness.json` using the same
+regeneration command above. Corrected end-to-end impact remains pending.
+
+The third selected example, numerical task reliability on an unstable real-model
+solve, remains pending. Supplementary fix inventory:
+`publication/ws2/fixes.csv`; evidence labels distinguish real-model proposal
+measurements, sampled narratives, fixture-only checks and pending work.
 
 ### Model evaluation
 
