@@ -56,6 +56,20 @@
     "sha256": "7077098ca6189ff0d5f9081f679c0055a3bf8bc060d65692a2dc802d76e529e2"
   },
   {
+    "label": "Archived standalone beta1 before shared-ID safeguard",
+    "path": "runs/thg-ws1-a/artifacts/export-beta1/attempt-0001/thg-beta1-candidate.json",
+    "provenance": "Historical numerical-failure and identity measurement; not a final model",
+    "status": "present",
+    "sha256": "fb081fa8acf6f9ca898e9603105ac3eab5543e56448837140138c05ea407f5b1"
+  },
+  {
+    "label": "Archived standalone beta2 passing control",
+    "path": "runs/thg-ws1-a/artifacts/export-beta2/attempt-0002/thg-beta2-candidate.json",
+    "provenance": "Numerical negative control; not a final model",
+    "status": "present",
+    "sha256": "8aef371abb499276e0215ad4bf3aa946a8454cabc5378b2a6ef091220ad98314"
+  },
+  {
     "label": "thg-ws1-a:export-beta1",
     "path": "runs/thg-ws1-a/artifacts/export-beta1/attempt-0002/thg-beta1-candidate.json",
     "provenance": "runs/thg-ws1-a/manifest.json; attempt 2; stage status completed; candidate, not yet final-gated",
@@ -64,7 +78,20 @@
     "matches_ledger": true
   },
   {
+    "label": "thg-ws1-a:export-beta2",
+    "path": "runs/thg-ws1-a/artifacts/export-beta2/attempt-0003/thg-beta2-candidate.json",
+    "provenance": "runs/thg-ws1-a/manifest.json; attempt 3; stage status completed; candidate, not yet final-gated",
+    "status": "present",
+    "sha256": "a27a48faf9fdfebf9146038379ed18f2f87f12d5b79f443730994ea275f7dc00",
+    "matches_ledger": true
+  },
+  {
     "label": "thg-ws1-b",
+    "status": "not built",
+    "sha256": null
+  },
+  {
+    "label": "thg-ws1-c",
     "status": "not built",
     "sha256": null
   }

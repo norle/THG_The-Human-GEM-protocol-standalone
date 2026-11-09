@@ -28,7 +28,11 @@ def freeze(run, template, out, *, archived=False):
         raise FileExistsError(f"Freeze destination must be empty: {out}")
     raw_manifest = (run / "manifest.json").read_bytes()
     manifest = json.loads(raw_manifest)
-    if archived and manifest.get("overall_status") not in {"completed", "failed"}:
+    if archived and manifest.get("overall_status") not in {
+        "completed",
+        "failed",
+        "interrupted",
+    }:
         raise ValueError("Archived input capture requires a terminal source run")
     steps = manifest["steps"]
     definitions = {stage.id: stage for stage in REFERENCE_STAGES}

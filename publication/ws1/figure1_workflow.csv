@@ -15,7 +15,7 @@ apply-balance-proposals,Curate reference (beta1),generate-balance-proposals,
 deduplicate-and-clean,Curate reference (beta1),apply-balance-proposals,
 validate-beta1,Curate reference (beta1),deduplicate-and-clean,
 export-beta1,Curate reference (beta1),validate-beta1,
-load-beta1,Expand compartments (beta2),,export-beta1
+load-beta1,Expand compartments (beta2),export-beta1,export-beta1
 collect-catalysis-evidence,Expand compartments (beta2),load-beta1,export-beta1
 collect-gpr-evidence,Expand compartments (beta2),collect-catalysis-evidence,export-beta1
 resolve-gprs,Expand compartments (beta2),collect-catalysis-evidence;collect-gpr-evidence,export-beta1

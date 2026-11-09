@@ -212,8 +212,9 @@ def test_stage_table_counts_sbml_without_solver(tmp_path):
     assert runner.model_size(model) == {"reactions": 1, "metabolites": 1, "genes": 1}
 
 
+@pytest.mark.parametrize("terminal_status", ["completed", "failed", "interrupted"])
 def test_freeze_evidence_preserves_sources_and_requires_completed_run(
-    tmp_path, monkeypatch
+    tmp_path, monkeypatch, terminal_status
 ):
     import hashlib
 
@@ -295,7 +296,7 @@ def test_freeze_evidence_preserves_sources_and_requires_completed_run(
         runner.freeze(tmp_path, template, out)
     with pytest.raises(ValueError, match="terminal source run"):
         runner.freeze(tmp_path, template, tmp_path / "archive", archived=True)
-    manifest.write_text(json.dumps({"steps": steps, "overall_status": "completed"}))
+    manifest.write_text(json.dumps({"steps": steps, "overall_status": terminal_status}))
     runner.freeze(tmp_path, template, tmp_path / "archive", archived=True)
     archived = json.loads((tmp_path / "archive/manifest.json").read_text())
     assert archived["runtime_fingerprints_verified"] is False

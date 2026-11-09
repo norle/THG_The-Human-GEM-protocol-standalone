@@ -58,6 +58,22 @@ MODELS = [
 ]
 
 
+MODELS.extend(
+    [
+        (
+            "Archived standalone beta1 before shared-ID safeguard",
+            "runs/thg-ws1-a/artifacts/export-beta1/attempt-0001/thg-beta1-candidate.json",
+            "Historical numerical-failure and identity measurement; not a final model",
+        ),
+        (
+            "Archived standalone beta2 passing control",
+            "runs/thg-ws1-a/artifacts/export-beta2/attempt-0002/thg-beta2-candidate.json",
+            "Numerical negative control; not a final model",
+        ),
+    ]
+)
+
+
 def pin(label, relative, provenance):
     path = ROOT / relative
     return {
@@ -73,7 +89,7 @@ def pin(label, relative, provenance):
 
 def main():
     rows = [pin(*entry) for entry in MODELS]
-    for run in ("thg-ws1-a", "thg-ws1-b"):
+    for run in ("thg-ws1-a", "thg-ws1-b", "thg-ws1-c"):
         manifest_path = ROOT / "runs" / run / "manifest.json"
         if not manifest_path.is_file():
             rows.append({"label": run, "status": "not built", "sha256": None})

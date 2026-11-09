@@ -1,0 +1,61 @@
+{
+  "source_run": "/home/reinism/THG_The-Human-GEM-protocol-standalone/runs/thg-ws1-a",
+  "runtime_fingerprints_verified": false,
+  "input_status": "archived acquisition outputs",
+  "source_manifest_sha256": "b963982031922a74996875a12344a6847909587d8c89243e8b9b63b362c55f6b",
+  "script_sha256": "03fa1f747096983b374862b037f8ad890cd19b1f293f55fcd5c90e24c6586c10",
+  "template_sha256": "db93ef3c8b9966e40145c6ffd743a6c0bd3fb4ea42467dce41a9636bf4bcb9ed",
+  "snapshot_sha256": "aab2ca0c49a4a4e58e31c12f22a8abf55bdabd42a26906283c1f8a1432f6d1ab",
+  "source_releases": {
+    "go": {
+      "parser_version": "1",
+      "raw_response_sha256": "c72fc198a86983d55e43aac585d1ffdbeb6e3601475b3f18b6045acdc0a0734c",
+      "release": "2026-06-19",
+      "retrieved_at": "2026-11-09T13:28:41.223516Z",
+      "source": "Gene Ontology",
+      "url": "https://release.geneontology.org/2026-06-19/ontology/go-basic.obo"
+    },
+    "goa": {
+      "release": "232"
+    },
+    "reactome": {
+      "release": "97"
+    },
+    "rhea": {
+      "release": "141"
+    },
+    "uniprot": {
+      "release": "2026_02"
+    }
+  },
+  "artifacts": [
+    {
+      "stage": "collect-gpr-evidence",
+      "source_path": "artifacts/collect-gpr-evidence/attempt-0003/beta2-gpr-evidence.jsonl",
+      "frozen_path": "sources/beta2-gpr-evidence.jsonl",
+      "sha256": "c71f9f50e98893e4b17fde43c3dc977afa631781a041c2dd82cfdc1c16b7a84b"
+    },
+    {
+      "stage": "collect-location-evidence",
+      "source_path": "artifacts/collect-location-evidence/attempt-0003/beta2-location-evidence.json",
+      "frozen_path": "sources/beta2-location-evidence.json",
+      "sha256": "d46e9c2b25c716fc826ba247c34167dfc4e31087e420b619bc4368f67fce388f"
+    },
+    {
+      "stage": "collect-reaction-location-evidence",
+      "source_path": "artifacts/collect-reaction-location-evidence/attempt-0003/beta2-reaction-location-evidence.jsonl",
+      "frozen_path": "sources/beta2-reaction-location-evidence.jsonl",
+      "sha256": "7941ee14d8d1f82bea4a930354b8ec607e587f3e0a21fb8db10189fd55ef355f"
+    },
+    {
+      "stage": "normalize-compartments",
+      "source_path": "artifacts/normalize-compartments/attempt-0003/compartment-registry.json",
+      "frozen_path": "sources/compartment-registry.json",
+      "sha256": "a904735474f3ba3b15335a3696a4596acbf3256068a0136a4900b531181c6802"
+    }
+  ],
+  "records": 14620,
+  "replay_config": "publication/ws1/reference-b-frozen.json",
+  "scope": "Collected location/GPR evidence and ontology replay; resolution and construction rerun; HTTP acquisition not replayed",
+  "comparison_required": "Measure checksums and semantic differences; snapshot provenance can differ"
+}

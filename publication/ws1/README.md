@@ -1,8 +1,10 @@
 # WS1: Frozen build of the current THG model
 
-Status (2026-11-09): **corrected build running; not done.** Beta1 curation, validation
-and export completed; beta2 evidence collection is active. The manifest
-and live log remain authoritative; independent replay is pending.
+Status (2026-11-09): **paused for shutdown; build incomplete.** The build exited
+cleanly with code 130 at stage 45/52 (gapfill coverage), and its lock is gone.
+Completed artifacts through stage 44 are preserved. Beta2 export attempt 3
+and its construction gate completed. See `publication/HANDOFF-2026-11-09.md`
+for authoritative restart instructions; earlier running notes below are historical.
 
 ## Files
 | File | What |
@@ -92,3 +94,20 @@ the licensed native-thread check separately verifies effective Gurobi settings.
 explicit dependencies plus beta2's implicit reference to the beta1 export.
 This is a protocol diagram; stage counts include optional/disabled stages and
 do not claim that a build completed. The PNG was visually checked.
+
+## Shutdown and fingerprint migration
+
+Acquisition run A loaded source `ac56d01`. The later `9174aea` fix makes beta2
+fingerprints stable across same-run manifest updates and declares the beta1
+DAG dependency. A retained the old in-memory implementation. Its beta2 cache
+fingerprints cannot be certified by the new runtime, and resuming it would
+repeat service acquisition.
+
+Completed acquisition outputs were frozen using the explicit `--archived`
+mode after the interrupted process exited. `frozen/manifest.json` records
+`runtime_fingerprints_verified: false`; source completion and artifact hashes
+were checked. This is a pinned input dataset, not an independent replay.
+`reference-b-frozen.json` and `reference-c-frozen.json` are prepared for a fresh
+same-code cohort. Neither has started. They must use verified native solver
+defaults; see the handoff's bootstrap command. Partial coverage work remains in
+the run's failed attempt directory and must not be counted as completed.
