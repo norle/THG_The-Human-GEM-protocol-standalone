@@ -176,6 +176,7 @@
       "B",
       "C"
     ],
-    "validation_profile": "structural-fast"
+    "validation_profile": "structural-fast",
+    "coverage_workers": 8
   }
 }
