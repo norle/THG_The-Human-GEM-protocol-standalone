@@ -280,9 +280,13 @@ def test_sink_milp_accepts_its_parameters(tmp_path):
             candidate_types=["A", "B"],
             tradeoff_lambda=0.5,
             min_component_size=2,
+            coverage_workers=3,
+            solver="highs",
         )
     )
     assert config.sections["gapfill"]["method"] == "sink-milp"
+    assert config.sections["gapfill"]["coverage_workers"] == 3
+    assert config.sections["gapfill"]["solver"] == "highs"
 
 
 @pytest.mark.parametrize(
@@ -295,6 +299,11 @@ def test_sink_milp_accepts_its_parameters(tmp_path):
         ({"tradeoff_lambda": True}, "tradeoff_lambda"),
         ({"min_component_size": 0}, "min_component_size"),
         ({"min_component_size": 1.5}, "min_component_size"),
+        ({"coverage_workers": 0}, "coverage_workers"),
+        ({"coverage_workers": 1.5}, "coverage_workers"),
+        ({"coverage_workers": True}, "coverage_workers"),
+        ({"solver": "cplex"}, "gapfill.solver"),
+        ({"solver": 1}, "gapfill.solver"),
         ({"candidate_types": ["D"]}, "candidate_types"),
         ({"objective": "R1"}, "objective"),
         ({"universal_model": "u.json"}, "universal_model"),
@@ -305,7 +314,9 @@ def test_sink_milp_rejects_invalid_parameters(tmp_path, changes, message):
         load_workflow_config(_sink_milp_config(tmp_path, **changes))
 
 
-@pytest.mark.parametrize("key", ["tradeoff_lambda", "min_component_size"])
+@pytest.mark.parametrize(
+    "key", ["tradeoff_lambda", "min_component_size", "coverage_workers"]
+)
 def test_greedy_rejects_sink_milp_parameters(tmp_path, key):
     with pytest.raises(ConfigError, match=key):
         load_workflow_config(

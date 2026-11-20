@@ -26,7 +26,7 @@ JSON and workflow manifests; new-job estimates below are not measured results.
 | WS1 independent replay | `thg-run reference publication/ws1/reference-b-frozen.json -v` | pending freezer output and stable candidate |
 | WS1 stage sizes/runtime | `python publication/scripts/stage_table.py runs/thg-ws1-a publication/ws1/current` | live checkpoint; pending/stale outputs omitted |
 | WS1 stage task gate | `python publication/scripts/run_tasks.py MODEL STAGE publication/ws1/numerical-refresh VerifyModel` | pending corrected artifacts |
-| WS1 corroboration | `THG_SOLVER=glpk python publication/scripts/run_tasks.py MODEL STAGE-glpk publication/ws1/numerical-refresh VerifyModel` | pending; separate solver retained in provenance |
+| WS1 corroboration | `THG_SOLVER=glpk python publication/scripts/run_tasks.py MODEL STAGE-glpk publication/ws1/numerical-refresh VerifyModel` | **dropped by user decision 2026-11-10**; Gurobi with residual diagnostics is the sole gate |
 | WS2 fix inventory | `publication/ws2/fixes.csv` | identity/parent checks, location-policy ablation and historical numerical artifact saved; see handoff |
 | WS2 tests | `python -m pytest -m "not online" --ignore=tests/docs -q` | 350.38 s; 2,513 passed; `ws2/pytest-offline.log`; six docs checks passed separately |
 | WS4 quality/coverage | matched baseline/candidate validation | pending candidate and VerifyModel gate; command not yet available |

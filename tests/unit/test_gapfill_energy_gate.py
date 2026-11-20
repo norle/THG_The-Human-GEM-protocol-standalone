@@ -124,8 +124,21 @@ def test_sink_milp_keeps_the_connector_when_the_gate_is_off():
         "max_additions": 10,
         "energy_cycle_gate": False,
     }
+    # Supply and drain, so the transport can carry flux; an inactive connector
+    # would be dropped whatever the gate does.
+    model = egc_model(with_transport=False)
+    for identifier, sign in (
+        ("adp_c", 1),
+        ("pi_c", 1),
+        ("h_c", 1),
+        ("atp_c", -1),
+        ("h2o_c", -1),
+    ):
+        boundary = cobra.Reaction(f"EX_{identifier}", lower_bound=0, upper_bound=1000)
+        model.add_reactions([boundary])
+        boundary.add_metabolites({model.metabolites.get_by_id(identifier): sign})
     result = run_sink_milp(
-        egc_model(with_transport=False),
+        model,
         parameters,
         candidates=[candidate],
         connectors=[candidate],

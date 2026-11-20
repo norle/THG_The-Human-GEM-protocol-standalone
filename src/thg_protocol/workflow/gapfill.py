@@ -313,8 +313,24 @@ def _parameters(section: Mapping[str, object]) -> dict[str, Any]:
             "input_model",
             "run_loop_detection",
             "remove_infeasible_loops",
+            "coverage_workers",
+            "solver",
         }
     }
+
+
+#: Stages that build only structure; every other gapfill stage solves LPs and
+#: has the solver in its fingerprint.
+_STRUCTURAL_STAGES = {
+    "load-gapfill-source",
+    "generate-gapfill-candidates",
+    "select-gapfill-connectors",
+}
+
+
+def _solver_setting(section: Mapping[str, object]) -> str | None:
+    value = section.get("solver")
+    return value if isinstance(value, str) else None
 
 
 class GapfillStage:
@@ -330,7 +346,7 @@ class GapfillStage:
         elif stage_id == "gate-gapfill":
             self.implementation_version = 3
         elif stage_id == "generate-gapfill-plan":
-            self.implementation_version = 6
+            self.implementation_version = 7
         elif stage_id in _PTR_STAGES:
             self.implementation_version = 3
 
@@ -351,6 +367,10 @@ class GapfillStage:
                 else {}
             ),
         }
+        if self.id not in _STRUCTURAL_STAGES:
+            from thg_protocol.gapfill.solvers import resolve_solver
+
+            data["solver"] = resolve_solver(_solver_setting(section))
         if self.id == "load-gapfill-source":
             data["workflow"] = context.config.workflow
             data["input_sha256"] = _hash(section.get("input_model"))
@@ -359,7 +379,13 @@ class GapfillStage:
             data["algorithm"] = {
                 key: value
                 for key, value in section.items()
-                if key not in {"validation_profile", "task_suite", "task_mapping"}
+                if key
+                not in {
+                    "validation_profile",
+                    "task_suite",
+                    "task_mapping",
+                    "coverage_workers",
+                }
             }
             data["candidate_universe_sha256"] = _hash(section.get("candidate_universe"))
             data["universal_model_sha256"] = _hash(section.get("universal_model"))
@@ -389,6 +415,14 @@ class GapfillStage:
         return data
 
     def run(self, context: StageContext, work_dir: Path) -> StageResult:
+        """Run the stage with the configured gapfill solver as cobra's default."""
+        from thg_protocol.gapfill.solvers import default_solver, resolve_solver
+
+        solver = resolve_solver(_solver_setting(_section(context)))
+        with default_solver(solver):
+            return self._run(context, work_dir)
+
+    def _run(self, context: StageContext, work_dir: Path) -> StageResult:
         section = _section(context)
         if self.id == "load-gapfill-source":
             if context.config.workflow == "reference":
@@ -615,6 +649,8 @@ class GapfillStage:
                     min_component_size=parameters["min_component_size"],
                     done=done,
                     on_component=checkpoint,
+                    # Results do not depend on it; None sizes the pool itself.
+                    workers=section.get("coverage_workers"),
                 )
             return StageResult(
                 (("coverage", path),),

@@ -43,13 +43,25 @@ resumable stage, enabled only for this method and recorded `skipped` otherwise:
    and a temporary sink for every dead-end product, and records which targets
    each candidate PTR newly unblocks. It writes one line per component to
    `ptr-coverage.jsonl` as each finishes, and a retry reuses the lines of a
-   failed or interrupted attempt with the same inputs.
+   failed or interrupted attempt with the same inputs. The candidate tests run
+   in a process pool. The optional `coverage_workers` setting (a positive
+   integer, workflow config only) fixes the number of processes. When it is
+   absent, the stage starts one process per 64 tests, up to 8 and the CPU
+   count, so small models run in one process. Each process holds a copy of the
+   model. The setting does not change results or any stage fingerprint.
+
+The optional `solver` setting (`gurobi`, `highs`, `glpk` or `auto`) chooses
+the solver for all solving gapfill stages; `auto` uses Gurobi when it can start
+and HiGHS otherwise. The resolved solver is part of those stages'
+fingerprints. See [sink-MILP gap-filling](gapfill-sink-milp.md#solver).
 
 `generate-gapfill-plan` then solves one MILP on the model's solver: maximize
 covered targets − `tradeoff_lambda` × selected PTRs (default 0.01; the config
-requires 0 < λ < 1), within `max_additions` minus the connectors. The plan
-proposes the connectors (`phase: 2`) and the selected PTRs (`phase: 3`), all
-reversible at ±1000 with IDs `GAPFILL_PTR_<met1>_<met2>`. The status is
+requires 0 < λ < 1), within `max_additions` minus the connectors. The MILP is
+solved exactly, and ties between equal selections are broken by candidate type
+(A, B, C) and then by reaction ID, so the same inputs give the same plan. The
+plan proposes the connectors (`phase: 2`) that carry flux in the final model
+and the selected PTRs (`phase: 3`), with IDs `GAPFILL_PTR_<met1>_<met2>`. The status is
 `partial` when the budget binds while coverable targets remain, and `failed`
 when the MILP does not solve to optimality.
 
@@ -66,7 +78,11 @@ Two deviations from legacy:
 Temporary sinks and sources never reach the output model. The plan's
 `solver.verification` reports, without sinks, which targets the final model
 actually unblocks (`verified_unblocked`) and which connectors carry no flux
-(`inactive_connectors`). Nothing acts on this report.
+(`inactive_connectors`). Connectors that carry no flux are removed from the
+plan, with the model verified again after each removal, and are listed under
+`inactive_connectors` with the candidate status `connector-inactive`. The plan
+status is not changed by this. Targets that fail verification are only
+reported.
 
 The canonical pipeline always runs gapfill before producing a **THG candidate**.
 The final gapfill stage writes `thg-reference-gapfilled.json` and `.xml` only after

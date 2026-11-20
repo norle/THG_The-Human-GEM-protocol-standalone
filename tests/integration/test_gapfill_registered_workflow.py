@@ -470,6 +470,56 @@ def test_sink_milp_workflow_runs_phase_stages(tmp_path):
     }
 
 
+def _with_gapfill(config: Path, **changes) -> None:
+    payload = json.loads(config.read_text(encoding="utf-8"))
+    payload["gapfill"].update(changes)
+    config.write_text(json.dumps(payload), encoding="utf-8")
+
+
+@pytest.mark.parametrize(("configured", "expected"), [(None, None), (3, 3)])
+def test_coverage_stage_passes_the_worker_setting(
+    tmp_path, monkeypatch, configured, expected
+):
+    from thg_protocol.gapfill import ptr
+
+    original = ptr.compute_coverage
+    seen: list[object] = []
+
+    def recording(*args, **kwargs):
+        seen.append(kwargs.get("workers", "missing"))
+        return original(*args, **kwargs)
+
+    monkeypatch.setattr(ptr, "compute_coverage", recording)
+    source = tmp_path / "model.json"
+    _three_components(source)
+    config = _sink_milp_config(tmp_path, source)
+    if configured is not None:
+        _with_gapfill(config, coverage_workers=configured)
+    start(config)
+    # Unset means automatic (None); the stage must not fall back to one process.
+    assert seen == [expected]
+
+
+def test_worker_setting_changes_no_stage_fingerprint(tmp_path):
+    from types import SimpleNamespace
+
+    from thg_protocol.runtime.stage import StageContext
+    from thg_protocol.workflow.gapfill import gapfill_stages
+
+    def fingerprints(**extra):
+        section = {
+            "method": "sink-milp",
+            "max_additions": 10,
+            "allowed_connections": [["c", "e"]],
+            **extra,
+        }
+        config = SimpleNamespace(workflow="gapfill", sections={"gapfill": section})
+        context = StageContext(config, tmp_path, {})
+        return {stage.id: stage.fingerprint_data(context) for stage in gapfill_stages()}
+
+    assert fingerprints() == fingerprints(coverage_workers=4)
+
+
 def test_phase_stages_are_skipped_for_greedy(tmp_path):
     source = tmp_path / "model.json"
     _model(source)

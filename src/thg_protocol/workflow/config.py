@@ -181,6 +181,8 @@ WORKFLOW_SECTION_KEYS = {
         "penalties",
         "tradeoff_lambda",
         "min_component_size",
+        "coverage_workers",
+        "solver",
         "excluded_metabolites",
         "energy_cycle_gate",
         "connection_costs",
@@ -736,6 +738,14 @@ def _parse_workflow(
                 value["max_additions"] = _positive_integer(
                     value["max_additions"], "gapfill.max_additions"
                 )
+                if "solver" in value:
+                    from thg_protocol.gapfill.solvers import SOLVER_CHOICES
+
+                    if value["solver"] not in SOLVER_CHOICES:
+                        raise ConfigError(
+                            "'gapfill.solver' must be one of "
+                            + ", ".join(SOLVER_CHOICES)
+                        )
                 standalone = workflow == "gapfill"
                 if standalone:
                     if value.get("external_input") is not True:
@@ -761,6 +771,7 @@ def _parse_workflow(
                 sink_keys = {
                     "tradeoff_lambda",
                     "min_component_size",
+                    "coverage_workers",
                     "connection_costs",
                 }
                 if method != "sink-milp" and sink_keys & set(value):
@@ -818,6 +829,15 @@ def _parse_workflow(
                     if isinstance(size, bool) or not isinstance(size, int) or size < 1:
                         raise ConfigError(
                             "'gapfill.min_component_size' must be a positive integer"
+                        )
+                    workers = value.get("coverage_workers", 1)
+                    if (
+                        isinstance(workers, bool)
+                        or not isinstance(workers, int)
+                        or workers < 1
+                    ):
+                        raise ConfigError(
+                            "'gapfill.coverage_workers' must be a positive integer"
                         )
                     _check_transport_settings(value)
                     incompatible = {

@@ -10,20 +10,55 @@ Read first: `docs/about/legacy-comparison.md`,
 `docs/plans/metabolic_task_leaks_plan.md`,
 `docs/protocol/implementation-status.md`.
 
-## Progress (updated 2026-11-09)
+## Progress (updated 2026-11-18)
 
-**Shutdown checkpoint:** goal paused; build stopped cleanly at stage 45/52.
-Read [`publication/HANDOFF-2026-11-09.md`](../../publication/HANDOFF-2026-11-09.md)
-for current results, preserved inputs and exact restart instructions. No final
-gapfilled candidate or independent replay exists yet.
+This section replaces the 2026-11-09 status. The shutdown handoff
+[`publication/HANDOFF-2026-11-09.md`](../../publication/HANDOFF-2026-11-09.md)
+and the speedup handoff
+[`gapfill-speedup-handoff-2026-11-10.md`](gapfill-speedup-handoff-2026-11-10.md)
+are history; where they disagree with this section, this section wins.
+
+**Blocker (2026-11-18): the Gurobi license has expired** (`License 2780343 has
+expired`). Builds, task runs and the Gurobi-marked tests cannot run until it is
+renewed. Writing and planning can continue.
+
+**HiGHS added as a gapfill solver (2026-11-18, not committed).** New setting
+`gapfill.solver` (`gurobi`, `highs`, `glpk`, `auto`; `auto` = Gurobi if it can
+start, else HiGHS); `highspy` and `osqp` installed in `thg_standalone`. It is
+not a way around the license for the paper. Through optlang's `hybrid`
+interface one LP on the β2 model takes about 1.8 s against about 0.04 s with
+Gurobi, so the full coverage step would take many hours. Small models, the
+tests and the selection MILP run fine on it. Details:
+`docs/workflows/gapfill-sink-milp.md`, "Solver". Full offline suite with HiGHS
+as cobra's default (`THG_TEST_SOLVER=hybrid`): 2,531 passed, 25 failed, 1
+skipped. None of the failures is in gapfill. 24 are task-harness and GIMME
+tests that build a model on the default solver and switch it to GLPK: optlang
+copies HiGHS's timeout 0 ("no limit") to GLPK, which reads it as a zero-second
+limit and reports `time_limit`. The same tests pass with GLPK as the default.
+The 25th needs a licensed Gurobi. The VerifyModel/Essential task gates of a
+gapfill run on HiGHS have not been tried on a real model.
 
 | WS | State |
 |---|---|
-| WS0 | **Partial.** Native-thread-verified patched baseline: VerifyModel 21/21, Essential 57/57, Full 255 passed / 257 total (2 invalid), 278.85 s. Basic statistics saved. MEMOTE/final-standard validation remains missing. Essentiality dropped; Human1/legacy benchmark rows deferred. |
-| WS1 | **Paused for shutdown.** Acquisition run A interrupted cleanly at stage 45/52 (`compute-gapfill-coverage`, attempt 2); completed artifacts retained through stage 44. Beta1 and beta2 exported (attempts 2/3). Beta1 VerifyModel 21/21 with Gurobi and GLPK. Same-run fingerprint bug fixed (`9174aea`); A used the old implementation. Archived evidence and fresh B/C frozen configs saved. Independent replay not started. |
-| WS2 | **Measured results saved.** 11 shared-ID conflicts; exclusions of 26 copies from 14 failed-balance parents; whole-baseline location-policy ablation (848 genes); archived failing beta1 optimum has bound violation 3.0276e-7 and is correctly unresolved. Other inventory entries retain evidence-strength labels. |
-| WS3, WS4, WS5, WS7 | WS3 deferred; WS4/WS5 await a gated candidate. WS7 Methods draft, status refresh and Figure 1 saved; remaining figures/results and evidence audit incomplete. |
-| WS6 | **Dropped** (essentiality benchmark skipped by user; DepMap not used). Fig 5 loses its essentiality panel. |
+| WS0 | **Partial.** Patched baseline: VerifyModel 21/21, Essential 57/57, Full 255 passed / 257 total (2 invalid), 278.85 s (`ws0/pinned-refresh/`). Basic statistics saved. MEMOTE not run. |
+| WS1 | **Build B complete but superseded by the gapfill change.** `runs/thg-ws1-b` finished 52/52 on 2026-11-10 (15,202 reactions, 12,927 metabolites, 13 compartments; VerifyModel 21/21 at β1, β2 and final; Essential 57/57; Full 255/257, 2 invalid; `ws1/b-current/`, `ws1/b-final/`). It used gapfill plan stage version 6 (314 gapfill reactions). The approved gapfill change (version 7) selects differently, so B's final model is not what the current code produces. B's manifest also does not record the source commit, and it ran on a tree with uncommitted changes. Build C (replay) not started. Run A is acquisition provenance only. |
+| WS2 | **Measured results saved.** 11 shared-ID conflicts; 26 copies from 14 unbalanced parents excluded; location-policy ablation (848 genes); archived beta1 task-21 optimum is a numerical artefact (bound violation 3.0276e-7, unresolved). Compartment-resolution ablation ladder (Results 3.1) not started. |
+| WS4 | **Preliminary, on old B.** Matched quality table without MEMOTE (`ws4/quality_table.csv`) and coverage (`ws4/coverage-b/`): all 2,140 β2 copies and 314 gapfill reactions are mass- and charge-balanced; dead ends 623 → 3,530; blocked reactions 1,257 → 3,607. Stoichiometric consistency fails on the THG SBML file but passes on the same model as JSON (6,700 vs 0 unconserved metabolites); unexplained. Must be redone on the rebuilt B. |
+| WS5 | Task results exist for old B only (see WS1). Redo on the rebuilt B. |
+| WS7 | Methods draft, Figure 1 and `publication/README.md` exist. Gapfill selection not yet in Methods. Figures 2–4, Table 1, Results, Discussion and the evidence audit not started. |
+| WS3 | Deferred. |
+| WS6 | **Dropped** (essentiality skipped by user; DepMap not used). |
+
+**Gapfill change: code written, docs written, not committed.** See "Gapfill
+selection (approved 2026-11-18)" below. The coverage speedup was benchmarked on
+run A's model: 536 s with eight workers against about 2.5 h serial, with
+identical coverage, targets and `sink_only` sets for components 1–4
+(`docs/workflows/gapfill-sink-milp.md`, "Timing of the coverage step"). The
+benchmark files were in a session scratchpad and are not saved under
+`publication/`; rerun it to keep the evidence. On 2026-11-18 the gapfill unit
+tests and the registered gapfill workflow test passed on HiGHS
+(`THG_TEST_SOLVER=hybrid`), including the tie-break and connector-removal
+tests; they still need a run on Gurobi once the license is renewed.
 
 **WS1 findings from `thg-ws1-a` (resolved 2026-11-09):**
 
@@ -62,20 +97,180 @@ gapfilled candidate or independent replay exists yet.
    (`MAR00031`, `MAR07160`, `MAR07625`) are R/X pool reactions and stay
    unbalanced and uncopied.
 
-**Next actions after explicit resume:** follow the shutdown handoff. Diagnostics
-and pinned baseline tasks are done. Gate new beta2 attempt 3; corroborate the
-historical numerical example with GLPK; build fresh frozen B/C cohorts under
-the corrected runtime and verified solver defaults; then final gates, matched
-quality/coverage, replay, figures and manuscript audit. Charge curation of the
-11 inherited parents remains desirable, but is not a draft prerequisite while
-unbalanced parents are excluded. Respect the WS5 stop condition.
+Charge curation of the 11 inherited parents remains desirable, but is not a
+draft prerequisite while unbalanced parents are excluded.
+
+## Remaining work, in order (2026-11-18)
+
+GLPK corroboration was dropped by user decision (2026-11-10): Gurobi with
+residual diagnostics is the only task gate. No target dates are set. Respect
+the WS5 stop condition throughout.
+
+1. **Renew the Gurobi license.** Everything below that solves an LP needs it.
+   HiGHS is not a substitute for the paper runs (too slow at this model size,
+   and the benchmark settings pin Gurobi).
+2. **Finish and commit the gapfill change and the HiGHS option.** Run the
+   gapfill tests on Gurobi (they pass on HiGHS), the full offline suite and
+   ruff; fix what fails. Rerun the coverage-equality benchmark and save it
+   under `publication/ws1/gapfill-change/` with its command. Commit when the
+   user asks.
+3. **Rebuild B and build C on that commit, from a clean tree.** Record the
+   source commit for each build (the manifest does not do it; save
+   `git rev-parse HEAD` and `git status --porcelain` next to the run). Leave
+   `gapfill.solver` unset or set it to `gurobi`, never `auto`, so a lost
+   license fails the run instead of switching solver. B can resume from the
+   existing run, but every solving gapfill stage now has the solver in its
+   fingerprint, so `compute-gapfill-coverage` is recomputed too (about 10 min
+   with eight workers on Gurobi); compare its output with B's old coverage as
+   a second equality check. C starts fresh from
+   `publication/ws1/reference-c-frozen.json`.
+4. **Gate the rebuilt B:** VerifyModel per stage and final, then Essential and
+   Full.
+5. **Measure the gapfill change** for Methods (see "Gapfill selection" below):
+   connectors dropped, selection under version 6 vs 7, B vs C plan identity.
+6. **Compare B and C** (checksums, semantic diff, stage table). This is
+   Results 3.4.
+7. **Explain the SBML/JSON stoichiometric-consistency discrepancy** before
+   any quality claim.
+8. **Decide the two-tier export** (section 6, item 9) before figures: the
+   dead-end and blocked counts make it a question of which model the paper
+   presents.
+9. **Re-check the unpatched 2.1.1 task-21 leak** through `MAR20193` with
+   residual diagnostics before claiming it as a Human-GEM defect.
+10. **Compartment-resolution ablation ladder** (Results 3.1).
+11. **MEMOTE and `final-standard` validation** on the patched baseline and the
+    rebuilt B, sequentially; check `free -m` first. Redo `ws4/quality_table.csv`
+    and coverage on the rebuilt B.
+12. **HPA comparison** if approved (section 6, item 10).
+13. **Figures 2–4, Table 1, Results, Discussion, evidence audit.**
+
+## Gapfill selection (approved 2026-11-18)
+
+The user approved the changes to the sink-MILP selection in
+`generate-gapfill-plan` (stage version 6 → 7). They change the model, so the
+paper must describe them in Methods (section 2) and the numbers below must be
+measured on the rebuilt B. The reference description is
+`docs/workflows/gapfill-sink-milp.md`, stage 4 and "Verification".
+
+What changed:
+
+1. **Exact MILP.** Gurobi's default relative gap (1e-4) can exceed
+   `tradeoff_lambda` (0.01 per PTR) when hundreds of targets are in the
+   objective, so a near-optimal solution can keep PTRs the true optimum would
+   not. The MILP is now solved with `MIPGap = 0`.
+2. **Deterministic tie-break.** Different selections often cover the same
+   targets at the same cost (two transports that unblock the same reactions),
+   and the solver's choice between them is arbitrary. A second solve fixes
+   coverage and cost at the optimum and minimises the summed preference
+   position of the chosen PTRs: type A before B before C, then reaction ID.
+   The same inputs therefore give the same plan. An exact tie in that sum is
+   possible in principle and is not detected.
+3. **Inactive connectors are dropped.** Connectors (the minimum-spanning-tree
+   PTRs that join network components) are still added before coverage and
+   selection. After selection, the model without temporary sinks is checked;
+   a connector that carries no flux is removed, and the check repeats until
+   every remaining connector carries flux. Removed connectors are listed in
+   `verification["inactive_connectors"]` with status `connector-inactive`.
+   The plan status stays `solved`. On run A's model, 1 of 152 connectors
+   carried flux without sinks, so most connectors are expected to go.
+   Removing the connector stage altogether, or choosing connectors by flux, is
+   deferred to the method discussion.
+
+The coverage speedup (cached solver variables, a sum-LP pre-check, one test
+per cross-component candidate, a process pool set by `coverage_workers`) does
+not change results and belongs in Methods only as runtime.
+
+Methods should also name the solver and say that the protocol supports HiGHS
+as an open-source alternative (`gapfill.solver`), with the measured per-LP
+cost on the β2 model, and that all reported runs used Gurobi.
+
+Evidence to save under `publication/ws1/gapfill-change/`, each with its
+command:
+
+- connectors proposed, kept and dropped on the rebuilt B;
+- PTRs selected under version 6 (old B) and version 7 (rebuilt B), and how
+  many reactions differ, separating the effect of the dropped connectors from
+  the exact gap and tie-break where possible;
+- whether the tie-break was needed: number of alternative optima the second
+  solve chose between, or at least whether its selection differs from the
+  first solve's;
+- B vs C gapfill plans identical (determinism);
+- coverage-step runtime and equality with the serial code (rerun of the
+  benchmark).
 
 
-## Draft target: November 9–12, 2026
+## Revised direction (2026-11-11)
+
+Agreed with the user on 2026-11-11. Where this section conflicts with the
+framing, manuscript structure or figure list below, this section wins. The
+Progress table above predates build B: `runs/thg-ws1-b` completed 52/52 on
+2026-11-10 (15,202 reactions, 12,927 metabolites, 13 compartments; VerifyModel
+21/21 at β1, β2 and final; Essential 57/57; Full 255 passed / 257, 2 invalid).
+
+**Main comparison: Human-GEM 2.1.1 (patched), not THG-2023.** Human-GEM 2.1.1
+is the newer state-of-the-art model, so the paper asks what THG adds to it and
+at what cost. THG-2023 appears as one context row at most; the paper does not
+centre on the legacy model.
+
+**Working hook:** THG extends Human-GEM 2.1.1 with finer subcellular
+resolution while keeping its conservation and function, and building it exposed
+defects in Human-GEM itself. The leak mechanisms (consolidation, unbalanced
+parents, numerical task reliability) explain why the gates exist; they are not
+the headline.
+
+**Compartment resolution is a Results section.** It is the step that produces
+the localised reactions THG adds. Show two rule changes, selected because they
+change the final model:
+
+1. *Genes with several compartments are kept* (`0188ac5`). Previously a gene
+   with more than one location contributed none. Measured: 848 of 2,870 genes
+   rescued (`publication/ws2/gene_locations.json`).
+2. *One GO term can map to several compartments* (`4e88dea`). Previously the
+   resolver picked the compartment the fewest GO steps away (93 terms narrowed,
+   8 ties dropped; narrative counts, no saved measurement). Now every
+   configured compartment reached through the GO hierarchy is kept, except one
+   that contains another reached one. Examples: axonemal microtubule → cilium
+   and cytoskeleton; mitochondrial inner membrane → `i` only.
+
+The UniProt query fix (R1) and the "Cytoplasm" alias (R8) are **not** shown in
+Results; they stay in the supplementary fix inventory.
+
+Required analysis: an ablation ladder on the frozen evidence snapshot
+(`publication/ws1/frozen/`), β2 planning stages only. Start from the old rules
+and switch on one change at a time. At each step record genes localised and
+reaction copies generated per compartment. Save results and the regeneration
+command under `publication/ws2/compartment-resolution/`.
+
+Wording constraint: the existing measurement for change 1 is an ablation of an
+earlier *standalone* rule; legacy attribution is not established. Before the
+text says "the 2023 protocol did X", confirm each old behaviour in the legacy
+checkout (`../THG_The-Human-GEM-protocol`). Otherwise write "an earlier rule".
+
+**Revised Results structure:** 3.1 compartment resolution, 3.2 safe
+expansion, 3.3 THG vs Human-GEM 2.1.1, 3.4 reproducibility. The full table and
+figure list are in section 2.
+
+Defects found in Human-GEM 2.1.1, to consolidate for 3.3: the task-21 route
+through `MAR20193` on the unpatched release (re-check with residual
+diagnostics before claiming it), isomer pairs sharing copied structure
+annotations (WS1 finding 1), and the 11 charge-only unbalanced reactions (WS1
+finding 3).
+
+**Proposed, not yet decided by the user** (see section 6, items 9 and 10):
+a flux-capable classification of added reactions with a two-tier export, and
+a Human Protein Atlas comparison of gene-to-compartment assignments. If the
+HPA comparison is approved, add HPA agreement as a column of the ablation
+ladder.
+
+Remaining work is listed in order under "Remaining work, in order" above.
+
+## Draft scope and rules (agreed November 9, 2026)
 
 Scope agreed after review on November 9: a methods-led internal draft and
-traceable results within four days. Dates are targets, not runtime guarantees.
-This scope overrides the deferred workstream descriptions below.
+traceable results. The four-day schedule below has passed and is kept as a
+record; the order of work is now "Remaining work, in order" above. The scope
+and rules in this section still apply and override the deferred workstream
+descriptions below.
 
 | Day | Priority | Deliverable |
 |---|---|---|
@@ -129,13 +324,15 @@ optlang/Gurobi for model-scale LPs. mkdocs and ruff live only in the base env.
 
 ## 1. Framing of the paper
 
-**Main framing (software/methods):** a redesigned, reproducible and resumable
-THG protocol, with measured examples of how scientific safeguards affect
-model construction and validation. Claim testing and reproducibility only to
-the extent supported by recorded checks and the independent replay.
+**Main framing (updated 2026-11-11):** a protocol that extends Human-GEM 2.1.1
+with finer subcellular resolution, derived from gene locations through the GO
+hierarchy, while stage gates keep the model's conservation and function. The
+redesigned, reproducible and resumable workflow is the means. Claim testing
+and reproducibility only to the extent supported by recorded checks and the
+independent replay.
 
-**Resource evaluation:** compare current THG with Human-GEM 2.1.1 with
-`MAR20193` blocked under matched conditions. Whether THG preserves consistency
+**Main comparison:** current THG against Human-GEM 2.1.1 with `MAR20193`
+blocked under matched conditions. THG-2023 is context only. Whether THG preserves consistency
 and extends useful coverage is a question to test, not a promised conclusion.
 Keep unpatched 2.1.1 as context for the baseline intervention.
 
@@ -151,15 +348,18 @@ strong.
 
 ## 2. Proposed manuscript structure
 
+Updated 2026-11-11 (see "Revised direction").
+
 | Section | Content | Evidence from |
 |---|---|---|
-| Abstract | Methods contribution and verified quantitative findings | WS1, WS2, WS4, WS5 |
-| 1. Introduction | Human GEM curation and reproducibility problem | literature; citations still pending |
-| 2. Methods / Implementation | Workflow, provenance, scientific gates, numerical diagnostics, benchmark settings | WS0, WS1, WS7 |
-| 3.1 Results: correctness | Three measured examples, with origin of defects stated | WS2 |
-| 3.2 Results: model evaluation | Patched baseline vs. THG quality, supported coverage and preservation of task performance | WS4, WS5 |
-| 3.3 Results: reproducibility | Independent replay and stage sizes/runtime | WS1 |
-| 4. Discussion | Supported conclusions, numerical limits, missing validation and future work | all active WS |
+| Abstract | What THG adds to Human-GEM 2.1.1, how it is kept consistent, and verified quantitative findings | WS1, WS2, WS4, WS5 |
+| 1. Introduction | Human GEM curation; limited subcellular resolution of Human-GEM; risk of breaking conservation when expanding a model | literature; citations still pending |
+| 2. Methods / Implementation | Workflow, compartment resolution through the GO hierarchy, gapfill selection (exact MILP, tie-break, removal of inactive connectors; see "Gapfill selection"), provenance, scientific gates, numerical diagnostics, benchmark settings | WS0, WS1, WS7 |
+| 3.1 Results: compartment resolution | Two rule changes (multi-compartment genes; one GO term to several compartments), ablation ladder, worked GO examples | WS2 (`compartment-resolution/`) |
+| 3.2 Results: safe expansion | Stage gates, leak mechanisms with origin of defects stated, 0 of 21 VerifyModel tasks feasible at every stage | WS1, WS2 |
+| 3.3 Results: THG vs Human-GEM 2.1.1 | Size, balance of additions, quality, task preservation, defects found in Human-GEM 2.1.1 | WS4, WS5 |
+| 3.4 Results: reproducibility | Independent replay and stage sizes/runtime | WS1 |
+| 4. Discussion | Supported conclusions, connectivity of added reactions, numerical limits, missing validation and future work | all active WS |
 | Data and code availability | Local artifacts and regeneration commands; public release pending | WS7 |
 | Supplementary | Full fix inventory with evidence strength, per-task results, manifests and validation detail | active WS |
 
@@ -168,8 +368,9 @@ strong.
 | ID | Content | Produced by |
 |---|---|---|
 | Fig 1 | Protocol stages, gates and provenance | WS1 |
-| Fig 2 | Three correctness examples with measured effects | WS2 |
-| Fig 3 | Patched baseline vs. THG quality and supported coverage; task preservation | WS4, WS5 |
+| Fig 2 | Compartment resolution: GO-hierarchy mapping examples and ablation ladder (genes localised, reaction copies per compartment) | WS2 |
+| Fig 3 | Safe expansion: VerifyModel per stage and the three leak mechanisms with measured effects | WS1, WS2 |
+| Fig 4 | Human-GEM 2.1.1 vs. THG: quality, supported coverage, task preservation | WS4, WS5 |
 | Table 1 | Model statistics and benchmark outcomes, including invalid/unresolved counts | WS0, WS4, WS5 |
 | Table S* | Fix inventory, per-task results, stage/replay evidence and validation details | active WS |
 
@@ -325,7 +526,8 @@ Goal: one pinned, end-to-end build that every other workstream uses.
    models in section 3.
 4. Re-run the build once from scratch and check the exported model has the same
    checksum (determinism). If it does not, find and document the
-   nondeterminism.
+   nondeterminism. Both builds must run on the same committed source with a
+   clean tree, and the commit must be saved next to each run.
 5. Export a stage table: per stage, its input/output sizes (reactions,
    metabolites, genes) and runtime. This feeds Fig 1 and Methods.
 
@@ -515,7 +717,7 @@ Goal: show what the models can do, not only how they look.
    (missing reaction, missing transport, blocked metabolite).
 
 Output: `publication/ws5/task_results.csv` (model, table, task id, result,
-cause), summary table for Fig 5.
+cause), summary table for Fig 4.
 Done when: current THG has 21 of 21 VerifyModel tasks infeasible and every
 discordant task has a stated cause. If the stop condition fired, WS5 is not done
 until the user has investigated and given the go-ahead.
@@ -544,9 +746,16 @@ number in `publication/`.
 
 ## 5. Order and dependencies
 
-Numerical task diagnostics → pinned settings → corrected WS1 build → stage
-and final VerifyModel gates → WS4 quality/coverage and WS5 functional tasks →
-figures and Results. Run the independent replay once the candidate is stable.
+Current order (2026-11-18): Gurobi license → commit gapfill change →
+rebuild B and build C on that commit → stage and final VerifyModel gates →
+gapfill-change measurements and B/C comparison → WS4 quality/coverage and WS5
+functional tasks on the rebuilt B → figures and Results. The numbered list
+under "Remaining work, in order" is authoritative.
+
+Original order: numerical task diagnostics → pinned settings → corrected WS1
+build → stage and final VerifyModel gates → WS4 quality/coverage and WS5
+functional tasks → figures and Results. Run the independent replay once the
+candidate is stable.
 Complete WS0 baseline validation with the same settings, scheduling heavy jobs
 sequentially. WS2 and manuscript Introduction/Methods can proceed independently.
 
@@ -575,6 +784,24 @@ Ask; do not decide alone.
    charge curation still to do).
 7. **WS0 legacy/Human1 rows:** *decided 2026-11-09: not needed for now.*
 8. **Commits:** *decided 2026-11-09: commit now.*
+9. **Two-tier export:** open; decide before figures (remaining-work step 8).
+   Classify added reactions as flux-capable or blocked and export both the
+   full localisation layer and a flux-consistent model. Changes the model
+   presented.
+10. **Human Protein Atlas data:** open. Use HPA subcellular locations as an
+    independent check of gene-to-compartment assignments in both models.
+11. **Main comparison:** *decided 2026-11-11: Human-GEM 2.1.1, not THG-2023.*
+12. **Legacy changes in Results:** *decided 2026-11-11: multi-compartment genes
+    and GO-hierarchy compartment mapping; UniProt query and "Cytoplasm" alias
+    dropped from Results.*
+13. **Gapfill selection:** *decided 2026-11-18: exact MILP, rank-then-ID
+    tie-break and removal of inactive connectors approved; describe them in
+    Methods.* Removing the connector stage or choosing connectors by flux, and
+    FASTCORE-style selection, remain deferred.
+14. **HiGHS:** *decided 2026-11-18: add HiGHS as an optional gapfill solver.*
+    Paper runs stay on Gurobi. Open: whether to build a faster HiGHS path that
+    calls `highspy` directly with warm starts (estimated 2–3 days), so the full
+    model can be gap-filled without a commercial license.
 
 ## 7. Rules for the agent
 

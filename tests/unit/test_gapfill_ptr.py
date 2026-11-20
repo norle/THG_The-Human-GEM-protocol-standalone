@@ -12,6 +12,7 @@ from thg_protocol.gapfill import (
     gapfill_model,
     generate_gapfill_plan,
 )
+from thg_protocol.gapfill import ptr as ptr_module
 from thg_protocol.gapfill.core import _resolved_parameters
 from thg_protocol.gapfill.ptr import (
     ComponentCoverage,
@@ -312,6 +313,73 @@ def test_small_components_are_skipped():
     assert [item.component for item in coverages] == [1]
 
 
+def linked_islands():
+    """Island e makes surplus Ae, island m lacks Am: either transport runs both."""
+    return build(
+        {
+            "I1": {"Ae": -1, "Be": 1},
+            "I2": {"Be": -1, "Ae": 2},
+            "J1": {"Am": -1, "Bm": 1},
+            "J2": {"Bm": -2, "Am": 1},
+        }
+    )
+
+
+def linked_coverage(**kwargs):
+    model = linked_islands()
+    components = network_components(model)
+    candidates = generate_ptr_candidates(
+        model, [("e", "m")], ["A", "B", "C"], components
+    )
+    return compute_coverage(model, candidates, components, **kwargs)
+
+
+LINKED = [
+    ComponentCoverage(
+        1,
+        ["I1", "I2"],
+        [],
+        {"GAPFILL_PTR_Ae_Am": ["I1", "I2"], "GAPFILL_PTR_Be_Bm": ["I1", "I2"]},
+    ),
+    ComponentCoverage(
+        2,
+        ["J1", "J2"],
+        [],
+        {"GAPFILL_PTR_Ae_Am": ["J1", "J2"], "GAPFILL_PTR_Be_Bm": ["J1", "J2"]},
+    ),
+]
+
+
+def test_candidate_between_two_components_is_tested_once(monkeypatch):
+    added = []
+    real = ptr_module._add_ptr
+
+    def spy(model, candidate):
+        added.append(candidate.reaction_id)
+        real(model, candidate)
+
+    monkeypatch.setattr(ptr_module, "_add_ptr", spy)
+    assert linked_coverage() == LINKED
+    assert sorted(added) == ["GAPFILL_PTR_Ae_Am", "GAPFILL_PTR_Be_Bm"]
+
+
+def test_parallel_coverage_equals_serial_coverage():
+    seen = []
+    assert linked_coverage(workers=2, on_component=seen.append) == LINKED
+    assert seen == LINKED
+
+
+def test_parallel_coverage_leaves_the_model_unchanged():
+    model = linked_islands()
+    before = sorted(reaction.id for reaction in model.reactions)
+    components = network_components(model)
+    candidates = generate_ptr_candidates(
+        model, [("e", "m")], ["A", "B", "C"], components
+    )
+    compute_coverage(model, candidates, components, workers=2)
+    assert sorted(reaction.id for reaction in model.reactions) == before
+
+
 def overlapping_coverage():
     return [
         ComponentCoverage(
@@ -437,8 +505,21 @@ def test_verification_reports_inactive_connectors():
         {**SINK_MILP, "allowed_connections": [("c", "e"), ("e", "m")]},
     )
     assert result.status == "solved"
-    assert result.selected == ["GAPFILL_PTR_Ke_Km", "GAPFILL_PTR_Ac_Ae"]
     assert result.solver["verification"]["inactive_connectors"] == ["GAPFILL_PTR_Ke_Km"]
+
+
+def test_connector_that_carries_no_flux_is_not_proposed():
+    result = run_sink_milp(
+        three_components(),
+        {**SINK_MILP, "allowed_connections": [("c", "e"), ("e", "m")]},
+    )
+    assert result.status == "solved"
+    assert result.selected == ["GAPFILL_PTR_Ac_Ae"]
+    assert "GAPFILL_PTR_Ke_Km" not in result.model.reactions
+    assert "GAPFILL_PTR_Ac_Ae" in result.model.reactions
+    assert result.candidate_coverage["GAPFILL_PTR_Ke_Km"] == "connector-inactive"
+    assert result.candidate_coverage["GAPFILL_PTR_Ac_Ae"] == "connector"
+    assert result.solver["connectors"] == 1
 
 
 def test_already_present_component_gets_no_proposal():
@@ -498,13 +579,19 @@ def test_components_reject_ids_shared_by_reaction_and_metabolite():
 
 
 def cofactor_islands():
-    """Two islands joined only by a would-be ATP transport (annotated MNXM3)."""
+    """Two islands joined only by a would-be ATP transport (annotated MNXM3).
+
+    The boundary reactions let flux run through that transport; a closed
+    network would leave it inactive and the sink-MILP would drop it.
+    """
     model = build(
         {
             "R1": {"Pc": -1, "Yc": 1},
             "R2": {"Yc": -1, "Pc": 1},
             "R3": {"Pe": -1, "We": 1},
             "R4": {"We": -1, "Pe": 1},
+            "EX_Pc": {"Pc": 1},
+            "EX_We": {"We": -1},
         }
     )
     for identifier in ("Pc", "Pe"):
@@ -589,6 +676,80 @@ def test_connection_costs_steer_the_milp_choice():
     assert (cheap_second.selected, cheap_first.selected) == (["P2"], ["P1"])
 
 
+def test_equal_covers_are_settled_by_rank_then_id():
+    coverage = [
+        ComponentCoverage(2, ["a"], [], {"P1": ["a"], "P2": ["a"], "P3": ["a"]})
+    ]
+    kwargs = {"tradeoff_lambda": 0.01, "budget": 10, "interface": INTERFACE}
+
+    def chosen(ranks):
+        return select_unblockers(coverage, ranks=ranks, **kwargs).selected
+
+    assert chosen({"P1": 2, "P2": 0, "P3": 1}) == ["P2"]
+    assert chosen({"P1": 1, "P2": 2, "P3": 0}) == ["P3"]
+    assert chosen({"P1": 1, "P2": 1, "P3": 1}) == ["P1"]
+    assert chosen({"P1": 1, "P2": 0, "P3": 0}) == ["P2"]
+
+
+def test_rank_never_buys_a_larger_or_dearer_selection():
+    coverage = [
+        ComponentCoverage(
+            2, ["a", "b"], [], {"P1": ["a", "b"], "P2": ["a"], "P3": ["b"]}
+        )
+    ]
+    kwargs = {"tradeoff_lambda": 0.01, "budget": 10, "interface": INTERFACE}
+    ranks = {"P1": 2, "P2": 0, "P3": 0}
+    assert select_unblockers(coverage, ranks=ranks, **kwargs).selected == ["P1"]
+    dear = select_unblockers(
+        [ComponentCoverage(2, ["a"], [], {"P1": ["a"], "P2": ["a"]})],
+        ranks={"P1": 0, "P2": 2},
+        costs={"P1": 3.0, "P2": 1.0},
+        **kwargs,
+    )
+    assert dear.selected == ["P2"]
+
+
+def test_tie_break_keeps_the_optimum_and_reports_an_exact_mip():
+    plain = select_unblockers(
+        overlapping_coverage(), tradeoff_lambda=0.01, budget=10, interface=INTERFACE
+    )
+    assert plain.solver["objective"] == pytest.approx(4 - 0.02)
+    assert plain.solver["mip_gap"] == 0
+
+
+@pytest.mark.parametrize(("drain", "shuttle"), [("m", "e"), ("e", "m")])
+def test_sink_milp_prefers_the_better_typed_of_two_equal_transports(drain, shuttle):
+    """Draining Xc into a substrate-only X (type A) or a product-only X (type B)
+    unblocks T either way; the type-A transport wins wherever its ID sorts.
+
+    The product-only X is drained through its reversible reactions, so it gets
+    no temporary sink.
+    """
+    model = build(
+        {
+            "EXS": {"Sc": 1},
+            "T": {"Sc": -1, "Xc": 1},
+            "U": {f"X{drain}": -1, "Sc": -1},
+            "EXQ": {f"Q{shuttle}": -1},
+            "W1": {f"Q{shuttle}": -1, f"X{shuttle}": 1},
+            "W2": {f"P{shuttle}": -1, f"X{shuttle}": 1},
+            "EXP": {f"P{shuttle}": -1, "Sc": -1},
+        },
+        reversible={"T", "EXQ", "W1", "W2"},
+    )
+    connections = [("c", "e"), ("c", "m")]
+    types = {item.reaction_id: item.type for item in candidates_of(model, connections)}
+    assert types == {
+        f"GAPFILL_PTR_Xc_X{drain}": "A",
+        f"GAPFILL_PTR_Xc_X{shuttle}": "B",
+    }
+    result = run_sink_milp(model, {**SINK_MILP, "allowed_connections": connections})
+    assert result.solver["coverable_targets"] == 1
+    assert result.solver["candidates"] == 2
+    assert result.selected == [f"GAPFILL_PTR_Xc_X{drain}"]
+    assert result.solver["verification"]["verified_unblocked"] == ["T", "U"]
+
+
 def test_candidate_too_costly_for_its_coverage_is_dropped():
     coverage = [ComponentCoverage(2, ["a"], [], {"P1": ["a"]})]
     selection = select_unblockers(
@@ -642,3 +803,20 @@ def test_transport_methods_default_to_the_cofactor_blocklist_and_gate():
         ]
         == {}
     )
+
+
+def test_gurobi_parameters_are_forwarded_to_workers():
+    gurobipy = pytest.importorskip("gurobipy")
+    from thg_protocol.gapfill.ptr import _gurobi_parameters
+    from thg_protocol.gapfill.solvers import gurobi_usable
+
+    if not gurobi_usable():
+        pytest.skip("Gurobi is installed but cannot start (license)")
+
+    assert _gurobi_parameters("glpk") == {}
+    old = gurobipy.getParamInfo("FeasibilityTol")[2]
+    try:
+        gurobipy.setParam("FeasibilityTol", 1e-8)
+        assert _gurobi_parameters("gurobi")["FeasibilityTol"] == 1e-8
+    finally:
+        gurobipy.setParam("FeasibilityTol", old)

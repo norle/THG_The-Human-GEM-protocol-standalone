@@ -29,7 +29,7 @@ The method comes from the legacy `gapfill/` scripts (strategy `sink_milp` in
 | Strategies | greedy, hybrid, tiered MILP, component MILP, sink MILP, chosen by CLI flag | `sink-milp` only for the putative-transport pipeline (`greedy` and `deadends` remain as simpler methods) |
 | How it runs | Three scripts passing CSV/JSON files between them; components picked by hand (`--components 4,5,6,7`) | Four resumable stages in the reference workflow; every component of ≥ 4 nodes is processed |
 | MILP | One per component, solved with PuLP or SciPy | One for the whole model, solved with the model's own solver (Gurobi/CPLEX/GLPK through optlang) and with a global budget |
-| Blocked-reaction test | Two LPs per reaction, parallelised with a process pool | LPs over batches of reactions (FASTCC LP7 and a random-direction LP pair), single process |
+| Blocked-reaction test | Two LPs per reaction, parallelised with a process pool | LPs over batches of reactions (FASTCC LP7 and a random-direction LP pair), in a process pool for large models |
 | "Carries flux" threshold | `10 × solver tolerance` (≈ 1e-5 with Gurobi) | `1e-4` |
 | Credit for the temporary sinks | Included in candidate coverage | Excluded (`sink_only`) |
 | Caching | Pickle files keyed by a hash of the model file | Per-component JSONL lines in the run directory, reused when a retry has the same inputs |
@@ -64,7 +64,9 @@ Treat each component as a node and each candidate between two components as
 an edge. Build a **minimum spanning tree** (Kruskal's algorithm) in which edges
 are ranked by type (A < B < C) and then by base ID. This links every component
 to the network with as few PTRs as possible. These PTRs are the
-**connectors**. They are always proposed.
+**connectors**. Stages 2 and 3 treat them as present. The final plan keeps a
+connector only if it carries flux without the temporary sinks (see
+stage 4).
 
 Output: `ptr-connectors.jsonl`.
 
@@ -83,7 +85,8 @@ This is the expensive step. It runs on the model with the connectors added.
    `sink_only`. No candidate gets credit for them.
 4. For each remaining candidate PTR that touches the component: add it, test
    which remaining targets are now unblocked, then remove it. This gives a
-   coverage list `candidate → {targets it unblocks}`.
+   coverage list `candidate → {targets it unblocks}`. A candidate between two
+   components is tested once, against the targets of both.
 
 A reaction counts as unblocked if it can carry |v| ≥ 1e-4. The test does not
 run two LPs per reaction:
@@ -98,6 +101,17 @@ run two LPs per reaction:
 - If neither LP gives a new answer, the remaining reactions are tested one at
   a time, so the result is the same as the per-reaction test (up to solver
   tolerance).
+- Before LP7, one LP maximises the plain sum of the fluxes of the irreversible
+  reactions whose direction is fixed by their bounds. A maximum below ε proves
+  that none of them can reach it, and LP7 is skipped. The pre-check is not
+  used when one of those bounds is infinite, since the sum could be unbounded.
+
+The candidate tests are independent, so they can run in a process pool. The
+`coverage_workers` setting gives the number of processes. When it is not set,
+one process is started per 64 tests, up to 8 and up to the CPU count, so small
+models stay in one process. Each worker holds its own copy of the model
+(about 560 MB for 14,888 reactions). Results do not depend on the number of
+workers, and the setting is not part of any stage fingerprint.
 
 Each finished component is written as one line of `ptr-coverage.jsonl`. If
 the stage fails or is interrupted, a retry with the same inputs reuses those
@@ -123,6 +137,12 @@ whenever it covers at least one target that is not covered yet. Among
 solutions that cover the same number of targets, the one with the fewest PTRs
 wins. The `z_r` do not need to be integer: at the optimum each one is pushed
 to 0 or 1.
+
+The MILP is solved exactly (`MIPGap = 0` on Gurobi). Several selections can
+share the same number of covered targets and the same cost, so a second solve
+fixes both values and minimises the summed preference position of the chosen
+PTRs (type A before B before C, then by reaction ID). The same inputs
+therefore give the same plan. An exact tie in that sum is not detected.
 
 `tradeoff_lambda` is multiplied by a per-candidate cost, 1 by default. The
 optional `connection_costs` setting (for example `{"c:m": 3}`; compartment
@@ -163,7 +183,13 @@ selected PTRs (`phase: 3`), with IDs `GAPFILL_PTR_<met1>_<met2>`. Status is:
 Finally, `verify_selection` checks the model with the connectors and selected
 PTRs but **without** the temporary sinks. It reports which targets really carry
 flux (`verified_unblocked`) and which connectors carry none
-(`inactive_connectors`). The report is for review only and changes nothing.
+(`inactive_connectors`). A connector that carries no flux is removed from the
+plan, one at a time, and the model is verified again after each removal, so
+`verification` describes the final model. The removed IDs stay in
+`verification["inactive_connectors"]` and their candidate status is
+`connector-inactive`. The plan status stays `solved`: dropping a blocked
+reaction changes no flux, so it is not a partial result. Targets that fail
+verification are only reported.
 
 ## Why the two legacy fixes matter
 
@@ -199,8 +225,56 @@ Points to note from this run:
 - Verification found 32 of the 39 targets carrying flux without the sinks. The
   other 7 depended on a sink that the final model does not have.
 - Connectors join components topologically, but 4 of the 7 carry no flux.
-  They are still proposed. Whether to drop inactive connectors is an open
-  decision.
+  The current code drops such connectors from the plan; this run predates that
+  change.
+
+## Timing of the coverage step
+
+On run `thg-ws1-a` (14,888 reactions, Gurobi, 22,470 candidate tests), the
+earlier single-process code needed about 0.4 s per test, roughly 2.5 hours in
+all. Of the 0.44 s measured for one test, 0.125 s was LP solving; the rest was
+Python and optlang overhead. With the lower overhead, one test per
+cross-component candidate and eight workers, the whole step took 536 s. For
+components 1–4 the coverage sets, targets and `sink_only` sets are identical
+to those of the earlier serial run (117, 63, 35 and 37 candidates with
+coverage).
+
+In that run 1 of 152 connectors carried flux without the temporary sinks, and
+1,227 of 3,328 blocked reactions were `sink_only`.
+
+## Solver
+
+The `gapfill.solver` setting chooses the LP/MILP solver for every gapfill
+stage that solves (all except loading the source, generating candidates and
+choosing connectors):
+
+| Value | Solver |
+| --- | --- |
+| not set | cobra's configured default (Gurobi when installed) |
+| `gurobi` | Gurobi; fails if its license cannot start |
+| `highs` | HiGHS through optlang's `hybrid` interface (`pip install highspy osqp`) |
+| `glpk` | GLPK |
+| `auto` | Gurobi if it can start, otherwise HiGHS |
+
+The run never changes solver silently. The resolved solver is part of the
+fingerprint of every solving gapfill stage, so a resumed run cannot mix stages
+solved with different solvers, and the plan header records the MILP interface
+(`solver.interface`) and the gap in force (`solver.mip_gap`). With HiGHS the
+MILP is also solved with a relative gap of 0. Worker processes of the coverage
+step build their model on the parent's solver, not on cobra's default.
+
+Results can differ slightly between solvers: whether a reaction reaches the
+1e-4 flux threshold depends on the solver's numerics near that value. Runs
+that are compared with each other must use the same solver.
+
+HiGHS is much slower here. optlang's `hybrid` interface rebuilds the whole
+matrix and starts HiGHS from scratch for every LP. On the β2 model of
+`thg-ws1-b` (14,888 reactions) one LP took about 1.8 s with HiGHS, of which
+0.35 s was the matrix rebuild, against about 0.04 s with Gurobi. The full
+coverage step (about 22,000 candidate tests of a few LPs each) is therefore
+impractical on HiGHS at this model size; the small and medium models in the
+tests and the selection MILP are fine. A faster HiGHS path would call
+`highspy` directly and warm-start from the previous basis.
 
 ## Open points
 
@@ -209,5 +283,9 @@ Points to note from this run:
 - `allowed_connections` contains no c–e (cytosol–extracellular) or m–i
   (mitochondria–inner mitochondrial membrane) pair. Those transports can never
   be proposed. Whether that is intended needs a decision.
-- Inactive connectors and targets that fail verification are only reported.
-  Nothing acts on them.
+- Targets that fail verification are only reported. Nothing acts on them.
+- Connectors are still chosen and counted against `max_additions` before the
+  inactive ones are dropped. Removing the connector stage altogether, or
+  choosing connectors by flux, is part of the deferred method discussion.
+- A prefilter that skips candidates unable to carry flux alone was not
+  implemented; its gain after the overhead cut is expected to be small.

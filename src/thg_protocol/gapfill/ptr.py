@@ -6,15 +6,21 @@ The legacy three-phase pipeline, as pure functions over COBRApy models:
    either join two network components or link main-component dead ends;
 2. connectors: a minimum spanning tree over components, one PTR per edge;
 3. coverage and selection: per component, which blocked reactions each PTR
-   unblocks with temporary dead-end sinks, then one MILP picks the PTRs.
+   unblocks with temporary dead-end sinks, then one MILP picks the PTRs. The
+   MILP is solved exactly and ties are broken by candidate type, then ID.
+
+A connector that cannot carry flux in the final model, which has no temporary
+sinks, is dropped from the result. Coverage tests can run in a process pool.
 """
 
 from __future__ import annotations
 
 import math
+import os
 import random
 import re
-from collections.abc import Callable, Collection, Mapping
+from collections.abc import Callable, Collection, Iterator, Mapping
+from contextlib import contextmanager
 from dataclasses import asdict, dataclass, field, replace
 from typing import Any
 
@@ -242,12 +248,29 @@ def _connector_key(candidate: PtrCandidate) -> tuple[int, str, str, str]:
     return (_RANK[candidate.type], candidate.base, candidate.met1, candidate.met2)
 
 
-def _fluxes(model: Any, reactions: dict[str, Any]) -> dict[str, float]:
-    primal = model.solver.primal_values
+_Variables = dict[str, tuple[Any, Any]]
+
+
+def _flux_variables(model: Any, reaction_ids: Collection[str]) -> _Variables:
+    """Forward and reverse solver variables of the reactions found in ``model``.
+
+    Looked up once per call: ``reaction.forward_variable`` synchronizes the
+    solver on every access, which costs more than the LPs when repeated for
+    hundreds of reactions.
+    """
+    variables = model.variables
+    reactions = model.reactions
     return {
-        rid: primal[reaction.forward_variable.name]
-        - primal[reaction.reverse_variable.name]
-        for rid, reaction in reactions.items()
+        rid: (variables[rid], variables[reactions.get_by_id(rid).reverse_id])
+        for rid in reaction_ids
+        if rid in reactions
+    }
+
+
+def _fluxes(variables: _Variables, reaction_ids: Collection[str]) -> dict[str, float]:
+    """Net flux of ``reaction_ids`` in the solver's current solution."""
+    return {
+        rid: variables[rid][0].primal - variables[rid][1].primal for rid in reaction_ids
     }
 
 
@@ -266,7 +289,11 @@ def _solve(model: Any) -> float | None:
 
 
 def _lp7(
-    model: Any, signs: dict[str, int], epsilon: float, watched: dict[str, Any]
+    model: Any,
+    variables: _Variables,
+    signs: dict[str, int],
+    epsilon: float,
+    watched: Collection[str],
 ) -> tuple[float, dict[str, float]] | None:
     """FASTCC LP7: maximize sum z, 0 <= z_r <= epsilon, z_r <= sign_r * v_r.
 
@@ -276,76 +303,76 @@ def _lp7(
     """
     from optlang.symbolics import Zero
 
-    reactions = [model.reactions.get_by_id(rid) for rid in sorted(signs)]
+    ordered = sorted(signs)
     with model:
         z = [
             model.problem.Variable(f"_ptr_lp7_z_{index}", lb=0, ub=epsilon)
-            for index in range(len(reactions))
+            for index in range(len(ordered))
         ]
         constraints = [
             model.problem.Constraint(Zero, ub=0, name=f"_ptr_lp7_c_{index}")
-            for index in range(len(reactions))
+            for index in range(len(ordered))
         ]
         model.add_cons_vars([*z, *constraints])
-        for variable, constraint, reaction in zip(
-            z, constraints, reactions, strict=True
-        ):
-            sign = signs[reaction.id]
+        model.solver.update()  # rows must exist before they get coefficients
+        for variable, constraint, rid in zip(z, constraints, ordered, strict=True):
+            sign = signs[rid]
+            forward, reverse = variables[rid]
             constraint.set_linear_coefficients(
-                {
-                    variable: 1,
-                    reaction.forward_variable: -sign,
-                    reaction.reverse_variable: sign,
-                }
+                {variable: 1, forward: -sign, reverse: sign}
             )
         model.objective = model.problem.Objective(Zero, direction="max")
         model.objective.set_linear_coefficients({variable: 1 for variable in z})
         value = _solve(model)
         if value is None:
             return None
-        return value, _fluxes(model, watched)
+        return value, _fluxes(variables, watched)
 
 
 def _optimize_direction(
-    model: Any, weights: dict[str, float], direction: str, watched: dict[str, Any]
+    model: Any,
+    variables: _Variables,
+    weights: Mapping[str, float],
+    direction: str,
+    watched: Collection[str],
 ) -> tuple[float, dict[str, float]] | None:
     """Optimize ``sum weight_r * v_r``; ``watched`` fluxes, ``None`` if infeasible."""
     from optlang.symbolics import Zero
 
     coefficients = {}
     for rid, weight in weights.items():
-        reaction = model.reactions.get_by_id(rid)
-        coefficients[reaction.forward_variable] = weight
-        coefficients[reaction.reverse_variable] = -weight
+        forward, reverse = variables[rid]
+        coefficients[forward] = weight
+        coefficients[reverse] = -weight
     with model:
         model.objective = model.problem.Objective(Zero, direction=direction)
         model.objective.set_linear_coefficients(coefficients)
         value = _solve(model)
         if value is None:
             return None
-        return value, _fluxes(model, watched)
+        return value, _fluxes(variables, watched)
 
 
 def unblockable(model: Any, reaction_ids: set[str], epsilon: float) -> set[str]:
     """Reactions of ``reaction_ids`` that can carry at least ``epsilon`` flux.
 
     Every LP solution is a witness: a reaction it shows at ``epsilon`` or more
-    is unblockable. Irreversible reactions go through FASTCC's LP7 loop, whose
-    optimum below ``epsilon`` proves none of them can reach it. Reversible
-    reactions are pushed both ways along one random direction ``c``; when
-    ``c . v`` cannot vary, none of them can, and the witness settles them.
-    When neither LP proves anything new, the varying reactions are maximized
-    one at a time, so the result matches two LPs per reaction up to tolerance.
+    is unblockable. Irreversible reactions are first pushed together: their
+    fluxes cannot be negative, so a maximal sum below ``epsilon`` proves none
+    of them can reach it, without building anything. Otherwise they go through
+    FASTCC's LP7 loop, whose optimum below ``epsilon`` is the same proof.
+    Reversible reactions are pushed both ways along one random direction
+    ``c``; when ``c . v`` cannot vary, none of them can, and the witness
+    settles them. When neither LP proves anything new, the varying reactions
+    are maximized one at a time, so the result matches two LPs per reaction up
+    to tolerance.
     """
     threshold = 0.99 * epsilon
-    reactions = {
-        rid: model.reactions.get_by_id(rid)
-        for rid in reaction_ids
-        if rid in model.reactions
-    }
+    variables = _flux_variables(model, reaction_ids)
+    reactions = {rid: model.reactions.get_by_id(rid) for rid in variables}
     found: set[str] = set()
 
-    def harvest(fluxes: dict[str, float], pending: set[str]) -> set[str]:
+    def harvest(fluxes: dict[str, float], pending: Collection[str]) -> set[str]:
         new = {rid for rid in pending if abs(fluxes[rid]) >= threshold}
         found.update(new)
         return new
@@ -361,8 +388,26 @@ def unblockable(model: Any, reaction_ids: set[str], epsilon: float) -> set[str]:
         for rid, reaction in reactions.items()
         if reaction.lower_bound < 0 < reaction.upper_bound
     }
+    # An infinite bound could make the plain sum unbounded; LP7 caps it.
+    if signs and all(
+        math.isfinite(
+            reactions[rid].upper_bound if sign > 0 else reactions[rid].lower_bound
+        )
+        for rid, sign in signs.items()
+    ):
+        watched = [*signs, *reversible]
+        solved = _optimize_direction(model, variables, signs, "max", watched)
+        if solved is None:
+            return found
+        value, fluxes = solved
+        if value < threshold:
+            signs = {}
+        else:
+            harvest(fluxes, watched)
+            reversible -= found
+            signs = {rid: sign for rid, sign in signs.items() if rid not in found}
     while signs:
-        solved = _lp7(model, signs, epsilon, reactions)
+        solved = _lp7(model, variables, signs, epsilon, [*signs, *reversible])
         if solved is None:
             return found
         value, fluxes = solved
@@ -385,8 +430,8 @@ def unblockable(model: Any, reaction_ids: set[str], epsilon: float) -> set[str]:
             rid: rng.choice((-1, 1)) * rng.uniform(0.5, 1.0)
             for rid in sorted(reversible)
         }
-        high = _optimize_direction(model, weights, "max", reactions)
-        low = _optimize_direction(model, weights, "min", reactions)
+        high = _optimize_direction(model, variables, weights, "max", reversible)
+        low = _optimize_direction(model, variables, weights, "min", reversible)
         if high is None or low is None:
             return found
         new = harvest(high[1], reversible) | harvest(low[1], reversible)
@@ -492,6 +537,134 @@ def candidate_costs(
     }
 
 
+def _newly_unblocked(model: Any, candidate: PtrCandidate, wanted: set[str]) -> set[str]:
+    """Reactions of ``wanted`` that adding ``candidate`` lets carry flux."""
+    with model:
+        _add_ptr(model, candidate)
+        return unblockable(model, wanted, EPSILON)
+
+
+#: Candidate tests that justify starting one more worker process.
+TESTS_PER_WORKER = 64
+#: Most worker processes started when the caller does not say how many.
+MAX_AUTO_WORKERS = 8
+
+_Test = tuple[PtrCandidate, tuple[int, ...]]
+_WORKER: dict[str, Any] = {}
+
+
+#: Gurobi parameters a spawned worker must share with its parent: tolerances
+#: decide which reactions count as able to carry flux, and a worker that falls
+#: back to Gurobi's own thread default would oversubscribe the machine.
+_GUROBI_WORKER_PARAMETERS = (
+    "Threads",
+    "FeasibilityTol",
+    "OptimalityTol",
+    "IntFeasTol",
+    "MIPGap",
+    "Method",
+)
+
+
+def _gurobi_parameters(solver: str) -> dict[str, Any]:
+    """Parameters set on the parent's global Gurobi environment."""
+    if solver != "gurobi":
+        return {}
+    import gurobipy
+
+    return {name: gurobipy.getParamInfo(name)[2] for name in _GUROBI_WORKER_PARAMETERS}
+
+
+def _start_worker(
+    payload: dict[str, Any],
+    solver: str,
+    tolerance: float,
+    remaining: dict[int, set[str]],
+    solver_parameters: dict[str, Any],
+) -> None:
+    """Rebuild the coverage model (temporary sinks included) in a worker."""
+    from cobra import Configuration
+    from cobra.io.dict import model_from_dict
+    from cobra.util.solver import interface_to_str
+
+    # Build the model on the parent's solver from the start: a spawned process
+    # would otherwise use cobra's default, which may be an unlicensed Gurobi.
+    Configuration().solver = solver
+    if solver_parameters:
+        import gurobipy
+
+        for name, value in solver_parameters.items():
+            gurobipy.setParam(name, value)
+    model = model_from_dict(payload)
+    if interface_to_str(model.problem) != solver:
+        model.solver = solver
+    model.tolerance = tolerance
+    _WORKER.update(model=model, remaining=remaining)
+
+
+def _test_in_worker(task: tuple[dict[str, Any], tuple[int, ...]]) -> list[str]:
+    payload, numbers = task
+    wanted = set().union(*(_WORKER["remaining"][number] for number in numbers))
+    return sorted(
+        _newly_unblocked(_WORKER["model"], PtrCandidate.from_dict(payload), wanted)
+    )
+
+
+@contextmanager
+def _candidate_tests(
+    model: Any, remaining: dict[int, set[str]], workers: int
+) -> Iterator[Callable[[list[_Test]], list[set[str]]]]:
+    """Yield ``run(tests)``: what each candidate unblocks in its components.
+
+    A test is a candidate and the components whose remaining targets it is
+    tried against. With ``workers`` above 1 the tests run in that many
+    processes, each on its own copy of ``model``; the candidates are
+    independent, so the answers are those of a serial run.
+    """
+    if workers <= 1:
+
+        def run(tests: list[_Test]) -> list[set[str]]:
+            return [
+                _newly_unblocked(
+                    model,
+                    candidate,
+                    set().union(*(remaining[number] for number in numbers)),
+                )
+                for candidate, numbers in tests
+            ]
+
+        yield run
+        return
+    import multiprocessing
+    from concurrent.futures import ProcessPoolExecutor
+
+    from cobra.io.dict import model_to_dict
+    from cobra.util.solver import interface_to_str
+
+    # Spawned, not forked: solver environments and threads do not survive a fork.
+    with ProcessPoolExecutor(
+        workers,
+        mp_context=multiprocessing.get_context("spawn"),
+        initializer=_start_worker,
+        initargs=(
+            model_to_dict(model),
+            interface_to_str(model.problem),
+            model.tolerance,
+            remaining,
+            _gurobi_parameters(interface_to_str(model.problem)),
+        ),
+    ) as pool:
+
+        def run(tests: list[_Test]) -> list[set[str]]:
+            tasks = [(candidate.to_dict(), numbers) for candidate, numbers in tests]
+            chunk = max(1, min(16, len(tasks) // (workers * 4)))
+            return [
+                set(item) for item in pool.map(_test_in_worker, tasks, chunksize=chunk)
+            ]
+
+        yield run
+
+
 def compute_coverage(
     model: Any,
     candidates: list[PtrCandidate],
@@ -500,6 +673,7 @@ def compute_coverage(
     min_component_size: int = 4,
     done: Mapping[int, ComponentCoverage] | None = None,
     on_component: Callable[[ComponentCoverage], None] | None = None,
+    workers: int | None = 1,
 ) -> list[ComponentCoverage]:
     """Per original component, the blocked reactions each candidate unblocks.
 
@@ -507,6 +681,11 @@ def compute_coverage(
     of the model before phase 2. Components below ``min_component_size`` nodes
     are skipped. A component in ``done`` is reused, and ``on_component`` is
     called after each newly computed one. ``model`` is left unchanged.
+
+    A candidate between two components is tested once, against the targets of
+    both. ``workers`` is the number of processes that test candidates;
+    ``None`` starts one per ``TESTS_PER_WORKER`` tests, up to the CPU count
+    and ``MAX_AUTO_WORKERS``. The result does not depend on it.
     """
     done = dict(done or {})
     epsilon = EPSILON
@@ -532,23 +711,50 @@ def compute_coverage(
         blocked = reactions - unblockable(model, reactions, epsilon)
         with model:
             _add_temporary_exchanges(model)
-            for number in todo:
-                targets = blocked & members.get(number, set())
-                sink_only = unblockable(model, targets, epsilon)
-                remaining = targets - sink_only
-                coverage = {}
-                for candidate in testable.get(number, []) if remaining else []:
-                    with model:
-                        _add_ptr(model, candidate)
-                        unblocked = unblockable(model, remaining, epsilon)
-                    if unblocked:
-                        coverage[candidate.reaction_id] = sorted(unblocked)
-                entry = ComponentCoverage(
-                    number, sorted(targets), sorted(sink_only), coverage
+            sink_only = unblockable(model, blocked, epsilon)
+            targets = {number: blocked & members.get(number, set()) for number in todo}
+            remaining = {
+                number: targets[number] - sink_only
+                for number in todo
+                if targets[number] - sink_only
+            }
+            tests: dict[str, list[int]] = {}
+            for number in remaining:
+                for candidate in testable.get(number, []):
+                    tests.setdefault(candidate.reaction_id, []).append(number)
+            if workers is None:
+                workers = min(
+                    os.cpu_count() or 1,
+                    MAX_AUTO_WORKERS,
+                    len(tests) // TESTS_PER_WORKER,
                 )
-                computed[number] = entry
-                if on_component is not None:
-                    on_component(entry)
+            unblocked: dict[str, set[str]] = {}
+            with _candidate_tests(model, remaining, min(workers, len(tests))) as run:
+                for number in todo:
+                    batch = [
+                        (candidate, tuple(tests[candidate.reaction_id]))
+                        for candidate in testable.get(number, [])
+                        if number in remaining
+                        and candidate.reaction_id not in unblocked
+                    ]
+                    for (candidate, _), found in zip(batch, run(batch), strict=True):
+                        unblocked[candidate.reaction_id] = found
+                    coverage = {}
+                    for candidate in testable.get(number, []):
+                        mine = unblocked.get(
+                            candidate.reaction_id, set()
+                        ) & remaining.get(number, set())
+                        if mine:
+                            coverage[candidate.reaction_id] = sorted(mine)
+                    entry = ComponentCoverage(
+                        number,
+                        sorted(targets[number]),
+                        sorted(targets[number] & sink_only),
+                        coverage,
+                    )
+                    computed[number] = entry
+                    if on_component is not None:
+                        on_component(entry)
     return [done.get(number) or computed[number] for number in numbers]
 
 
@@ -563,6 +769,35 @@ class Selection:
     solver: dict[str, Any] = field(default_factory=dict)
 
 
+def _exact_mip(problem: Any) -> float | None:
+    """Ask for a proven optimum; the relative gap in force, ``None`` if unknown.
+
+    Gurobi and HiGHS stop at a relative gap of 1e-4 by default. With hundreds
+    of targets in the objective that is more than ``tradeoff_lambda``, i.e.
+    room for PTRs a true optimum would not contain.
+    """
+    interface = type(problem).__module__
+    if interface == "optlang.gurobi_interface":
+        problem.problem.Params.MIPGap = 0.0
+        return float(problem.problem.Params.MIPGap)
+    if interface == "optlang.glpk_interface":
+        return 0.0  # GLPK's default, which optlang leaves alone
+    if interface == "optlang.hybrid_interface":
+        # HiGHS (default gap 1e-4). optlang rebuilds the HiGHS options from its
+        # own settings on every solve, so the gap is added to that step.
+        inner = problem.problem
+        base = inner.highs_settings
+
+        def highs_settings() -> Any:
+            options = base()
+            options.mip_rel_gap = 0.0
+            return options
+
+        inner.highs_settings = highs_settings
+        return float(highs_settings().mip_rel_gap)
+    return None
+
+
 def select_unblockers(
     coverage: list[ComponentCoverage],
     *,
@@ -570,6 +805,7 @@ def select_unblockers(
     budget: int,
     interface: Any,
     costs: Mapping[str, float] | None = None,
+    ranks: Mapping[str, int] | None = None,
 ) -> Selection:
     """Maximize covered targets minus ``tradeoff_lambda * cost`` per selected PTR.
 
@@ -579,6 +815,12 @@ def select_unblockers(
     One global problem on an optlang ``interface``: binary y per candidate,
     z_r <= sum of y over the candidates covering target r, sum y <= budget.
     Status is ``partial`` when the budget binds with coverable targets left.
+
+    Equally good selections are common (two transports that unblock the same
+    reactions), and which one a solver returns is arbitrary. A second solve
+    therefore keeps the coverage and cost of the optimum and minimizes the
+    summed preference position of the selected candidates, ordered by
+    ``ranks`` (lower first, default 0) and then by ID.
     """
     from optlang.symbolics import add
 
@@ -595,9 +837,11 @@ def select_unblockers(
         "budget": budget,
         "candidates": len(candidates),
         "coverable_targets": len(covering),
+        "interface": interface.__name__.rsplit(".", 1)[-1],
     }
     if not candidates:
         return Selection([], [], "solved", solver={**solver, "milp_status": "empty"})
+    price = {name: (costs or {}).get(name, 1.0) for name in candidates}
     problem = interface.Model()
     y = {
         name: interface.Variable(f"y_{index}", type="binary")
@@ -622,9 +866,18 @@ def select_unblockers(
     )
     problem.objective = interface.Objective(
         add(list(z.values()))
-        - tradeoff_lambda * add([(costs or {}).get(name, 1.0) * y[name] for name in y]),
+        - tradeoff_lambda * add([price[name] * y[name] for name in y]),
         direction="max",
     )
+    solver["mip_gap"] = _exact_mip(problem)
+
+    def solution() -> tuple[list[str], list[str]]:
+        selected = sorted(name for name, variable in y.items() if variable.primal > 0.5)
+        chosen = set(selected)
+        return selected, sorted(
+            target for target, names in covering.items() if chosen.intersection(names)
+        )
+
     status = problem.optimize()
     solver["milp_status"] = status
     if status != "optimal":
@@ -632,11 +885,33 @@ def select_unblockers(
             [], [], "failed", f"sink MILP ended with status {status}", solver
         )
     solver["objective"] = problem.objective.value
-    selected = sorted(name for name, variable in y.items() if variable.primal > 0.5)
-    chosen = set(selected)
-    covered = sorted(
-        target for target, names in covering.items() if chosen.intersection(names)
+    selected, covered = solution()
+    # Covering fewer targets or paying more would no longer be an optimum.
+    spent = sum(price[name] for name in selected)
+    problem.add(
+        [
+            interface.Constraint(
+                add(list(z.values())), lb=len(covered) - 0.5, name="keep_coverage"
+            ),
+            interface.Constraint(
+                add([price[name] * y[name] for name in y]),
+                ub=spent + 1e-6 * max(1.0, spent),
+                name="keep_cost",
+            ),
+        ]
     )
+    order = sorted(candidates, key=lambda name: ((ranks or {}).get(name, 0), name))
+    problem.objective = interface.Objective(
+        add([position * y[name] for position, name in enumerate(order, 1)]),
+        direction="min",
+    )
+    status = problem.optimize()
+    solver["tie_break"] = {"order": "rank, then ID", "milp_status": status}
+    if status != "optimal":
+        return Selection(
+            [], [], "failed", f"sink MILP tie-break ended with status {status}", solver
+        )
+    selected, covered = solution()
     partial = len(selected) >= budget and len(covered) < len(covering)
     return Selection(
         selected, covered, "partial" if partial else "solved", solver=solver
@@ -709,8 +984,11 @@ def run_sink_milp(
     """Run candidates, connectors, coverage and MILP on a copy of ``model``.
 
     Phases already computed (by workflow stages) are passed in and reused.
-    The result selects the connectors (phase 2) and then the MILP's PTRs
-    (phase 3); ``solver`` carries MILP metadata and the verification report.
+    The result selects the connectors (phase 2) that carry flux in the final
+    model and then the MILP's PTRs (phase 3). A connector that stays inactive
+    is removed, listed in ``verification["inactive_connectors"]`` and marked
+    ``connector-inactive`` in the candidate coverage. ``solver`` carries MILP
+    metadata and the verification report.
     """
     parameters = _resolved_parameters("sink-milp", parameters)
     if isinstance(model, dict):
@@ -761,6 +1039,9 @@ def run_sink_milp(
         budget=budget,
         interface=result_model.solver.interface,
         costs=candidate_costs(candidates, parameters["connection_costs"]),
+        ranks={
+            candidate.reaction_id: _RANK[candidate.type] for candidate in candidates
+        },
     )
     if selection.status == "failed":
         failed = _failed(model.copy(), parameters, before, "milp-failed")
@@ -781,7 +1062,17 @@ def run_sink_milp(
     connectors = [item for item in connectors if item.reaction_id not in rejected]
     chosen = [item for item in chosen if item.reaction_id not in rejected]
     targets = {target for item in coverage for target in item.targets}
-    verification = verify_selection(result_model, connectors, chosen, targets)
+    # A connector joins components on paper only until it can carry flux. One
+    # that cannot is left out: removing a blocked reaction changes no flux.
+    inactive: list[str] = []
+    while True:
+        verification = verify_selection(result_model, connectors, chosen, targets)
+        if not verification["inactive_connectors"]:
+            break
+        inactive += verification["inactive_connectors"]
+        result_model.remove_reactions(verification["inactive_connectors"])
+        connectors = [item for item in connectors if item.reaction_id not in inactive]
+    verification["inactive_connectors"] = inactive
     connector_ids = {candidate.reaction_id for candidate in connectors}
     chosen_ids = {candidate.reaction_id for candidate in chosen}
     candidate_coverage = {
@@ -789,6 +1080,8 @@ def run_sink_milp(
         if candidate.reaction_id in rejected
         else "already-present"
         if candidate.present
+        else "connector-inactive"
+        if candidate.reaction_id in inactive
         else "connector"
         if candidate.reaction_id in connector_ids
         else "selected"
