@@ -89,7 +89,8 @@ def export(run, out):
         start, end = state.get("started_at"), state.get("finished_at")
         runtime = (
             (
-                datetime.fromisoformat(end) - datetime.fromisoformat(start)
+                datetime.fromisoformat(end.replace("Z", "+00:00"))
+                - datetime.fromisoformat(start.replace("Z", "+00:00"))
             ).total_seconds()
             if start and end
             else None
