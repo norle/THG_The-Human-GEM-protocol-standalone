@@ -1,0 +1,29 @@
+{
+  "sources": {
+    "runs/thg-ws1-b/artifacts/validate-gapfill/attempt-0002/validation-report.json": "98acbe844573304150f0fefd7de5b60e1a27e98807daada9e314d43e9abef0b7",
+    "runs/thg-ws1-b/artifacts/apply-gapfill/attempt-0002/gapfilled-candidate.json": "3e32b47f4b2345e7d0a5c48050c0293c25060093245997b6ae94a5d261fefc6d",
+    "runs/thg-ws1-b/artifacts/export-reference/attempt-0002/thg-reference.json": "fd7da017ad2cd616b26829b5d04f5270aa28ca3c1cf822213cdd780b07636dda",
+    "runs/thg-ws1-b/artifacts/generate-gapfill-plan/attempt-0002/gapfill-plan.jsonl": "43225f1ff1c4759cbf322cd66074f23e0b0f5fbcbd0798e2c9131a870f32dce9"
+  },
+  "method": "COBRApy blocked reaction check with model exchange bounds",
+  "model_scope": "Applied model and final JSON differ only in model annotation",
+  "blocked_before_gapfill": 3393,
+  "blocked_after_gapfill": 3471,
+  "previously_blocked_now_flux_capable": 47,
+  "previously_blocked_copies_now_flux_capable": 5,
+  "newly_blocked_preexisting_reactions": 0,
+  "additions": {
+    "β2 copies": {
+      "flux_capable": 9,
+      "blocked": 2131
+    },
+    "Gapfill connectors": {
+      "flux_capable": 16,
+      "blocked": 0
+    },
+    "Selected transports": {
+      "flux_capable": 37,
+      "blocked": 125
+    }
+  }
+}

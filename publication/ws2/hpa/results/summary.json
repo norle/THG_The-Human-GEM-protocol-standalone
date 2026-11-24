@@ -1,0 +1,211 @@
+{
+ "hpa_file": "publication/ws2/hpa/source/subcellular_location.tsv",
+ "hpa_zip_sha256": "f01de8b4102bc0b8922d40cd036719830d3274392add11ea558229d652af3d08",
+ "go_obo_sha256": "c72fc198a86983d55e43aac585d1ffdbeb6e3601475b3f18b6045acdc0a0734c",
+ "keep_uncertain": false,
+ "hpa_genes_used": 12853,
+ "hpa_genes_with_mapped_compartment": 12121,
+ "hpa_terms_unmapped": [
+  [
+   "Vesicles",
+   2277
+  ],
+  [
+   "Cell Junctions",
+   306
+  ],
+  [
+   "Cytokinetic bridge",
+   241
+  ],
+  [
+   "Focal adhesion sites",
+   138
+  ],
+  [
+   "Connecting piece",
+   85
+  ],
+  [
+   "Mitotic chromosome",
+   79
+  ],
+  [
+   "Equatorial segment",
+   75
+  ],
+  [
+   "Cytoplasmic bodies",
+   71
+  ],
+  [
+   "Calyx",
+   68
+  ],
+  [
+   "Midbody",
+   52
+  ],
+  [
+   "Lipid droplets",
+   40
+  ],
+  [
+   "Midbody ring",
+   25
+  ],
+  [
+   "Aggresome",
+   19
+  ],
+  [
+   "Rods & Rings",
+   19
+  ],
+  [
+   "Kinetochore",
+   8
+  ]
+ ],
+ "hpa_terms_mapped": [
+  [
+   "Nucleoplasm",
+   6026
+  ],
+  [
+   "Cytosol",
+   5063
+  ],
+  [
+   "Plasma membrane",
+   2150
+  ],
+  [
+   "Golgi apparatus",
+   1207
+  ],
+  [
+   "Mitochondria",
+   1081
+  ],
+  [
+   "Nucleoli",
+   1062
+  ],
+  [
+   "Nuclear bodies",
+   615
+  ],
+  [
+   "Endoplasmic reticulum",
+   561
+  ],
+  [
+   "Primary cilium",
+   498
+  ],
+  [
+   "Nuclear speckles",
+   490
+  ],
+  [
+   "Centrosome",
+   479
+  ],
+  [
+   "Basal body",
+   469
+  ],
+  [
+   "Principal piece",
+   346
+  ],
+  [
+   "Microtubules",
+   330
+  ],
+  [
+   "Mid piece",
+   327
+  ]
+ ],
+ "code_commit": "1805783f471452e27f02ff9fe3fa213091e4bade",
+ "script_sha256": "0e88be3ac15dad2d2f3784a02a8dcc1f2dbf37e627308c1dce95ec6c60099c1b",
+ "models": {
+  "baseline": {
+   "path": "runs/human211-patched/Human_211_patched.xml",
+   "sha256": "04cb9de9e9ea3236c2ba06487847348ec2b7d5576d2e1c33e2f1ef9c58ab3f38",
+   "compartments": [
+    "c",
+    "e",
+    "g",
+    "i",
+    "l",
+    "m",
+    "n",
+    "r",
+    "x"
+   ],
+   "genes_with_single_compartment_reactions": 2289,
+   "all_compartments": {
+    "genes": 1494,
+    "exact_match": 244,
+    "any_overlap": 975,
+    "model_subset_of_hpa": 614,
+    "mean_jaccard": 0.3646
+   },
+   "shared_compartments_only": {
+    "genes": 1415,
+    "exact_match": 313,
+    "any_overlap": 975,
+    "model_subset_of_hpa": 614,
+    "mean_jaccard": 0.4272
+   }
+  },
+  "thg-b": {
+   "path": "runs/thg-ws1-b/artifacts/export-reference/attempt-0002/thg-reference.json",
+   "sha256": "fd7da017ad2cd616b26829b5d04f5270aa28ca3c1cf822213cdd780b07636dda",
+   "compartments": [
+    "a",
+    "c",
+    "ci",
+    "ck",
+    "e",
+    "g",
+    "i",
+    "l",
+    "m",
+    "n",
+    "r",
+    "v",
+    "x"
+   ],
+   "genes_with_single_compartment_reactions": 2289,
+   "all_compartments": {
+    "genes": 1494,
+    "exact_match": 229,
+    "any_overlap": 1118,
+    "model_subset_of_hpa": 518,
+    "mean_jaccard": 0.394
+   },
+   "shared_compartments_only": {
+    "genes": 1415,
+    "exact_match": 296,
+    "any_overlap": 1084,
+    "model_subset_of_hpa": 533,
+    "mean_jaccard": 0.4522
+   }
+  }
+ },
+ "shared_compartments": [
+  "c",
+  "e",
+  "g",
+  "i",
+  "l",
+  "m",
+  "n",
+  "r",
+  "x"
+ ]
+}

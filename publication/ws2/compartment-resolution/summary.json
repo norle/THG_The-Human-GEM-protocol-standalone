@@ -1,0 +1,122 @@
+{
+  "command": "python publication/scripts/measure_compartment_ablation.py",
+  "code_commit": "1805783f471452e27f02ff9fe3fa213091e4bade",
+  "script_sha256": "b994bd4892428dde03f6d270871848d4363644bd46031f8d321d0a35f18dadf2",
+  "old_go_source": "4e88dea275ad934df3f4c7301d7d5c719a1eede1^",
+  "scope": "Historical standalone rules on frozen B inputs. HPA comparison uses gene targets.",
+  "sources": {
+    "runs/thg-ws1-b/artifacts/normalize-compartments/attempt-0001/compartment-registry.json": "e508c59f4308ded509b89e443ca0807f3c73f18a05210ef741f5ee40a75e6af2",
+    "runs/thg-ws1-b/artifacts/collect-location-evidence/attempt-0001/beta2-location-evidence.json": "f2d0c856e1ec51f4773bf2dd93323289add72cab063ece3fffe0bc323cdbfc4f",
+    "runs/thg-ws1-b/artifacts/collect-reaction-location-evidence/attempt-0001/beta2-reaction-location-evidence.jsonl": "7941ee14d8d1f82bea4a930354b8ec607e587f3e0a21fb8db10189fd55ef355f",
+    "runs/thg-ws1-b/artifacts/resolve-gprs/attempt-0001/beta2-gprs.json": "2965ff6d337f11362a49d86053f86cb0db522891ffd6d68ec5552f972c25f352",
+    "runs/thg-ws1-b/artifacts/resolve-gprs/attempt-0001/beta2-resolved-gprs-model.json": "50f9e3aeb332b8187ee0707c06d4651acfe29f51180e083a8a8ccac968b02cb6",
+    "runs/thg-ws1-b/artifacts/generate-expansion-plan/attempt-0001/beta2-expansion-plan.jsonl": "53d4833e1e4f31e8594bf106c7918c95cd7919b1735d54daf430a3314e43f64b",
+    "publication/ws1/reference-b-frozen.json": "287fba260e1932eecaa53d7f13ff1c03ad3851fb3dd708b534376dcad492a767",
+    "/home/reinism/THG_The-Human-GEM-protocol-standalone/publication/ws2/hpa/source/subcellular_location.tsv": "c126d09a3cb2963502095c358efab7b86ae3fc03675b443ad673c4c5a7d9bf52",
+    "/home/reinism/THG_The-Human-GEM-protocol-standalone/publication/ws1/frozen/beta2-evidence.jsonl": "aab2ca0c49a4a4e58e31c12f22a8abf55bdabd42a26906283c1f8a1432f6d1ab"
+  },
+  "variants": [
+    {
+      "variant": "both-older-rules",
+      "genes_localised": 1620,
+      "copies": 623,
+      "copies_by_compartment": {
+        "r": 185,
+        "a": 130,
+        "i": 34,
+        "m": 85,
+        "c": 25,
+        "n": 46,
+        "l": 19,
+        "v": 50,
+        "g": 26,
+        "ck": 3,
+        "x": 13,
+        "ci": 7
+      },
+      "plan_sha256": "8c93107644248684cc6db4ea1f3dc76638a66901abd65d4a65db3e180f370c9f",
+      "hpa_all": {
+        "genes": 945,
+        "exact_match": 341,
+        "any_overlap": 645,
+        "model_subset_of_hpa": 645,
+        "mean_jaccard": 0.5027
+      },
+      "hpa_common_genes": {
+        "genes": 945,
+        "exact_match": 341,
+        "any_overlap": 645,
+        "model_subset_of_hpa": 645,
+        "mean_jaccard": 0.5027
+      }
+    },
+    {
+      "variant": "retain-multi-location-genes",
+      "genes_localised": 2461,
+      "copies": 2134,
+      "copies_by_compartment": {
+        "r": 300,
+        "m": 230,
+        "l": 79,
+        "v": 206,
+        "c": 73,
+        "n": 285,
+        "a": 426,
+        "ck": 106,
+        "i": 171,
+        "g": 129,
+        "x": 88,
+        "ci": 41
+      },
+      "plan_sha256": "e331807ff023d2dcfde85f2b2663a4ba92a3e2db76f922a79fb370eb4f3d484a",
+      "hpa_all": {
+        "genes": 1556,
+        "exact_match": 407,
+        "any_overlap": 1184,
+        "model_subset_of_hpa": 745,
+        "mean_jaccard": 0.4755
+      },
+      "hpa_common_genes": {
+        "genes": 945,
+        "exact_match": 341,
+        "any_overlap": 645,
+        "model_subset_of_hpa": 645,
+        "mean_jaccard": 0.5027
+      }
+    },
+    {
+      "variant": "current",
+      "genes_localised": 2461,
+      "copies": 2140,
+      "copies_by_compartment": {
+        "r": 300,
+        "m": 230,
+        "l": 79,
+        "v": 206,
+        "c": 73,
+        "n": 285,
+        "a": 427,
+        "ck": 111,
+        "i": 171,
+        "g": 129,
+        "x": 88,
+        "ci": 41
+      },
+      "plan_sha256": "53d4833e1e4f31e8594bf106c7918c95cd7919b1735d54daf430a3314e43f64b",
+      "hpa_all": {
+        "genes": 1556,
+        "exact_match": 406,
+        "any_overlap": 1184,
+        "model_subset_of_hpa": 744,
+        "mean_jaccard": 0.4751
+      },
+      "hpa_common_genes": {
+        "genes": 945,
+        "exact_match": 340,
+        "any_overlap": 645,
+        "model_subset_of_hpa": 644,
+        "mean_jaccard": 0.5022
+      }
+    }
+  ]
+}

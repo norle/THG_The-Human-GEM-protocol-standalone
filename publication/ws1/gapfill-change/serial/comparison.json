@@ -1,0 +1,12 @@
+{
+  "parallel_file": "runs/thg-ws1-b/artifacts/compute-gapfill-coverage/attempt-0003/ptr-coverage.jsonl",
+  "serial_file": "publication/ws1/gapfill-change/serial/ptr-coverage.jsonl",
+  "serial_elapsed_seconds": 2093.32,
+  "components_in_parallel": 141,
+  "components_in_serial": 141,
+  "different_components": [],
+  "components": 141,
+  "reused_components": 0,
+  "targets": 3328,
+  "sink_only": 1227
+}

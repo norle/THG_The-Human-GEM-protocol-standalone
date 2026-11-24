@@ -1,0 +1,4 @@
+variant,genes_localised,total_copies,a,c,ci,ck,e,g,i,l,m,n,r,v,x
+both-older-rules,1620,623,130,25,7,3,0,26,34,19,85,46,185,50,13
+retain-multi-location-genes,2461,2134,426,73,41,106,0,129,171,79,230,285,300,206,88
+current,2461,2140,427,73,41,111,0,129,171,79,230,285,300,206,88

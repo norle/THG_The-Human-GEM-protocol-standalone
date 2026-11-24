@@ -1,0 +1,14 @@
+{
+ "reactions_json": 15066,
+ "reactions_sbml": 15066,
+ "same_reaction_ids": true,
+ "reactions_with_different_stoichiometry": 0,
+ "first_differences": [],
+ "metabolite_ids_equal": true,
+ "boundary_json": 1654,
+ "boundary_sbml": 1654,
+ "solver_json": "optlang.gurobi_interface",
+ "solver_sbml": "optlang.gurobi_interface",
+ "consistent_json": false,
+ "consistent_sbml": false
+}

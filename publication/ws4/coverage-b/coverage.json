@@ -1,0 +1,112 @@
+{
+  "balance": {
+    "baseline_all": {
+      "charge_unbalanced": 181,
+      "mass_and_charge_balanced": 12517,
+      "mass_unbalanced": 70,
+      "reactions": 12748,
+      "unassessable": 8
+    },
+    "beta2-copy": {
+      "charge_unbalanced": 0,
+      "mass_and_charge_balanced": 2140,
+      "mass_unbalanced": 0,
+      "reactions": 2140,
+      "unassessable": 0
+    },
+    "gapfill": {
+      "charge_unbalanced": 0,
+      "mass_and_charge_balanced": 314,
+      "mass_unbalanced": 0,
+      "reactions": 314,
+      "unassessable": 0
+    }
+  },
+  "baseline": {
+    "dead_end_metabolites": 623,
+    "metabolites": 8374,
+    "reactions": 12748
+  },
+  "beta2_copies": {
+    "by_location": {
+      "Cytosol": 73,
+      "Endoplasmic reticulum": 300,
+      "Golgi apparatus": 129,
+      "Mitochondria": 230,
+      "Nucleus": 285,
+      "Peroxisome": 88,
+      "cell membrane": 427,
+      "cilium": 41,
+      "cytoskeleton": 111,
+      "inner mitochondria": 171,
+      "lysosome": 79,
+      "vesicle": 206
+    },
+    "distinct_parents": 1076,
+    "gpr_policy_evidence": {
+      "loc": 2140
+    },
+    "location_source": {
+      "uniprot": 2140
+    },
+    "with_gpr": 2140
+  },
+  "gapfill": {
+    "by_candidate_type": {
+      "A": 114,
+      "B": 109,
+      "C": 91
+    },
+    "by_coverage_kind": {
+      "connector": 152,
+      "selected": 162
+    },
+    "by_phase": {
+      "2": 152,
+      "3": 162
+    },
+    "compartment_pairs": {
+      "a-c": 5,
+      "a-ci": 4,
+      "a-ck": 18,
+      "a-e": 3,
+      "a-r": 17,
+      "a-v": 8,
+      "c-ci": 1,
+      "c-ck": 6,
+      "c-g": 19,
+      "c-l": 16,
+      "c-m": 23,
+      "c-n": 33,
+      "c-r": 31,
+      "c-v": 6,
+      "c-x": 18,
+      "ci-ck": 5,
+      "ci-e": 1,
+      "e-l": 5,
+      "g-i": 28,
+      "m-n": 41,
+      "r-v": 26
+    },
+    "report": {
+      "after_metrics": {
+        "components": 51,
+        "dead_ends": 5862,
+        "reactions": 15202
+      },
+      "before_metrics": {
+        "components": 203,
+        "dead_ends": 6150,
+        "reactions": 14888
+      },
+      "status": "solved",
+      "stop_reason": "milp-optimal"
+    }
+  },
+  "removed_baseline_reactions": 0,
+  "thg": {
+    "dead_end_metabolites": 3530,
+    "metabolites": 12927,
+    "reactions": 15202
+  }
+}

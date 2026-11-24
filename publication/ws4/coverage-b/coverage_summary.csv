@@ -1,0 +1,17 @@
+metric,value
+baseline_reactions,12748
+thg_reactions,15202
+added_beta2-copy,2140
+beta2-copy_reactions,2140
+beta2-copy_unassessable,0
+beta2-copy_mass_unbalanced,0
+beta2-copy_charge_unbalanced,0
+beta2-copy_mass_and_charge_balanced,2140
+added_gapfill,314
+gapfill_reactions,314
+gapfill_unassessable,0
+gapfill_mass_unbalanced,0
+gapfill_charge_unbalanced,0
+gapfill_mass_and_charge_balanced,314
+baseline_dead_ends,623
+thg_dead_ends,3530

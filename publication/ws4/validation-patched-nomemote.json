@@ -1,0 +1,3 @@
+{"workflow": "validate",
+ "run": {"name": "ws4-patched-nomemote", "output_dir": "../../runs/ws4-patched-nomemote"},
+ "validation": {"input_model": "../../runs/human211-patched/Human_211_patched.xml", "profile": "final-standard", "run_memote": false, "run_solver": true}}

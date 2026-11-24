@@ -1,0 +1,655 @@
+{
+  "model": "/home/reinism/THG_The-Human-GEM-protocol-standalone/inputs/models/Human_211.xml",
+  "model_sha256": "dc0efd8009a8b680bde7040440f2e3592027dd118833445092ebd8d7bc425ddf",
+  "code_commit": "1805783f471452e27f02ff9fe3fa213091e4bade",
+  "code_diff_sha256": "7c75c90c45b62bfd77a17709e856f9df0cc5ae217a051666adb7fccb84788958",
+  "script_sha256": "89fea34b232c7f107a310937d2db6e74441dd3706f4abf1c8c9fbb877dd13678",
+  "settings": {
+    "status": "Task settings pinned; patched-baseline native threads and tolerances verified 2026-11-09",
+    "solver": {
+      "name": "gurobi",
+      "interface": "cobrapy/optlang",
+      "threads": 2,
+      "tolerances": {
+        "feasibility": 1e-07,
+        "optimality": 1e-07,
+        "integrality": 1e-07
+      }
+    },
+    "validation": {
+      "profile": "final-standard",
+      "run_memote": true,
+      "run_solver": true
+    },
+    "tasks": {
+      "tables_dir": "files/metabolic_tasks",
+      "source": "Human-GEM develop 2f1d3e33ce591b357accc08d85aebc27bdcf4244",
+      "sha256": {
+        "metabolicTasks_Essential.txt": "d0c58503fc44d1eb49ea1b89f4cc90930a06bcd2c3972083c0986cfb126a0f18",
+        "metabolicTasks_Full.txt": "75f338da2635bf8cd0f77d319f4880abb2a3fbbacc2217806940b79424108ad9",
+        "metabolicTasks_VerifyModel.txt": "17409a25af172813647370557814879446feaed0236e4595a25180abe0e9faed"
+      },
+      "mapping": "files/metabolic_tasks/human_gem_names.json",
+      "mapping_sha256": "f12d0918055f69b284236d1b462119d154cb9ed4eb8a19f9bb481d5f0737b137",
+      "medium": "closed",
+      "forced_flux_relaxation": "non-boundary reactions with LB>0 set LB=0 and UB<0 set UB=0",
+      "script": "publication/scripts/run_tasks.py",
+      "residual_reliability_threshold": 1e-07,
+      "numerical_policy": "Every optimal solve requires finite primal bound and constraint residuals <= 1e-7; otherwise unresolved (error), never a biological outcome. Infeasible residuals are null."
+    },
+    "depmap": {
+      "skipped": true,
+      "reason": "user decision; WS0 step 6 and WS6 not performed"
+    },
+    "human2_identity": {
+      "inputs/models/Human2.xml": {
+        "sha256": "cc5a4383c6116b0c91f4db089cc640f29aec7e840249b573b74d3792c9ca4a7a",
+        "version": "believed to be Human-GEM 2.0 (user, unverified)"
+      },
+      "inputs/models/Human_211.xml": {
+        "sha256": "dc0efd8009a8b680bde7040440f2e3592027dd118833445092ebd8d7bc425ddf",
+        "version": "Human-GEM 2.1.1 (user)"
+      }
+    },
+    "benchmark_human2": {
+      "path": "runs/human211-patched/Human_211_patched.xml",
+      "sha256": "04cb9de9e9ea3236c2ba06487847348ec2b7d5576d2e1c33e2f1ef9c58ab3f38",
+      "base": "inputs/models/Human_211.xml (Human-GEM 2.1.1)",
+      "patch": "MAR20193 bounds set to [0,0] (publication/scripts/patch_human211.py)",
+      "reason": "VerifyModel task 21 feasible on unpatched 2.1.1",
+      "decided_by": "user, 2026-11-04"
+    },
+    "initial_settings_code_commit": "968c2a858e2a5216ce8252244133a54308bf115f"
+  },
+  "solver": "gurobi",
+  "cobra_version": "0.31.1",
+  "blocked_reactions": [],
+  "relaxed_forced_bounds": 0,
+  "runtime_seconds": 79.63331853600175,
+  "reports": {
+    "VerifyModel": {
+      "schema_version": 2,
+      "task_schema_version": 2,
+      "tolerance": 1e-06,
+      "status": "failed",
+      "passed": false,
+      "counts": {
+        "passed": 20,
+        "failed": 0,
+        "invalid": 0,
+        "error": 1
+      },
+      "tasks": [
+        {
+          "id": "1",
+          "version": "1",
+          "group": "core",
+          "kind": "feasibility",
+          "identity": null,
+          "solver": null,
+          "expected_outcome": "failure",
+          "actual_outcome": "failure",
+          "solver_status": "infeasible",
+          "objective_value": null,
+          "diagnostics": {
+            "solver_interface": "optlang.gurobi_interface",
+            "solver_threads": 2,
+            "solver_tolerances": {
+              "feasibility": 1e-07,
+              "integrality": 1e-07,
+              "optimality": 1e-07
+            },
+            "residual_reliability_threshold": 1e-07,
+            "max_bound_violation": null,
+            "max_constraint_violation": null,
+            "numerical_reliability": "unavailable"
+          },
+          "status": "passed",
+          "passed": true
+        },
+        {
+          "id": "2",
+          "version": "1",
+          "group": "core",
+          "kind": "feasibility",
+          "identity": null,
+          "solver": null,
+          "expected_outcome": "failure",
+          "actual_outcome": "failure",
+          "solver_status": "infeasible",
+          "objective_value": null,
+          "diagnostics": {
+            "solver_interface": "optlang.gurobi_interface",
+            "solver_threads": 2,
+            "solver_tolerances": {
+              "feasibility": 1e-07,
+              "integrality": 1e-07,
+              "optimality": 1e-07
+            },
+            "residual_reliability_threshold": 1e-07,
+            "max_bound_violation": null,
+            "max_constraint_violation": null,
+            "numerical_reliability": "unavailable"
+          },
+          "status": "passed",
+          "passed": true
+        },
+        {
+          "id": "3",
+          "version": "1",
+          "group": "core",
+          "kind": "feasibility",
+          "identity": null,
+          "solver": null,
+          "expected_outcome": "failure",
+          "actual_outcome": "failure",
+          "solver_status": "infeasible",
+          "objective_value": null,
+          "diagnostics": {
+            "solver_interface": "optlang.gurobi_interface",
+            "solver_threads": 2,
+            "solver_tolerances": {
+              "feasibility": 1e-07,
+              "integrality": 1e-07,
+              "optimality": 1e-07
+            },
+            "residual_reliability_threshold": 1e-07,
+            "max_bound_violation": null,
+            "max_constraint_violation": null,
+            "numerical_reliability": "unavailable"
+          },
+          "status": "passed",
+          "passed": true
+        },
+        {
+          "id": "4",
+          "version": "1",
+          "group": "core",
+          "kind": "feasibility",
+          "identity": null,
+          "solver": null,
+          "expected_outcome": "failure",
+          "actual_outcome": "failure",
+          "solver_status": "infeasible",
+          "objective_value": null,
+          "diagnostics": {
+            "solver_interface": "optlang.gurobi_interface",
+            "solver_threads": 2,
+            "solver_tolerances": {
+              "feasibility": 1e-07,
+              "integrality": 1e-07,
+              "optimality": 1e-07
+            },
+            "residual_reliability_threshold": 1e-07,
+            "max_bound_violation": null,
+            "max_constraint_violation": null,
+            "numerical_reliability": "unavailable"
+          },
+          "status": "passed",
+          "passed": true
+        },
+        {
+          "id": "5",
+          "version": "1",
+          "group": "core",
+          "kind": "feasibility",
+          "identity": null,
+          "solver": null,
+          "expected_outcome": "failure",
+          "actual_outcome": "failure",
+          "solver_status": "infeasible",
+          "objective_value": null,
+          "diagnostics": {
+            "solver_interface": "optlang.gurobi_interface",
+            "solver_threads": 2,
+            "solver_tolerances": {
+              "feasibility": 1e-07,
+              "integrality": 1e-07,
+              "optimality": 1e-07
+            },
+            "residual_reliability_threshold": 1e-07,
+            "max_bound_violation": null,
+            "max_constraint_violation": null,
+            "numerical_reliability": "unavailable"
+          },
+          "status": "passed",
+          "passed": true
+        },
+        {
+          "id": "6",
+          "version": "1",
+          "group": "core",
+          "kind": "feasibility",
+          "identity": null,
+          "solver": null,
+          "expected_outcome": "failure",
+          "actual_outcome": "failure",
+          "solver_status": "infeasible",
+          "objective_value": null,
+          "diagnostics": {
+            "solver_interface": "optlang.gurobi_interface",
+            "solver_threads": 2,
+            "solver_tolerances": {
+              "feasibility": 1e-07,
+              "integrality": 1e-07,
+              "optimality": 1e-07
+            },
+            "residual_reliability_threshold": 1e-07,
+            "max_bound_violation": null,
+            "max_constraint_violation": null,
+            "numerical_reliability": "unavailable"
+          },
+          "status": "passed",
+          "passed": true
+        },
+        {
+          "id": "7",
+          "version": "1",
+          "group": "core",
+          "kind": "feasibility",
+          "identity": null,
+          "solver": null,
+          "expected_outcome": "failure",
+          "actual_outcome": "failure",
+          "solver_status": "infeasible",
+          "objective_value": null,
+          "diagnostics": {
+            "solver_interface": "optlang.gurobi_interface",
+            "solver_threads": 2,
+            "solver_tolerances": {
+              "feasibility": 1e-07,
+              "integrality": 1e-07,
+              "optimality": 1e-07
+            },
+            "residual_reliability_threshold": 1e-07,
+            "max_bound_violation": null,
+            "max_constraint_violation": null,
+            "numerical_reliability": "unavailable"
+          },
+          "status": "passed",
+          "passed": true
+        },
+        {
+          "id": "8",
+          "version": "1",
+          "group": "core",
+          "kind": "feasibility",
+          "identity": null,
+          "solver": null,
+          "expected_outcome": "failure",
+          "actual_outcome": "failure",
+          "solver_status": "infeasible",
+          "objective_value": null,
+          "diagnostics": {
+            "solver_interface": "optlang.gurobi_interface",
+            "solver_threads": 2,
+            "solver_tolerances": {
+              "feasibility": 1e-07,
+              "integrality": 1e-07,
+              "optimality": 1e-07
+            },
+            "residual_reliability_threshold": 1e-07,
+            "max_bound_violation": null,
+            "max_constraint_violation": null,
+            "numerical_reliability": "unavailable"
+          },
+          "status": "passed",
+          "passed": true
+        },
+        {
+          "id": "9",
+          "version": "1",
+          "group": "core",
+          "kind": "feasibility",
+          "identity": null,
+          "solver": null,
+          "expected_outcome": "failure",
+          "actual_outcome": "failure",
+          "solver_status": "infeasible",
+          "objective_value": null,
+          "diagnostics": {
+            "solver_interface": "optlang.gurobi_interface",
+            "solver_threads": 2,
+            "solver_tolerances": {
+              "feasibility": 1e-07,
+              "integrality": 1e-07,
+              "optimality": 1e-07
+            },
+            "residual_reliability_threshold": 1e-07,
+            "max_bound_violation": null,
+            "max_constraint_violation": null,
+            "numerical_reliability": "unavailable"
+          },
+          "status": "passed",
+          "passed": true
+        },
+        {
+          "id": "10",
+          "version": "1",
+          "group": "core",
+          "kind": "feasibility",
+          "identity": null,
+          "solver": null,
+          "expected_outcome": "failure",
+          "actual_outcome": "failure",
+          "solver_status": "infeasible",
+          "objective_value": null,
+          "diagnostics": {
+            "solver_interface": "optlang.gurobi_interface",
+            "solver_threads": 2,
+            "solver_tolerances": {
+              "feasibility": 1e-07,
+              "integrality": 1e-07,
+              "optimality": 1e-07
+            },
+            "residual_reliability_threshold": 1e-07,
+            "max_bound_violation": null,
+            "max_constraint_violation": null,
+            "numerical_reliability": "unavailable"
+          },
+          "status": "passed",
+          "passed": true
+        },
+        {
+          "id": "11",
+          "version": "1",
+          "group": "core",
+          "kind": "feasibility",
+          "identity": null,
+          "solver": null,
+          "expected_outcome": "failure",
+          "actual_outcome": "failure",
+          "solver_status": "infeasible",
+          "objective_value": null,
+          "diagnostics": {
+            "solver_interface": "optlang.gurobi_interface",
+            "solver_threads": 2,
+            "solver_tolerances": {
+              "feasibility": 1e-07,
+              "integrality": 1e-07,
+              "optimality": 1e-07
+            },
+            "residual_reliability_threshold": 1e-07,
+            "max_bound_violation": null,
+            "max_constraint_violation": null,
+            "numerical_reliability": "unavailable"
+          },
+          "status": "passed",
+          "passed": true
+        },
+        {
+          "id": "12",
+          "version": "1",
+          "group": "core",
+          "kind": "feasibility",
+          "identity": null,
+          "solver": null,
+          "expected_outcome": "failure",
+          "actual_outcome": "failure",
+          "solver_status": "infeasible",
+          "objective_value": null,
+          "diagnostics": {
+            "solver_interface": "optlang.gurobi_interface",
+            "solver_threads": 2,
+            "solver_tolerances": {
+              "feasibility": 1e-07,
+              "integrality": 1e-07,
+              "optimality": 1e-07
+            },
+            "residual_reliability_threshold": 1e-07,
+            "max_bound_violation": null,
+            "max_constraint_violation": null,
+            "numerical_reliability": "unavailable"
+          },
+          "status": "passed",
+          "passed": true
+        },
+        {
+          "id": "13",
+          "version": "1",
+          "group": "core",
+          "kind": "feasibility",
+          "identity": null,
+          "solver": null,
+          "expected_outcome": "failure",
+          "actual_outcome": "failure",
+          "solver_status": "infeasible",
+          "objective_value": null,
+          "diagnostics": {
+            "solver_interface": "optlang.gurobi_interface",
+            "solver_threads": 2,
+            "solver_tolerances": {
+              "feasibility": 1e-07,
+              "integrality": 1e-07,
+              "optimality": 1e-07
+            },
+            "residual_reliability_threshold": 1e-07,
+            "max_bound_violation": null,
+            "max_constraint_violation": null,
+            "numerical_reliability": "unavailable"
+          },
+          "status": "passed",
+          "passed": true
+        },
+        {
+          "id": "14",
+          "version": "1",
+          "group": "core",
+          "kind": "feasibility",
+          "identity": null,
+          "solver": null,
+          "expected_outcome": "failure",
+          "actual_outcome": "failure",
+          "solver_status": "infeasible",
+          "objective_value": null,
+          "diagnostics": {
+            "solver_interface": "optlang.gurobi_interface",
+            "solver_threads": 2,
+            "solver_tolerances": {
+              "feasibility": 1e-07,
+              "integrality": 1e-07,
+              "optimality": 1e-07
+            },
+            "residual_reliability_threshold": 1e-07,
+            "max_bound_violation": null,
+            "max_constraint_violation": null,
+            "numerical_reliability": "unavailable"
+          },
+          "status": "passed",
+          "passed": true
+        },
+        {
+          "id": "15",
+          "version": "1",
+          "group": "core",
+          "kind": "feasibility",
+          "identity": null,
+          "solver": null,
+          "expected_outcome": "failure",
+          "actual_outcome": "failure",
+          "solver_status": "infeasible",
+          "objective_value": null,
+          "diagnostics": {
+            "solver_interface": "optlang.gurobi_interface",
+            "solver_threads": 2,
+            "solver_tolerances": {
+              "feasibility": 1e-07,
+              "integrality": 1e-07,
+              "optimality": 1e-07
+            },
+            "residual_reliability_threshold": 1e-07,
+            "max_bound_violation": null,
+            "max_constraint_violation": null,
+            "numerical_reliability": "unavailable"
+          },
+          "status": "passed",
+          "passed": true
+        },
+        {
+          "id": "16",
+          "version": "1",
+          "group": "core",
+          "kind": "feasibility",
+          "identity": null,
+          "solver": null,
+          "expected_outcome": "failure",
+          "actual_outcome": "failure",
+          "solver_status": "infeasible",
+          "objective_value": null,
+          "diagnostics": {
+            "solver_interface": "optlang.gurobi_interface",
+            "solver_threads": 2,
+            "solver_tolerances": {
+              "feasibility": 1e-07,
+              "integrality": 1e-07,
+              "optimality": 1e-07
+            },
+            "residual_reliability_threshold": 1e-07,
+            "max_bound_violation": null,
+            "max_constraint_violation": null,
+            "numerical_reliability": "unavailable"
+          },
+          "status": "passed",
+          "passed": true
+        },
+        {
+          "id": "17",
+          "version": "1",
+          "group": "core",
+          "kind": "feasibility",
+          "identity": null,
+          "solver": null,
+          "expected_outcome": "failure",
+          "actual_outcome": "failure",
+          "solver_status": "infeasible",
+          "objective_value": null,
+          "diagnostics": {
+            "solver_interface": "optlang.gurobi_interface",
+            "solver_threads": 2,
+            "solver_tolerances": {
+              "feasibility": 1e-07,
+              "integrality": 1e-07,
+              "optimality": 1e-07
+            },
+            "residual_reliability_threshold": 1e-07,
+            "max_bound_violation": null,
+            "max_constraint_violation": null,
+            "numerical_reliability": "unavailable"
+          },
+          "status": "passed",
+          "passed": true
+        },
+        {
+          "id": "18",
+          "version": "1",
+          "group": "core",
+          "kind": "feasibility",
+          "identity": null,
+          "solver": null,
+          "expected_outcome": "failure",
+          "actual_outcome": "failure",
+          "solver_status": "infeasible",
+          "objective_value": null,
+          "diagnostics": {
+            "solver_interface": "optlang.gurobi_interface",
+            "solver_threads": 2,
+            "solver_tolerances": {
+              "feasibility": 1e-07,
+              "integrality": 1e-07,
+              "optimality": 1e-07
+            },
+            "residual_reliability_threshold": 1e-07,
+            "max_bound_violation": null,
+            "max_constraint_violation": null,
+            "numerical_reliability": "unavailable"
+          },
+          "status": "passed",
+          "passed": true
+        },
+        {
+          "id": "19",
+          "version": "1",
+          "group": "core",
+          "kind": "feasibility",
+          "identity": null,
+          "solver": null,
+          "expected_outcome": "failure",
+          "actual_outcome": "failure",
+          "solver_status": "infeasible",
+          "objective_value": null,
+          "diagnostics": {
+            "solver_interface": "optlang.gurobi_interface",
+            "solver_threads": 2,
+            "solver_tolerances": {
+              "feasibility": 1e-07,
+              "integrality": 1e-07,
+              "optimality": 1e-07
+            },
+            "residual_reliability_threshold": 1e-07,
+            "max_bound_violation": null,
+            "max_constraint_violation": null,
+            "numerical_reliability": "unavailable"
+          },
+          "status": "passed",
+          "passed": true
+        },
+        {
+          "id": "20",
+          "version": "1",
+          "group": "core",
+          "kind": "feasibility",
+          "identity": null,
+          "solver": null,
+          "expected_outcome": "failure",
+          "actual_outcome": "failure",
+          "solver_status": "infeasible",
+          "objective_value": null,
+          "diagnostics": {
+            "solver_interface": "optlang.gurobi_interface",
+            "solver_threads": 2,
+            "solver_tolerances": {
+              "feasibility": 1e-07,
+              "integrality": 1e-07,
+              "optimality": 1e-07
+            },
+            "residual_reliability_threshold": 1e-07,
+            "max_bound_violation": null,
+            "max_constraint_violation": null,
+            "numerical_reliability": "unavailable"
+          },
+          "status": "passed",
+          "passed": true
+        },
+        {
+          "id": "21",
+          "version": "1",
+          "group": "core",
+          "kind": "feasibility",
+          "identity": null,
+          "solver": null,
+          "expected_outcome": "failure",
+          "actual_outcome": null,
+          "solver_status": "optimal",
+          "objective_value": null,
+          "diagnostics": {
+            "solver_interface": "optlang.gurobi_interface",
+            "solver_threads": 2,
+            "solver_tolerances": {
+              "feasibility": 1e-07,
+              "integrality": 1e-07,
+              "optimality": 1e-07
+            },
+            "residual_reliability_threshold": 1e-07,
+            "max_bound_violation": 5.519827588317753e-07,
+            "max_constraint_violation": 0.0,
+            "numerical_reliability": "unreliable"
+          },
+          "status": "error",
+          "passed": false
+        }
+      ],
+      "suite": "metabolicTasks_VerifyModel",
+      "suite_version": "17409a25af172813"
+    }
+  }
+}

@@ -1,0 +1,3 @@
+{"workflow": "validate",
+ "run": {"name": "ws4-thg-b-json-nomemote", "output_dir": "../../runs/ws4-thg-b-json-nomemote"},
+ "validation": {"input_model": "../../runs/thg-ws1-b/artifacts/export-reference/attempt-0001/thg-reference.json", "profile": "final-standard", "run_memote": false, "run_solver": true}}

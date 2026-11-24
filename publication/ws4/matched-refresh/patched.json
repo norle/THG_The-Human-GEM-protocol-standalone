@@ -1,0 +1,13 @@
+{
+  "workflow": "validate",
+  "run": {
+    "name": "publication-ws4-patched-memote",
+    "output_dir": "../../../runs/publication-ws4-patched-memote"
+  },
+  "validation": {
+    "input_model": "../../../runs/human211-patched/Human_211_patched.xml",
+    "profile": "final-standard",
+    "run_memote": true,
+    "run_solver": true
+  }
+}
