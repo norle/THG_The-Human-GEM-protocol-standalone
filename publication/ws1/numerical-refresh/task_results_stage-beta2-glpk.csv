@@ -1,0 +1,22 @@
+model,table,task_id,description,expected,actual,status,solver_status,solver_interface,solver_threads,cause,max_bound_violation,max_constraint_violation,numerical_reliability
+stage-beta2-glpk,VerifyModel,1,Oxygen from water,failure,failure,passed,infeasible,optlang.glpk_interface,,,,,unavailable
+stage-beta2-glpk,VerifyModel,2,Rephosphorylation of ATP in cytoplasm,failure,failure,passed,infeasible,optlang.glpk_interface,,,,,unavailable
+stage-beta2-glpk,VerifyModel,3,Rephosphorylation of ATP in mitochondria,failure,failure,passed,infeasible,optlang.glpk_interface,,,,,unavailable
+stage-beta2-glpk,VerifyModel,4,Rephosphorylation of ATP in peroxisome,failure,failure,passed,infeasible,optlang.glpk_interface,,,,,unavailable
+stage-beta2-glpk,VerifyModel,5,Rephosphorylation of ATP in Golgi,failure,failure,passed,infeasible,optlang.glpk_interface,,,,,unavailable
+stage-beta2-glpk,VerifyModel,6,Rephosphorylation of ATP in endoplasmatic reticulum,failure,failure,passed,infeasible,optlang.glpk_interface,,,,,unavailable
+stage-beta2-glpk,VerifyModel,7,Rephosphorylation of ATP in nucleus,failure,failure,passed,infeasible,optlang.glpk_interface,,,,,unavailable
+stage-beta2-glpk,VerifyModel,8,Rephosphorylation of ATP in lysosome,failure,failure,passed,infeasible,optlang.glpk_interface,,,,,unavailable
+stage-beta2-glpk,VerifyModel,9,Rephosphorylation of ATP from protons,failure,failure,passed,infeasible,optlang.glpk_interface,,,,,unavailable
+stage-beta2-glpk,VerifyModel,10,Generation of reduction potential in cytoplasm,failure,failure,passed,infeasible,optlang.glpk_interface,,,,,unavailable
+stage-beta2-glpk,VerifyModel,11,Generation of reduction potential in mitochondria,failure,failure,passed,infeasible,optlang.glpk_interface,,,,,unavailable
+stage-beta2-glpk,VerifyModel,12,Generation of reduction potential in peroxisome,failure,failure,passed,infeasible,optlang.glpk_interface,,,,,unavailable
+stage-beta2-glpk,VerifyModel,13,Generation of reduction potential in cytoplasm (FADH2),failure,failure,passed,infeasible,optlang.glpk_interface,,,,,unavailable
+stage-beta2-glpk,VerifyModel,14,Generation of reduction potential in mitochondria (FADH2),failure,failure,passed,infeasible,optlang.glpk_interface,,,,,unavailable
+stage-beta2-glpk,VerifyModel,15,Generation of reduction potential in peroxisome (FADH2),failure,failure,passed,infeasible,optlang.glpk_interface,,,,,unavailable
+stage-beta2-glpk,VerifyModel,16,Generation of CO2 from nothing,failure,failure,passed,infeasible,optlang.glpk_interface,,,,,unavailable
+stage-beta2-glpk,VerifyModel,17,mol ATP phosphorylated per mol glucose consumed exceeds 40,failure,failure,passed,infeasible,optlang.glpk_interface,,,,,unavailable
+stage-beta2-glpk,VerifyModel,18,Free transport of phosphate from cytoplasm to mitochondria [#99],failure,failure,passed,infeasible,optlang.glpk_interface,,,,,unavailable
+stage-beta2-glpk,VerifyModel,19,Anaerobic production of propanoate from glucose [#100],failure,failure,passed,infeasible,optlang.glpk_interface,,,,,unavailable
+stage-beta2-glpk,VerifyModel,20,Anaerobic ATP phosphorylation per glucose consumed exceeds 2 [#101],failure,failure,passed,infeasible,optlang.glpk_interface,,,,,unavailable
+stage-beta2-glpk,VerifyModel,21,ATP production from Pi and O2 [#102],failure,failure,passed,infeasible,optlang.glpk_interface,,,,,unavailable

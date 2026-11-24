@@ -1,0 +1,7 @@
+{
+  "run": "/home/reinism/THG_The-Human-GEM-protocol-standalone/runs/thg-ws1-b",
+  "overall_status": "completed",
+  "manifest_sha256": "d450fb1bafe11d35b5f7dbfd382b9068fa4509a894e8c5a5a34399d5fd939df0",
+  "command": "python publication/scripts/stage_table.py runs/thg-ws1-b publication/ws1/rebuild-b/stages",
+  "scope": "Current manifest attempts; completed-stage models checked against ledger and runtime fingerprints; task gates not inferred"
+}

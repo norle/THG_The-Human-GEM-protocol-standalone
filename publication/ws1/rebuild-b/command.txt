@@ -1,0 +1,3 @@
+conda run -n thg_standalone python publication/ws1/run_build.py publication/ws1/reference-b-frozen.json (resume of runs/thg-ws1-b), started 2026-11-20T10:05:34+01:00
+restarted 2026-11-20T10:53:41+01:00 after worker re-import bug in unguarded wrapper (fixed)
+stale lock (pid 53402 dead) removed, relaunched 2026-11-20T10:53:51+01:00

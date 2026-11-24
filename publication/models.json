@@ -37,7 +37,7 @@
   {
     "label": "THG-2023",
     "path": "models/THG-2023-02-25.xml",
-    "provenance": "2023-02-25 legacy model; provenance comparison in publication plan; benchmark deferred",
+    "provenance": "Published supplement S2 byte match; publication/ws3/README.md",
     "status": "present",
     "sha256": "72e90e562689eacd66fbfa1c20e2950826bd40fdea368ddf47aac1728dd014d1"
   },
@@ -72,27 +72,161 @@
   {
     "label": "thg-ws1-a:export-beta1",
     "path": "runs/thg-ws1-a/artifacts/export-beta1/attempt-0002/thg-beta1-candidate.json",
-    "provenance": "runs/thg-ws1-a/manifest.json; attempt 2; stage status completed; candidate, not yet final-gated",
+    "provenance": "runs/thg-ws1-a/manifest.json; attempt 2; stage status completed; artifact role model",
     "status": "present",
     "sha256": "50f9e3aeb332b8187ee0707c06d4651acfe29f51180e083a8a8ccac968b02cb6",
     "matches_ledger": true
   },
   {
+    "label": "thg-ws1-a:export-beta1:sbml",
+    "path": "runs/thg-ws1-a/artifacts/export-beta1/attempt-0002/thg-beta1-candidate.xml",
+    "provenance": "runs/thg-ws1-a/manifest.json; attempt 2; stage status completed; artifact role sbml",
+    "status": "present",
+    "sha256": "c7cdfbfb03308728bfd2888c22c0cffce49f89856c66dc195cc3be748db7ca12",
+    "matches_ledger": true
+  },
+  {
     "label": "thg-ws1-a:export-beta2",
     "path": "runs/thg-ws1-a/artifacts/export-beta2/attempt-0003/thg-beta2-candidate.json",
-    "provenance": "runs/thg-ws1-a/manifest.json; attempt 3; stage status completed; candidate, not yet final-gated",
+    "provenance": "runs/thg-ws1-a/manifest.json; attempt 3; stage status completed; artifact role model",
     "status": "present",
     "sha256": "a27a48faf9fdfebf9146038379ed18f2f87f12d5b79f443730994ea275f7dc00",
     "matches_ledger": true
   },
   {
-    "label": "thg-ws1-b",
-    "status": "not built",
-    "sha256": null
+    "label": "thg-ws1-a:export-beta2:sbml",
+    "path": "runs/thg-ws1-a/artifacts/export-beta2/attempt-0003/thg-beta2-candidate.xml",
+    "provenance": "runs/thg-ws1-a/manifest.json; attempt 3; stage status completed; artifact role sbml",
+    "status": "present",
+    "sha256": "6b50c70e915c5161b6459c5c9aae09ccb0d3d388a69d11b5d303bcbaac8c81cf",
+    "matches_ledger": true
   },
   {
-    "label": "thg-ws1-c",
-    "status": "not built",
-    "sha256": null
+    "label": "thg-ws1-b:export-beta1",
+    "path": "runs/thg-ws1-b/artifacts/export-beta1/attempt-0001/thg-beta1-candidate.json",
+    "provenance": "runs/thg-ws1-b/manifest.json; attempt 1; stage status completed; artifact role model",
+    "status": "present",
+    "sha256": "50f9e3aeb332b8187ee0707c06d4651acfe29f51180e083a8a8ccac968b02cb6",
+    "matches_ledger": true
+  },
+  {
+    "label": "thg-ws1-b:export-beta1:sbml",
+    "path": "runs/thg-ws1-b/artifacts/export-beta1/attempt-0001/thg-beta1-candidate.xml",
+    "provenance": "runs/thg-ws1-b/manifest.json; attempt 1; stage status completed; artifact role sbml",
+    "status": "present",
+    "sha256": "c7cdfbfb03308728bfd2888c22c0cffce49f89856c66dc195cc3be748db7ca12",
+    "matches_ledger": true
+  },
+  {
+    "label": "thg-ws1-b:export-beta2",
+    "path": "runs/thg-ws1-b/artifacts/export-beta2/attempt-0001/thg-beta2-candidate.json",
+    "provenance": "runs/thg-ws1-b/manifest.json; attempt 1; stage status completed; artifact role model",
+    "status": "present",
+    "sha256": "a27a48faf9fdfebf9146038379ed18f2f87f12d5b79f443730994ea275f7dc00",
+    "matches_ledger": true
+  },
+  {
+    "label": "thg-ws1-b:export-beta2:sbml",
+    "path": "runs/thg-ws1-b/artifacts/export-beta2/attempt-0001/thg-beta2-candidate.xml",
+    "provenance": "runs/thg-ws1-b/manifest.json; attempt 1; stage status completed; artifact role sbml",
+    "status": "present",
+    "sha256": "6b50c70e915c5161b6459c5c9aae09ccb0d3d388a69d11b5d303bcbaac8c81cf",
+    "matches_ledger": true
+  },
+  {
+    "label": "thg-ws1-b:export-gapfilled-reference",
+    "path": "runs/thg-ws1-b/artifacts/export-gapfilled-reference/attempt-0002/thg-reference-gapfilled.json",
+    "provenance": "runs/thg-ws1-b/manifest.json; attempt 2; stage status completed; artifact role model",
+    "status": "present",
+    "sha256": "3e32b47f4b2345e7d0a5c48050c0293c25060093245997b6ae94a5d261fefc6d",
+    "matches_ledger": true
+  },
+  {
+    "label": "thg-ws1-b:export-gapfilled-reference:sbml",
+    "path": "runs/thg-ws1-b/artifacts/export-gapfilled-reference/attempt-0002/thg-reference-gapfilled.xml",
+    "provenance": "runs/thg-ws1-b/manifest.json; attempt 2; stage status completed; artifact role sbml",
+    "status": "present",
+    "sha256": "3b0cdd0bac4fc826a6ac88e0141a8fdbe879c79cbbf1c8e692a23828dfba0925",
+    "matches_ledger": true
+  },
+  {
+    "label": "thg-ws1-b:export-reference",
+    "path": "runs/thg-ws1-b/artifacts/export-reference/attempt-0002/thg-reference.json",
+    "provenance": "runs/thg-ws1-b/manifest.json; attempt 2; stage status completed; artifact role model",
+    "status": "present",
+    "sha256": "fd7da017ad2cd616b26829b5d04f5270aa28ca3c1cf822213cdd780b07636dda",
+    "matches_ledger": true
+  },
+  {
+    "label": "thg-ws1-b:export-reference:sbml",
+    "path": "runs/thg-ws1-b/artifacts/export-reference/attempt-0002/thg-reference.xml",
+    "provenance": "runs/thg-ws1-b/manifest.json; attempt 2; stage status completed; artifact role sbml",
+    "status": "present",
+    "sha256": "087cf3b5ab3b3c578b235c994c87052a3a59a953ad84c9a5a456b74daa2ef4ee",
+    "matches_ledger": true
+  },
+  {
+    "label": "thg-ws1-c:export-beta1",
+    "path": "runs/thg-ws1-c/artifacts/export-beta1/attempt-0001/thg-beta1-candidate.json",
+    "provenance": "runs/thg-ws1-c/manifest.json; attempt 1; stage status completed; artifact role model",
+    "status": "present",
+    "sha256": "50f9e3aeb332b8187ee0707c06d4651acfe29f51180e083a8a8ccac968b02cb6",
+    "matches_ledger": true
+  },
+  {
+    "label": "thg-ws1-c:export-beta1:sbml",
+    "path": "runs/thg-ws1-c/artifacts/export-beta1/attempt-0001/thg-beta1-candidate.xml",
+    "provenance": "runs/thg-ws1-c/manifest.json; attempt 1; stage status completed; artifact role sbml",
+    "status": "present",
+    "sha256": "c7cdfbfb03308728bfd2888c22c0cffce49f89856c66dc195cc3be748db7ca12",
+    "matches_ledger": true
+  },
+  {
+    "label": "thg-ws1-c:export-beta2",
+    "path": "runs/thg-ws1-c/artifacts/export-beta2/attempt-0001/thg-beta2-candidate.json",
+    "provenance": "runs/thg-ws1-c/manifest.json; attempt 1; stage status completed; artifact role model",
+    "status": "present",
+    "sha256": "a27a48faf9fdfebf9146038379ed18f2f87f12d5b79f443730994ea275f7dc00",
+    "matches_ledger": true
+  },
+  {
+    "label": "thg-ws1-c:export-beta2:sbml",
+    "path": "runs/thg-ws1-c/artifacts/export-beta2/attempt-0001/thg-beta2-candidate.xml",
+    "provenance": "runs/thg-ws1-c/manifest.json; attempt 1; stage status completed; artifact role sbml",
+    "status": "present",
+    "sha256": "6b50c70e915c5161b6459c5c9aae09ccb0d3d388a69d11b5d303bcbaac8c81cf",
+    "matches_ledger": true
+  },
+  {
+    "label": "thg-ws1-c:export-gapfilled-reference",
+    "path": "runs/thg-ws1-c/artifacts/export-gapfilled-reference/attempt-0001/thg-reference-gapfilled.json",
+    "provenance": "runs/thg-ws1-c/manifest.json; attempt 1; stage status completed; artifact role model",
+    "status": "present",
+    "sha256": "3e32b47f4b2345e7d0a5c48050c0293c25060093245997b6ae94a5d261fefc6d",
+    "matches_ledger": true
+  },
+  {
+    "label": "thg-ws1-c:export-gapfilled-reference:sbml",
+    "path": "runs/thg-ws1-c/artifacts/export-gapfilled-reference/attempt-0001/thg-reference-gapfilled.xml",
+    "provenance": "runs/thg-ws1-c/manifest.json; attempt 1; stage status completed; artifact role sbml",
+    "status": "present",
+    "sha256": "3b0cdd0bac4fc826a6ac88e0141a8fdbe879c79cbbf1c8e692a23828dfba0925",
+    "matches_ledger": true
+  },
+  {
+    "label": "thg-ws1-c:export-reference",
+    "path": "runs/thg-ws1-c/artifacts/export-reference/attempt-0001/thg-reference.json",
+    "provenance": "runs/thg-ws1-c/manifest.json; attempt 1; stage status completed; artifact role model",
+    "status": "present",
+    "sha256": "fd7da017ad2cd616b26829b5d04f5270aa28ca3c1cf822213cdd780b07636dda",
+    "matches_ledger": true
+  },
+  {
+    "label": "thg-ws1-c:export-reference:sbml",
+    "path": "runs/thg-ws1-c/artifacts/export-reference/attempt-0001/thg-reference.xml",
+    "provenance": "runs/thg-ws1-c/manifest.json; attempt 1; stage status completed; artifact role sbml",
+    "status": "present",
+    "sha256": "087cf3b5ab3b3c578b235c994c87052a3a59a953ad84c9a5a456b74daa2ef4ee",
+    "matches_ledger": true
   }
 ]

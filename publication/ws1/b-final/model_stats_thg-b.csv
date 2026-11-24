@@ -1,0 +1,2 @@
+model,sha256,reactions,metabolites,genes,compartments,subsystems,exchange_reactions,boundary_reactions,met_xref_fraction,rxn_xref_fraction,gene_xref_fraction,sbml_warnings
+thg-b-final,7f9f3215384764c123ef0dce323c4c3b2db6f9acd1b031a20280fb670d99ee9b,15202,12927,2870,13,0,1654,1654,0.9991,0.9912,1.0,0

@@ -1,0 +1,315 @@
+model,table,task_id,description,expected,actual,status,solver_status,solver_interface,solver_threads,cause,max_bound_violation,max_constraint_violation,numerical_reliability
+b-rebuilt-final,Essential,ER-row4,Aerobic rephosphorylation of ATP from glucose,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Essential,ER-row5,Aerobic rephosphorylation of GTP,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Essential,ER-row6,Aerobic rephosphorylation of CTP,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Essential,ER-row7,Aerobic rephosphorylation of UTP,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Essential,BS-row10,ATP de novo synthesis,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Essential,BS-row12,CTP de novo synthesis,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Essential,BS-row14,GTP de novo synthesis,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Essential,BS-row16,UTP de novo synthesis,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Essential,BS-row18,dATP de novo synthesis,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Essential,BS-row20,dCTP de novo synthesis,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Essential,BS-row22,dGTP de novo synthesis,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Essential,BS-row24,dTTP de novo synthesis,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Essential,SU-row27,Histidine uptake,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Essential,SU-row28,Isoleucine uptake,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Essential,SU-row29,Leucine uptake,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Essential,SU-row30,Lysine uptake,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Essential,SU-row31,Methionine uptake,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Essential,SU-row32,Phenylalanine uptake,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Essential,SU-row33,Threonine uptake,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Essential,SU-row34,Tryptophan uptake,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Essential,SU-row35,Valine uptake,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Essential,IC-row38,Glycerate 3-phosphate  de novo synthesis,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Essential,IC-row40,Mitochondrial acetyl-CoA de novo synthesis,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Essential,IC-row41,Mitochondrial AKG de novo synthesis,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Essential,IC-row43,Erythrose 4-phosphate de novo synthesis,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Essential,IC-row45,Fructose 6-phosphate de novo synthesis,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Essential,IC-row47,Glyceraldehyde 3-phosphate de novo synthesis,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Essential,IC-row49,Glucose 6-phosphate de novo synthesis,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Essential,IC-row51,Mitochondrial oxaloacetate de novo synthesis,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Essential,IC-row53,Phosphoenolpyruvate de novo synthesis,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Essential,IC-row55,Pyruvate de novo synthesis,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Essential,IC-row57,Ribose 5-phosphate de novo synthesis,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Essential,IC-row59,Mitochondrial succinyl-CoA de novo synthesis,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Essential,BS-row62,Cholesterol de novo synthesis,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Essential,BS-row66,Protein synthesis from AAs,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Essential,ER-row70,Oxidative phosphorylation,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Essential,ER-row72,Oxidative decarboxylation,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Essential,ER-row74,Krebs cycle NADH,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Essential,ER-row77,Ubiquinol-to-proton,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Essential,ER-row80,Ubiquinol-to-ATP,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Essential,SU-row84,Beta oxidation of saturated FA,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Essential,SU-row86,Beta oxidation of long-chain FA,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Essential,SU-row88,Beta oxidation of odd-chain FA,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Essential,SU-row90,Beta oxidation of unsaturated fatty acid (n-9),success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Essential,SU-row92,Beta oxidation of unsaturated fatty acid (n-6),success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Essential,SU-row94,Uptake and beta oxidation of all NEFAs,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Essential,SU-row98,Choline uptake,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Essential,SU-row99,Inositol uptake,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Essential,BS-row100,Phosphatidylcholine de novo synthesis,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Essential,BS-row102,Phosphatidylethanolamine de novo synthesis,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Essential,BS-row104,Phosphatidylserine de novo synthesis,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Essential,BS-row106,Phosphatidylinositol de novo synthesis,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Essential,BS-row110,Thiamin phosphorylation to TPP,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Essential,BS-row112,Coenzyme A synthesis from pantothenate,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Essential,BS-row114,FAD synthesis from riboflavin,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Essential,BS-row116,Heme biosynthesis,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Essential,GR,Growth on Ham's media (biomass production),success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,1,Aerobic rephosphorylation of ATP from glucose,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,2,Aerobic rephosphorylation of ATP from a fatty acid,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,3,Aerobic rephosphorylation of GTP,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,4,Aerobic rephosphorylation of CTP,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,5,Aerobic rephosphorylation of UTP,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,6,Anaerobic rephosphorylation of ATP,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,7,Anaerobic rephosphorylation of GTP,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,8,Anaerobic rephosphorylation of CTP,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,9,Anaerobic rephosphorylation of UTP,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,10,"ATP de novo synthesis (minimal substrates, physiological excretion)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,11,"CTP de novo synthesis (minimal substrates, physiological excretion)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,12,"GTP de novo synthesis (minimal substrates, physiological excretion)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,13,"UTP de novo synthesis (minimal substrates, physiological excretion)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,14,"dATP de novo synthesis (minimal substrates, physiological excretion)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,15,"dCTP de novo synthesis (minimal substrates, physiological excretion)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,16,"dGTP de novo synthesis (minimal substrates, physiological excretion)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,17,"dTTP de novo synthesis (minimal substrates, physiological excretion)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,18,ATP salvage from Adenosine,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,19,ATP salvage from Hypoxanthine,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,20,dTTP salvage from Thymine,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,21,Aerobic reduction of NAD+,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,22,Aerobic reduction of NADP+,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,23,Gluconeogenesis from Lactate,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,24,Gluconeogenesis from Glycerol,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,25,Gluconeogenesis from Alanine,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,26,Gluconeogenesis from Lactate and optionally fatty acid,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,27,Gluconeogenesis from Glycerol and optionally fatty acid,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,28,Gluconeogenesis from Alanine and fatty acid,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,29,Storage of glucose in Glycogen,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,30,Release of glucose from Glycogen,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,31,Fructose degradation,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,32,Galactose degradation,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,33,"UDP-glucose de novo synthesis (minimal substrates, physiological excretion)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,34,"UDP-galactose de novo synthesis (minimal substrates, physiological excretion)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,35,"UDP-glucuronate de novo synthesis (minimal substrates, physiological excretion)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,36,"GDP-L-fucose de novo synthesis (minimal substrates, physiological excretion)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,37,"GDP-mannose de novo synthesis (minimal substrates, physiological excretion)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,38,"UDP-N-acetyl D-galactosamine de novo synthesis (minimal substrates, physiological excretion)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,39,"CMP-N-acetylneuraminate de novo synthesis (minimal substrates, physiological excretion)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,40,"N-Acetylglucosamine de novo synthesis (minimal substrates, physiological excretion)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,41,"Glucuronate de novo synthesis (minimal substrates, physiological excretion)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,42,"Alanine de novo synthesis (minimal substrates, minimal excretion)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,43,"Arginine de novo synthesis (minimal substrates, minimal excretion)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,44,"Asparagine de novo synthesis (minimal substrates, minimal excretion)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,45,"Aspartate de novo synthesis (minimal substrates, minimal excretion)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,46,"Glutamate de novo synthesis (minimal substrates, minimal excretion)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,47,"Glycine de novo synthesis (minimal substrates, minimal excretion)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,48,"Glutamine de novo synthesis (minimal substrates, minimal excretion)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,49,"Proline de novo synthesis (minimal substrates, minimal excretion)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,50,"Serine de novo synthesis (minimal substrates, minimal excretion)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,51,"Histidine de novo synthesis (minimal substrates, minimal excretion)",failure,failure,passed,infeasible,optlang.gurobi_interface,2,,,,unavailable
+b-rebuilt-final,Full,52,Histidine uptake,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,53,"Isoleucine de novo synthesis (minimal substrates, minimal excretion)",failure,failure,passed,infeasible,optlang.gurobi_interface,2,,,,unavailable
+b-rebuilt-final,Full,54,Isoleucine uptake,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,55,"Leucine de novo synthesis (minimal substrates, minimal excretion)",failure,failure,passed,infeasible,optlang.gurobi_interface,2,,,,unavailable
+b-rebuilt-final,Full,56,Leucine uptake,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,57,"Lysine de novo synthesis (minimal substrates, minimal excretion)",failure,failure,passed,infeasible,optlang.gurobi_interface,2,,,,unavailable
+b-rebuilt-final,Full,58,Lysine uptake,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,59,"Methionine de novo synthesis (minimal substrates, minimal excretion)",failure,failure,passed,infeasible,optlang.gurobi_interface,2,,,,unavailable
+b-rebuilt-final,Full,60,Methionine uptake,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,61,"Phenylalanine de novo synthesis (minimal substrates, minimal excretion)",failure,failure,passed,infeasible,optlang.gurobi_interface,2,,,,unavailable
+b-rebuilt-final,Full,62,Phenylalanine uptake,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,63,"Threonine de novo synthesis (minimal substrates, minimal excretion)",failure,failure,passed,infeasible,optlang.gurobi_interface,2,,,,unavailable
+b-rebuilt-final,Full,64,Threonine uptake,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,65,"Tryptophan de novo synthesis (minimal substrates, minimal excretion)",failure,failure,passed,infeasible,optlang.gurobi_interface,2,,,,unavailable
+b-rebuilt-final,Full,66,Tryptophan uptake,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,67,"Valine de novo synthesis (minimal substrates, minimal excretion)",failure,failure,passed,infeasible,optlang.gurobi_interface,2,,,,unavailable
+b-rebuilt-final,Full,68,Valine uptake,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,69,"Cysteine de novo synthesis (minimal substrates, minimal excretion)",failure,failure,passed,infeasible,optlang.gurobi_interface,2,,,,unavailable
+b-rebuilt-final,Full,70,"Cysteine de novo synthesis (minimal substrates and AA, minimal excretion)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,71,"Cystine de novo synthesis (minimal substrates, minimal excretion)",failure,failure,passed,infeasible,optlang.gurobi_interface,2,,,,unavailable
+b-rebuilt-final,Full,72,"Tyrosine de novo synthesis (minimal substrates, minimal excretion)",failure,failure,passed,infeasible,optlang.gurobi_interface,2,,,,unavailable
+b-rebuilt-final,Full,73,"Tyrosine de novo synthesis (minimal substrates with AA, minimal excretion)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,74,"Homocysteine de novo synthesis (minimal substrates, minimal excretion)",failure,failure,passed,infeasible,optlang.gurobi_interface,2,,,,unavailable
+b-rebuilt-final,Full,75,"Homocysteine de novo synthesis (minimal substrates with AA, minimal excretion)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,76,"beta-Alanine de novo synthesis (minimal substrates, minimal excretion)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,77,Alanine degradation,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,78,Arginine degradation,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,79,Asparagine degradation,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,80,Aspartate degradation,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,81,Cysteine degradation,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,82,Glutamate degradation,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,83,Glycine degradation,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,84,Histidine degradation,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,85,Isoleucine degradation,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,86,Glutamine degradation,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,87,Leucine degradation,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,88,Lysine degradation,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,89,Methionine degradation,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,90,Phenylalanine degradation,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,91,Proline degradation,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,92,Serine degradation,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,93,Threonine degradation,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,94,Tryptophan degradation,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,95,Tyrosine degradation,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,96,Valine degradation,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,97,Homocysteine degradation,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,98,Ornithine degradation,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,99,beta-Alanine degradation,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,100,Urea from alanine,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,101,Urea from glutamine,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,102,"Creatine de novo synthesis (minimal substrates, physiological excretion)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,103,"Heme de novo synthesis (minimal substrates, physiological excretion)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,104,"PC de novo synthesis (physiological substrates, physiological excretion)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,105,"PE de novo synthesis (physiological substrates, physiological excretion)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,106,"PS de novo synthesis (physiological substrates, physiological excretion)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,107,"PI de novo synthesis (physiological substrates, physiological excretion)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,108,"Cardiolipin de novo synthesis (physiological substrates, physiological excretion)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,109,"SM de novo synthesis (physiological substrates, physiological excretion)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,110,"Ceramide de novo synthesis (physiological substrates, physiological excretion)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,111,"Lactosylceramide de novo synthesis (physiological substrates, physiological excretion)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,112,"CoA de novo synthesis (minimal substrates, physiological excretion)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,113,"NAD de novo synthesis (minimal substrates, physiological excretion)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,114,"NADP de novo synthesis (minimal substrates, physiological excretion)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,115,"FAD de novo synthesis (minimal substrates, physiological excretion)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,116,"Thioredoxin de novo synthesis (physiological substrates, physiological excretion)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,117,"THF de novo synthesis (minimal substrates, physiological excretion)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,118,"Pyridoxal-P de novo synthesis (minimal substrates, physiological excretion)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,119,Acetoacetate de novo synthesis,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,120,(R)-3-Hydroxybutanoate de novo synthesis,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,121,"Farnesyl-PP de novo synthesis (minimal substrates, physiological excretion)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,122,"Lauric acid de novo synthesis (minimal substrates, physiological excretion)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,123,"Tridecylic acid de novo synthesis (minimal substrates, physiological excretion)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,124,"Myristic acid de novo synthesis (minimal substrates, physiological excretion)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,125,"9E-tetradecenoic acid de novo synthesis (minimal substrates, physiological excretion)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,126,"7Z-tetradecenoic acid de novo synthesis (minimal substrates, physiological excretion)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,127,"Physeteric acid de novo synthesis (minimal substrates, physiological excretion)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,128,"Pentadecylic acid de novo synthesis (minimal substrates, physiological excretion)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,129,"Palmitate de novo synthesis (minimal substrates, physiological excretion)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,130,"Palmitolate de novo synthesis (minimal substrates, physiological excretion)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,131,"7-palmitoleic acid de novo synthesis (minimal substrates, physiological excretion)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,132,"Margaric acid de novo synthesis (minimal substrates, physiological excretion)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,133,"10Z-heptadecenoic acid de novo synthesis (minimal substrates, physiological excretion)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,134,"9-heptadecylenic acid de novo synthesis (minimal substrates, physiological excretion)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,135,"Stearate de novo synthesis (minimal substrates, physiological excretion)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,136,"13Z-octadecenoic acid de novo synthesis (minimal substrates, physiological excretion)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,137,"cis-vaccenic acid de novo synthesis (minimal substrates, physiological excretion)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,138,"Oleate de novo synthesis (minimal substrates, physiological excretion)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,139,"Elaidate de novo synthesis (minimal substrates, physiological excretion)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,140,"7Z-octadecenoic acid de novo synthesis (minimal substrates, physiological excretion)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,141,"6Z,9Z-octadecadienoic acid de novo synthesis (minimal substrates, physiological excretion)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,142,"Nonadecylic acid de novo synthesis (minimal substrates, physiological excretion)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,143,"Eicosanoate de novo synthesis (minimal substrates, physiological excretion)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,144,"13Z-Eicosenoic acid de novo synthesis (minimal substrates, physiological excretion)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,145,"cis-Gondoic acid de novo synthesis (minimal substrates, physiological excretion)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,146,"9-Eicosenoic acid de novo synthesis (minimal substrates, physiological excretion)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,147,"8,11-Eicosadienoic acid de novo synthesis (minimal substrates, physiological excretion)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,148,"Mead acid de novo synthesis (minimal substrates, physiological excretion)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,149,"Heneicosanoic acid de novo synthesis (minimal substrates, physiological excretion)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,150,"Behenic acid de novo synthesis (minimal substrates, physiological excretion)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,151,"cis-Erucic acid de novo synthesis (minimal substrates, physiological excretion)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,152,"cis-Cetoleic acid de novo synthesis (minimal substrates, physiological excretion)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,153,"Tricosanoic acid de novo synthesis (minimal substrates, physiological excretion)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,154,"Lignocerate de novo synthesis (minimal substrates, physiological excretion)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,155,"Nervonic acid de novo synthesis (minimal substrates, physiological excretion)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,156,"Cerotic acid de novo synthesis (minimal substrates, physiological excretion)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,157,"Ximenic acid de novo synthesis (minimal substrates, physiological excretion)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,158,"Linolenate de novo synthesis (minimal substrates, physiological excretion)",failure,failure,passed,infeasible,optlang.gurobi_interface,2,,,,unavailable
+b-rebuilt-final,Full,159,"Stearidonic acid de novo synthesis (minimal substrates, physiological excretion)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,160,"omega-3-Arachidonic acid de novo synthesis (minimal substrates, physiological excretion)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,161,"EPA de novo synthesis (minimal substrates, physiological excretion)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,162,"DPA de novo synthesis (minimal substrates, physiological excretion)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,163,"9Z,12Z,15Z,18Z,21Z-TPA de novo synthesis (minimal substrates, physiological excretion)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,164,"6Z,9Z,12Z,15Z,18Z,21Z-THA de novo synthesis (minimal substrates, physiological excretion)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,165,"DHA de novo synthesis (minimal substrates, physiological excretion)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,166,"11Z,14Z,17Z-eicosatrienoic acid de novo synthesis (minimal substrates, physiological excretion)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,167,"13,16,19-docosatrienoic acid de novo synthesis (minimal substrates, physiological excretion)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,168,"10,13,16,19-docosatetraenoic acid de novo synthesis (minimal substrates, physiological excretion)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,169,"12,15,18,21-tetracosatetraenoic acid de novo synthesis (minimal substrates, physiological excretion)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,170,"Linoleate de novo synthesis (minimal substrates, physiological excretion)",failure,failure,passed,infeasible,optlang.gurobi_interface,2,,,,unavailable
+b-rebuilt-final,Full,171,"gamma-Linolenate de novo synthesis (minimal substrates, physiological excretion)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,172,"Dihomo-gamma-linolenate de novo synthesis (minimal substrates, physiological excretion)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,173,"Arachidonate de novo synthesis (minimal substrates, physiological excretion)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,174,"Adrenic acid de novo synthesis (minimal substrates, physiological excretion)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,175,"9Z,12Z,15Z,18Z-TTA de novo synthesis (minimal substrates, physiological excretion)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,176,"6Z,9Z,12Z,15Z,18Z-TPA de novo synthesis (minimal substrates, physiological excretion)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,177,"4Z,7Z,10Z,13Z,16Z-DPA de novo synthesis (minimal substrates, physiological excretion)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,178,"11Z,14Z-eicosadienoic acid de novo synthesis (minimal substrates, physiological excretion)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,179,"13Z,16Z-docosadienoic acid de novo synthesis (minimal substrates, physiological excretion)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,180,"10,13,16-docosatriynoic acid de novo synthesis (minimal substrates, physiological excretion)",success,,invalid,,,,"metabolicTasks_Full.txt row 320 OUT '10,13,16-docosatriynoic acid[c]': no model metabolite matches",,,unavailable
+b-rebuilt-final,Full,181,Lauric acid (complete oxidation),success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,182,Tridecylic acid (complete oxidation),success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,183,Myristic acid (complete oxidation),success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,184,9E-tetradecenoic acid (complete oxidation),success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,185,7Z-tetradecenoic acid (complete oxidation),success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,186,Physeteric acid (complete oxidation),success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,187,Pentadecylic acid (complete oxidation),success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,188,Palmitate (complete oxidation),success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,189,Palmitolate (complete oxidation),success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,190,7-palmitoleic acid (complete oxidation),success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,191,Margaric acid (complete oxidation),success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,192,10Z-heptadecenoic acid (complete oxidation),success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,193,9-heptadecylenic acid (complete oxidation),success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,194,Stearate (complete oxidation),success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,195,13Z-octadecenoic acid (complete oxidation),success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,196,cis-Vaccenic acid (complete oxidation),success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,197,Oleate (complete oxidation),success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,198,Elaidate (complete oxidation),success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,199,7Z-octadecenoic acid (complete oxidation),success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,200,"6Z,9Z-octadecadienoic acid (complete oxidation)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,201,Nonadecylic acid (complete oxidation),success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,202,Eicosanoate (complete oxidation),success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,203,13Z-Eicosenoic acid (complete oxidation),success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,204,cis-Gondoic acid (complete oxidation),success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,205,9-Eicosenoic acid (complete oxidation),success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,206,"8,11-Eicosadienoic acid (complete oxidation)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,207,Mead acid (complete oxidation),success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,208,heneicosanoic acid (complete oxidation),success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,209,Behenic acid (complete oxidation),success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,210,cis-Erucic acid (complete oxidation),success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,211,cis-Cetoleic acid (complete oxidation),success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,212,Tricosanoic acid (complete oxidation),success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,213,Lignocerate (complete oxidation),success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,214,Nervonic acid (complete oxidation),success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,215,Cerotic acid (complete oxidation),success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,216,Ximenic acid (complete oxidation),success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,217,Linolenate (complete oxidation),success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,218,Stearidonic acid (complete oxidation),success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,219,omega-3-Arachidonic acid (complete oxidation),success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,220,EPA (complete oxidation),success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,221,DPA (complete oxidation),success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,222,"9Z,12Z,15Z,18Z,21Z-TPA (complete oxidation)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,223,"6Z,9Z,12Z,15Z,18Z,21Z-THA (complete oxidation)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,224,DHA (complete oxidation),success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,225,"11Z,14Z,17Z-eicosatrienoic acid (complete oxidation)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,226,"13,16,19-docosatrienoic acid (complete oxidation)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,227,"10,13,16,19-docosatetraenoic acid (complete oxidation)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,228,"12,15,18,21-tetracosatetraenoic acid (complete oxidation)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,229,Linoleate (complete oxidation),success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,230,gamma-Linolenate (complete oxidation),success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,231,Dihomo-gamma-linolenate (complete oxidation),success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,232,Arachidonate (complete oxidation),success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,233,Adrenic acid (complete oxidation),success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,234,"9Z,12Z,15Z,18Z-TTA (complete oxidation)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,235,"6Z,9Z,12Z,15Z,18Z-TPA (complete oxidation)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,236,"4Z,7Z,10Z,13Z,16Z-DPA (complete oxidation)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,237,"11Z,14Z-eicosadienoic acid (complete oxidation)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,238,"13Z,16Z-docosadienoic acid (complete oxidation)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,239,"10,13,16-docosatriynoic acid (complete oxidation)",success,,invalid,,,,"metabolicTasks_Full.txt row 437 IN '10,13,16-docosatriynoic acid[e]': no model metabolite matches",,,unavailable
+b-rebuilt-final,Full,240,"Triacylglycerol de novo synthesis (physiological substrates, physiological excretion)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,241,"Glycocholate de novo synthesis and excretion (minimal substrates, physiological excretion)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,242,Glycochenodeoxycholate de novo synthesis and excretion,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,243,"Taurocholate de novo synthesis and excretion (minimal substrates, physiological excretion)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,244,"Taurochenodeoxycholate de novo synthesis and excretion (minimal substrates, physiological excretion)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,245,"PAPS de novo synthesis (minimal substrates, physiological excretion)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,246,PAP degradation,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,247,"SAM de novo synthesis (minimal substrates, physiological excretion)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,248,"GSH de novo synthesis (minimal substrates, physiological excretion)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,249,"Bilirubin conjugation (minimal substrates, physiological excretion)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,250,NH3 import and degradation,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,251,"Ethanol import and degradation (minimal substrates, minimalexcretion)",success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,252,Oxidative phosphorylation,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,253,Oxidative decarboxylation,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,254,Krebs cycle NADH,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,255,Ubiquinol-to-proton,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,256,Ubiquinol-to-ATP,success,success,passed,optimal,optlang.gurobi_interface,2,,0.0,0.0,reliable
+b-rebuilt-final,Full,257,Biosynthesis of Vitamin C (ascorbate),failure,failure,passed,infeasible,optlang.gurobi_interface,2,,,,unavailable

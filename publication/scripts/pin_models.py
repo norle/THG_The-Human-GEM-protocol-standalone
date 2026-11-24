@@ -42,8 +42,7 @@ MODELS = [
     (
         "THG-2023",
         "models/THG-2023-02-25.xml",
-        "2023-02-25 legacy model; provenance comparison in publication plan; "
-        "benchmark deferred",
+        "Published supplement S2 byte match; publication/ws3/README.md",
     ),
     (
         "Legacy THG beta1",
@@ -105,15 +104,16 @@ def main():
             for artifact in state.get("outputs", []):
                 if (
                     artifact["path"].endswith((".xml", ".json"))
-                    and artifact["role"] == "model"
+                    and artifact["role"] in {"model", "sbml"}
                 ):
+                    role = artifact["role"]
+                    label = f"{run}:{stage}" + (":sbml" if role == "sbml" else "")
                     row = pin(
-                        f"{run}:{stage}",
+                        label,
                         f"runs/{run}/{artifact['path']}",
                         f"{manifest_path.relative_to(ROOT)}; "
                         f"attempt {state['attempt']}; "
-                        f"stage status {state['status']}; "
-                        "candidate, not yet final-gated",
+                        f"stage status {state['status']}; artifact role {role}",
                     )
                     row["matches_ledger"] = row["sha256"] == artifact["sha256"]
                     rows.append(row)

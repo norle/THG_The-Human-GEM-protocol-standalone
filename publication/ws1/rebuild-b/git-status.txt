@@ -1,0 +1,10 @@
+?? publication/scripts/compare_replay.py
+?? publication/scripts/measure_coverage.py
+?? publication/scripts/quality_table.py
+?? publication/ws1/b-current/
+?? publication/ws1/b-final/
+?? publication/ws1/gapfill-change/
+?? publication/ws1/numerical-refresh/
+?? publication/ws1/rebuild-b/
+?? publication/ws1/run_build.py
+?? publication/ws4/
