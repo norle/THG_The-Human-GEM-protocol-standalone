@@ -1,65 +1,52 @@
 # Publication evidence and internal draft
 
-**Paused for shutdown, 2026-11-09.** Build stopped cleanly; no task process is
-left running. Start with [the handoff](HANDOFF-2026-11-09.md). It supersedes
-earlier running/pending notes and gives the restart sequence.
+- [November 23 progress and handoff](HANDOFF-2026-11-23.md)
+- [Publication plan](../docs/plans/publication-plan.md)
+- [Bullet-point manuscript draft](manuscript/draft.md)
+- [Table 1 source](manuscript/table1.csv) and [figure sources](figures/README.md)
+- [Pinned models](models.json) and [benchmark settings](benchmark_settings.json)
 
-The controlling scope is `docs/plans/publication-plan.md` (November 9–12
-methods-led draft). Work is in progress. No gated final candidate, independent
-replay or complete model-results draft is available yet. WS3 is deferred;
-WS6 is dropped. Public release is deferred.
+Run from the repository root in `thg_standalone`. The Gurobi analyses need
+access to the configured license service. Run memory-heavy validation jobs
+sequentially. The November 9 acquisition shutdown is recorded in the
+[historical handoff](HANDOFF-2026-11-09.md).
 
-Run commands from the repository root in conda environment `thg_standalone`.
-Gurobi requires access to its configured license service. Run memory-heavy
-model jobs sequentially and check `free -m` first. Runtime is measured in task
-JSON and workflow manifests; new-job estimates below are not measured results.
+| Work | Regeneration and evidence |
+|---|---|
+| Model identity | `python publication/scripts/pin_models.py`. The original THG asset is verified against the paper's S2 supplement in [WS3](ws3/README.md) |
+| Patched baseline tasks | `python publication/scripts/run_tasks.py runs/human211-patched/Human_211_patched.xml human211-patched publication/ws0/pinned-refresh`. Native threads, solver tolerances and residuals are in the JSON |
+| Unpatched recheck | `python publication/scripts/run_tasks.py inputs/models/Human_211.xml human211-unpatched publication/ws0/unpatched-recheck VerifyModel` |
+| Rebuilt B and replay C | `python publication/ws1/run_build.py publication/ws1/reference-b-frozen.json` and the corresponding `reference-c-frozen.json`. See [build comparison](ws1/replay-b-vs-c/README.md) for source commits, limits and comparison command |
+| Correctness and localisation | [WS2 evidence](ws2/README.md), [fix inventory](ws2/fixes.csv) and [compartment ablation](ws2/compartment-resolution/README.md) |
+| HPA model comparison | [Input provenance, command and summary](ws2/hpa/README.md) |
+| Gapfill | [Version 6/7 comparison](ws1/gapfill-change/README.md) and pinned follow-up commands below |
+| Format consistency | [SBML and JSON comparison with shared exclusions](ws4/consistency/README.md) |
+| Matched validation | [Configuration, commands and output status](ws4/matched-refresh/README.md) |
+| Figures 2–4 and Table 1 | `python publication/scripts/plot_update_results.py` |
 
-| Work | Regeneration command | Runtime / status |
-|---|---|---|
-| Model provenance | `python publication/scripts/pin_models.py` | seconds; file hashes only, no validation |
-| WS0 patched tasks | `python publication/scripts/run_tasks.py runs/human211-patched/Human_211_patched.xml human211-patched publication/ws0/pinned-refresh` | 278.85 s; VerifyModel 21/21, Essential 57/57, Full 255 pass + 2 invalid; native threads verified |
-| WS0 control | `python publication/scripts/run_tasks.py models/Human-GEM_2022-06-21.xml Human1 publication/ws0/numerical-refresh VerifyModel` | refresh pending |
-| WS0 validation | `thg-run validate publication/ws0/validation-config-211-patched.json` | pending; potentially hours |
-| WS1 corrected build | `thg-run resume runs/thg-ws1-a --force-step deduplicate-and-clean -v` | interrupted cleanly at stage 45/52; source `ac56d01`; see handoff before resuming |
-| WS1 fresh checkout | `thg-run reference publication/ws1/reference-a.json -v` | existing run resumes; full build not yet measured |
-| WS1 freeze evidence | `python publication/scripts/freeze_evidence.py runs/thg-ws1-a publication/ws1/reference-b.json publication/ws1/frozen --archived` | archived input dataset captured with `--archived`; runtime fingerprints explicitly uncertified |
-| WS1 independent replay | `thg-run reference publication/ws1/reference-b-frozen.json -v` | pending freezer output and stable candidate |
-| WS1 stage sizes/runtime | `python publication/scripts/stage_table.py runs/thg-ws1-a publication/ws1/current` | live checkpoint; pending/stale outputs omitted |
-| WS1 stage task gate | `python publication/scripts/run_tasks.py MODEL STAGE publication/ws1/numerical-refresh VerifyModel` | pending corrected artifacts |
-| WS1 corroboration | `THG_SOLVER=glpk python publication/scripts/run_tasks.py MODEL STAGE-glpk publication/ws1/numerical-refresh VerifyModel` | **dropped by user decision 2026-11-10**; Gurobi with residual diagnostics is the sole gate |
-| WS2 fix inventory | `publication/ws2/fixes.csv` | identity/parent checks, location-policy ablation and historical numerical artifact saved; see handoff |
-| WS2 tests | `python -m pytest -m "not online" --ignore=tests/docs -q` | 350.38 s; 2,513 passed; `ws2/pytest-offline.log`; six docs checks passed separately |
-| WS4 quality/coverage | matched baseline/candidate validation | pending candidate and VerifyModel gate; command not yet available |
-| WS5 functional tasks | same `run_tasks.py` command on candidate, with all three tables | blocked on candidate; VerifyModel failure/unresolved result skips later tables |
-| Fig 1 | `python publication/scripts/plot_workflow.py` | generated SVG/PDF/PNG; protocol diagram and source table |
-| WS7 internal draft | `publication/manuscript/draft.md` | Introduction/Methods drafted; results, figures and evidence audit incomplete |
+## Solver-backed follow-up commands
 
-`run_tasks.py` reads pinned numerical settings from `benchmark_settings.json`
-and exports detailed JSON as well as per-task CSV. Error outcomes remain
-unresolved; unavailable residuals are null. Earlier `ws0/task_results_*.csv` and
-`ws1/verifymodel/` results predate residual diagnostics and are historical,
-not refreshed benchmark evidence. Task JSON records commit and working-diff
-checksum; comparisons require the same source version and settings.
+```sh
+export OMP_NUM_THREADS=2 OPENBLAS_NUM_THREADS=2 MKL_NUM_THREADS=2
+run_pinned() {
+  python -c 'import runpy,sys; runpy.run_path("publication/ws1/run_build.py")["pin_solver"](); sys.argv=sys.argv[1:]; runpy.run_path(sys.argv[0],run_name="__main__")' "$@"
+}
+run_pinned publication/scripts/measure_gapfill_selection_ablation.py
+run_pinned publication/scripts/recheck_gapfill_coverage.py runs/thg-ws1-b publication/ws1/reference-b-frozen.json publication/ws1/gapfill-change/serial
+python publication/scripts/run_tasks.py runs/thg-ws1-b/artifacts/export-reference/attempt-0002/thg-reference.json b-rebuilt-final-verify publication/ws1/rebuild-b/gates VerifyModel
+```
 
-The model inventory records historical legacy-provenance claims as historical;
-it does not re-establish their source-byte comparison. Input source-tag and
-download-date information not available locally remains explicitly unknown.
+## Structural coverage
 
-No public tag, archive or hosted release was created.
+```sh
+python -c 'import cobra,runpy,sys; cobra.Configuration().solver="glpk"; sys.argv=sys.argv[1:]; runpy.run_path(sys.argv[0],run_name="__main__")' \
+  publication/scripts/measure_coverage.py \
+  runs/human211-patched/Human_211_patched.xml \
+  runs/thg-ws1-b/artifacts/export-reference/attempt-0002/thg-reference.json \
+  runs/thg-ws1-b/artifacts/generate-gapfill-plan/attempt-0002 \
+  runs/thg-ws1-b/artifacts/resolve-compartment-evidence/attempt-0001/beta2-compartment-resolution-evidence.json \
+  publication/ws4/coverage-rebuilt-b
+```
 
-The first task refresh has an unverified native Gurobi thread count
-(`ws0/numerical-refresh/limitations.json`). Its numerical task counts are
-historical evidence; a thread-verified refresh is required before matched
-comparison. The corrected runner records the effective native count per solve.
-
-The native-thread-verified baseline is now saved in `ws0/pinned-refresh/`
-(source `628c6f0`, 278.85 s). Every solved task reports two native threads and
-feasibility tolerance 1e-7. MEMOTE and matched final-model evaluation remain
-pending. The earlier thread limitation applies to `numerical-refresh/`, not
-this corrected result.
-
-Archived biological-service evidence is preserved in `ws1/frozen/` (74 MB),
-with source hashes and an explicit archival status. Fresh B/C configs exist;
-neither has started. Do not blindly resume acquisition run A after the runtime
-fingerprint fix: beta2 service collection would repeat. The handoff explains
-the required solver bootstrap and all unverified deliverables.
+The structural coverage script uses GLPK to load the models and performs no
+optimization. Flux-capability counts come from the Gurobi construction report.

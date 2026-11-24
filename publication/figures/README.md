@@ -1,15 +1,9 @@
-# Draft figures
+# Draft publication figures
 
-Figure 1: `figure1_workflow.svg` (vector), `.pdf` and `.png`. Regenerate with
-`python publication/scripts/plot_workflow.py` from the repository root in
-`thg_standalone` (`MPLCONFIGDIR=/tmp/thg-matplotlib` avoids a read-only cache warning).
-Source table: `publication/ws1/figure1_workflow.csv`.
+- **Figure 1.** [Reference workflow](figure1_workflow.svg), including the optional Human Database stages. The B/C benchmark ran with those stages disabled. Regenerate with `python publication/scripts/plot_workflow.py`. Source: `publication/ws1/figure1_workflow.csv`.
+- **Figure 2.** [Compartment-rule ablation](figure2_compartment_ablation.svg). Source: [frozen-policy replay](../ws2/compartment-resolution/summary.json).
+- **Figure 3.** [Stage VerifyModel and unresolved residuals](figure3_expansion_safeguards.svg). The plotting script checks each stage model's checksum against build B.
+- **Figure 4.** [Flux-capability of additions](figure4_flux_coverage.svg). Source: [blocked reaction classification](../ws4/coverage-rebuilt-b/flux_coverage.json) from the post-gapfill model under its exchange bounds.
 
-The figure shows the registered reference workflow, its scientific gates and
-cross-stage provenance. Optional/disabled stages are included in the stage
-counts. Publication VerifyModel/quality/task evaluation is shown separately
-from construction. This diagram is not evidence of successful execution.
-
-Figures 2 and 3 remain pending measured numerical reliability, the gated
-candidate, matched quality/coverage and task evaluation. No candidate improvement
-or independent replay result is illustrated yet.
+Regenerate Figures 2–4, their PDF versions and the draft Table 1 with
+`python publication/scripts/plot_update_results.py` in `thg_standalone`.

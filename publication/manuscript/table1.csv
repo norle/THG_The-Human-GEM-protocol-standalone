@@ -1,0 +1,4 @@
+model,reactions,metabolites,genes,compartments,VerifyModel_passed,VerifyModel_total,VerifyModel_invalid,VerifyModel_error,Essential_passed,Essential_total,Essential_invalid,Essential_error,Full_passed,Full_total,Full_invalid,Full_error
+THG-2023 (historical),20677,14058,3394,9,,,,,,,,,,,,
+Patched Human-GEM 2.1.1,12748,8374,2870,9,21,21,0,0,57,57,0,0,255,257,2,0
+Rebuilt THG,15066,12927,2870,13,21,21,0,0,57,57,0,0,255,257,2,0
